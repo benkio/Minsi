@@ -11,7 +11,17 @@ When creating a new Spago project, you can use
 to generate this file without the comments in this block.
 -}
 { name = "minsi"
-, dependencies = [ "assert", "console", "effect", "prelude" ]
+, dependencies =
+  [ "assert"
+  , "console"
+  , "effect"
+  , "exceptions"
+  , "maybe"
+  , "prelude"
+  , "tuples"
+  , "web-dom"
+  , "web-html"
+  ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]
 }
