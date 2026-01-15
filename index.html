@@ -4,224 +4,210 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Minsi</title>
+
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-      crossorigin="anonymous"
     />
   </head>
+
   <body>
-      <!-- Fixed Video at Top -->
-      <div class="position-fixed top-0 start-0 w-100 bg-dark" style="z-index: 1030;">
-          <div class="container-fluid p-2">
-              <video id="resultPreview" class="w-100" style="max-height: 200px; object-fit: contain;"></video>
-          </div>
+    <div class="container-fluid px-3 py-2">
+      <!-- Header -->
+      <div class="row app-header text-center">
+        <div class="col">
+          <h1 class="mb-0">Minsi</h1>
+          <p class="text-muted">
+            Opinionated YouTube Clip Video Gif Audio Extractor
+          </p>
+        </div>
       </div>
 
-      <!-- Spacer for fixed video -->
-      <div style="height: 220px;"></div>
+      <!-- Main content -->
+      <div class="row g-3">
+        <!-- Left controls -->
+        <div class="col-12 col-lg-3">
+          <div class="card control-card shadow-sm">
+            <div class="card-body">
+              <div class="mb-3">
+                <label for="outputFilename" class="form-label"
+                  >Output Filename</label
+                >
+                <input type="text" class="form-control" id="outputFilename" />
+              </div>
 
-      <!-- Main Content with Sidebar -->
-      <div class="container-fluid">
-          <div class="row">
-              <!-- Sidebar Navigation -->
-              <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar position-sticky" style="top: 220px; height: calc(100vh - 220px); overflow-y: auto;">
-                  <div class="position-sticky pt-3">
-                      <ul class="nav nav-pills flex-column">
-                          <li class="nav-item">
-                              <a class="nav-link" href="#phase1" data-bs-toggle="collapse" data-bs-target="#collapsePhase1" aria-expanded="true" aria-controls="collapsePhase1">
-                                  Video Cut
-                              </a>
-                          </li>
-                          <li class="nav-item">
-                              <a class="nav-link" href="#phase2" data-bs-toggle="collapse" data-bs-target="#collapsePhase2" aria-expanded="false" aria-controls="collapsePhase2">
-                                  Video Information
-                              </a>
-                          </li>
-                          <li class="nav-item">
-                              <a class="nav-link" href="#phase3" data-bs-toggle="collapse" data-bs-target="#collapsePhase3" aria-expanded="false" aria-controls="collapsePhase3">
-                                  Subtitles
-                              </a>
-                          </li>
-                          <li class="nav-item">
-                              <a class="nav-link" href="#phase4" data-bs-toggle="collapse" data-bs-target="#collapsePhase4" aria-expanded="false" aria-controls="collapsePhase4">
-                                  Extra Configurations
-                              </a>
-                          </li>
-                      </ul>
-                  </div>
-              </nav>
+              <div class="mb-3">
+                <label for="artist" class="form-label">Artist</label>
+                <input type="text" class="form-control" id="artist" />
+              </div>
 
-              <!-- Main Content Area -->
-              <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                  <!-- Phase 1 - Collapsible Section -->
-                  <div class="row mb-3">
-                      <div class="col-12">
-                          <div class="card">
-                              <div class="card-header" id="headingPhase1">
-                                  <h2 class="mb-0 text-center">
-                                      <button class="btn btn-link btn-block text-center text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePhase1" aria-expanded="true" aria-controls="collapsePhase1">
-                                          Video Cut
-                                      </button>
-                                  </h2>
-                              </div>
-                              <div id="collapsePhase1" class="collapse show" aria-labelledby="headingPhase1">
-                                  <div class="card-body">
-                                      <div class="mb-3">
-                                          <label for="youtubeUrl" class="form-label text-center d-block">YouTube URL</label>
-                                          <input type="url" class="form-control" id="youtubeUrl" placeholder="https://www.youtube.com/watch?v=..." />
-                                      </div>
-                                      <div class="mb-3">
-                                          <label class="form-label text-center d-block">Video Cut Range</label>
-                                          <div class="mb-2">
-                                              <label for="cutStart" class="form-label small">Start Time (seconds)</label>
-                                              <input type="range" class="form-range" id="cutStart" min="0" max="100" value="0" step="1" />
-                                              <div class="text-center">
-                                                  <small class="text-muted"><span id="cutStartValue">0</span>s</small>
-                                              </div>
-                                          </div>
-                                          <div class="mb-2">
-                                              <label for="cutEnd" class="form-label small">End Time (seconds)</label>
-                                              <input type="range" class="form-range" id="cutEnd" min="0" max="100" value="100" step="1" />
-                                              <div class="text-center">
-                                                  <small class="text-muted"><span id="cutEndValue">100</span>s</small>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
+              <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="title" />
+              </div>
 
-                  <!-- Phase 2 - Collapsible Section -->
-                  <div class="row mb-3">
-                      <div class="col-12">
-                          <div class="card">
-                              <div class="card-header" id="headingPhase2">
-                                  <h2 class="mb-0 text-center">
-                                      <button class="btn btn-link btn-block text-center text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePhase2" aria-expanded="false" aria-controls="collapsePhase2">
-                                          Video Information
-                                      </button>
-                                  </h2>
-                              </div>
-                              <div id="collapsePhase2" class="collapse" aria-labelledby="headingPhase2">
-                                  <div class="card-body">
-                                      <div class="mb-3">
-                                          <label for="outputFilename" class="form-label text-center d-block">Output Filename</label>
-                                          <input type="text" class="form-control" id="outputFilename" placeholder="Enter output filename" />
-                                      </div>
-                                      <div class="mb-3">
-                                          <label for="artist" class="form-label text-center d-block">Artist</label>
-                                          <input type="text" class="form-control" id="artist" placeholder="Enter artist name" />
-                                      </div>
-                                      <div class="mb-3">
-                                          <label for="title" class="form-label text-center d-block">Title</label>
-                                          <input type="text" class="form-control" id="title" placeholder="Enter title" />
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
+              <div class="form-check mb-4">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="reverseLoopGif"
+                />
+                <label class="form-check-label" for="reverseLoopGif">
+                  Reverse / Loop GIF
+                </label>
+              </div>
 
-                  <!-- Phase 3 - Collapsible Section -->
-                  <div class="row mb-3">
-                      <div class="col-12">
-                          <div class="card">
-                              <div class="card-header" id="headingPhase3">
-                                  <h2 class="mb-0 text-center">
-                                      <button class="btn btn-link btn-block text-center text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePhase3" aria-expanded="false" aria-controls="collapsePhase3">
-                                          Subtitles
-                                      </button>
-                                  </h2>
-                              </div>
-                              <div id="collapsePhase3" class="collapse" aria-labelledby="headingPhase3">
-                                  <div class="card-body">
-                                      <div class="mb-3 text-center">
-                                          <button type="button" class="btn btn-primary">Add Subtitles</button>
-                                      </div>
-                                      <div class="table-responsive">
-                                          <table class="table table-bordered">
-                                              <thead>
-                                                  <tr>
-                                                      <th>Start</th>
-                                                      <th>End</th>
-                                                      <th>Value</th>
-                                                      <th>Font</th>
-                                                      <th>Color</th>
-                                                      <th>Position</th>
-                                                  </tr>
-                                              </thead>
-                                              <tbody>
-                                                  <tr>
-                                                      <td><input type="number" class="form-control form-control-sm" placeholder="Start" /></td>
-                                                      <td><input type="number" class="form-control form-control-sm" placeholder="End" /></td>
-                                                      <td><textarea class="form-control form-control-sm" rows="2" placeholder="Subtitle text"></textarea></td>
-                                                      <td>
-                                                          <select class="form-select form-select-sm">
-                                                              <option value="Impact" selected>Impact</option>
-                                                              <option value="Arial Black">Arial Black</option>
-                                                          </select>
-                                                      </td>
-                                                      <td>
-                                                          <select class="form-select form-select-sm">
-                                                              <option value="white" selected>White</option>
-                                                              <option value="black">Black</option>
-                                                              <option value="lightgreen">Light Green</option>
-                                                              <option value="lightorange">Light Orange</option>
-                                                              <option value="yellow">Yellow</option>
-                                                          </select>
-                                                      </td>
-                                                      <td>
-                                                          <select class="form-select form-select-sm">
-                                                              <option value="top">Top</option>
-                                                              <option value="bottom" selected>Bottom</option>
-                                                          </select>
-                                                      </td>
-                                                  </tr>
-                                              </tbody>
-                                          </table>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
+              <div class="mb-3 range-group">
+                <label for="cutStart" class="form-label small">
+                  Start Time
+                </label>
+                <input
+                  type="range"
+                  class="form-range"
+                  id="cutStart"
+                  min="0"
+                  max="100"
+                  value="0"
+                />
+                <small class="text-muted">
+                  <span id="cutStartValue">0</span>s
+                </small>
+              </div>
 
-                  <!-- Phase 4 - Collapsible Section -->
-                  <div class="row mb-3">
-                      <div class="col-12">
-                          <div class="card">
-                              <div class="card-header" id="headingPhase4">
-                                  <h2 class="mb-0 text-center">
-                                      <button class="btn btn-link btn-block text-center text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePhase4" aria-expanded="false" aria-controls="collapsePhase4">
-                                          (Optional) Extra Configurations
-                                      </button>
-                                  </h2>
-                              </div>
-                              <div id="collapsePhase4" class="collapse" aria-labelledby="headingPhase4">
-                                  <div class="card-body">
-                                      <div class="form-check d-flex justify-content-center">
-                                          <input class="form-check-input" type="checkbox" id="reverseLoopGif" />
-                                          <label class="form-check-label ms-2" for="reverseLoopGif">
-                                              Reverse / Loop GIF
-                                          </label>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </main>
+              <div class="range-group">
+                <label for="cutEnd" class="form-label small"> End Time </label>
+                <input
+                  type="range"
+                  class="form-range"
+                  id="cutEnd"
+                  min="0"
+                  max="100"
+                  value="100"
+                />
+                <small class="text-muted">
+                  <span id="cutEndValue">100</span>s
+                </small>
+              </div>
+
+              <div class="my-3">
+                <button type="button" class="btn btn-success btn-sm mx-auto">
+                  Cut Video
+                </button>
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="reloadOnChange"
+                />
+                <label class="form-check-label" for="reloadOnChange">
+                  Reload On Change
+                </label>
+              </div>
+            </div>
           </div>
+        </div>
+
+        <!-- Right preview -->
+        <div class="col-12 col-lg-9">
+          <div class="card shadow-sm">
+            <div class="card-body text-center">
+              <div class="mb-3">
+                <label for="youtubeUrl" class="form-label">YouTube URL</label>
+                <input
+                  type="url"
+                  class="form-control w-75 mx-auto"
+                  id="youtubeUrl"
+                  placeholder="https://www.youtube.com/watch?v=..."
+                />
+              </div>
+
+              <video class="w-75 embed-responsive-item bg-dark" controls>
+                <source id="resultPreviewSource" type="video/mp4" />
+              </video>
+            </div>
+          </div>
+        </div>
       </div>
-    <script src="./index.js"></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-      crossorigin="anonymous"
-    ></script>
+
+      <!-- Subtitles -->
+      <div class="w-75 mx-auto">
+        <div class="d-flex justify-content-end mb-2">
+          <button type="button" class="btn btn-success btn-sm mx-auto">
+            Apply Subtitles
+          </button>
+          <button type="button" class="btn btn-primary btn-sm mx-auto">
+            Add Subtitles
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-bordered table-sm bg-white shadow-sm">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 70px">Start</th>
+                <th style="width: 70px">End</th>
+                <th>Value</th>
+                <th style="width: 140px">Font</th>
+                <th style="width: 120px">Color</th>
+                <th style="width: 100px">Position</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <input type="number" class="form-control form-control-sm" />
+                </td>
+                <td>
+                  <input type="number" class="form-control form-control-sm" />
+                </td>
+                <td>
+                  <textarea
+                    class="form-control form-control-sm"
+                    rows="2"
+                  ></textarea>
+                </td>
+                <td>
+                  <select class="form-select form-select-sm">
+                    <option selected>Impact</option>
+                    <option>Arial Black</option>
+                  </select>
+                </td>
+                <td>
+                  <select class="form-select form-select-sm">
+                    <option selected>White</option>
+                    <option>Black</option>
+                    <option>Light Green</option>
+                    <option>Light Orange</option>
+                    <option>Yellow</option>
+                  </select>
+                </td>
+                <td>
+                  <select class="form-select form-select-sm">
+                    <option>Top</option>
+                    <option selected>Bottom</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const cutStart = document.getElementById("cutStart");
+      const cutEnd = document.getElementById("cutEnd");
+
+      cutStart.addEventListener("input", (e) => {
+        document.getElementById("cutStartValue").textContent = e.target.value;
+        cutEnd.min = e.target.value;
+      });
+
+      cutEnd.addEventListener("input", (e) => {
+        document.getElementById("cutEndValue").textContent = e.target.value;
+        cutStart.max = e.target.value;
+      });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
