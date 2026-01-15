@@ -2,31 +2,8 @@
 
 Opinionated YouTube Clip Video GIF Audio Extractor
 
-## Dependencies
+[Frontend](./frontend/README.md)
 
-- `ffmpeg`
-- `yt-dlp`
-- `id3v2`
-- `fc-list`
-- [Impact font](https://www.dafontfree.io/download/impact/)
-- [Arial Black font](https://online-fonts.com/fonts/arial-black)
-
-## Usage
-
-open `index.html`
-
-## Contributing
-
-### Dependencies
-
-- `purescript`
-- `spago`
-
-### Commands
-
-- compile :: `spago build`
-- compile for browser :: `spago bundle-app`
-- test :: `spago test`
 
 ## Motivation
 
