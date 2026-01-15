@@ -294,9 +294,27 @@
   function error(msg) {
     return new Error(msg);
   }
+  function message(e) {
+    return e.message;
+  }
   function throwException(e) {
     return function() {
       throw e;
+    };
+  }
+  function catchException(c) {
+    return function(t) {
+      return function() {
+        try {
+          return t();
+        } catch (e) {
+          if (e instanceof Error || Object.prototype.toString.call(e) === "[object Error]") {
+            return c(e)();
+          } else {
+            return c(new Error(e.toString()))();
+          }
+        }
+      };
     };
   }
 
@@ -581,6 +599,13 @@
       return window2.document;
     };
   }
+  function alert(str) {
+    return function(window2) {
+      return function() {
+        window2.alert(str);
+      };
+    };
+  }
 
   // output/Main/index.js
   var getDocument = function __do() {
@@ -588,11 +613,18 @@
     var d = document(w)();
     return toNonElementParentNode(d);
   };
-  var main = function __do2() {
+  var program = function __do2() {
     var doc = getDocument();
     var components = loadComponents(doc)();
     return log("Components correctly loaded")();
   };
+  var errorsHandler = function(e) {
+    return function __do3() {
+      var w = windowImpl();
+      return alert("\u{1F6AB} An error occurred: " + message(e))(w)();
+    };
+  };
+  var main = /* @__PURE__ */ catchException(errorsHandler)(program);
 
   // <stdin>
   main();
