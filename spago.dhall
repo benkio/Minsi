@@ -12,12 +12,13 @@ to generate this file without the comments in this block.
 -}
 { name = "minsi"
 , dependencies =
-  [ "assert"
-  , "console"
+  [ "console"
   , "effect"
   , "exceptions"
   , "maybe"
   , "prelude"
+  , "spec"
+  , "spec-discovery"
   , "tuples"
   , "web-dom"
   , "web-html"
