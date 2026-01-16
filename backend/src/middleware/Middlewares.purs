@@ -1,10 +1,10 @@
 module Middleware.Middlewares where
 
-import Prelude
+import Prelude (bind)
 
 import Effect.Class (liftEffect)
-import Middleware.PublicMiddleware
 import Node.Express.App (App, useExternal)
+import Middleware.PublicMiddleware (publicMiddleware)
 
 registerMiddlewares :: App
 registerMiddlewares = do

@@ -11,20 +11,16 @@ import Web.HTML.HTMLDocument (toNonElementParentNode)
 import Web.HTML.Window (document, alert)
 import Components.HtmlComponents (loadComponents)
 
--- - load components
--- - check dependencies
--- - register eventhandlers
--- - use a state represenation of the input where you go from components <-> state at each onchange (elmlike)
 main :: Effect Unit
 main = catchException errorsHandler program
 
 program :: Effect Unit
 program = do
+    -- check dependencies: yt-dlp,ffmpeg...
     doc <- getDocument
     components <- loadComponents doc
     log "Components correctly loaded"
     -- Initialize State
-    -- check dependencies: yt-dlp,ffmpeg...
     -- add yt handler + FFI iframe API + enable the rest of the control + spin
     -- add slider cut logic UI constraint: cstartmax<cendmin, cendmax < yt video length, cstart < cend values
     -- add subtitle logic UI constraint: 0-max length of yt cut
