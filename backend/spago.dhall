@@ -1,8 +1,10 @@
 { name = "my-project"
-, dependencies = 
+, dependencies =
   [ "console"
   , "effect"
   , "express"
+  , "foldable-traversable"
+  , "node-child-process"
   , "node-path"
   , "prelude"
   ]
