@@ -458,11 +458,14 @@
     };
   };
 
+  // output/Web.HTML.HTMLButtonElement/index.js
+  var fromElement = /* @__PURE__ */ unsafeReadProtoTagged("HTMLButtonElement");
+
   // output/Web.HTML.HTMLInputElement/index.js
-  var fromElement = /* @__PURE__ */ unsafeReadProtoTagged("HTMLInputElement");
+  var fromElement2 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLInputElement");
 
   // output/Web.HTML.HTMLVideoElement/index.js
-  var fromElement2 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLVideoElement");
+  var fromElement3 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLVideoElement");
 
   // output/Components.HTMLComponentsLoader/index.js
   var bind1 = /* @__PURE__ */ bind(bindMaybe);
@@ -472,12 +475,21 @@
     return function(doc) {
       return function __do3() {
         var maybeComponent = getElementById(id)(doc)();
-        var maybeComponentElement = bind1(maybeComponent)(fromElement2);
+        var maybeComponentElement = bind1(maybeComponent)(fromElement3);
         return maybe(throwException(error(show2(new HTMLElementNotFound(id)))))(pure2)(maybeComponentElement)();
       };
     };
   };
   var loadInputComponentById = function(id) {
+    return function(doc) {
+      return function __do3() {
+        var maybeComponent = getElementById(id)(doc)();
+        var maybeComponentElement = bind1(maybeComponent)(fromElement2);
+        return maybe(throwException(error(show2(new HTMLElementNotFound(id)))))(pure2)(maybeComponentElement)();
+      };
+    };
+  };
+  var loadButtonComponentById = function(id) {
     return function(doc) {
       return function __do3() {
         var maybeComponent = getElementById(id)(doc)();
@@ -493,9 +505,18 @@
   var reverseLoopGifId = "reverseLoopGif";
   var resultPreviewId = "resultPreview";
   var outputFilenameId = "outputFilename";
+  var cutVideoId = "cutVideoButton";
   var cutStartId = "cutStart";
   var cutEndId = "cutEnd";
   var artistId = "artist";
+  var applySubtitleId = "applySubtitleButton";
+  var addSubtitleId = "addSubtitleButton";
+
+  // output/Components.AddSubtitleButton/index.js
+  var loadAddSubtitleButton = /* @__PURE__ */ loadButtonComponentById(addSubtitleId);
+
+  // output/Components.ApplySubtitleButton/index.js
+  var loadApplySubtitleButton = /* @__PURE__ */ loadButtonComponentById(applySubtitleId);
 
   // output/Components.Artist/index.js
   var loadArtist = /* @__PURE__ */ loadInputComponentById(artistId);
@@ -529,6 +550,9 @@
       return new Tuple(cutStart, cutEnd);
     };
   };
+
+  // output/Components.CutVideoButton/index.js
+  var loadCutVideoButton = /* @__PURE__ */ loadButtonComponentById(cutVideoId);
 
   // output/Components.Filename/index.js
   var loadFilename = /* @__PURE__ */ loadInputComponentById(outputFilenameId);
@@ -565,6 +589,9 @@
       var reverseLoop = loadReverseLoop(doc)();
       var title2 = loadTitle(doc)();
       var resultPreview = loadResultPreview(doc)();
+      var cutVideoButton = loadCutVideoButton(doc)();
+      var applySubtitleButton = loadApplySubtitleButton(doc)();
+      var addSubtitleButton = loadAddSubtitleButton(doc)();
       return new HtmlComponents({
         cutStart: fst(rangeTuple),
         cutEnd: snd(rangeTuple),
@@ -573,7 +600,10 @@
         reverseLoop,
         artist,
         title: title2,
-        resultPreview
+        resultPreview,
+        cutVideoButton,
+        addSubtitleButton,
+        applySubtitleButton
       });
     };
   };

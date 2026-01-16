@@ -32,3 +32,12 @@ youtubeUrlId = "youtubeUrl"
 
 resultPreviewId :: String
 resultPreviewId = "resultPreview"
+
+cutVideoId :: String
+cutVideoId = "cutVideoButton"
+
+applySubtitleId :: String
+applySubtitleId = "applySubtitleButton"
+
+addSubtitleId :: String
+addSubtitleId = "addSubtitleButton"

@@ -98,7 +98,7 @@
               </div>
 
               <div class="my-3">
-                <button type="button" class="btn btn-success btn-sm mx-auto">
+                <button id="cutVideoButton" type="button" class="btn btn-success btn-sm mx-auto">
                   Cut Video
                 </button>
                 <input
@@ -142,11 +142,8 @@
       <!-- Subtitles -->
       <div class="w-75 mx-auto my-2">
         <div class="d-flex justify-content-end mb-2">
-          <button type="button" class="btn btn-success btn-sm mx-auto">
+          <button id="applySubtitleButton" type="button" class="btn btn-primary btn-sm mx-auto">
             Apply Subtitles
-          </button>
-          <button type="button" class="btn btn-primary btn-sm mx-auto">
-            Add Subtitles
           </button>
         </div>
 
@@ -160,6 +157,7 @@
                 <th style="width: 140px">Font</th>
                 <th style="width: 120px">Color</th>
                 <th style="width: 100px">Position</th>
+                <th style="width: 100px"></th>
               </tr>
             </thead>
             <tbody>
@@ -197,27 +195,17 @@
                     <option selected>Bottom</option>
                   </select>
                 </td>
+                <td class="text-center">
+                    <button id="addSubtitleButton" type="button" class="btn btn-sm border border-primary mx-auto">
+                        ➕
+                    </button>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
-
-    <script>
-      const cutStart = document.getElementById("cutStart");
-      const cutEnd = document.getElementById("cutEnd");
-
-      cutStart.addEventListener("input", (e) => {
-        document.getElementById("cutStartValue").textContent = e.target.value;
-        cutEnd.min = e.target.value;
-      });
-
-      cutEnd.addEventListener("input", (e) => {
-        document.getElementById("cutEndValue").textContent = e.target.value;
-        cutStart.max = e.target.value;
-      });
-    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="./index.js"></script>
