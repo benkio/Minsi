@@ -12,9 +12,13 @@ to generate this file without the comments in this block.
 -}
 { name = "minsi"
 , dependencies =
-  [ "console"
+  [ "aff"
+  , "console"
+  , "datetime"
   , "effect"
   , "exceptions"
+  , "fetch"
+  , "fetch-yoga-json"
   , "maybe"
   , "prelude"
   , "spec"
