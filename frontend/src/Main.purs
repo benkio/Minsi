@@ -3,24 +3,23 @@ module Main where
 import Prelude
 
 import Components.HtmlComponents (loadComponents)
+import Components.Window (getDocument, raiseErrorAlert)
 import Effect (Effect)
-import Effect.Aff (launchAff_)
+import Effect.Aff (runAff_)
 import Effect.Console (log)
-import Effect.Exception (Error, catchException, message)
+import Effect.Exception (Error, message)
 import Main.CheckDependencies (checkDependecies)
-import Web.DOM.NonElementParentNode (NonElementParentNode)
-import Web.HTML (window)
-import Web.HTML.HTMLDocument (toNonElementParentNode)
-import Web.HTML.Window (alert, document)
+import Control.Monad.Error.Class (catchError)
+import Data.Either ( Either(..))
 
 main :: Effect Unit
-main = catchException errorsHandler program
+main = genericErrorsHandler program
 
 program :: Effect Unit
 program = do
-    launchAff_ checkDependecies
+    runAff_ genericErrorsHandlerEither checkDependecies
     doc <- getDocument
-    components <- loadComponents doc
+    _ <- loadComponents doc
     log "Components correctly loaded"
 
 -- Initialize State
@@ -31,13 +30,9 @@ program = do
 -- Idea: add a control for current video position to facilitate the insertion of subtitles
 -- Idea: dropdown to switch from video to GIF to compare the 2.
 
-errorsHandler :: Error -> Effect Unit
-errorsHandler e = do
-    w <- window
-    alert ("🚫 An error occurred: " <> message e) w
+genericErrorsHandler :: Effect Unit -> Effect Unit
+genericErrorsHandler p = catchError p \e -> raiseErrorAlert (message e)
 
-getDocument :: Effect NonElementParentNode
-getDocument = do
-    w <- window
-    d <- document w
-    pure $ toNonElementParentNode d
+genericErrorsHandlerEither :: forall a. Either Error a -> Effect Unit
+genericErrorsHandlerEither (Right _) = pure unit
+genericErrorsHandlerEither (Left e) = raiseErrorAlert (message e)

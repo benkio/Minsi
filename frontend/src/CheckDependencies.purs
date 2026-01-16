@@ -1,28 +1,27 @@
 module Main.CheckDependencies where
 
 import Prelude
-import Data.Unit (Unit)
 import Effect.Aff (Aff)
 import Main.Config (backendUrl)
 import Fetch (fetch, Method(..))
 import Fetch.Yoga.Json (fromJSON)
-import Control.Monad.Error.Class (throwError)
-import Main.MinsiErrors (MinsiError(..))
+import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Foreign (Foreign)
+import Effect.Class (liftEffect)
 
-type MissingDependenciesResponse = { json :: { missedDependencies :: Array String } }
+type MissingDependenciesResponse = { missedDependencies :: Array String }
 
 checkDependeciesEndpoint :: String
-checkDependeciesEndpoint = backendUrl <> "/checkDependencies"
+checkDependeciesEndpoint = backendUrl <> "checkDependencies"
 
 checkDependecies :: Aff Unit
 checkDependecies = do
-  { status, text } <- fetch checkDependeciesEndpoint { method: POST}
-  if status == 200
+  response <- fetch checkDependeciesEndpoint { method: POST }
+  if response.ok
   then pure unit
-  else missingDependencies text
+  else missingDependencies response.json
 
 missingDependencies :: Aff Foreign -> Aff Unit
 missingDependencies jsonText = do
-  { json: { missedDependencies: deps } } :: MissingDependenciesResponse <- fromJSON jsonText
-  throwError $ MissingDependenciesError deps
+  { missedDependencies: deps } :: MissingDependenciesResponse <- fromJSON jsonText
+  liftEffect $ throwMinsiError $ MissingDependenciesError deps

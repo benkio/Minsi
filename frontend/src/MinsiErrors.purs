@@ -1,14 +1,20 @@
 module Main.MinsiErrors where
 
 import Prelude
-import Control.Monad.Error.Class (class MonadThrow)
-import Effect.Exception (throwException, error)
 import Effect (Effect)
+import Effect.Exception (error, throwException)
 
-data MinsiError =
-  HTMLElementNotFound String
+data MinsiError
+  = HTMLElementNotFound String
   | MissingDependenciesError (Array String)
 
-instance minsiError :: MonadThrow MinsiError Effect where
-  throwError (HTMLElementNotFound id) = throwException $ error $ "HTML Element couldn't be loaded " <> id
-  throwError (MissingDependenciesError deps) = throwException $ error $ "Missing Following dependencies: " <> (show deps)
+instance Show MinsiError where
+  show = case _ of
+    HTMLElementNotFound id ->
+      "HTML Element couldn't be loaded: " <> id
+    MissingDependenciesError deps ->
+      "Missing following dependencies: " <> show deps
+
+throwMinsiError :: forall a. MinsiError -> Effect a
+throwMinsiError =
+  throwException <<< error <<< show
