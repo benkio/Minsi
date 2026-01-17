@@ -1,8 +1,8 @@
-module Test.Controller.CheckDependenciesControllerSpec where
+module Test.CheckDependencies.FontCheckSpec where
 
 import Prelude
 
-import Controller.CheckDependenciesController (checkSoftwareDependency, searchFont, searchFontInDir, checkFileMatch)
+import CheckDependencies.FontCheck (searchFont, searchFontInDir, checkFileMatch)
 import Effect.Class (liftEffect)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldReturn, shouldEqual)
@@ -13,11 +13,6 @@ spec = do
         it "should find the Impact and Arial Black font" $ liftEffect $ do
             (searchFont "Impact") `shouldReturn` true
             (searchFont "Arial Black") `shouldReturn` true
-    describe "checkSoftwareDependency" do
-        it "should find ffmpeg in PATH" $ liftEffect $ do
-            (checkSoftwareDependency "ffmpeg") `shouldReturn` true
-        it "should return false if the input is not a valid command" $ liftEffect $ do
-            checkSoftwareDependency "not a valid command" `shouldReturn` false
     describe "searchFontInDir" do
         it "should find the Impact font in /Library/fonts/" $ liftEffect $ do
           searchFontInDir "Impact" "/Library/Fonts" `shouldReturn` true

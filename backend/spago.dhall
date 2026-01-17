@@ -1,7 +1,6 @@
 { name = "my-project"
 , dependencies =
-  [ "aff"
-  , "arrays"
+  [ "arrays"
   , "console"
   , "effect"
   , "either"
@@ -9,7 +8,6 @@
   , "express"
   , "foldable-traversable"
   , "lists"
-  , "maybe"
   , "monad-loops"
   , "node-buffer"
   , "node-child-process"
