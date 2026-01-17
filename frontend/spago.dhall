@@ -13,6 +13,7 @@ to generate this file without the comments in this block.
 { name = "minsi"
 , dependencies =
   [ "aff"
+  , "arrays"
   , "bifunctors"
   , "console"
   , "datetime"
@@ -24,6 +25,7 @@ to generate this file without the comments in this block.
   , "foldable-traversable"
   , "foreign"
   , "foreign-object"
+  , "functions"
   , "maybe"
   , "node-path"
   , "node-url"

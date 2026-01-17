@@ -1,16 +1,16 @@
 module Model.State.State where
 
+import Effect (Effect)
+
 import Prelude
 import Data.Time.Duration (Milliseconds)
 import Node.Path (FilePath)
-import Node.URL (URL)
-import Yoga.JSON (class WriteForeign, writeImpl)
-
-newtype YoutubeUrl = YoutubeUrl URL
+import Node.URL (URL, href)
+import Yoga.JSON (class WriteForeign, writeImpl, writeJSON)
 
 newtype State = State
   { cutVideo :: DurationRange
-  , youtubeUrl :: YoutubeUrl
+  , youtubeUrl :: URL
   , filename :: FilePath
   , reverseLoop :: Boolean
   , artist :: String
@@ -51,30 +51,18 @@ instance WriteForeign Font where
   writeImpl Impact = writeImpl "Impact"
   writeImpl ArialBlack = writeImpl "Arial Black"
 
-instance WriteForeign YoutubeUrl where
-  writeImpl (YoutubeUrl url ) = writeImpl (show url)
-instance Show YoutubeUrl where
-  show (YoutubeUrl url) = show url
-
 derive newtype instance writeDurationRange :: WriteForeign DurationRange
 derive newtype instance writeSubtitle :: WriteForeign Subtitle
-derive newtype instance writeState :: WriteForeign State
 
-
--- instance WriteForeign State where
---   writeImpl (State { cutVideo , youtubeUrl , filename , reverseLoop , artist , title , subtitles}) =
---     { cutVideo : writeImpl cutVideo
---   , youtubeUrl : writeImpl youtubeUrl
---   , filename : writeImpl filename
---   , reverseLoop : writeImpl reverseLoop
---   , artist : writeImpl artist
---   , title : writeImpl title
---   , subtitles : writeImpl subtitles
---   }
-
--- instance WriteForeign DurationRange where
---   writeImpl (DurationRange { start , end}) =
---     {
---       start: writeImpl start
---       end: writeImpl end
---     }
+stateToJson :: State -> Effect String
+stateToJson (State { cutVideo, youtubeUrl, filename, reverseLoop, artist, title, subtitles }) = do
+  youtubeUrlString <- href youtubeUrl
+  pure $ writeJSON
+    { cutVideo: writeImpl cutVideo
+    , youtubeUrl: writeImpl youtubeUrlString
+    , filename: writeImpl filename
+    , reverseLoop: writeImpl reverseLoop
+    , artist: writeImpl artist
+    , title: writeImpl title
+    , subtitles: writeImpl subtitles
+    }

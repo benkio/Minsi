@@ -6,7 +6,8 @@ import Effect (Effect)
 import Data.Traversable (traverse)
 
 import Components.HtmlComponents (HtmlComponents(..))
-import Model.State.State (State(..), DurationRange(..), YoutubeUrl(..))
+import Model.State.State (State(..), DurationRange(..))
+import Node.URL (URL)
 import Prelude
 import Data.Time.Duration (Milliseconds(..))
 import Node.URL (new)
@@ -43,13 +44,13 @@ cutVideoValidation start end =
 youtubeRegexString :: String
 youtubeRegexString = """(http:|https:)?(\/\/)?(www\.)?(youtube.com|youtu.be)\/(watch|embed)?(\?v=|\/)?(\S+)?"""
 
-youtubeUrlFromHTMLInput :: HTMLInputElement -> Effect (V (Array String) YoutubeUrl)
+youtubeUrlFromHTMLInput :: HTMLInputElement -> Effect (V (Array String) URL)
 youtubeUrlFromHTMLInput youtubeUrlComponent = value youtubeUrlComponent >>= youtubeUrlValidation
 
-youtubeUrlValidation :: String -> Effect (V (Array String) YoutubeUrl)
+youtubeUrlValidation :: String -> Effect (V (Array String) URL)
 youtubeUrlValidation v = do
   youtubeRegex <- liftEither $ lmap error (regex youtubeRegexString noFlags)
-  traverse (\x -> YoutubeUrl <$> new x) (matches youtubeRegex v)
+  traverse new (matches youtubeRegex v)
 
 matches :: Regex -> String -> V (Array String) String
 matches r v | test r v = pure v
