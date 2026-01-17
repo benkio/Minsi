@@ -1,4 +1,4 @@
-module Model.State where
+module Model.State.StateFromHtml where
 
 import Effect.Exception (error)
 import Web.HTML.HTMLInputElement (HTMLInputElement, value, valueAsNumber, checked)
@@ -6,43 +6,15 @@ import Effect (Effect)
 import Data.Traversable (traverse)
 
 import Components.HtmlComponents (HtmlComponents(..))
+import Model.State.State (State(..), DurationRange(..))
 import Prelude
 import Data.Time.Duration (Milliseconds(..))
-import Node.Path (FilePath)
 import Node.URL (URL, new)
 import Data.Validation.Semigroup (V, invalid)
 import Data.String.Regex (Regex, test, regex)
 import Data.String.Regex.Flags (noFlags)
 import Control.Monad.Error.Class (liftEither)
 import Data.Bifunctor (lmap)
-
-data State = State
-  { cutVideo :: DurationRange
-  , youtubeUrl :: URL
-  , filename :: FilePath
-  , reverseLoop :: Boolean
-  , artist :: String
-  , title :: String
-  , subtitles :: Array Subtitle
-  }
-
-data DurationRange = DurationRange
-  { start :: Milliseconds
-  , end :: Milliseconds
-  }
-
-data Subtitle = Subtitle
-  { videoPosition :: DurationRange
-  , value :: String
-  , font :: Font
-  , size :: Int
-  , color :: Color
-  , screenPosition :: Position
-  }
-
-data Font = Impact | ArialBlack
-data Color = White | Black | LightGreen | LightOrange | Yellow
-data Position = Top | Bottom
 
 fromHtmlComponents :: HtmlComponents -> Effect (V (Array String) State)
 fromHtmlComponents (HtmlComponents { cutStart, cutEnd, youtubeUrl: youtubeUrlInput, filename: filenameInput, reverseLoop: reverseLoopInput, artist: artistInput, title: titleInput }) = do

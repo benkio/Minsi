@@ -6,7 +6,7 @@ import Node.Express.Types
 import Effect (Effect)
 
 publicDir :: FilePath
-publicDir = concat ["..", "public"]
+publicDir = concat [ "..", "public" ]
 
 publicMiddleware :: Effect Middleware
 publicMiddleware = Static.static publicDir

@@ -2,7 +2,7 @@ module Test.StateSpec where
 
 import Prelude
 
-import Model.State (youtubeUrlValidation, cutVideoValidation)
+import Model.State.StateFromHtml (youtubeUrlValidation, cutVideoValidation)
 import Effect.Class (liftEffect)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldSatisfy, shouldEqual)

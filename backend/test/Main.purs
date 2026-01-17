@@ -6,4 +6,4 @@ import Test.Spec.Discovery (discoverAndRunSpecs)
 import Test.Spec.Reporter.Console (consoleReporter)
 
 main :: Effect Unit
-main = discoverAndRunSpecs [consoleReporter] ".*Spec$"
+main = discoverAndRunSpecs [ consoleReporter ] ".*Spec$"

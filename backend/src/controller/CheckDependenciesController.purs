@@ -11,12 +11,11 @@ import Prelude (bind, discard, (*>), (<$>), (<*>), (<>))
 
 checkDependenciesController :: Handler
 checkDependenciesController = do
-    setResponseHeader "Access-Control-Allow-Origin" "*"
-    failedDependencies <- liftEffect checkDependecies
-    if null failedDependencies
-        then setStatus 200 *> end
-        else setStatus 500 *> sendJson{missedDependencies: failedDependencies}
+  setResponseHeader "Access-Control-Allow-Origin" "*"
+  failedDependencies <- liftEffect checkDependecies
+  if null failedDependencies then setStatus 200 *> end
+  else setStatus 500 *> sendJson { missedDependencies: failedDependencies }
 
 checkDependecies :: Effect (Array String)
 checkDependecies =
-    (<>) <$> checkFontDependencies <*> checkSoftwareDependencies
+  (<>) <$> checkFontDependencies <*> checkSoftwareDependencies
