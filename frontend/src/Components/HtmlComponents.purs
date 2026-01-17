@@ -15,9 +15,8 @@ import Components.Title (loadTitle)
 import Components.Filename (loadFilename)
 import Components.ReverseLoop (loadReverseLoop)
 import Components.ResultPreview (loadResultPreview)
-import Components.CutVideoButton (loadCutVideoButton)
 import Components.AddSubtitleButton (loadAddSubtitleButton)
-import Components.ApplySubtitleButton (loadApplySubtitleButton)
+import Components.ApplyButton (loadApplyButton)
 
 data HtmlComponents = HtmlComponents
   { cutStart :: HTMLInputElement
@@ -28,8 +27,7 @@ data HtmlComponents = HtmlComponents
   , artist :: HTMLInputElement
   , title :: HTMLInputElement
   , resultPreview :: HTMLVideoElement
-  , cutVideoButton :: HTMLButtonElement
-  , applySubtitleButton :: HTMLButtonElement
+  , applyButton :: HTMLButtonElement
   , addSubtitleButton :: HTMLButtonElement
   }
 
@@ -42,8 +40,7 @@ loadComponents doc = do
   reverseLoop <- loadReverseLoop doc
   title <- loadTitle doc
   resultPreview <- loadResultPreview doc
-  cutVideoButton <- loadCutVideoButton doc
-  applySubtitleButton <- loadApplySubtitleButton doc
+  applyButton <- loadApplyButton doc
   addSubtitleButton <- loadAddSubtitleButton doc
   pure
     ( HtmlComponents
@@ -55,8 +52,7 @@ loadComponents doc = do
         , artist: artist
         , title: title
         , resultPreview: resultPreview
-        , cutVideoButton: cutVideoButton
         , addSubtitleButton: addSubtitleButton
-        , applySubtitleButton: applySubtitleButton
+        , applyButton: applyButton
         }
     )

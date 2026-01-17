@@ -24,9 +24,6 @@ cutEndId = "cutEnd"
 cutEndValueId :: String
 cutEndValueId = "cutEndValue"
 
-reloadOnChangeId :: String
-reloadOnChangeId = "reloadOnChange"
-
 youtubeUrlId :: String
 youtubeUrlId = "youtubeUrl"
 
@@ -36,8 +33,8 @@ resultPreviewId = "resultPreview"
 cutVideoId :: String
 cutVideoId = "cutVideoButton"
 
-applySubtitleId :: String
-applySubtitleId = "applySubtitleButton"
+applyId :: String
+applyId = "applyButton"
 
 addSubtitleId :: String
 addSubtitleId = "addSubtitleButton"
