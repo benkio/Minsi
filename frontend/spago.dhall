@@ -23,6 +23,7 @@ to generate this file without the comments in this block.
   , "fetch-yoga-json"
   , "foldable-traversable"
   , "foreign"
+  , "foreign-object"
   , "maybe"
   , "node-path"
   , "node-url"
@@ -35,6 +36,7 @@ to generate this file without the comments in this block.
   , "validation"
   , "web-dom"
   , "web-html"
+  , "yoga-json"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]

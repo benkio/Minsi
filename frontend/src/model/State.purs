@@ -1,4 +1,4 @@
-module Model.State.StateFromHtml where
+module Model.State where
 
 import Effect.Exception (error)
 import Web.HTML.HTMLInputElement (HTMLInputElement, value, valueAsNumber, checked)
@@ -6,15 +6,45 @@ import Effect (Effect)
 import Data.Traversable (traverse)
 
 import Components.HtmlComponents (HtmlComponents(..))
-import Model.State.State (State(..), DurationRange(..), YoutubeUrl(..))
 import Prelude
 import Data.Time.Duration (Milliseconds(..))
-import Node.URL (new)
+import Node.Path (FilePath)
+import Node.URL (URL, new)
 import Data.Validation.Semigroup (V, invalid)
 import Data.String.Regex (Regex, test, regex)
 import Data.String.Regex.Flags (noFlags)
 import Control.Monad.Error.Class (liftEither)
 import Data.Bifunctor (lmap)
+
+data State = State
+  { cutVideo :: DurationRange
+  , youtubeUrl :: URL
+  , filename :: FilePath
+  , reverseLoop :: Boolean
+  , artist :: String
+  , title :: String
+  , subtitles :: Array Subtitle
+  }
+
+data DurationRange = DurationRange
+  { start :: Milliseconds
+  , end :: Milliseconds
+  }
+
+data Subtitle = Subtitle
+  { videoPosition :: DurationRange
+  , value :: String
+  , font :: Font
+  , size :: Int
+  , color :: Color
+  , screenPosition :: Position
+  }
+
+data Font = Impact | ArialBlack
+data Color = White | Black | LightGreen | LightOrange | Yellow
+data Position = Top | Bottom
+
+-- State Conversion from HTML Elements ------------------
 
 fromHtmlComponents :: HtmlComponents -> Effect (V (Array String) State)
 fromHtmlComponents (HtmlComponents { cutStart, cutEnd, youtubeUrl: youtubeUrlInput, filename: filenameInput, reverseLoop: reverseLoopInput, artist: artistInput, title: titleInput }) = do
@@ -43,13 +73,13 @@ cutVideoValidation start end =
 youtubeRegexString :: String
 youtubeRegexString = """(http:|https:)?(\/\/)?(www\.)?(youtube.com|youtu.be)\/(watch|embed)?(\?v=|\/)?(\S+)?"""
 
-youtubeUrlFromHTMLInput :: HTMLInputElement -> Effect (V (Array String) YoutubeUrl)
+youtubeUrlFromHTMLInput :: HTMLInputElement -> Effect (V (Array String) URL)
 youtubeUrlFromHTMLInput youtubeUrlComponent = value youtubeUrlComponent >>= youtubeUrlValidation
 
-youtubeUrlValidation :: String -> Effect (V (Array String) YoutubeUrl)
+youtubeUrlValidation :: String -> Effect (V (Array String) URL)
 youtubeUrlValidation v = do
   youtubeRegex <- liftEither $ lmap error (regex youtubeRegexString noFlags)
-  traverse (\x -> YoutubeUrl <$> new x) (matches youtubeRegex v)
+  traverse new (matches youtubeRegex v)
 
 matches :: Regex -> String -> V (Array String) String
 matches r v | test r v = pure v
