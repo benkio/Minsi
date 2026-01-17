@@ -9,12 +9,14 @@ import Web.HTML.Window (alert, document)
 
 getDocument :: Effect NonElementParentNode
 getDocument = do
-    w <- window
-    d <- document w
-    pure $ toNonElementParentNode d
+  w <- window
+  d <- document w
+  pure $ toNonElementParentNode d
 
 raiseErrorAlert :: String -> Effect Unit
 raiseErrorAlert msg =
-  window >>= \w -> alert (
-  """😾!!! ERROR !!! 😾
-""" <> msg) w
+  window >>= \w -> alert
+    ( """😾!!! ERROR !!! 😾
+""" <> msg
+    )
+    w

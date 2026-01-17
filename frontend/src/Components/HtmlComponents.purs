@@ -20,18 +20,18 @@ import Components.AddSubtitleButton (loadAddSubtitleButton)
 import Components.ApplySubtitleButton (loadApplySubtitleButton)
 
 data HtmlComponents = HtmlComponents
-    { cutStart :: HTMLInputElement
-    , cutEnd :: HTMLInputElement
-    , youtubeUrl :: HTMLInputElement
-    , filename :: HTMLInputElement
-    , reverseLoop :: HTMLInputElement
-    , artist :: HTMLInputElement
-    , title :: HTMLInputElement
-    , resultPreview :: HTMLVideoElement
-    , cutVideoButton:: HTMLButtonElement
-    , applySubtitleButton:: HTMLButtonElement
-    , addSubtitleButton:: HTMLButtonElement
-    }
+  { cutStart :: HTMLInputElement
+  , cutEnd :: HTMLInputElement
+  , youtubeUrl :: HTMLInputElement
+  , filename :: HTMLInputElement
+  , reverseLoop :: HTMLInputElement
+  , artist :: HTMLInputElement
+  , title :: HTMLInputElement
+  , resultPreview :: HTMLVideoElement
+  , cutVideoButton :: HTMLButtonElement
+  , applySubtitleButton :: HTMLButtonElement
+  , addSubtitleButton :: HTMLButtonElement
+  }
 
 loadComponents :: NonElementParentNode -> Effect HtmlComponents
 loadComponents doc = do
@@ -45,16 +45,18 @@ loadComponents doc = do
   cutVideoButton <- loadCutVideoButton doc
   applySubtitleButton <- loadApplySubtitleButton doc
   addSubtitleButton <- loadAddSubtitleButton doc
-  pure (HtmlComponents
-    { cutStart : fst rangeTuple
-    , cutEnd : snd rangeTuple
-    , youtubeUrl : youtubeUrl
-    , filename : filename
-    , reverseLoop : reverseLoop
-    , artist : artist
-    , title : title
-    , resultPreview : resultPreview
-    , cutVideoButton: cutVideoButton
-    , addSubtitleButton: addSubtitleButton
-    , applySubtitleButton: applySubtitleButton
-    })
+  pure
+    ( HtmlComponents
+        { cutStart: fst rangeTuple
+        , cutEnd: snd rangeTuple
+        , youtubeUrl: youtubeUrl
+        , filename: filename
+        , reverseLoop: reverseLoop
+        , artist: artist
+        , title: title
+        , resultPreview: resultPreview
+        , cutVideoButton: cutVideoButton
+        , addSubtitleButton: addSubtitleButton
+        , applySubtitleButton: applySubtitleButton
+        }
+    )

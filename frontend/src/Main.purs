@@ -10,17 +10,17 @@ import Effect.Console (log)
 import Effect.Exception (Error, message)
 import Main.CheckDependencies (checkDependecies)
 import Control.Monad.Error.Class (catchError)
-import Data.Either ( Either(..))
+import Data.Either (Either(..))
 
 main :: Effect Unit
 main = genericErrorsHandler program
 
 program :: Effect Unit
 program = do
-    runAff_ genericErrorsHandlerEither checkDependecies
-    doc <- getDocument
-    _ <- loadComponents doc
-    log "Components correctly loaded"
+  runAff_ genericErrorsHandlerEither checkDependecies
+  doc <- getDocument
+  _ <- loadComponents doc
+  log "Components correctly loaded"
 
 -- Initialize State
 -- add yt handler + FFI iframe API + enable the rest of the control + spin

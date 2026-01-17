@@ -39,6 +39,11 @@ PureScript frontend application for the Minsi YouTube clip extractor.
    spago test
    ```
 
+4. **Format**
+   ```bash
+   npx purs-tidy format-in-place "src/**/*.purs" && npx purs-tidy format-in-place "test/**/*.purs"
+   ```
+
 ### Production
 
 After bundling, the `index.js` file will be placed in the `public/` folder at the root of the project. The backend server will serve this file along with the HTML.

@@ -17,8 +17,7 @@ checkDependeciesEndpoint = backendUrl <> "checkDependencies"
 checkDependecies :: Aff Unit
 checkDependecies = do
   response <- fetch checkDependeciesEndpoint { method: POST }
-  if response.ok
-  then pure unit
+  if response.ok then pure unit
   else missingDependencies response.json
 
 missingDependencies :: Aff Foreign -> Aff Unit
