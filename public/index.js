@@ -736,6 +736,64 @@
     };
   };
 
+  // output/Components.HTMLComponentsLoader/index.js
+  var bind1 = /* @__PURE__ */ bind(bindMaybe);
+  var loadHtmlElement = function(id) {
+    return function(f) {
+      return function(doc) {
+        return function __do3() {
+          var maybeComponent = getElementById(id)(doc)();
+          var maybeComponentElement = bind1(maybeComponent)(f);
+          if (maybeComponentElement instanceof Nothing) {
+            return throwMinsiError(new HTMLElementNotFound(id))();
+          }
+          ;
+          if (maybeComponentElement instanceof Just) {
+            return maybeComponentElement.value0;
+          }
+          ;
+          throw new Error("Failed pattern match at Components.HTMLComponentsLoader (line 15, column 3 - line 17, column 33): " + [maybeComponentElement.constructor.name]);
+        };
+      };
+    };
+  };
+
+  // output/Components.HtmlIds/index.js
+  var youtubeUrlId = "youtubeUrl";
+  var videoSourceId = "videoSource";
+  var titleId = "title";
+  var reverseLoopGifId = "reverseLoopGif";
+  var resultPreviewId = "resultPreview";
+  var playbackPositionId = "playbackPosition";
+  var outputFilenameId = "outputFilename";
+  var minsiLogId = "minsiLog";
+  var cutStartId = "cutStart";
+  var cutEndId = "cutEnd";
+  var artistId = "artist";
+  var applyId = "applyButton";
+  var addSubtitleId = "addSubtitleButton";
+
+  // output/Data.Tuple/index.js
+  var Tuple = /* @__PURE__ */ function() {
+    function Tuple2(value0, value1) {
+      this.value0 = value0;
+      this.value1 = value1;
+    }
+    ;
+    Tuple2.create = function(value0) {
+      return function(value1) {
+        return new Tuple2(value0, value1);
+      };
+    };
+    return Tuple2;
+  }();
+  var snd = function(v) {
+    return v.value1;
+  };
+  var fst = function(v) {
+    return v.value0;
+  };
+
   // output/Unsafe.Coerce/foreign.js
   var unsafeCoerce2 = function(x) {
     return x;
@@ -773,160 +831,75 @@
   // output/Web.HTML.HTMLButtonElement/index.js
   var fromElement = /* @__PURE__ */ unsafeReadProtoTagged("HTMLButtonElement");
 
+  // output/Web.HTML.HTMLDivElement/index.js
+  var fromElement2 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLDivElement");
+
   // output/Web.HTML.HTMLInputElement/index.js
-  var fromElement2 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLInputElement");
+  var fromElement3 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLInputElement");
+
+  // output/Web.HTML.HTMLSelectElement/index.js
+  var fromElement4 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLSelectElement");
+
+  // output/Web.HTML.HTMLSpanElement/index.js
+  var fromElement5 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLSpanElement");
 
   // output/Web.HTML.HTMLVideoElement/index.js
-  var fromElement3 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLVideoElement");
+  var fromElement6 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLVideoElement");
 
-  // output/Components.HTMLComponentsLoader/index.js
-  var bind1 = /* @__PURE__ */ bind(bindMaybe);
-  var loadVideoComponentById = function(id) {
-    return function(doc) {
-      return function __do3() {
-        var maybeComponent = getElementById(id)(doc)();
-        var maybeComponentElement = bind1(maybeComponent)(fromElement3);
-        if (maybeComponentElement instanceof Nothing) {
-          return throwMinsiError(new HTMLElementNotFound(id))();
-        }
-        ;
-        if (maybeComponentElement instanceof Just) {
-          return maybeComponentElement.value0;
-        }
-        ;
-        throw new Error("Failed pattern match at Components.HTMLComponentsLoader (line 27, column 3 - line 29, column 33): " + [maybeComponentElement.constructor.name]);
-      };
-    };
-  };
-  var loadInputComponentById = function(id) {
-    return function(doc) {
-      return function __do3() {
-        var maybeComponent = getElementById(id)(doc)();
-        var maybeComponentElement = bind1(maybeComponent)(fromElement2);
-        if (maybeComponentElement instanceof Nothing) {
-          return throwMinsiError(new HTMLElementNotFound(id))();
-        }
-        ;
-        if (maybeComponentElement instanceof Just) {
-          return maybeComponentElement.value0;
-        }
-        ;
-        throw new Error("Failed pattern match at Components.HTMLComponentsLoader (line 19, column 3 - line 21, column 33): " + [maybeComponentElement.constructor.name]);
-      };
-    };
-  };
-  var loadButtonComponentById = function(id) {
-    return function(doc) {
-      return function __do3() {
-        var maybeComponent = getElementById(id)(doc)();
-        var maybeComponentElement = bind1(maybeComponent)(fromElement);
-        if (maybeComponentElement instanceof Nothing) {
-          return throwMinsiError(new HTMLElementNotFound(id))();
-        }
-        ;
-        if (maybeComponentElement instanceof Just) {
-          return maybeComponentElement.value0;
-        }
-        ;
-        throw new Error("Failed pattern match at Components.HTMLComponentsLoader (line 35, column 3 - line 37, column 33): " + [maybeComponentElement.constructor.name]);
-      };
-    };
-  };
-
-  // output/Components.HtmlIds/index.js
-  var youtubeUrlId = "youtubeUrl";
-  var titleId = "title";
-  var reverseLoopGifId = "reverseLoopGif";
-  var resultPreviewId = "resultPreview";
-  var outputFilenameId = "outputFilename";
-  var cutVideoId = "cutVideoButton";
-  var cutStartId = "cutStart";
-  var cutEndId = "cutEnd";
-  var artistId = "artist";
-  var applySubtitleId = "applySubtitleButton";
-  var addSubtitleId = "addSubtitleButton";
-
-  // output/Components.AddSubtitleButton/index.js
-  var loadAddSubtitleButton = /* @__PURE__ */ loadButtonComponentById(addSubtitleId);
-
-  // output/Components.ApplySubtitleButton/index.js
-  var loadApplySubtitleButton = /* @__PURE__ */ loadButtonComponentById(applySubtitleId);
-
-  // output/Components.Artist/index.js
-  var loadArtist = /* @__PURE__ */ loadInputComponentById(artistId);
-
-  // output/Data.Tuple/index.js
-  var Tuple = /* @__PURE__ */ function() {
-    function Tuple2(value0, value1) {
+  // output/Components.HtmlComponents/index.js
+  var HtmlOutputs = /* @__PURE__ */ function() {
+    function HtmlOutputs2(value0) {
       this.value0 = value0;
-      this.value1 = value1;
     }
     ;
-    Tuple2.create = function(value0) {
-      return function(value1) {
-        return new Tuple2(value0, value1);
-      };
+    HtmlOutputs2.create = function(value0) {
+      return new HtmlOutputs2(value0);
     };
-    return Tuple2;
+    return HtmlOutputs2;
   }();
-  var snd = function(v) {
-    return v.value1;
-  };
-  var fst = function(v) {
-    return v.value0;
-  };
-
-  // output/Components.CutRange/index.js
+  var HtmlInputs = /* @__PURE__ */ function() {
+    function HtmlInputs2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    HtmlInputs2.create = function(value0) {
+      return new HtmlInputs2(value0);
+    };
+    return HtmlInputs2;
+  }();
+  var loadYoutubeUrl = /* @__PURE__ */ loadHtmlElement(youtubeUrlId)(fromElement3);
+  var loadVideoSource = /* @__PURE__ */ loadHtmlElement(videoSourceId)(fromElement4);
+  var loadTitle = /* @__PURE__ */ loadHtmlElement(titleId)(fromElement3);
+  var loadReverseLoop = /* @__PURE__ */ loadHtmlElement(reverseLoopGifId)(fromElement3);
+  var loadResultPreview = /* @__PURE__ */ loadHtmlElement(resultPreviewId)(fromElement6);
+  var loadPlaybackPosition = /* @__PURE__ */ loadHtmlElement(playbackPositionId)(fromElement5);
+  var loadMinsiLog = /* @__PURE__ */ loadHtmlElement(minsiLogId)(fromElement2);
+  var loadFilename = /* @__PURE__ */ loadHtmlElement(outputFilenameId)(fromElement3);
   var loadCutRange = function(doc) {
     return function __do3() {
-      var cutStart = loadInputComponentById(cutStartId)(doc)();
-      var cutEnd = loadInputComponentById(cutEndId)(doc)();
+      var cutStart = loadHtmlElement(cutStartId)(fromElement3)(doc)();
+      var cutEnd = loadHtmlElement(cutEndId)(fromElement3)(doc)();
       return new Tuple(cutStart, cutEnd);
     };
   };
-
-  // output/Components.CutVideoButton/index.js
-  var loadCutVideoButton = /* @__PURE__ */ loadButtonComponentById(cutVideoId);
-
-  // output/Components.Filename/index.js
-  var loadFilename = /* @__PURE__ */ loadInputComponentById(outputFilenameId);
-
-  // output/Components.ResultPreview/index.js
-  var loadResultPreview = /* @__PURE__ */ loadVideoComponentById(resultPreviewId);
-
-  // output/Components.ReverseLoop/index.js
-  var loadReverseLoop = /* @__PURE__ */ loadInputComponentById(reverseLoopGifId);
-
-  // output/Components.Title/index.js
-  var loadTitle = /* @__PURE__ */ loadInputComponentById(titleId);
-
-  // output/Components.YoutubeUrl/index.js
-  var loadYoutubeUrl = /* @__PURE__ */ loadInputComponentById(youtubeUrlId);
-
-  // output/Components.HtmlComponents/index.js
-  var HtmlComponents = /* @__PURE__ */ function() {
-    function HtmlComponents2(value0) {
-      this.value0 = value0;
-    }
-    ;
-    HtmlComponents2.create = function(value0) {
-      return new HtmlComponents2(value0);
-    };
-    return HtmlComponents2;
-  }();
+  var loadArtist = /* @__PURE__ */ loadHtmlElement(artistId)(fromElement3);
+  var loadApplyButton = /* @__PURE__ */ loadHtmlElement(applyId)(fromElement);
+  var loadAddSubtitleButton = /* @__PURE__ */ loadHtmlElement(addSubtitleId)(fromElement);
   var loadComponents = function(doc) {
     return function __do3() {
-      var artist = loadArtist(doc)();
       var rangeTuple = loadCutRange(doc)();
       var youtubeUrl = loadYoutubeUrl(doc)();
       var filename = loadFilename(doc)();
       var reverseLoop = loadReverseLoop(doc)();
+      var artist = loadArtist(doc)();
       var title2 = loadTitle(doc)();
+      var applyButton = loadApplyButton(doc)();
+      var videoSource = loadVideoSource(doc)();
       var resultPreview = loadResultPreview(doc)();
-      var cutVideoButton = loadCutVideoButton(doc)();
-      var applySubtitleButton = loadApplySubtitleButton(doc)();
       var addSubtitleButton = loadAddSubtitleButton(doc)();
-      return new HtmlComponents({
+      var minsiLog = loadMinsiLog(doc)();
+      var playbackPosition = loadPlaybackPosition(doc)();
+      return new Tuple(new HtmlInputs({
         cutStart: fst(rangeTuple),
         cutEnd: snd(rangeTuple),
         youtubeUrl,
@@ -934,11 +907,14 @@
         reverseLoop,
         artist,
         title: title2,
+        applyButton,
+        videoSource
+      }), new HtmlOutputs({
         resultPreview,
-        cutVideoButton,
         addSubtitleButton,
-        applySubtitleButton
-      });
+        minsiLog,
+        playbackPosition
+      }));
     };
   };
 
@@ -4089,7 +4065,7 @@
       return raiseErrorAlert(message(v.value0));
     }
     ;
-    throw new Error("Failed pattern match at Main (line 36, column 1 - line 36, column 70): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at Main (line 29, column 1 - line 29, column 70): " + [v.constructor.name]);
   };
   var program = function __do2() {
     runAff_(genericErrorsHandlerEither)(checkDependecies)();

@@ -96,8 +96,19 @@
                   <span id="cutEndValue">100</span>s
                 </small>
               </div>
-
             </div>
+          </div>
+          <div class="card bg-black border border-success text-success">
+            <div
+              class="card-header bg-black border-success fw-bold font-monospace text-center"
+            >
+              😺 MINSI LOG 😺
+            </div>
+            <div
+              id="minsiLog"
+              class="card-body font-monospace"
+              style="height: 100px; overflow-y: auto"
+            ></div>
           </div>
         </div>
 
@@ -121,6 +132,23 @@
                 controls
               ></video>
             </div>
+            <div class="row text-center">
+              <div class="col-md-1 col-lg-2"></div>
+              <div class="col-md-5 col-lg-4">
+                <p>
+                  playback position:
+                  <span id="playbackPosition">0</span>
+                </p>
+              </div>
+              <div class="col-md-5 col-lg-4">
+                <span>Video Source:</span>
+                <select name="videoSource" id="videoSource">
+                  <option value="video">Video</option>
+                  <option value="gif">Gif</option>
+                </select>
+                <div class="col-md-1 col-lg-2"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -128,7 +156,11 @@
       <!-- Subtitles -->
       <div class="w-75 mx-auto my-2">
         <div class="d-flex justify-content-end mb-2">
-            <button id="applyButton" type="button" class="btn btn-primary btn-lg mx-auto">
+          <button
+            id="applyButton"
+            type="button"
+            class="btn btn-primary btn-lg mx-auto"
+          >
             Apply
           </button>
         </div>
@@ -182,9 +214,13 @@
                   </select>
                 </td>
                 <td class="text-center">
-                    <button id="addSubtitleButton" type="button" class="btn btn-sm border border-primary mx-auto">
-                        ➕
-                    </button>
+                  <button
+                    id="addSubtitleButton"
+                    type="button"
+                    class="btn btn-sm border border-primary mx-auto"
+                  >
+                    ➕
+                  </button>
                 </td>
               </tr>
             </tbody>

@@ -22,7 +22,6 @@ program = do
   _ <- loadComponents doc
   log "Components correctly loaded"
 
-
 genericErrorsHandler :: Effect Unit -> Effect Unit
 genericErrorsHandler p = catchError p \e -> raiseErrorAlert (message e)
 

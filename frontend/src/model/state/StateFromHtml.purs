@@ -4,7 +4,7 @@ import Web.HTML.HTMLInputElement (HTMLInputElement, value, valueAsNumber, checke
 import Effect (Effect)
 import Data.Traversable (traverse)
 
-import Components.HtmlComponents (HtmlComponents(..))
+import Components.HtmlComponents (HtmlInputs(..))
 import Model.State.State (State(..), DurationRange(..))
 import Node.URL (URL, new)
 import Prelude
@@ -14,8 +14,8 @@ import Data.String.Regex (Regex, test, regex)
 import Data.String.Regex.Flags (noFlags)
 import Data.Bifunctor (lmap)
 
-fromHtmlComponents :: HtmlComponents -> Effect (V (Array String) State)
-fromHtmlComponents (HtmlComponents { cutStart, cutEnd, youtubeUrl: youtubeUrlInput, filename: filenameInput, reverseLoop: reverseLoopInput, artist: artistInput, title: titleInput }) = do
+fromHtmlInputs :: HtmlInputs -> Effect (V (Array String) State)
+fromHtmlInputs (HtmlInputs { cutStart, cutEnd, youtubeUrl: youtubeUrlInput, filename: filenameInput, reverseLoop: reverseLoopInput, artist: artistInput, title: titleInput }) = do
   cutVideoV <- cutVideoFromHtmlRange cutStart cutEnd
   youtubeUrlV <- youtubeUrlFromHTMLInput youtubeUrlInput
   filenameV <- nonEmptyFromHtmlInput filenameInput
@@ -43,12 +43,15 @@ cutVideoValidation start end =
 
 youtubeRegex :: String
 youtubeRegex = """(http:|https:)?(\/\/)?(www\.)?(youtube.com|youtu.be)\/(watch|embed)?(\?v=|\/)?(\S+)?"""
+
 youtubeRegexValidation :: V (Array String) Regex
-youtubeRegexValidation = V $ lmap (\x -> [x]) (regex youtubeRegex noFlags)
+youtubeRegexValidation = V $ lmap (\x -> [ x ]) (regex youtubeRegex noFlags)
+
 nonEmptyRegex :: String
 nonEmptyRegex = """[\S\s]*\S[\S\s]*"""
+
 nonEmptyRegexValidation :: V (Array String) Regex
-nonEmptyRegexValidation = V $ lmap (\x -> [x]) (regex nonEmptyRegex noFlags)
+nonEmptyRegexValidation = V $ lmap (\x -> [ x ]) (regex nonEmptyRegex noFlags)
 
 youtubeUrlFromHTMLInput :: HTMLInputElement -> Effect (V (Array String) URL)
 youtubeUrlFromHTMLInput youtubeUrlComponent = value youtubeUrlComponent >>= youtubeUrlValidation

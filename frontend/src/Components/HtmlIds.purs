@@ -38,3 +38,12 @@ applyId = "applyButton"
 
 addSubtitleId :: String
 addSubtitleId = "addSubtitleButton"
+
+videoSourceId :: String
+videoSourceId = "videoSource"
+
+minsiLogId :: String
+minsiLogId = "minsiLog"
+
+playbackPositionId :: String
+playbackPositionId = "playbackPosition"
