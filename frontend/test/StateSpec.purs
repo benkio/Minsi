@@ -1,7 +1,8 @@
 module Test.StateSpec where
 
 import Prelude
-
+import Test.Arbitrary
+import Test.QuickCheck (quickCheck)
 import Data.Maybe (Maybe(..))
 import Model.State.StateFromHtml (youtubeUrlValidation, cutVideoValidation, nonEmptyValidation)
 import Model.State.State (State(..), DurationRange(..), Subtitle(..), Font(..), Color(..), Position(..), stateToJson)
@@ -63,46 +64,23 @@ spec = do
       result <- youtubeUrlValidation "not a youtube url"
       isValid result `shouldEqual` false
   describe "cutVideoValidation" do
-    it "should validate when start is less than end" do
-      let result = cutVideoValidation 0.0 100.0
-      isValid result `shouldEqual` true
-    it "should validate when start equals end" do
-      let result = cutVideoValidation 50.0 50.0
-      isValid result `shouldEqual` true
-    it "should validate when start is zero and end is positive" do
-      let result = cutVideoValidation 0.0 10.5
-      isValid result `shouldEqual` true
-    it "should reject when start is greater than end" do
-      let result = cutVideoValidation 100.0 50.0
-      isValid result `shouldEqual` false
-    it "should reject when start is positive and end is zero" do
-      let result = cutVideoValidation 10.0 0.0
-      isValid result `shouldEqual` false
+    it "should validate when the range is valid" $ liftEffect $
+      quickCheck (\(Range s e) -> isValid (cutVideoValidation s e))
+    it "should not validate when the range is invalid" $ liftEffect $
+      quickCheck (\(Range s e) -> not (isValid (cutVideoValidation (e + 1.0) s)))
+
   describe "nonEmptyValidation" do
-    it "should validate a non-empty string" do
-      let result = nonEmptyValidation "Hello World"
-      isValid result `shouldEqual` true
-    it "should validate a string with only one character" do
-      let result = nonEmptyValidation "a"
-      isValid result `shouldEqual` true
-    it "should validate a string with spaces and non-whitespace characters" do
-      let result = nonEmptyValidation "  Test  String  "
-      isValid result `shouldEqual` true
-    it "should validate a string with special characters" do
-      let result = nonEmptyValidation "test@123!#$"
-      isValid result `shouldEqual` true
-    it "should reject an empty string" do
-      let result = nonEmptyValidation ""
-      isValid result `shouldEqual` false
-    it "should reject a string with only whitespace" do
-      let result = nonEmptyValidation "   "
-      isValid result `shouldEqual` false
-    it "should reject a string with only newlines" do
-      let result = nonEmptyValidation "\n\n\n"
-      isValid result `shouldEqual` false
-    it "should reject a string with only tabs" do
-      let result = nonEmptyValidation "\t\t\t"
-      isValid result `shouldEqual` false
+    it "should validate a non-empty string" $ liftEffect $
+      quickCheck
+        ( \(NonEmptyASCIIString s) ->
+            (isValid <<< nonEmptyValidation) s
+        )
+    it "should not validate a empty string" $ liftEffect $
+      quickCheck
+        ( \(EmptyASCIIString s) ->
+            (not <<< isValid <<< nonEmptyValidation) s
+        )
+
   describe "State JSON encoding" do
     it "should encode State to JSON properly" $ liftEffect $ do
       -- Create a sample State
