@@ -33,8 +33,6 @@ genericErrorsHandlerEither (Left e) = raiseErrorAlert (message e)
 -- TODOs --------------------------------
 {-
 
-- Add the validations on the fields when the controls are converted to
-  state to not be empty. Add tests
 - Change the /cutVideo endpoint to /compute endpoint. Print the
   incoming json to Console.
 - Add the Apply button handler that takes the htmlcontrols, convert

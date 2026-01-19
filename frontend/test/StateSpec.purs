@@ -3,16 +3,14 @@ module Test.StateSpec where
 import Prelude
 
 import Data.Maybe (Maybe(..))
-import Model.State.StateFromHtml (youtubeUrlValidation, cutVideoValidation)
-import Model.State.State (State(..), DurationRange(..), Subtitle(..), Font(..), Color(..), Position(..))
+import Model.State.StateFromHtml (youtubeUrlValidation, cutVideoValidation, nonEmptyValidation)
+import Model.State.State (State(..), DurationRange(..), Subtitle(..), Font(..), Color(..), Position(..), stateToJson)
 import Effect.Class (liftEffect)
 import Test.Spec (Spec, describe, it)
-import Test.Spec.Assertions (shouldEqual, fail)
+import Test.Spec.Assertions (shouldEqual)
 import Data.Validation.Semigroup (isValid)
-import Model.State.State (stateToJson)
-import Foreign (unsafeFromForeign)
 import Data.Function.Uncurried (Fn1, runFn1)
-import Node.URL (URL, new)
+import Node.URL (new)
 import Data.Time.Duration (Milliseconds(..))
 import Foreign (Foreign)
 import Foreign.Object (Object, lookup)
@@ -79,6 +77,31 @@ spec = do
       isValid result `shouldEqual` false
     it "should reject when start is positive and end is zero" do
       let result = cutVideoValidation 10.0 0.0
+      isValid result `shouldEqual` false
+  describe "nonEmptyValidation" do
+    it "should validate a non-empty string" do
+      let result = nonEmptyValidation "Hello World"
+      isValid result `shouldEqual` true
+    it "should validate a string with only one character" do
+      let result = nonEmptyValidation "a"
+      isValid result `shouldEqual` true
+    it "should validate a string with spaces and non-whitespace characters" do
+      let result = nonEmptyValidation "  Test  String  "
+      isValid result `shouldEqual` true
+    it "should validate a string with special characters" do
+      let result = nonEmptyValidation "test@123!#$"
+      isValid result `shouldEqual` true
+    it "should reject an empty string" do
+      let result = nonEmptyValidation ""
+      isValid result `shouldEqual` false
+    it "should reject a string with only whitespace" do
+      let result = nonEmptyValidation "   "
+      isValid result `shouldEqual` false
+    it "should reject a string with only newlines" do
+      let result = nonEmptyValidation "\n\n\n"
+      isValid result `shouldEqual` false
+    it "should reject a string with only tabs" do
+      let result = nonEmptyValidation "\t\t\t"
       isValid result `shouldEqual` false
   describe "State JSON encoding" do
     it "should encode State to JSON properly" $ liftEffect $ do

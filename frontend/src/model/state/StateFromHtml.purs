@@ -1,34 +1,34 @@
 module Model.State.StateFromHtml where
 
-import Effect.Exception (error)
 import Web.HTML.HTMLInputElement (HTMLInputElement, value, valueAsNumber, checked)
 import Effect (Effect)
 import Data.Traversable (traverse)
 
 import Components.HtmlComponents (HtmlComponents(..))
 import Model.State.State (State(..), DurationRange(..))
-import Node.URL (URL)
+import Node.URL (URL, new)
 import Prelude
 import Data.Time.Duration (Milliseconds(..))
-import Node.URL (new)
-import Data.Validation.Semigroup (V, invalid)
+import Data.Validation.Semigroup (V(..), invalid, andThen)
 import Data.String.Regex (Regex, test, regex)
 import Data.String.Regex.Flags (noFlags)
-import Control.Monad.Error.Class (liftEither)
 import Data.Bifunctor (lmap)
 
 fromHtmlComponents :: HtmlComponents -> Effect (V (Array String) State)
 fromHtmlComponents (HtmlComponents { cutStart, cutEnd, youtubeUrl: youtubeUrlInput, filename: filenameInput, reverseLoop: reverseLoopInput, artist: artistInput, title: titleInput }) = do
   cutVideoV <- cutVideoFromHtmlRange cutStart cutEnd
   youtubeUrlV <- youtubeUrlFromHTMLInput youtubeUrlInput
-  filenameValue <- value filenameInput
+  filenameV <- nonEmptyFromHtmlInput filenameInput
   reverseLoopValue <- checked reverseLoopInput
-  artistValue <- value artistInput
-  titleValue <- value titleInput
+  artistV <- nonEmptyFromHtmlInput artistInput
+  titleV <- nonEmptyFromHtmlInput titleInput
   pure $ ado
     cutVideo <- cutVideoV
     youtubeUrl <- youtubeUrlV
-    in State { cutVideo: cutVideo, youtubeUrl: youtubeUrl, filename: filenameValue, reverseLoop: reverseLoopValue, artist: artistValue, title: titleValue, subtitles: [] }
+    filename <- filenameV
+    artist <- artistV
+    title <- titleV
+    in State { cutVideo: cutVideo, youtubeUrl: youtubeUrl, filename: filename, reverseLoop: reverseLoopValue, artist: artist, title: title, subtitles: [] }
 
 cutVideoFromHtmlRange :: HTMLInputElement -> HTMLInputElement -> Effect (V (Array String) DurationRange)
 cutVideoFromHtmlRange cutStart cutEnd = do
@@ -41,17 +41,30 @@ cutVideoValidation start end =
   if start > end then invalid [ "start > end: " <> show start <> " " <> show end ]
   else pure $ DurationRange { start: Milliseconds start, end: Milliseconds end }
 
-youtubeRegexString :: String
-youtubeRegexString = """(http:|https:)?(\/\/)?(www\.)?(youtube.com|youtu.be)\/(watch|embed)?(\?v=|\/)?(\S+)?"""
+youtubeRegex :: String
+youtubeRegex = """(http:|https:)?(\/\/)?(www\.)?(youtube.com|youtu.be)\/(watch|embed)?(\?v=|\/)?(\S+)?"""
+youtubeRegexValidation :: V (Array String) Regex
+youtubeRegexValidation = V $ lmap (\x -> [x]) (regex youtubeRegex noFlags)
+nonEmptyRegex :: String
+nonEmptyRegex = """[\S\s]*\S[\S\s]*"""
+nonEmptyRegexValidation :: V (Array String) Regex
+nonEmptyRegexValidation = V $ lmap (\x -> [x]) (regex nonEmptyRegex noFlags)
 
 youtubeUrlFromHTMLInput :: HTMLInputElement -> Effect (V (Array String) URL)
 youtubeUrlFromHTMLInput youtubeUrlComponent = value youtubeUrlComponent >>= youtubeUrlValidation
 
 youtubeUrlValidation :: String -> Effect (V (Array String) URL)
-youtubeUrlValidation v = do
-  youtubeRegex <- liftEither $ lmap error (regex youtubeRegexString noFlags)
-  traverse new (matches youtubeRegex v)
+youtubeUrlValidation v =
+  traverse new (andThen youtubeRegexValidation (\ytRegex -> matches ytRegex v))
 
 matches :: Regex -> String -> V (Array String) String
 matches r v | test r v = pure v
-matches r v = invalid [ "Youtube Input does not matches the requested format, value: " <> v <> " regex: " <> show r ]
+matches r v = invalid [ "Input does not matches the requested format, value: " <> v <> " regex: " <> show r ]
+
+nonEmptyFromHtmlInput :: HTMLInputElement -> Effect (V (Array String) String)
+nonEmptyFromHtmlInput i =
+  value i <#> nonEmptyValidation
+
+nonEmptyValidation :: String -> V (Array String) String
+nonEmptyValidation v =
+  andThen nonEmptyRegexValidation (\r -> matches r v)
