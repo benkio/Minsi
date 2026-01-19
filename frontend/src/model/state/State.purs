@@ -8,6 +8,10 @@ import Node.Path (FilePath)
 import Node.URL (URL, href)
 import Yoga.JSON (class WriteForeign, writeImpl, writeJSON)
 
+-------------------------------------------------------------------------------
+--                    Copy Pasted between Frontend↔Backend                   --
+-------------------------------------------------------------------------------
+
 newtype State = State
   { cutVideo :: DurationRange
   , youtubeUrl :: URL

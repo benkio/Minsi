@@ -2,17 +2,21 @@
 , dependencies =
   [ "arrays"
   , "console"
+  , "datetime"
   , "effect"
   , "either"
   , "exceptions"
   , "express"
   , "foldable-traversable"
+  , "foreign"
   , "lists"
   , "monad-loops"
   , "node-buffer"
   , "node-child-process"
   , "node-fs"
   , "node-path"
+  , "node-url"
+  , "open-foreign-generic"
   , "prelude"
   , "spec"
   , "spec-discovery"
@@ -20,6 +24,7 @@
   , "stringutils"
   , "transformers"
   , "tuples"
+  , "yoga-json"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]

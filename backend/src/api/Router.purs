@@ -3,9 +3,9 @@ module Api.Router where
 import Prelude
 import Node.Express.App (App, post)
 import Controller.CheckDependenciesController (checkDependenciesController)
-import Controller.CutVideoController (cutVideoController)
+import Controller.ComputeController (computeController)
 
 router :: App
 router = do
   post "/checkDependencies" checkDependenciesController
-  post "/cutVideo" cutVideoController
+  post "/compute" computeController

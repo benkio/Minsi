@@ -32,8 +32,6 @@ genericErrorsHandlerEither (Left e) = raiseErrorAlert (message e)
 -- TODOs --------------------------------
 {-
 
-- Change the /cutVideo endpoint to /compute endpoint. Print the
-  incoming json to Console.
 - Add the Apply button handler that takes the htmlinputs, convert
   them to state and send them to the compute endpoint if the
   conversion is successful. disable the button until the call ends. animate the message section
