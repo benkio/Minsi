@@ -6,13 +6,12 @@ import Data.Traversable (traverse)
 
 import Components.HtmlComponents (HtmlInputs(..))
 import Model.State.State (State(..), DurationRange(..))
-import Node.URL (URL, new)
+import Node.URL (URL)
 import Prelude
-import Data.Time.Duration (Milliseconds(..))
-import Data.Validation.Semigroup (V(..), invalid, andThen)
-import Data.String.Regex (Regex, test, regex)
-import Data.String.Regex.Flags (noFlags)
-import Data.Bifunctor (lmap)
+import Data.Validation.Semigroup (V(..))
+import Validations.YoutubeValidation (youtubeUrlValidation)
+import Validations.NonEmptyValidation (nonEmptyValidation)
+import Validations.CutVideoValidation (cutVideoValidation)
 
 fromHtmlInputs :: HtmlInputs -> Effect (V (Array String) State)
 fromHtmlInputs (HtmlInputs { cutStart, cutEnd, youtubeUrl: youtubeUrlInput, filename: filenameInput, reverseLoop: reverseLoopInput, artist: artistInput, title: titleInput }) = do
@@ -36,38 +35,9 @@ cutVideoFromHtmlRange cutStart cutEnd = do
   end <- valueAsNumber cutEnd
   pure $ cutVideoValidation start end
 
-cutVideoValidation :: Number -> Number -> V (Array String) DurationRange
-cutVideoValidation start end =
-  if start > end then invalid [ "start > end: " <> show start <> " " <> show end ]
-  else pure $ DurationRange { start: Milliseconds start, end: Milliseconds end }
-
-youtubeRegex :: String
-youtubeRegex = """(http:|https:)?(\/\/)?(www\.)?(youtube.com|youtu.be)\/(watch|embed)?(\?v=|\/)?(\S+)?"""
-
-youtubeRegexValidation :: V (Array String) Regex
-youtubeRegexValidation = V $ lmap (\x -> [ x ]) (regex youtubeRegex noFlags)
-
-nonEmptyRegex :: String
-nonEmptyRegex = """[\S\s]*\S[\S\s]*"""
-
-nonEmptyRegexValidation :: V (Array String) Regex
-nonEmptyRegexValidation = V $ lmap (\x -> [ x ]) (regex nonEmptyRegex noFlags)
-
 youtubeUrlFromHTMLInput :: HTMLInputElement -> Effect (V (Array String) URL)
 youtubeUrlFromHTMLInput youtubeUrlComponent = value youtubeUrlComponent >>= youtubeUrlValidation
-
-youtubeUrlValidation :: String -> Effect (V (Array String) URL)
-youtubeUrlValidation v =
-  traverse new (andThen youtubeRegexValidation (\ytRegex -> matches ytRegex v))
-
-matches :: Regex -> String -> V (Array String) String
-matches r v | test r v = pure v
-matches r v = invalid [ "Input does not matches the requested format, value: " <> v <> " regex: " <> show r ]
 
 nonEmptyFromHtmlInput :: HTMLInputElement -> Effect (V (Array String) String)
 nonEmptyFromHtmlInput i =
   value i <#> nonEmptyValidation
-
-nonEmptyValidation :: String -> V (Array String) String
-nonEmptyValidation v =
-  andThen nonEmptyRegexValidation (\r -> matches r v)

@@ -1,15 +1,11 @@
 module Test.StateSpec where
 
 import Prelude
-import Test.Arbitrary
-import Test.QuickCheck (quickCheck)
 import Data.Maybe (Maybe(..))
-import Model.State.StateFromHtml (youtubeUrlValidation, cutVideoValidation, nonEmptyValidation)
 import Model.State.State (State(..), DurationRange(..), Subtitle(..), Font(..), Color(..), Position(..), stateToJson)
 import Effect.Class (liftEffect)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
-import Data.Validation.Semigroup (isValid)
 import Data.Function.Uncurried (Fn1, runFn1)
 import Node.URL (new)
 import Data.Time.Duration (Milliseconds(..))
@@ -44,43 +40,6 @@ parseJSON = runFn1 parseJSONImpl
 
 spec :: Spec Unit
 spec = do
-  describe "youtubeUrlValidation" do
-    it "should validate a standard youtube.com URL" $ liftEffect $ do
-      result <- youtubeUrlValidation "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-      isValid result `shouldEqual` true
-    it "should validate a standard youtube.com URL with time query parameter" $ liftEffect $ do
-      result <- youtubeUrlValidation "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10s"
-      isValid result `shouldEqual` true
-    it "should validate a youtu.be short URL" $ liftEffect $ do
-      result <- youtubeUrlValidation "https://youtu.be/dQw4w9WgXcQ"
-      isValid result `shouldEqual` true
-    it "should validate a youtube.com URL without www" $ liftEffect $ do
-      result <- youtubeUrlValidation "https://youtube.com/watch?v=dQw4w9WgXcQ"
-      isValid result `shouldEqual` true
-    it "should validate a youtube.com URL without https" $ liftEffect $ do
-      result <- youtubeUrlValidation "http://www.youtube.com/watch?v=dQw4w9WgXcQ"
-      isValid result `shouldEqual` true
-    it "should reject an invalid URL" $ liftEffect $ do
-      result <- youtubeUrlValidation "not a youtube url"
-      isValid result `shouldEqual` false
-  describe "cutVideoValidation" do
-    it "should validate when the range is valid" $ liftEffect $
-      quickCheck (\(Range s e) -> isValid (cutVideoValidation s e))
-    it "should not validate when the range is invalid" $ liftEffect $
-      quickCheck (\(Range s e) -> not (isValid (cutVideoValidation (e + 1.0) s)))
-
-  describe "nonEmptyValidation" do
-    it "should validate a non-empty string" $ liftEffect $
-      quickCheck
-        ( \(NonEmptyASCIIString s) ->
-            (isValid <<< nonEmptyValidation) s
-        )
-    it "should not validate a empty string" $ liftEffect $
-      quickCheck
-        ( \(EmptyASCIIString s) ->
-            (not <<< isValid <<< nonEmptyValidation) s
-        )
-
   describe "State JSON encoding" do
     it "should encode State to JSON properly" $ liftEffect $ do
       -- Create a sample State

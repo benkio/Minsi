@@ -14,6 +14,7 @@ import Web.HTML.Event.EventTypes as E
 import Web.Event.Internal.Types (Event)
 import Web.HTML.HTMLInputElement as HI
 import Web.Event.Event (target)
+import Effect.Console (log)
 
 setupEventHandlers :: HtmlComponents -> Effect Unit
 setupEventHandlers (Tuple (HtmlInputs { youtubeUrl }) (HtmlOutputs _)) = do
@@ -21,7 +22,9 @@ setupEventHandlers (Tuple (HtmlInputs { youtubeUrl }) (HtmlOutputs _)) = do
   addEventListener E.change ytEvL false (toEventTarget (HI.toElement youtubeUrl))
 
 youtubeUrlEventListener :: Event -> Effect Unit
-youtubeUrlEventListener _ = pure unit --TODO: implement
+youtubeUrlEventListener ev = do
+    value <- getInputValue ev
+    log ("Youtube Url Handler fired with value: " <> show value)
 
 getInputValue :: Event -> Effect (Maybe String)
 getInputValue ev =
