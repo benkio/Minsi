@@ -3,7 +3,7 @@ module Controller.ComputeController where
 import Prelude
 import Effect.Class (liftEffect)
 import Effect.Console (log)
-import Data.Either (Either(Left, Right), either)
+import Data.Either (Either(Left, Right))
 import Control.Monad.Except (runExcept)
 import Model.State (State(..))
 import Node.Express.Request (getBody)

@@ -594,12 +594,12 @@
   // output/Control.Monad/index.js
   var ap = function(dictMonad) {
     var bind6 = bind(dictMonad.Bind1());
-    var pure6 = pure(dictMonad.Applicative0());
+    var pure7 = pure(dictMonad.Applicative0());
     return function(f) {
       return function(a) {
         return bind6(f)(function(f$prime) {
           return bind6(a)(function(a$prime) {
-            return pure6(f$prime(a$prime));
+            return pure7(f$prime(a$prime));
           });
         });
       };
@@ -708,10 +708,10 @@
   }();
 
   // output/Web.DOM.NonElementParentNode/foreign.js
-  function _getElementById(id) {
+  function _getElementById(id2) {
     return function(node) {
       return function() {
-        return node.getElementById(id);
+        return node.getElementById(id2);
       };
     };
   }
@@ -738,21 +738,21 @@
 
   // output/Components.HTMLComponentsLoader/index.js
   var bind1 = /* @__PURE__ */ bind(bindMaybe);
-  var loadHtmlElement = function(id) {
+  var loadHtmlElement = function(id2) {
     return function(f) {
       return function(doc) {
         return function __do3() {
-          var maybeComponent = getElementById(id)(doc)();
+          var maybeComponent = getElementById(id2)(doc)();
           var maybeComponentElement = bind1(maybeComponent)(f);
           if (maybeComponentElement instanceof Nothing) {
-            return throwMinsiError(new HTMLElementNotFound(id))();
+            return throwMinsiError(new HTMLElementNotFound(id2))();
           }
           ;
           if (maybeComponentElement instanceof Just) {
             return maybeComponentElement.value0;
           }
           ;
-          throw new Error("Failed pattern match at Components.HTMLComponentsLoader (line 15, column 3 - line 17, column 33): " + [maybeComponentElement.constructor.name]);
+          throw new Error("Failed pattern match at Components.HTMLComponentsLoader (line 14, column 3 - line 16, column 33): " + [maybeComponentElement.constructor.name]);
         };
       };
     };
@@ -835,6 +835,7 @@
   var fromElement2 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLDivElement");
 
   // output/Web.HTML.HTMLInputElement/index.js
+  var toElement = unsafeCoerce2;
   var fromElement3 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLInputElement");
 
   // output/Web.HTML.HTMLSelectElement/index.js
@@ -842,9 +843,6 @@
 
   // output/Web.HTML.HTMLSpanElement/index.js
   var fromElement5 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLSpanElement");
-
-  // output/Web.HTML.HTMLVideoElement/index.js
-  var fromElement6 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLVideoElement");
 
   // output/Components.HtmlComponents/index.js
   var HtmlOutputs = /* @__PURE__ */ function() {
@@ -871,7 +869,7 @@
   var loadVideoSource = /* @__PURE__ */ loadHtmlElement(videoSourceId)(fromElement4);
   var loadTitle = /* @__PURE__ */ loadHtmlElement(titleId)(fromElement3);
   var loadReverseLoop = /* @__PURE__ */ loadHtmlElement(reverseLoopGifId)(fromElement3);
-  var loadResultPreview = /* @__PURE__ */ loadHtmlElement(resultPreviewId)(fromElement6);
+  var loadResultPreview = /* @__PURE__ */ loadHtmlElement(resultPreviewId)(fromElement2);
   var loadPlaybackPosition = /* @__PURE__ */ loadHtmlElement(playbackPositionId)(fromElement5);
   var loadMinsiLog = /* @__PURE__ */ loadHtmlElement(minsiLogId)(fromElement2);
   var loadFilename = /* @__PURE__ */ loadHtmlElement(outputFilenameId)(fromElement3);
@@ -1011,13 +1009,13 @@
   };
   var traverse_ = function(dictApplicative) {
     var applySecond2 = applySecond(dictApplicative.Apply0());
-    var pure6 = pure(dictApplicative);
+    var pure7 = pure(dictApplicative);
     return function(dictFoldable) {
       var foldr22 = foldr(dictFoldable);
       return function(f) {
         return foldr22(function($454) {
           return applySecond2(f($454));
-        })(pure6(unit));
+        })(pure7(unit));
       };
     };
   };
@@ -1183,10 +1181,10 @@
     var catchError1 = catchError(dictMonadError);
     var Monad0 = dictMonadError.MonadThrow0().Monad0();
     var map7 = map(Monad0.Bind1().Apply0().Functor0());
-    var pure6 = pure(Monad0.Applicative0());
+    var pure7 = pure(Monad0.Applicative0());
     return function(a) {
       return catchError1(map7(Right.create)(a))(function($52) {
-        return pure6(Left.create($52));
+        return pure7(Left.create($52));
       });
     };
   };
@@ -2131,12 +2129,12 @@
   };
   var bindExceptT = function(dictMonad) {
     var bind6 = bind(dictMonad.Bind1());
-    var pure6 = pure(dictMonad.Applicative0());
+    var pure7 = pure(dictMonad.Applicative0());
     return {
       bind: function(v) {
         return function(k) {
           return bind6(v)(either(function($193) {
-            return pure6(Left.create($193));
+            return pure7(Left.create($193));
           })(function(a) {
             var v1 = k(a);
             return v1;
@@ -2435,6 +2433,68 @@
   var log = function(s) {
     return function() {
       console.log(s);
+    };
+  };
+
+  // output/Web.DOM.Element/foreign.js
+  var getProp = function(name15) {
+    return function(doctype) {
+      return doctype[name15];
+    };
+  };
+  var _namespaceURI = getProp("namespaceURI");
+  var _prefix = getProp("prefix");
+  var localName = getProp("localName");
+  var tagName = getProp("tagName");
+
+  // output/Web.DOM.ParentNode/foreign.js
+  var getEffProp = function(name15) {
+    return function(node) {
+      return function() {
+        return node[name15];
+      };
+    };
+  };
+  var children = getEffProp("children");
+  var _firstElementChild = getEffProp("firstElementChild");
+  var _lastElementChild = getEffProp("lastElementChild");
+  var childElementCount = getEffProp("childElementCount");
+
+  // output/Web.DOM.Element/index.js
+  var toEventTarget = unsafeCoerce2;
+
+  // output/Web.Event.EventTarget/foreign.js
+  function eventListener(fn) {
+    return function() {
+      return function(event) {
+        return fn(event)();
+      };
+    };
+  }
+  function addEventListener(type) {
+    return function(listener) {
+      return function(useCapture) {
+        return function(target5) {
+          return function() {
+            return target5.addEventListener(type, listener, useCapture);
+          };
+        };
+      };
+    };
+  }
+
+  // output/Web.HTML.Event.EventTypes/index.js
+  var change = "change";
+
+  // output/Handlers.Handlers/index.js
+  var pure3 = /* @__PURE__ */ pure(applicativeEffect);
+  var youtubeUrlEventListener = function(ev) {
+    return pure3(unit);
+  };
+  var setupEventHandlers = function(v) {
+    return function __do3() {
+      var ytEvL = eventListener(youtubeUrlEventListener)();
+      return addEventListener(change)(ytEvL)(false)(toEventTarget(toElement(v.value0.value0.youtubeUrl)))();
     };
   };
 
@@ -3672,10 +3732,10 @@
   // output/Foreign.Index/index.js
   var unsafeReadProp = function(dictMonad) {
     var fail2 = fail(dictMonad);
-    var pure6 = pure(applicativeExceptT(dictMonad));
+    var pure7 = pure(applicativeExceptT(dictMonad));
     return function(k) {
       return function(value12) {
-        return unsafeReadPropImpl(fail2(new TypeMismatch("object", typeOf(value12))), pure6, k, value12);
+        return unsafeReadPropImpl(fail2(new TypeMismatch("object", typeOf(value12))), pure7, k, value12);
       };
     };
   };
@@ -3996,7 +4056,7 @@
   var intercalateMap2 = /* @__PURE__ */ intercalateMap(foldable1NonEmptyList)(semigroupString);
   var bind4 = /* @__PURE__ */ bind(bindAff);
   var throwError2 = /* @__PURE__ */ throwError(monadThrowAff);
-  var pure3 = /* @__PURE__ */ pure(applicativeAff);
+  var pure4 = /* @__PURE__ */ pure(applicativeAff);
   var fromJSON = function(dictReadForeign) {
     var read4 = read3(dictReadForeign);
     return function(json3) {
@@ -4009,7 +4069,7 @@
       return bind4(json3)(function() {
         var $10 = either(function($12) {
           return throwError2(toError2($12));
-        })(pure3);
+        })(pure4);
         return function($11) {
           return $10(read4($11));
         };
@@ -4028,7 +4088,7 @@
     }
   })(/* @__PURE__ */ readForeignArray(readForeignString))(readForeignFieldsNilRowRo)()()));
   var liftEffect5 = /* @__PURE__ */ liftEffect(monadEffectAff);
-  var pure4 = /* @__PURE__ */ pure(applicativeAff);
+  var pure5 = /* @__PURE__ */ pure(applicativeAff);
   var missingDependencies = function(jsonText) {
     return bind5(fromJSON2(jsonText))(function(v) {
       return liftEffect5(throwMinsiError(new MissingDependenciesError(v.missedDependencies)));
@@ -4046,7 +4106,7 @@
       method: POST.value
     }))(function(response) {
       if (response.ok) {
-        return pure4(unit);
+        return pure5(unit);
       }
       ;
       return missingDependencies(response.json);
@@ -4054,24 +4114,26 @@
   }();
 
   // output/Main/index.js
-  var pure5 = /* @__PURE__ */ pure(applicativeEffect);
+  var pure6 = /* @__PURE__ */ pure(applicativeEffect);
   var catchError2 = /* @__PURE__ */ catchError(monadErrorEffect);
   var genericErrorsHandlerEither = function(v) {
     if (v instanceof Right) {
-      return pure5(unit);
+      return pure6(unit);
     }
     ;
     if (v instanceof Left) {
       return raiseErrorAlert(message(v.value0));
     }
     ;
-    throw new Error("Failed pattern match at Main (line 29, column 1 - line 29, column 70): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at Main (line 31, column 1 - line 31, column 70): " + [v.constructor.name]);
   };
   var program = function __do2() {
     runAff_(genericErrorsHandlerEither)(checkDependecies)();
     var doc = getDocument();
-    loadComponents(doc)();
-    return log("Components correctly loaded")();
+    var htmlComponents = loadComponents(doc)();
+    log("Components correctly loaded")();
+    setupEventHandlers(htmlComponents)();
+    return log("Setup Handlers Done")();
   };
   var genericErrorsHandler = function(p) {
     return catchError2(p)(function(e) {

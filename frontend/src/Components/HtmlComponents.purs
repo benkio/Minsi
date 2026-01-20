@@ -8,8 +8,6 @@ import Effect (Effect)
 import Components.HtmlIds
 import Web.HTML.HTMLInputElement (HTMLInputElement)
 import Web.HTML.HTMLInputElement as HI
-import Web.HTML.HTMLVideoElement (HTMLVideoElement)
-import Web.HTML.HTMLVideoElement as HV
 import Web.HTML.HTMLButtonElement (HTMLButtonElement)
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLDivElement (HTMLDivElement)
@@ -33,7 +31,7 @@ data HtmlInputs = HtmlInputs
   }
 
 data HtmlOutputs = HtmlOutputs
-  { resultPreview :: HTMLVideoElement
+  { resultPreview :: HTMLDivElement
   , addSubtitleButton :: HTMLButtonElement
   , minsiLog :: HTMLDivElement
   , playbackPosition :: HTMLSpanElement
@@ -101,8 +99,8 @@ loadFilename = loadHtmlElement outputFilenameId HI.fromElement
 loadAddSubtitleButton :: NonElementParentNode -> Effect HTMLButtonElement
 loadAddSubtitleButton = loadHtmlElement addSubtitleId HB.fromElement
 
-loadResultPreview :: NonElementParentNode -> Effect HTMLVideoElement
-loadResultPreview = loadHtmlElement resultPreviewId HV.fromElement
+loadResultPreview :: NonElementParentNode -> Effect HTMLDivElement
+loadResultPreview = loadHtmlElement resultPreviewId HD.fromElement
 
 loadReverseLoop :: NonElementParentNode -> Effect HTMLInputElement
 loadReverseLoop = loadHtmlElement reverseLoopGifId HI.fromElement

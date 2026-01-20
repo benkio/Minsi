@@ -38,6 +38,7 @@ to generate this file without the comments in this block.
   , "tuples"
   , "validation"
   , "web-dom"
+  , "web-events"
   , "web-html"
   , "yoga-json"
   ]
