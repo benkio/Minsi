@@ -1,13 +1,15 @@
 module Test.StateSpec where
 
 import Prelude
-import Data.Maybe (Maybe(..))
-import Model.State.State (State(..), DurationRange(..), Subtitle(..), Font(..), Color(..), Position(..), stateToJson)
+import Data.Maybe (Maybe(..), fromJust)
+import Partial.Unsafe (unsafePartial)
+import Model.State.State (State(..), DurationRange(..), Subtitle(..), Font(..), Color(..), Position(..), WURL(..))
 import Effect.Class (liftEffect)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Data.Function.Uncurried (Fn1, runFn1)
-import Node.URL (new)
+import Data.URL (fromString)
+import Yoga.JSON (writeJSON)
 import Data.Time.Duration (Milliseconds(..))
 import Foreign (Foreign)
 import Foreign.Object (Object, lookup)
@@ -43,13 +45,13 @@ spec = do
   describe "State JSON encoding" do
     it "should encode State to JSON properly" $ liftEffect $ do
       -- Create a sample State
-      youtubeUrl <- new "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-      let cutVideo = DurationRange { start: Milliseconds 0.0, end: Milliseconds 100.0 }
-      let filename = "output.mp4"
-      let reverseLoop = false
-      let artist = "Test Artist"
-      let title = "Test Title"
       let
+        youtubeUrl = WURL (unsafePartial fromJust (fromString "https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
+        cutVideo = DurationRange { start: Milliseconds 0.0, end: Milliseconds 100.0 }
+        filename = "output.mp4"
+        reverseLoop = false
+        artist = "Test Artist"
+        title = "Test Title"
         subtitle = Subtitle
           { videoPosition: DurationRange { start: Milliseconds 10.0, end: Milliseconds 20.0 }
           , value: "Test subtitle"
@@ -58,7 +60,6 @@ spec = do
           , color: White
           , screenPosition: Top
           }
-      let
         state = State
           { cutVideo: cutVideo
           , youtubeUrl: youtubeUrl
@@ -70,7 +71,7 @@ spec = do
           }
 
       -- Encode to JSON
-      jsonString <- stateToJson state
+      let jsonString = writeJSON state
 
       -- Parse JSON string to Foreign
       let json = parseJSON jsonString

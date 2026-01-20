@@ -85,9 +85,6 @@ in  upstream
           , "transformers"
           , "foldable-traversable"
           , "exceptions"
-          , "node-fs"
-          , "node-buffer"
-          , "node-readline"
           , "datetime"
           , "now"
           ]

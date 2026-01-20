@@ -7,7 +7,7 @@ import Test.Spec.Assertions (shouldEqual)
 import Data.Validation.Semigroup (isValid, toEither)
 import Data.Either (Either(Left, Right))
 import Data.String.Regex (test)
-import Validations.YoutubeValidation (youtubeRegex, youtubeRegexValidation, youtubeUrlValidation)
+import Validations.YoutubeValidation (youtubeRegexValidation, youtubeUrlValidation)
 
 spec :: Spec Unit
 spec = do
@@ -29,20 +29,20 @@ spec = do
 
   describe "youtubeUrlValidation" do
     it "should validate a standard youtube.com URL" $ liftEffect $ do
-      result <- youtubeUrlValidation "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      let result = youtubeUrlValidation "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
       isValid result `shouldEqual` true
     it "should validate a standard youtube.com URL with time query parameter" $ liftEffect $ do
-      result <- youtubeUrlValidation "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10s"
+      let result = youtubeUrlValidation "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10s"
       isValid result `shouldEqual` true
     it "should validate a youtu.be short URL" $ liftEffect $ do
-      result <- youtubeUrlValidation "https://youtu.be/dQw4w9WgXcQ"
+      let result = youtubeUrlValidation "https://youtu.be/dQw4w9WgXcQ"
       isValid result `shouldEqual` true
     it "should validate a youtube.com URL without www" $ liftEffect $ do
-      result <- youtubeUrlValidation "https://youtube.com/watch?v=dQw4w9WgXcQ"
+      let result = youtubeUrlValidation "https://youtube.com/watch?v=dQw4w9WgXcQ"
       isValid result `shouldEqual` true
     it "should validate a youtube.com URL without https" $ liftEffect $ do
-      result <- youtubeUrlValidation "http://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      let result = youtubeUrlValidation "http://www.youtube.com/watch?v=dQw4w9WgXcQ"
       isValid result `shouldEqual` true
     it "should reject an invalid URL" $ liftEffect $ do
-      result <- youtubeUrlValidation "not a youtube url"
+      let result = youtubeUrlValidation "not a youtube url"
       isValid result `shouldEqual` false

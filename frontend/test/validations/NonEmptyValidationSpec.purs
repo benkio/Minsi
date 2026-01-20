@@ -9,7 +9,7 @@ import Test.Spec.Assertions (shouldEqual)
 import Data.Validation.Semigroup (isValid, toEither)
 import Data.Either (Either(Left, Right))
 import Data.String.Regex (test)
-import Validations.NonEmptyValidation (nonEmptyRegex, nonEmptyRegexValidation, nonEmptyValidation)
+import Validations.NonEmptyValidation (nonEmptyRegexValidation, nonEmptyValidation)
 
 spec :: Spec Unit
 spec = do

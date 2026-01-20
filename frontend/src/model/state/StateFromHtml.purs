@@ -2,13 +2,12 @@ module Model.State.StateFromHtml where
 
 import Web.HTML.HTMLInputElement (HTMLInputElement, value, valueAsNumber, checked)
 import Effect (Effect)
-import Data.Traversable (traverse)
 
 import Components.HtmlComponents (HtmlInputs(..))
-import Model.State.State (State(..), DurationRange(..))
-import Node.URL (URL)
+import Model.State.State (State(..), DurationRange, WURL(..))
+import Data.URL (URL)
 import Prelude
-import Data.Validation.Semigroup (V(..))
+import Data.Validation.Semigroup (V)
 import Validations.YoutubeValidation (youtubeUrlValidation)
 import Validations.NonEmptyValidation (nonEmptyValidation)
 import Validations.CutVideoValidation (cutVideoValidation)
@@ -27,7 +26,7 @@ fromHtmlInputs (HtmlInputs { cutStart, cutEnd, youtubeUrl: youtubeUrlInput, file
     filename <- filenameV
     artist <- artistV
     title <- titleV
-    in State { cutVideo: cutVideo, youtubeUrl: youtubeUrl, filename: filename, reverseLoop: reverseLoopValue, artist: artist, title: title, subtitles: [] }
+    in State { cutVideo: cutVideo, youtubeUrl: WURL youtubeUrl, filename: filename, reverseLoop: reverseLoopValue, artist: artist, title: title, subtitles: [] }
 
 cutVideoFromHtmlRange :: HTMLInputElement -> HTMLInputElement -> Effect (V (Array String) DurationRange)
 cutVideoFromHtmlRange cutStart cutEnd = do
@@ -36,7 +35,9 @@ cutVideoFromHtmlRange cutStart cutEnd = do
   pure $ cutVideoValidation start end
 
 youtubeUrlFromHTMLInput :: HTMLInputElement -> Effect (V (Array String) URL)
-youtubeUrlFromHTMLInput youtubeUrlComponent = value youtubeUrlComponent >>= youtubeUrlValidation
+youtubeUrlFromHTMLInput youtubeUrlComponent = do
+  urlString <- value youtubeUrlComponent
+  pure $ youtubeUrlValidation urlString
 
 nonEmptyFromHtmlInput :: HTMLInputElement -> Effect (V (Array String) String)
 nonEmptyFromHtmlInput i =

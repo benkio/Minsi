@@ -1,8 +1,11 @@
 module Handlers.Handlers where
 
-import Data.Traversable (traverse)
+import Validations.YoutubeValidation (youtubeUrlValidation)
 
-import Data.Maybe (Maybe)
+import Data.Traversable (traverse)
+import Data.Validation.Semigroup (invalid)
+
+import Data.Maybe (Maybe, maybe)
 
 import Prelude
 import Effect (Effect)
@@ -23,8 +26,9 @@ setupEventHandlers (Tuple (HtmlInputs { youtubeUrl }) (HtmlOutputs _)) = do
 
 youtubeUrlEventListener :: Event -> Effect Unit
 youtubeUrlEventListener ev = do
-    value <- getInputValue ev
-    log ("Youtube Url Handler fired with value: " <> show value)
+  rawValue <- getInputValue ev
+  let youtubeUrlV = maybe (invalid [ "Empty YoutubeUrl Input" ]) youtubeUrlValidation rawValue
+  log ("Youtube Url Handler fired with value: " <> show youtubeUrlV)
 
 getInputValue :: Event -> Effect (Maybe String)
 getInputValue ev =
