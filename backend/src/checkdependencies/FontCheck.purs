@@ -7,7 +7,7 @@ import Data.Either (hush)
 import Data.Foldable (foldM)
 import Data.Functor ((<#>))
 import Data.HeytingAlgebra ((||))
-import Data.List (fromFoldable)
+import Data.List (fromFoldable, filterM, List)
 import Data.String (contains, toLower)
 import Data.String.Common (replaceAll)
 import Data.String.Pattern (Pattern(..), Replacement(..))
@@ -22,7 +22,7 @@ import Node.ChildProcess (spawnSync)
 import Node.ChildProcess.Types (Exit(..))
 import Node.Encoding (Encoding(..))
 import Node.FS.Stats (isDirectory)
-import Node.FS.Sync (readdir, stat)
+import Node.FS.Sync (readdir, stat, exists)
 import Node.Path (FilePath, basename, normalize)
 import Prelude (bind, map, pure, ($), (*>), (<$>), (<<<), (<>), (>>=), (>>>))
 
@@ -32,10 +32,16 @@ fontDependencies =
   , "Arial Black"
   ]
 
-knownFontFolders :: Array FilePath
+knownFontFolders :: Effect (List FilePath)
 knownFontFolders =
-  map
-    normalize
+  ( fromFoldable >>> map normalize >>>
+      filterM
+        ( \p -> exists p >>=
+            \e ->
+              if e then isDirectory <$> stat p
+              else pure e
+        )
+  )
     [ "/System/Library/Fonts"
     , "/Library/Fonts"
     , "/Windows/Fonts"
@@ -69,8 +75,9 @@ fcListSearch font = catchException (\e -> error (message e) *> pure false) $ do
     _ -> pure false
 
 searchFontInDirs :: String -> Effect Boolean
-searchFontInDirs font =
-  catchError (anyM (searchFontInDir font) (fromFoldable knownFontFolders)) (\e -> error (message e) *> pure false)
+searchFontInDirs font = do
+  fontFolders <- knownFontFolders
+  catchError (anyM (searchFontInDir font) fontFolders) (\e -> error (message e) *> pure false)
 
 searchFontInDir :: String -> FilePath -> Effect Boolean
 searchFontInDir font dir = catchError check (\e -> error (message e) *> pure false)
