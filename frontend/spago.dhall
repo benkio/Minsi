@@ -29,6 +29,7 @@ to generate this file without the comments in this block.
   , "js-timers"
   , "maybe"
   , "node-path"
+  , "ordered-collections"
   , "partial"
   , "prelude"
   , "quickcheck"

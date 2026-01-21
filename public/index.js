@@ -134,10 +134,10 @@
   };
   var applySecond = function(dictApply) {
     var apply1 = apply(dictApply);
-    var map7 = map(dictApply.Functor0());
+    var map8 = map(dictApply.Functor0());
     return function(a) {
       return function(b) {
-        return apply1(map7($$const(identity2))(a))(b);
+        return apply1(map8($$const(identity2))(a))(b);
       };
     };
   };
@@ -399,11 +399,11 @@
     return Just2;
   }();
   var showMaybe = function(dictShow) {
-    var show8 = show(dictShow);
+    var show7 = show(dictShow);
     return {
       show: function(v) {
         if (v instanceof Just) {
-          return "(Just " + (show8(v.value0) + ")");
+          return "(Just " + (show7(v.value0) + ")");
         }
         ;
         if (v instanceof Nothing) {
@@ -1203,7 +1203,7 @@
   var traversableMaybe = {
     traverse: function(dictApplicative) {
       var pure9 = pure(dictApplicative);
-      var map7 = map(dictApplicative.Apply0().Functor0());
+      var map8 = map(dictApplicative.Apply0().Functor0());
       return function(v) {
         return function(v1) {
           if (v1 instanceof Nothing) {
@@ -1211,7 +1211,7 @@
           }
           ;
           if (v1 instanceof Just) {
-            return map7(Just.create)(v(v1.value0));
+            return map8(Just.create)(v(v1.value0));
           }
           ;
           throw new Error("Failed pattern match at Data.Traversable (line 115, column 1 - line 119, column 33): " + [v.constructor.name, v1.constructor.name]);
@@ -1220,14 +1220,14 @@
     },
     sequence: function(dictApplicative) {
       var pure9 = pure(dictApplicative);
-      var map7 = map(dictApplicative.Apply0().Functor0());
+      var map8 = map(dictApplicative.Apply0().Functor0());
       return function(v) {
         if (v instanceof Nothing) {
           return pure9(Nothing.value);
         }
         ;
         if (v instanceof Just) {
-          return map7(Just.create)(v.value0);
+          return map8(Just.create)(v.value0);
         }
         ;
         throw new Error("Failed pattern match at Data.Traversable (line 115, column 1 - line 119, column 33): " + [v.constructor.name]);
@@ -2203,10 +2203,10 @@
   var $$try = function(dictMonadError) {
     var catchError1 = catchError(dictMonadError);
     var Monad0 = dictMonadError.MonadThrow0().Monad0();
-    var map7 = map(Monad0.Bind1().Apply0().Functor0());
+    var map8 = map(Monad0.Bind1().Apply0().Functor0());
     var pure9 = pure(Monad0.Applicative0());
     return function(a) {
-      return catchError1(map7(Right.create)(a))(function($52) {
+      return catchError1(map8(Right.create)(a))(function($52) {
         return pure9(Left.create($52));
       });
     };
@@ -2653,15 +2653,24 @@
     });
   };
 
-  // output/Data.URL/foreign.js
-  var fromStringImpl = (s) => {
-    try {
-      return new URL(s);
-    } catch {
-      return null;
-    }
+  // output/Handers.YoutubeVideo.Handler/foreign.js
+  var embedVideo = function(embedVideoConfig) {
+    return function() {
+      return new YT.Player(embedVideoConfig.resultPreviewId, {
+        height: "390",
+        width: "640",
+        videoId: embedVideoConfig.videoId,
+        playerVars: {
+          playsinline: 1
+        }
+        //,
+        // events: {
+        //   'onReady': onPlayerReady,
+        //   'onStateChange': onPlayerStateChange
+        // }
+      });
+    };
   };
-  var hrefImpl = (u) => u.href;
 
   // output/Data.Array/foreign.js
   var replicateFill = function(count, value12) {
@@ -2680,6 +2689,9 @@
     return result;
   };
   var replicateImpl = typeof Array.prototype.fill === "function" ? replicateFill : replicatePolyfill;
+  var indexImpl = function(just, nothing, xs, i) {
+    return i < 0 || i >= xs.length ? nothing : just(xs[i]);
+  };
 
   // output/Data.Function.Uncurried/foreign.js
   var runFn2 = function(fn) {
@@ -2694,6 +2706,17 @@
       return function(b) {
         return function(c) {
           return fn(a, b, c);
+        };
+      };
+    };
+  };
+  var runFn4 = function(fn) {
+    return function(a) {
+      return function(b) {
+        return function(c) {
+          return function(d) {
+            return fn(a, b, c, d);
+          };
         };
       };
     };
@@ -2720,6 +2743,14 @@
     Functor0: function() {
       return functorArray;
     }
+  };
+
+  // output/Data.Array/index.js
+  var index2 = /* @__PURE__ */ function() {
+    return runFn4(indexImpl)(Just.create)(Nothing.value);
+  }();
+  var head = function(xs) {
+    return index2(xs)(0);
   };
 
   // output/Data.NonEmpty/index.js
@@ -3158,6 +3189,50 @@
       throw new Error("Failed pattern match at Data.Map.Internal (line 717, column 40 - line 738, column 34): " + [l.constructor.name]);
     };
   }();
+  var lookup = function(dictOrd) {
+    var compare3 = compare(dictOrd);
+    return function(k) {
+      var go2 = function($copy_v) {
+        var $tco_done = false;
+        var $tco_result;
+        function $tco_loop(v) {
+          if (v instanceof Leaf) {
+            $tco_done = true;
+            return Nothing.value;
+          }
+          ;
+          if (v instanceof Node) {
+            var v1 = compare3(k)(v.value2);
+            if (v1 instanceof LT) {
+              $copy_v = v.value4;
+              return;
+            }
+            ;
+            if (v1 instanceof GT) {
+              $copy_v = v.value5;
+              return;
+            }
+            ;
+            if (v1 instanceof EQ) {
+              $tco_done = true;
+              return new Just(v.value3);
+            }
+            ;
+            throw new Error("Failed pattern match at Data.Map.Internal (line 283, column 7 - line 286, column 22): " + [v1.constructor.name]);
+          }
+          ;
+          throw new Error("Failed pattern match at Data.Map.Internal (line 280, column 8 - line 286, column 22): " + [v.constructor.name]);
+        }
+        ;
+        while (!$tco_done) {
+          $tco_result = $tco_loop($copy_v);
+        }
+        ;
+        return $tco_result;
+      };
+      return go2;
+    };
+  };
   var insert = function(dictOrd) {
     var compare3 = compare(dictOrd);
     return function(k) {
@@ -3203,6 +3278,17 @@
       })(empty2);
     };
   };
+
+  // output/Data.URL/foreign.js
+  var fromStringImpl = (s) => {
+    try {
+      return new URL(s);
+    } catch {
+      return null;
+    }
+  };
+  var queryKeysImpl = (u) => Array.from(u.searchParams.keys());
+  var queryLookupImpl = (k) => (u) => u.searchParams.getAll(k);
 
   // output/Data.String.Common/foreign.js
   var toLower = function(s) {
@@ -3538,12 +3624,16 @@
   };
 
   // output/Data.URL/index.js
-  var show3 = /* @__PURE__ */ show(showString);
-  var toString = hrefImpl;
-  var showURL = {
-    show: function(u) {
-      return "(URL " + (show3(toString(u)) + ")");
-    }
+  var fromFoldable4 = /* @__PURE__ */ fromFoldable(ordString)(foldableArray);
+  var map5 = /* @__PURE__ */ map(functorArray);
+  var query = function(u) {
+    var vals = function(k) {
+      return queryLookupImpl(k)(u);
+    };
+    var ks = queryKeysImpl(u);
+    return fromFoldable4(map5(function(k) {
+      return new Tuple(k, vals(k));
+    })(ks));
   };
   var fromString2 = function($255) {
     return toMaybe(fromStringImpl($255));
@@ -3635,14 +3725,14 @@
 
   // output/Validations.RegexValidation/index.js
   var pure4 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupArray));
-  var show4 = /* @__PURE__ */ show(showRegex);
+  var show3 = /* @__PURE__ */ show(showRegex);
   var matches = function(v) {
     return function(v1) {
       if (test(v)(v1)) {
         return pure4(v1);
       }
       ;
-      return invalid(["Input does not matches the requested format, value: " + (v1 + (" regex: " + show4(v)))]);
+      return invalid(["Input does not matches the requested format, value: " + (v1 + (" regex: " + show3(v)))]);
     };
   };
 
@@ -3703,8 +3793,10 @@
   var bind2 = /* @__PURE__ */ bind(bindMaybe);
   var foldl2 = /* @__PURE__ */ foldl(foldableV);
   var pure6 = /* @__PURE__ */ pure(applicativeEffect);
-  var show5 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(showString));
-  var show1 = /* @__PURE__ */ show(showURL);
+  var show4 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(showString));
+  var lookup3 = /* @__PURE__ */ lookup(ordString);
+  var show1 = /* @__PURE__ */ show(showString);
+  var show22 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(/* @__PURE__ */ showArray(showString)));
   var getInputValue = function(ev) {
     return traverse2(value2)(bind2(bind2(target5(ev))(fromEventTarget))(fromElement3));
   };
@@ -3716,8 +3808,16 @@
         return function(v1) {
           return pure6(v1);
         };
-      })(throwMinsiError(new InvalidInput(show5(rawValue))))(youtubeUrlV)();
-      return log("Youtube Url Handler fired with value: " + show1(youtubeUrl))();
+      })(throwMinsiError(new InvalidInput(show4(rawValue))))(youtubeUrlV)();
+      var videoId = maybe(throwMinsiError(new InvalidInput(show4(rawValue))))(pure6)(function(v) {
+        return bind2(lookup3("v")(v))(head);
+      }(query(youtubeUrl)))();
+      var startTime = lookup3("t")(query(youtubeUrl));
+      log("Youtube Url Handler fired with value: " + (show1(videoId) + (" startTime: " + show22(startTime))))();
+      return embedVideo({
+        resultPreviewId,
+        videoId
+      })();
     });
   };
 
@@ -3990,7 +4090,7 @@
   }
 
   // output/Fetch.Internal.Request/index.js
-  var show6 = /* @__PURE__ */ show(showMethod);
+  var show5 = /* @__PURE__ */ show(showMethod);
   var toCoreRequestOptionsHelpe = {
     convertHelper: function(v) {
       return function(v1) {
@@ -4000,7 +4100,7 @@
   };
   var toCoreRequestOptionsConve9 = {
     convertImpl: function(v) {
-      return show6;
+      return show5;
     }
   };
   var $$new2 = function() {
@@ -4147,7 +4247,7 @@
   var voidRight2 = /* @__PURE__ */ voidRight(functorEffect);
   var mempty2 = /* @__PURE__ */ mempty(monoidCanceler);
   var thenOrCatch3 = /* @__PURE__ */ thenOrCatch2();
-  var map5 = /* @__PURE__ */ map(functorEffect);
+  var map6 = /* @__PURE__ */ map(functorEffect);
   var resolve3 = /* @__PURE__ */ resolve2();
   var alt5 = /* @__PURE__ */ alt(altMaybe);
   var map1 = /* @__PURE__ */ map(functorMaybe);
@@ -4158,9 +4258,9 @@
     return function(p) {
       return makeAff(function(cb) {
         return voidRight2(mempty2)(thenOrCatch3(function(a) {
-          return map5(resolve3)(cb(new Right(a)));
+          return map6(resolve3)(cb(new Right(a)));
         })(function(e) {
-          return map5(resolve3)(cb(new Left(customCoerce(e))));
+          return map6(resolve3)(cb(new Left(customCoerce(e))));
         })(p));
       });
     };
@@ -4230,7 +4330,7 @@
   // output/Fetch/index.js
   var $$void4 = /* @__PURE__ */ $$void(functorEffect);
   var thenOrCatch4 = /* @__PURE__ */ thenOrCatch2();
-  var map6 = /* @__PURE__ */ map(functorEffect);
+  var map7 = /* @__PURE__ */ map(functorEffect);
   var resolve4 = /* @__PURE__ */ resolve2();
   var bind4 = /* @__PURE__ */ bind(bindAff);
   var liftEffect4 = /* @__PURE__ */ liftEffect(monadEffectAff);
@@ -4243,9 +4343,9 @@
       return makeAff(function(cb) {
         return function __do3() {
           $$void4(thenOrCatch4(function(a) {
-            return map6(resolve4)(cb(new Right(a)));
+            return map7(resolve4)(cb(new Right(a)));
           })(function(e) {
-            return map6(resolve4)(cb(new Left(coerce3(e))));
+            return map7(resolve4)(cb(new Left(coerce3(e))));
           })(p))();
           return effectCanceler(abort(abortController));
         };
@@ -4427,7 +4527,7 @@
   };
 
   // output/Yoga.JSON.Error/index.js
-  var show7 = /* @__PURE__ */ show(showInt);
+  var show6 = /* @__PURE__ */ show(showInt);
   var toJSONPath = function(fe) {
     var go2 = function(v) {
       if (v instanceof ForeignError) {
@@ -4439,7 +4539,7 @@
       }
       ;
       if (v instanceof ErrorAtIndex) {
-        return "[" + (show7(v.value0) + ("]" + go2(v.value1)));
+        return "[" + (show6(v.value0) + ("]" + go2(v.value1)));
       }
       ;
       if (v instanceof ErrorAtProperty && (v.value1 instanceof TypeMismatch && v.value1.value1 === "undefined")) {

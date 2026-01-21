@@ -1,14 +1,14 @@
 module Handers.YoutubeVideo.Handler where
 
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
-
+import Components.HtmlIds (resultPreviewId)
 import Validations.YoutubeValidation (youtubeUrlValidation)
 import Data.Foldable (foldl)
 import Data.Traversable (traverse)
 import Data.Validation.Semigroup (invalid)
-
+import Data.Map (lookup)
 import Data.Maybe (Maybe, maybe)
-
+import Data.URL (query)
 import Prelude
 import Effect (Effect)
 import Web.DOM.Element (fromEventTarget)
@@ -17,14 +17,26 @@ import Web.HTML.HTMLInputElement as HI
 import Web.Event.Event (target)
 import Effect.Console (log)
 import Handers.ErrorHandlers (genericErrorsHandler)
+import Data.Array (head)
 
 youtubeUrlEventListener :: Event -> Effect Unit
 youtubeUrlEventListener ev = genericErrorsHandler $ do
   rawValue <- getInputValue ev
   let youtubeUrlV = maybe (invalid [ "Empty YoutubeUrl Input" ]) youtubeUrlValidation rawValue
-  youtubeUrl <- foldl (\_ v -> pure v) (throwMinsiError (InvalidInput (show rawValue))) youtubeUrlV
-  log ("Youtube Url Handler fired with value: " <> show youtubeUrl)
+  youtubeUrl <- foldl (\_ v -> pure v) (throwMinsiError (InvalidInput (show rawValue)))  youtubeUrlV
+  videoId <- (maybe (throwMinsiError (InvalidInput (show rawValue))) pure <<< (\v -> lookup "v" v >>= head) <<< query) youtubeUrl
+  let startTime = (lookup "t" <<< query) youtubeUrl
+  log ("Youtube Url Handler fired with value: " <> show videoId <> " startTime: " <> show startTime)
+  embedVideo { resultPreviewId: resultPreviewId, videoId: videoId }
 
 getInputValue :: Event -> Effect (Maybe String)
 getInputValue ev =
   traverse (HI.value) (target ev >>= fromEventTarget >>= HI.fromElement)
+
+type EmbedVideoConfig =
+  {
+    resultPreviewId :: String,
+    videoId :: String
+  }
+
+foreign import embedVideo :: EmbedVideoConfig -> Effect Unit
