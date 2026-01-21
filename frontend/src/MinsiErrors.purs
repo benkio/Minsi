@@ -7,6 +7,7 @@ import Effect.Exception (error, throwException)
 data MinsiError
   = HTMLElementNotFound String
   | MissingDependenciesError (Array String)
+  | InvalidInput String
 
 instance Show MinsiError where
   show = case _ of
@@ -14,6 +15,8 @@ instance Show MinsiError where
       "HTML Element couldn't be loaded: " <> id
     MissingDependenciesError deps ->
       "Missing following dependencies: " <> show deps
+    InvalidInput v ->
+      "Inserted an invalid Input: " <> v
 
 throwMinsiError :: forall a. MinsiError -> Effect a
 throwMinsiError =

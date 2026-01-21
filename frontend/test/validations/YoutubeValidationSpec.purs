@@ -44,5 +44,9 @@ spec = do
       let result = youtubeUrlValidation "http://www.youtube.com/watch?v=dQw4w9WgXcQ"
       isValid result `shouldEqual` true
     it "should reject an invalid URL" $ liftEffect $ do
-      let result = youtubeUrlValidation "not a youtube url"
-      isValid result `shouldEqual` false
+      isValid (youtubeUrlValidation "not a youtube url") `shouldEqual` false
+    it "should reject an youtube URL without id" $ liftEffect $ do
+      isValid (youtubeUrlValidation "http://www.youtube.com/") `shouldEqual` false
+      isValid (youtubeUrlValidation "https://www.youtube.com/") `shouldEqual` false
+      isValid (youtubeUrlValidation "http://www.youtube.com") `shouldEqual` false
+      isValid (youtubeUrlValidation "https://www.youtube.com") `shouldEqual` false

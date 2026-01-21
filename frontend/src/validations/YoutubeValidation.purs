@@ -10,7 +10,7 @@ import Data.URL (URL, fromString)
 import Validations.RegexValidation (matches)
 
 youtubeRegex :: String
-youtubeRegex = """(http:|https:)?(\/\/)?(www\.)?(youtube.com|youtu.be)\/(watch|embed)?(\?v=|\/)?(\S+)?"""
+youtubeRegex = """^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=([a-zA-Z0-9_]+)|youtu\.be\/([a-zA-Z\d_]+))(?:&.*)?$"""
 
 youtubeRegexValidation :: V (Array String) Regex
 youtubeRegexValidation = V $ lmap (\x -> [ x ]) (regex youtubeRegex noFlags)

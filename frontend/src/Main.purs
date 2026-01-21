@@ -1,16 +1,15 @@
 module Main where
 
+import Handers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
+
 import Prelude
 
 import Components.HtmlComponents (loadComponents)
-import Components.Window (getDocument, raiseErrorAlert)
+import Components.Window (getDocument)
 import Effect (Effect)
 import Effect.Aff (runAff_)
 import Effect.Console (log)
-import Effect.Exception (Error, message)
 import Main.CheckDependencies (checkDependecies)
-import Control.Monad.Error.Class (catchError)
-import Data.Either (Either(..))
 import Handlers.Handlers (setupEventHandlers)
 
 main :: Effect Unit
@@ -24,13 +23,6 @@ program = do
   log "Components correctly loaded"
   setupEventHandlers htmlComponents
   log "Setup Handlers Done"
-
-genericErrorsHandler :: Effect Unit -> Effect Unit
-genericErrorsHandler p = catchError p \e -> raiseErrorAlert (message e)
-
-genericErrorsHandlerEither :: forall a. Either Error a -> Effect Unit
-genericErrorsHandlerEither (Right _) = pure unit
-genericErrorsHandlerEither (Left e) = raiseErrorAlert (message e)
 
 -- TODOs --------------------------------
 {-
