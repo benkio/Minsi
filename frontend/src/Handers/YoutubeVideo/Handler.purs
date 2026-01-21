@@ -21,13 +21,18 @@ import Data.Array (head)
 
 youtubeUrlEventListener :: Event -> Effect Unit
 youtubeUrlEventListener ev = genericErrorsHandler $ do
+  log "YouTube URL event listener triggered"
   rawValue <- getInputValue ev
+  log ("Raw input value: " <> show rawValue)
   let youtubeUrlV = maybe (invalid [ "Empty YoutubeUrl Input" ]) youtubeUrlValidation rawValue
   youtubeUrl <- foldl (\_ v -> pure v) (throwMinsiError (InvalidInput (show rawValue)))  youtubeUrlV
+  log ("Parsed YouTube URL: " <> show youtubeUrl)
   videoId <- (maybe (throwMinsiError (InvalidInput (show rawValue))) pure <<< (\v -> lookup "v" v >>= head) <<< query) youtubeUrl
   let startTime = (lookup "t" <<< query) youtubeUrl
   log ("Youtube Url Handler fired with value: " <> show videoId <> " startTime: " <> show startTime)
+  log ("About to embed video in element: " <> resultPreviewId)
   embedVideo { resultPreviewId: resultPreviewId, videoId: videoId }
+  log "embedVideo function called"
 
 getInputValue :: Event -> Effect (Maybe String)
 getInputValue ev =

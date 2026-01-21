@@ -399,11 +399,11 @@
     return Just2;
   }();
   var showMaybe = function(dictShow) {
-    var show7 = show(dictShow);
+    var show8 = show(dictShow);
     return {
       show: function(v) {
         if (v instanceof Just) {
-          return "(Just " + (show7(v.value0) + ")");
+          return "(Just " + (show8(v.value0) + ")");
         }
         ;
         if (v instanceof Nothing) {
@@ -866,9 +866,9 @@
   var fromElement2 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLDivElement");
 
   // output/Web.HTML.HTMLInputElement/foreign.js
-  function value2(input) {
+  function value2(input2) {
     return function() {
-      return input.value;
+      return input2.value;
     };
   }
 
@@ -1280,7 +1280,7 @@
   };
 
   // output/Web.HTML.Window/foreign.js
-  function document(window2) {
+  function document2(window2) {
     return function() {
       return window2.document;
     };
@@ -1302,7 +1302,7 @@
   };
   var getDocument = function __do() {
     var w = windowImpl();
-    var d = document(w)();
+    var d = document2(w)();
     return toNonElementParentNode(d);
   };
 
@@ -2656,19 +2656,61 @@
   // output/Handers.YoutubeVideo.Handler/foreign.js
   var embedVideo = function(embedVideoConfig) {
     return function() {
-      return new YT.Player(embedVideoConfig.resultPreviewId, {
-        height: "390",
-        width: "640",
-        videoId: embedVideoConfig.videoId,
-        playerVars: {
-          playsinline: 1
+      if (typeof YT === "undefined" || typeof YT.Player === "undefined") {
+        const errorMsg = "YouTube IFrame API is not loaded. Please wait a moment and try again, or refresh the page.";
+        console.error(errorMsg);
+        console.error('Make sure the script tag is in the HTML: <script src="https://www.youtube.com/iframe_api"><\/script>');
+        throw new Error(errorMsg);
+      }
+      const targetElement = document.getElementById(embedVideoConfig.resultPreviewId);
+      if (!targetElement) {
+        const errorMsg = "Target element not found: " + embedVideoConfig.resultPreviewId;
+        console.error(errorMsg);
+        throw new Error(errorMsg);
+      }
+      console.log("Creating YouTube player with videoId:", embedVideoConfig.videoId);
+      console.log("Target element:", targetElement);
+      if (targetElement.dataset.playerId) {
+        try {
+          var existingPlayer = window["ytplayer_" + targetElement.dataset.playerId];
+          if (existingPlayer && typeof existingPlayer.destroy === "function") {
+            console.log("Destroying existing player");
+            existingPlayer.destroy();
+          }
+        } catch (e) {
+          console.warn("Error destroying existing player:", e);
         }
-        //,
-        // events: {
-        //   'onReady': onPlayerReady,
-        //   'onStateChange': onPlayerStateChange
-        // }
-      });
+      }
+      try {
+        const player = new YT.Player(embedVideoConfig.resultPreviewId, {
+          height: "390",
+          width: "640",
+          videoId: embedVideoConfig.videoId,
+          playerVars: {
+            playsinline: 1
+          },
+          events: {
+            "onReady": function(event) {
+              console.log("YouTube player is ready");
+              if (event.target && event.target.a && event.target.a.id) {
+                targetElement.dataset.playerId = event.target.a.id;
+              }
+            },
+            "onError": function(event) {
+              console.error("YouTube player error:", event.data);
+              console.error("Error codes: 2=invalid video ID, 5=HTML5 error, 100=video not found, 101/150=playback not allowed");
+            },
+            "onStateChange": function(event) {
+              console.log("YouTube player state changed:", event.data);
+            }
+          }
+        });
+        console.log("Player created successfully");
+        return player;
+      } catch (error3) {
+        console.error("Error creating YouTube player:", error3);
+        throw error3;
+      }
     };
   };
 
@@ -3287,6 +3329,7 @@
       return null;
     }
   };
+  var hrefImpl = (u) => u.href;
   var queryKeysImpl = (u) => Array.from(u.searchParams.keys());
   var queryLookupImpl = (k) => (u) => u.searchParams.getAll(k);
 
@@ -3624,8 +3667,15 @@
   };
 
   // output/Data.URL/index.js
+  var show3 = /* @__PURE__ */ show(showString);
   var fromFoldable4 = /* @__PURE__ */ fromFoldable(ordString)(foldableArray);
   var map5 = /* @__PURE__ */ map(functorArray);
+  var toString = hrefImpl;
+  var showURL = {
+    show: function(u) {
+      return "(URL " + (show3(toString(u)) + ")");
+    }
+  };
   var query = function(u) {
     var vals = function(k) {
       return queryLookupImpl(k)(u);
@@ -3725,14 +3775,14 @@
 
   // output/Validations.RegexValidation/index.js
   var pure4 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupArray));
-  var show3 = /* @__PURE__ */ show(showRegex);
+  var show4 = /* @__PURE__ */ show(showRegex);
   var matches = function(v) {
     return function(v1) {
       if (test(v)(v1)) {
         return pure4(v1);
       }
       ;
-      return invalid(["Input does not matches the requested format, value: " + (v1 + (" regex: " + show3(v)))]);
+      return invalid(["Input does not matches the requested format, value: " + (v1 + (" regex: " + show4(v)))]);
     };
   };
 
@@ -3791,33 +3841,39 @@
   // output/Handers.YoutubeVideo.Handler/index.js
   var traverse2 = /* @__PURE__ */ traverse(traversableMaybe)(applicativeEffect);
   var bind2 = /* @__PURE__ */ bind(bindMaybe);
+  var show5 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(showString));
   var foldl2 = /* @__PURE__ */ foldl(foldableV);
   var pure6 = /* @__PURE__ */ pure(applicativeEffect);
-  var show4 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(showString));
+  var show1 = /* @__PURE__ */ show(showURL);
   var lookup3 = /* @__PURE__ */ lookup(ordString);
-  var show1 = /* @__PURE__ */ show(showString);
-  var show22 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(/* @__PURE__ */ showArray(showString)));
+  var show22 = /* @__PURE__ */ show(showString);
+  var show32 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(/* @__PURE__ */ showArray(showString)));
   var getInputValue = function(ev) {
     return traverse2(value2)(bind2(bind2(target5(ev))(fromEventTarget))(fromElement3));
   };
   var youtubeUrlEventListener = function(ev) {
     return genericErrorsHandler(function __do3() {
+      log("YouTube URL event listener triggered")();
       var rawValue = getInputValue(ev)();
+      log("Raw input value: " + show5(rawValue))();
       var youtubeUrlV = maybe(invalid(["Empty YoutubeUrl Input"]))(youtubeUrlValidation)(rawValue);
       var youtubeUrl = foldl2(function(v) {
         return function(v1) {
           return pure6(v1);
         };
-      })(throwMinsiError(new InvalidInput(show4(rawValue))))(youtubeUrlV)();
-      var videoId = maybe(throwMinsiError(new InvalidInput(show4(rawValue))))(pure6)(function(v) {
+      })(throwMinsiError(new InvalidInput(show5(rawValue))))(youtubeUrlV)();
+      log("Parsed YouTube URL: " + show1(youtubeUrl))();
+      var videoId = maybe(throwMinsiError(new InvalidInput(show5(rawValue))))(pure6)(function(v) {
         return bind2(lookup3("v")(v))(head);
       }(query(youtubeUrl)))();
       var startTime = lookup3("t")(query(youtubeUrl));
-      log("Youtube Url Handler fired with value: " + (show1(videoId) + (" startTime: " + show22(startTime))))();
-      return embedVideo({
+      log("Youtube Url Handler fired with value: " + (show22(videoId) + (" startTime: " + show32(startTime))))();
+      log("About to embed video in element: " + resultPreviewId)();
+      embedVideo({
         resultPreviewId,
         videoId
       })();
+      return log("embedVideo function called")();
     });
   };
 
@@ -3842,13 +3898,16 @@
   }
 
   // output/Web.HTML.Event.EventTypes/index.js
+  var input = "input";
   var change = "change";
 
   // output/Handlers.Handlers/index.js
   var setupEventHandlers = function(v) {
     return function __do3() {
       var ytEvL = eventListener(youtubeUrlEventListener)();
-      return addEventListener(change)(ytEvL)(false)(toEventTarget(toElement(v.value0.value0.youtubeUrl)))();
+      addEventListener(input)(ytEvL)(false)(toEventTarget(toElement(v.value0.value0.youtubeUrl)))();
+      addEventListener(change)(ytEvL)(false)(toEventTarget(toElement(v.value0.value0.youtubeUrl)))();
+      return log("YouTube URL event listeners attached (input and change)")();
     };
   };
 
@@ -4090,7 +4149,7 @@
   }
 
   // output/Fetch.Internal.Request/index.js
-  var show5 = /* @__PURE__ */ show(showMethod);
+  var show6 = /* @__PURE__ */ show(showMethod);
   var toCoreRequestOptionsHelpe = {
     convertHelper: function(v) {
       return function(v1) {
@@ -4100,7 +4159,7 @@
   };
   var toCoreRequestOptionsConve9 = {
     convertImpl: function(v) {
-      return show5;
+      return show6;
     }
   };
   var $$new2 = function() {
@@ -4527,7 +4586,7 @@
   };
 
   // output/Yoga.JSON.Error/index.js
-  var show6 = /* @__PURE__ */ show(showInt);
+  var show7 = /* @__PURE__ */ show(showInt);
   var toJSONPath = function(fe) {
     var go2 = function(v) {
       if (v instanceof ForeignError) {
@@ -4539,7 +4598,7 @@
       }
       ;
       if (v instanceof ErrorAtIndex) {
-        return "[" + (show6(v.value0) + ("]" + go2(v.value1)));
+        return "[" + (show7(v.value0) + ("]" + go2(v.value1)));
       }
       ;
       if (v instanceof ErrorAtProperty && (v.value1 instanceof TypeMismatch && v.value1.value1 === "undefined")) {
