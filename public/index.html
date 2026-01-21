@@ -12,27 +12,27 @@
   </head>
 
   <body>
-    <div class="container-fluid px-3 py-2">
+    <div class="container-fluid px-3 px-lg-4 py-3">
       <!-- Header -->
-      <div class="row app-header text-center">
+      <div class="row text-center mb-4">
         <div class="col">
-          <h1 class="mb-0">Minsi</h1>
-          <p class="text-muted">
+          <h1 class="mb-1">Minsi</h1>
+          <p class="text-muted mb-0">
             Opinionated YouTube Clip Video Gif Audio Extractor
           </p>
         </div>
       </div>
 
       <!-- Main content -->
-      <div class="row g-3">
+      <div class="row gy-4">
         <!-- Left controls -->
         <div class="col-12 col-lg-3">
-          <div class="card control-card shadow-sm">
+          <div class="card shadow-sm mb-3">
             <div class="card-body">
               <div class="mb-3">
-                <label for="outputFilename" class="form-label"
-                  >Output Filename</label
-                >
+                <label for="outputFilename" class="form-label">
+                  Output Filename
+                </label>
                 <input type="text" class="form-control" id="outputFilename" />
               </div>
 
@@ -57,7 +57,7 @@
                 </label>
               </div>
 
-              <div class="mb-3 range-group">
+              <div class="mb-4">
                 <label for="cutStart" class="form-label small">
                   Start Time
                 </label>
@@ -74,7 +74,7 @@
                 </small>
               </div>
 
-              <div class="range-group">
+              <div>
                 <label for="cutEnd" class="form-label small"> End Time </label>
                 <input
                   type="range"
@@ -90,16 +90,17 @@
               </div>
             </div>
           </div>
+
           <div class="card bg-black border border-success text-success">
             <div
-              class="card-header bg-black border-success fw-bold font-monospace text-center"
+              class="card-header bg-black border-success fw-bold font-monospace text-center py-2"
             >
               😺 MINSI LOG 😺
             </div>
             <div
               id="minsiLog"
-              class="card-body font-monospace"
-              style="height: 100px; overflow-y: auto"
+              class="card-body font-monospace small"
+              style="height: 120px; overflow-y: auto"
             ></div>
           </div>
         </div>
@@ -108,11 +109,11 @@
         <div class="col-12 col-lg-9">
           <div class="card shadow-sm h-100">
             <div class="card-body text-center">
-              <div class="mb-3">
-                <label for="youtubeUrl" class="form-label">YouTube URL</label>
+              <div class="mb-4">
+                <label for="youtubeUrl" class="form-label"> YouTube URL </label>
                 <input
                   type="url"
-                  class="form-control w-75 mx-auto"
+                  class="form-control w-100 w-md-75 mx-auto"
                   pattern="https?://(www\.)?(youtube\.com|youtu\.be)/.+"
                   id="youtubeUrl"
                   placeholder="https://www.youtube.com/watch?v=..."
@@ -120,32 +121,43 @@
               </div>
 
               <div
-                class="w-75 embed-responsive-item bg-dark"
+                class="w-100 w-md-75 mx-auto bg-dark mb-3"
                 id="resultPreview"
-                controls
               ></div>
             </div>
-            <div class="row text-center">
-              <div class="col-md-1 col-lg-2">
-                <button id="setCutStartButton" class="btn btn-primary mx-auto">
+
+            <div class="row text-center align-items-center gy-2 px-3 pb-3">
+              <div class="col-12 col-md-3 col-lg-2">
+                <button id="setCutStartButton" class="btn btn-primary w-100">
                   Set Start Position
                 </button>
               </div>
-              <div class="col-md-5 col-lg-4">
-                <p>
+
+              <div class="col-12 col-md-3 col-lg-4">
+                <p class="mb-0">
                   playback position:
                   <span id="playbackPosition">0</span>
                 </p>
               </div>
-              <div class="col-md-5 col-lg-4">
-                <span>Video Source:</span>
-                <select name="videoSource" id="videoSource">
-                  <option value="video">Video</option>
-                  <option value="gif">Gif</option>
-                </select>
+
+              <div class="col-12 col-md-3 col-lg-4">
+                <div
+                  class="d-flex justify-content-center align-items-center gap-2"
+                >
+                  <span>Video Source:</span>
+                  <select
+                    name="videoSource"
+                    id="videoSource"
+                    class="form-select form-select-sm w-auto"
+                  >
+                    <option value="video">Video</option>
+                    <option value="gif">Gif</option>
+                  </select>
+                </div>
               </div>
-              <div class="col-md-1 col-lg-2">
-                <button id="setCutEndButton" class="btn btn-primary mx-auto">
+
+              <div class="col-12 col-md-3 col-lg-2">
+                <button id="setCutEndButton" class="btn btn-primary w-100">
                   Set End Position
                 </button>
               </div>
@@ -155,77 +167,81 @@
       </div>
 
       <!-- Subtitles -->
-      <div class="w-75 mx-auto my-2">
-        <div class="d-flex justify-content-end mb-2">
-          <button
-            id="applyButton"
-            type="button"
-            class="btn btn-primary btn-lg mx-auto"
-          >
-            Apply
-          </button>
-        </div>
+      <div class="row mt-4">
+        <div class="col-12 col-xl-10 mx-auto">
+          <div class="d-flex justify-content-center mb-3">
+            <button
+              id="applyButton"
+              type="button"
+              class="btn btn-primary btn-lg px-5"
+            >
+              Apply
+            </button>
+          </div>
 
-        <div class="table-responsive">
-          <table class="table table-bordered table-sm bg-white shadow-sm">
-            <thead class="table-light">
-              <tr>
-                <th style="width: 70px">Start</th>
-                <th style="width: 70px">End</th>
-                <th>Value</th>
-                <th style="width: 140px">Font</th>
-                <th style="width: 120px">Color</th>
-                <th style="width: 100px">Position</th>
-                <th style="width: 100px"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <input type="number" class="form-control form-control-sm" />
-                </td>
-                <td>
-                  <input type="number" class="form-control form-control-sm" />
-                </td>
-                <td>
-                  <textarea
-                    class="form-control form-control-sm"
-                    rows="2"
-                  ></textarea>
-                </td>
-                <td>
-                  <select class="form-select form-select-sm">
-                    <option selected>Impact</option>
-                    <option>Arial Black</option>
-                  </select>
-                </td>
-                <td>
-                  <select class="form-select form-select-sm">
-                    <option selected>White</option>
-                    <option>Black</option>
-                    <option>Light Green</option>
-                    <option>Light Orange</option>
-                    <option>Yellow</option>
-                  </select>
-                </td>
-                <td>
-                  <select class="form-select form-select-sm">
-                    <option>Top</option>
-                    <option selected>Bottom</option>
-                  </select>
-                </td>
-                <td class="text-center">
-                  <button
-                    id="addSubtitleButton"
-                    type="button"
-                    class="btn btn-sm border border-primary mx-auto"
-                  >
-                    ➕
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table
+              class="table table-bordered table-sm bg-white shadow-sm align-middle"
+            >
+              <thead class="table-light text-center">
+                <tr>
+                  <th style="width: 70px">Start</th>
+                  <th style="width: 70px">End</th>
+                  <th>Value</th>
+                  <th style="width: 140px">Font</th>
+                  <th style="width: 120px">Color</th>
+                  <th style="width: 100px">Position</th>
+                  <th style="width: 80px"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <input type="number" class="form-control form-control-sm" />
+                  </td>
+                  <td>
+                    <input type="number" class="form-control form-control-sm" />
+                  </td>
+                  <td>
+                    <textarea
+                      class="form-control form-control-sm"
+                      rows="2"
+                    ></textarea>
+                  </td>
+                  <td>
+                    <select class="form-select form-select-sm">
+                      <option selected>Impact</option>
+                      <option>Arial Black</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select class="form-select form-select-sm">
+                      <option selected>White</option>
+                      <option>Black</option>
+                      <option>Light Green</option>
+                      <option>Light Orange</option>
+                      <option>Yellow</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select class="form-select form-select-sm">
+                      <option>Top</option>
+                      <option selected>Bottom</option>
+                    </select>
+                  </td>
+                  <td class="text-center">
+                    <button
+                      id="addSubtitleButton"
+                      type="button"
+                      class="btn btn-sm btn-outline-primary"
+                    >
+                      ➕
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
