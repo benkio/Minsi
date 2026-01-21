@@ -1,5 +1,7 @@
 module Handers.YoutubeVideo.Handler where
 
+import Web.Event.EventTarget (EventTarget, addEventListener, eventListener)
+
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Components.HtmlIds (resultPreviewId)
 import Validations.YoutubeValidation (youtubeUrlValidation)
@@ -19,16 +21,28 @@ import Web.Event.Event (target)
 import Effect.Console (log)
 import Handers.ErrorHandlers (genericErrorsHandler)
 import Data.Array (head, last)
+import Web.HTML.Event.EventTypes as E
+
+setVideoHandlers :: EventTarget -> Effect Unit
+setVideoHandlers ytUrlEventTarget = do
+  ytEvL <- eventListener youtubeUrlEventListener
+  addEventListener E.input ytEvL false ytUrlEventTarget
+  addEventListener E.change ytEvL false ytUrlEventTarget
+  -- foreign functions to get player state, currenttime
+  -- polling on the player state with setInterval for the current position
+  -- handlers for the cut start and cut end buttons to get the current positions and set the values of the sliders
 
 youtubeUrlEventListener :: Event -> Effect Unit
 youtubeUrlEventListener ev = genericErrorsHandler $ do
   rawValue <- getInputValue ev
   let youtubeUrlV = maybe (invalid [ "Empty YoutubeUrl Input" ]) youtubeUrlValidation rawValue
-  youtubeUrl <- foldl (\_ v -> pure v) (throwMinsiError (InvalidInput (show rawValue)))  youtubeUrlV
+  youtubeUrl <- foldl (\_ v -> pure v) (throwMinsiError (InvalidInput (show rawValue))) youtubeUrlV
   videoId <- (maybe (throwMinsiError (InvalidInput (show rawValue))) pure <<< extractYoutubeVideoId) youtubeUrl
   let startTime = (lookup "t" <<< query) youtubeUrl
   log ("Youtube Url Handler fired with value: " <> show videoId <> " startTime: " <> show startTime)
   embedVideo { resultPreviewId: resultPreviewId, videoId: videoId, width: 1000, height: 500 }
+  -- foreign function to get the duration of the video
+  -- set the max of the sliders to the length of the video
 
 getInputValue :: Event -> Effect (Maybe String)
 getInputValue ev =
@@ -38,20 +52,19 @@ extractYoutubeVideoId :: URL -> Maybe String
 extractYoutubeVideoId url =
   maybeVQueryString <|> lastPath
   where
-    maybeVQueryString = ((\v -> lookup "v" v >>= head) <<< query) url
-    lastPath = (path >>> pathToArray >>> last) url
+  maybeVQueryString = ((\v -> lookup "v" v >>= head) <<< query) url
+  lastPath = (path >>> pathToArray >>> last) url
 
 pathToArray :: Path -> Array String
-pathToArray PathEmpty        = []
+pathToArray PathEmpty = []
 pathToArray (PathAbsolute s) = s
 pathToArray (PathRelative s) = s
 
 type EmbedVideoConfig =
-  {
-    resultPreviewId :: String,
-    videoId :: String,
-    width :: Int,
-    height :: Int
+  { resultPreviewId :: String
+  , videoId :: String
+  , width :: Int
+  , height :: Int
   }
 
 foreign import embedVideo :: EmbedVideoConfig -> Effect Unit
