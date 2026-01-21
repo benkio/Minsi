@@ -47,3 +47,9 @@ minsiLogId = "minsiLog"
 
 playbackPositionId :: String
 playbackPositionId = "playbackPosition"
+
+setCutStartButton :: String
+setCutStartButton = "setCutStartButton"
+
+setCutEndButton :: String
+setCutEndButton = "setCutEndButton"

@@ -28,9 +28,10 @@ setVideoHandlers ytUrlEventTarget = do
   ytEvL <- eventListener youtubeUrlEventListener
   addEventListener E.input ytEvL false ytUrlEventTarget
   addEventListener E.change ytEvL false ytUrlEventTarget
-  -- foreign functions to get player state, currenttime
-  -- polling on the player state with setInterval for the current position
-  -- handlers for the cut start and cut end buttons to get the current positions and set the values of the sliders
+
+-- foreign functions to get player state, currenttime
+-- polling on the player state with setInterval for the current position
+-- handlers for the cut start and cut end buttons to get the current positions and set the values of the sliders
 
 youtubeUrlEventListener :: Event -> Effect Unit
 youtubeUrlEventListener ev = genericErrorsHandler $ do
@@ -41,8 +42,9 @@ youtubeUrlEventListener ev = genericErrorsHandler $ do
   let startTime = (lookup "t" <<< query) youtubeUrl
   log ("Youtube Url Handler fired with value: " <> show videoId <> " startTime: " <> show startTime)
   embedVideo { resultPreviewId: resultPreviewId, videoId: videoId, width: 1000, height: 500 }
-  -- foreign function to get the duration of the video
-  -- set the max of the sliders to the length of the video
+
+-- foreign function to get the duration of the video
+-- set the max of the sliders to the length of the video
 
 getInputValue :: Event -> Effect (Maybe String)
 getInputValue ev =

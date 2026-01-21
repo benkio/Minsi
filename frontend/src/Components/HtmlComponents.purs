@@ -28,6 +28,8 @@ data HtmlInputs = HtmlInputs
   , title :: HTMLInputElement
   , applyButton :: HTMLButtonElement
   , videoSource :: HTMLSelectElement
+  , setCutEndButton :: HTMLButtonElement
+  , setCutStartButton :: HTMLButtonElement
   }
 
 data HtmlOutputs = HtmlOutputs
@@ -51,6 +53,8 @@ loadComponents doc = do
   videoSource <- loadVideoSource doc
   resultPreview <- loadResultPreview doc
   addSubtitleButton <- loadAddSubtitleButton doc
+  setCutStartButton <- loadSetCutStartButton doc
+  setCutEndButton <- loadSetCutEndButton doc
   minsiLog <- loadMinsiLog doc
   playbackPosition <- loadPlaybackPosition doc
   pure
@@ -65,6 +69,8 @@ loadComponents doc = do
             , title: title
             , applyButton: applyButton
             , videoSource: videoSource
+            , setCutStartButton: setCutStartButton
+            , setCutEndButton: setCutEndButton
             }
         )
         ( HtmlOutputs
@@ -119,3 +125,9 @@ loadMinsiLog = loadHtmlElement minsiLogId HD.fromElement
 
 loadPlaybackPosition :: NonElementParentNode -> Effect HTMLSpanElement
 loadPlaybackPosition = loadHtmlElement playbackPositionId HSP.fromElement
+
+loadSetCutStartButton :: NonElementParentNode -> Effect HTMLButtonElement
+loadSetCutStartButton = loadHtmlElement setCutStartButton HB.fromElement
+
+loadSetCutEndButton :: NonElementParentNode -> Effect HTMLButtonElement
+loadSetCutEndButton = loadHtmlElement setCutEndButton HB.fromElement

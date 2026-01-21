@@ -805,6 +805,8 @@
   var youtubeUrlId = "youtubeUrl";
   var videoSourceId = "videoSource";
   var titleId = "title";
+  var setCutStartButton = "setCutStartButton";
+  var setCutEndButton = "setCutEndButton";
   var reverseLoopGifId = "reverseLoopGif";
   var resultPreviewId = "resultPreview";
   var playbackPositionId = "playbackPosition";
@@ -954,6 +956,8 @@
   var loadYoutubeUrl = /* @__PURE__ */ loadHtmlElement(youtubeUrlId)(fromElement3);
   var loadVideoSource = /* @__PURE__ */ loadHtmlElement(videoSourceId)(fromElement4);
   var loadTitle = /* @__PURE__ */ loadHtmlElement(titleId)(fromElement3);
+  var loadSetCutStartButton = /* @__PURE__ */ loadHtmlElement(setCutStartButton)(fromElement);
+  var loadSetCutEndButton = /* @__PURE__ */ loadHtmlElement(setCutEndButton)(fromElement);
   var loadReverseLoop = /* @__PURE__ */ loadHtmlElement(reverseLoopGifId)(fromElement3);
   var loadResultPreview = /* @__PURE__ */ loadHtmlElement(resultPreviewId)(fromElement2);
   var loadPlaybackPosition = /* @__PURE__ */ loadHtmlElement(playbackPositionId)(fromElement5);
@@ -981,6 +985,8 @@
       var videoSource = loadVideoSource(doc)();
       var resultPreview = loadResultPreview(doc)();
       var addSubtitleButton = loadAddSubtitleButton(doc)();
+      var setCutStartButton2 = loadSetCutStartButton(doc)();
+      var setCutEndButton2 = loadSetCutEndButton(doc)();
       var minsiLog = loadMinsiLog(doc)();
       var playbackPosition = loadPlaybackPosition(doc)();
       return new Tuple(new HtmlInputs({
@@ -992,7 +998,9 @@
         artist,
         title: title2,
         applyButton,
-        videoSource
+        videoSource,
+        setCutStartButton: setCutStartButton2,
+        setCutEndButton: setCutEndButton2
       }), new HtmlOutputs({
         resultPreview,
         addSubtitleButton,
@@ -4371,6 +4379,30 @@
     return toMaybe(_target($3));
   };
 
+  // output/Web.Event.EventTarget/foreign.js
+  function eventListener(fn) {
+    return function() {
+      return function(event) {
+        return fn(event)();
+      };
+    };
+  }
+  function addEventListener(type) {
+    return function(listener) {
+      return function(useCapture) {
+        return function(target6) {
+          return function() {
+            return target6.addEventListener(type, listener, useCapture);
+          };
+        };
+      };
+    };
+  }
+
+  // output/Web.HTML.Event.EventTypes/index.js
+  var input = "input";
+  var change = "change";
+
   // output/Handers.YoutubeVideo.Handler/index.js
   var traverse2 = /* @__PURE__ */ traverse(traversableMaybe)(applicativeEffect);
   var bind2 = /* @__PURE__ */ bind(bindMaybe);
@@ -4394,7 +4426,7 @@
       return v.value0;
     }
     ;
-    throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 44, column 1 - line 44, column 36): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 58, column 1 - line 58, column 36): " + [v.constructor.name]);
   };
   var getInputValue = function(ev) {
     return traverse2(value2)(bind2(bind2(target5(ev))(fromEventTarget))(fromElement3));
@@ -4428,38 +4460,18 @@
       })();
     });
   };
-
-  // output/Web.Event.EventTarget/foreign.js
-  function eventListener(fn) {
-    return function() {
-      return function(event) {
-        return fn(event)();
-      };
+  var setVideoHandlers = function(ytUrlEventTarget) {
+    return function __do3() {
+      var ytEvL = eventListener(youtubeUrlEventListener)();
+      addEventListener(input)(ytEvL)(false)(ytUrlEventTarget)();
+      return addEventListener(change)(ytEvL)(false)(ytUrlEventTarget)();
     };
-  }
-  function addEventListener(type) {
-    return function(listener) {
-      return function(useCapture) {
-        return function(target6) {
-          return function() {
-            return target6.addEventListener(type, listener, useCapture);
-          };
-        };
-      };
-    };
-  }
-
-  // output/Web.HTML.Event.EventTypes/index.js
-  var input = "input";
-  var change = "change";
+  };
 
   // output/Handlers.Handlers/index.js
   var setupEventHandlers = function(v) {
-    return function __do3() {
-      var ytEvL = eventListener(youtubeUrlEventListener)();
-      addEventListener(input)(ytEvL)(false)(toEventTarget(toElement(v.value0.value0.youtubeUrl)))();
-      return addEventListener(change)(ytEvL)(false)(toEventTarget(toElement(v.value0.value0.youtubeUrl)))();
-    };
+    var ytUrlEventTarget = toEventTarget(toElement(v.value0.value0.youtubeUrl));
+    return setVideoHandlers(ytUrlEventTarget);
   };
 
   // output/Data.HTTP.Method/index.js
