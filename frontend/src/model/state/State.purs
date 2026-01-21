@@ -1,12 +1,9 @@
 module Model.State.State where
 
-import Effect (Effect)
-
-import Prelude
 import Data.Time.Duration (Milliseconds)
 import Node.Path (FilePath)
 import Data.URL (URL, toString)
-import Yoga.JSON (class WriteForeign, writeImpl, writeJSON)
+import Yoga.JSON (class WriteForeign, writeImpl)
 
 -------------------------------------------------------------------------------
 --                    Copy Pasted between Frontend↔Backend                   --
