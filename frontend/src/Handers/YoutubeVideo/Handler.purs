@@ -42,6 +42,7 @@ setVideoHandlers cutStart playbackPosition cutEnd ytUrlEventTarget = do
   addEventListener E.change ytEvL false ytUrlEventTarget
   --TODO: fix, not updating.
   _ <- setInterval 1000 (updatePlaybackPosition playbackPosition)
+  --TODO: Add the cut start position - cut end position handlers
   pure unit
 
 youtubeUrlEventListener :: HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit

@@ -146,6 +146,22 @@
   var pure = function(dict) {
     return dict.pure;
   };
+  var when = function(dictApplicative) {
+    var pure15 = pure(dictApplicative);
+    return function(v) {
+      return function(v1) {
+        if (v) {
+          return v1;
+        }
+        ;
+        if (!v) {
+          return pure15(unit);
+        }
+        ;
+        throw new Error("Failed pattern match at Control.Applicative (line 63, column 1 - line 63, column 63): " + [v.constructor.name, v1.constructor.name]);
+      };
+    };
+  };
   var liftA1 = function(dictApplicative) {
     var apply3 = apply(dictApplicative.Apply0());
     var pure15 = pure(dictApplicative);
@@ -4648,6 +4664,7 @@
   var show4 = /* @__PURE__ */ show(showNumber);
   var discard2 = /* @__PURE__ */ discard(discardUnit);
   var show1 = /* @__PURE__ */ show(showBoolean);
+  var when2 = /* @__PURE__ */ when(applicativeEffect);
   var join2 = /* @__PURE__ */ join(bindMaybe);
   var bind2 = /* @__PURE__ */ bind(bindMaybe);
   var traverse2 = /* @__PURE__ */ traverse(traversableMaybe)(applicativeEffect);
@@ -4667,7 +4684,7 @@
     var currentTime2 = show4(getPlayerCurrentTime(unit));
     return function __do3() {
       log("updatePlayback position: " + show1(playerReady))();
-      return setTextContent(currentTime2)(toNode2(playbackPosition))();
+      return when2(playerReady)(setTextContent(currentTime2)(toNode2(playbackPosition)))();
     };
   };
   var pathToArray = function(v) {
@@ -4683,7 +4700,7 @@
       return v.value0;
     }
     ;
-    throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 75, column 1 - line 75, column 36): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 76, column 1 - line 76, column 36): " + [v.constructor.name]);
   };
   var parseUnit = function(str) {
     return function(unit2) {
@@ -4702,10 +4719,10 @@
           return 0;
         }
         ;
-        throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 106, column 7 - line 108, column 21): " + [v1.constructor.name]);
+        throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 107, column 7 - line 109, column 21): " + [v1.constructor.name]);
       }
       ;
-      throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 103, column 3 - line 108, column 21): " + [v.constructor.name]);
+      throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 104, column 3 - line 109, column 21): " + [v.constructor.name]);
     };
   };
   var parseYouTubeT = function(raw) {
@@ -4720,15 +4737,15 @@
       var m = parseUnit(str)("m");
       var h = parseUnit(str)("h");
       var total = ((h * 3600 | 0) + (m * 60 | 0) | 0) + s | 0;
-      var $43 = total > 0;
-      if ($43) {
+      var $44 = total > 0;
+      if ($44) {
         return new Just(total);
       }
       ;
       return Nothing.value;
     }
     ;
-    throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 117, column 5 - line 126, column 52): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 118, column 5 - line 127, column 52): " + [v.constructor.name]);
   };
   var getInputValue = function(ev) {
     return traverse2(value2)(bind2(bind2(target5(ev))(fromEventTarget))(fromElement3));
@@ -4744,8 +4761,8 @@
     var maybeVQueryString = function(v) {
       return bind2(lookup3("v")(v))(head);
     }(query(url2));
-    var lastPath = function($44) {
-      return last(pathToArray($44));
+    var lastPath = function($45) {
+      return last(pathToArray($45));
     }(path(url2));
     return alt5(maybeVQueryString)(lastPath);
   };
