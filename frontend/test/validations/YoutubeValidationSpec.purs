@@ -1,13 +1,14 @@
 module Test.Validations.YoutubeValidationSpec where
 
-import Prelude
+import Data.Either (Either(Left, Right))
+import Data.String.Regex (test)
+import Data.Traversable (traverse_)
+import Data.Validation.Semigroup (isValid, toEither)
 import Effect.Class (liftEffect)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
-import Data.Validation.Semigroup (isValid, toEither)
-import Data.Either (Either(Left, Right))
-import Data.String.Regex (test)
 import Validations.YoutubeValidation (youtubeRegexValidation, youtubeUrlValidation)
+import Prelude
 
 spec :: Spec Unit
 spec = do
@@ -35,8 +36,13 @@ spec = do
       let result = youtubeUrlValidation "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10s"
       isValid result `shouldEqual` true
     it "should validate a youtu.be short URL" $ liftEffect $ do
-      let result = youtubeUrlValidation "https://youtu.be/dQw4w9WgXcQ"
-      isValid result `shouldEqual` true
+      let
+        input =
+          [ "https://youtu.be/PHi-UNsm2Ds"
+          , "https://youtu.be/dQw4w9WgXcQ"
+          , "https://youtu.be/PHi-UNsm2Ds?t=364"
+          ]
+      traverse_ (\i -> isValid (youtubeUrlValidation i) `shouldEqual` true) input
     it "should validate a youtube.com URL without www" $ liftEffect $ do
       let result = youtubeUrlValidation "https://youtube.com/watch?v=dQw4w9WgXcQ"
       isValid result `shouldEqual` true

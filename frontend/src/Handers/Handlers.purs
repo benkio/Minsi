@@ -9,7 +9,7 @@ import Web.DOM.Element (toEventTarget)
 import Web.HTML.HTMLInputElement as HI
 
 setupEventHandlers :: HtmlComponents -> Effect Unit
-setupEventHandlers (Tuple (HtmlInputs { youtubeUrl }) (HtmlOutputs _)) = do
-  setVideoHandlers ytUrlEventTarget
+setupEventHandlers (Tuple (HtmlInputs { cutStart, cutEnd, youtubeUrl }) (HtmlOutputs _)) = do
+  setVideoHandlers cutStart cutEnd ytUrlEventTarget
   where
   ytUrlEventTarget = (toEventTarget (HI.toElement youtubeUrl))

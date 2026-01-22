@@ -23,28 +23,29 @@ import Handers.ErrorHandlers (genericErrorsHandler)
 import Data.Array (head, last)
 import Web.HTML.Event.EventTypes as E
 
-setVideoHandlers :: EventTarget -> Effect Unit
-setVideoHandlers ytUrlEventTarget = do
-  ytEvL <- eventListener youtubeUrlEventListener
+setVideoHandlers :: HI.HTMLInputElement -> HI.HTMLInputElement -> EventTarget -> Effect Unit
+setVideoHandlers cutStart cutEnd ytUrlEventTarget = do
+  ytEvL <- eventListener (youtubeUrlEventListener cutStart cutEnd)
   addEventListener E.input ytEvL false ytUrlEventTarget
   addEventListener E.change ytEvL false ytUrlEventTarget
 
--- foreign functions to get player state, currenttime
--- polling on the player state with setInterval for the current position
+-- polling on the player with setInterval for the current position
 -- handlers for the cut start and cut end buttons to get the current positions and set the values of the sliders
 
-youtubeUrlEventListener :: Event -> Effect Unit
-youtubeUrlEventListener ev = genericErrorsHandler $ do
+youtubeUrlEventListener :: HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
+youtubeUrlEventListener cutStart cutEnd ev = genericErrorsHandler $ do
   rawValue <- getInputValue ev
   let youtubeUrlV = maybe (invalid [ "Empty YoutubeUrl Input" ]) youtubeUrlValidation rawValue
   youtubeUrl <- foldl (\_ v -> pure v) (throwMinsiError (InvalidInput (show rawValue))) youtubeUrlV
   videoId <- (maybe (throwMinsiError (InvalidInput (show rawValue))) pure <<< extractYoutubeVideoId) youtubeUrl
-  let startTime = (lookup "t" <<< query) youtubeUrl
+  let startTime = (lookup "t" <<< query) youtubeUrl --TODO: use it to set the video start time and the cutStart value
   log ("Youtube Url Handler fired with value: " <> show videoId <> " startTime: " <> show startTime)
   embedVideo { resultPreviewId: resultPreviewId, videoId: videoId, width: 1000, height: 500 }
-
--- foreign function to get the duration of the video
--- set the max of the sliders to the length of the video
+  -- TODO: Use isPlayerReady to check if player is ready before getting duration
+  -- TODO: Set the max of the sliders to the length of the video when player is ready
+  -- let duration = getVideoDuration unit
+  -- HI.setMax (show duration) cutStart
+  -- HI.setMax (show duration) cutEnd
 
 getInputValue :: Event -> Effect (Maybe String)
 getInputValue ev =
@@ -70,3 +71,6 @@ type EmbedVideoConfig =
   }
 
 foreign import embedVideo :: EmbedVideoConfig -> Effect Unit
+foreign import getPlayerCurrentTime :: Unit -> Number
+foreign import getVideoDuration :: Unit -> Number
+foreign import isPlayerReady :: Unit -> Boolean

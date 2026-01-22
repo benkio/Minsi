@@ -2816,22 +2816,48 @@
   };
 
   // output/Handers.YoutubeVideo.Handler/foreign.js
+  var player;
   var embedVideo = function(embedVideoConfig) {
     return function() {
-      try {
-        const player = new YT.Player(embedVideoConfig.resultPreviewId, {
-          height: embedVideoConfig.height,
-          width: embedVideoConfig.width,
-          videoId: embedVideoConfig.videoId,
-          playerVars: {
-            playsinline: 1
+      if (typeof player !== "undefined" && player !== null) {
+        try {
+          if (player.getVideoData && typeof player.getVideoData === "function") {
+            const videoData = player.getVideoData();
+            const currentVideoId = videoData && videoData.video_id;
+            if (currentVideoId === embedVideoConfig.videoId) {
+              console.log("Video ID is the same, skipping reload");
+              return;
+            }
           }
-        });
-        console.log("Player created successfully");
-        return player;
-      } catch (error3) {
-        console.error("Error creating YouTube player:", error3);
-        throw error3;
+        } catch (e) {
+          console.log("Could not get current video data, proceeding with load");
+        }
+        try {
+          player.loadVideoById({
+            videoId: embedVideoConfig.videoId
+            // startSeconds: Number, // TODO: if the t param is passed
+            // endSeconds: Number,
+          });
+          console.log("Video loaded using loadVideoById");
+        } catch (error3) {
+          console.error("Error loading video:", error3);
+          throw error3;
+        }
+      } else {
+        try {
+          player = new YT.Player(embedVideoConfig.resultPreviewId, {
+            height: embedVideoConfig.height,
+            width: embedVideoConfig.width,
+            videoId: embedVideoConfig.videoId,
+            playerVars: {
+              playsinline: 1
+            }
+          });
+          console.log("Player created successfully");
+        } catch (error3) {
+          console.error("Error creating YouTube player:", error3);
+          throw error3;
+        }
       }
     };
   };
@@ -4329,7 +4355,7 @@
 
   // output/Validations.YoutubeValidation/index.js
   var pure5 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupArray));
-  var youtubeRegex = "^(?:https?:\\/\\/)?(?:www\\.)?(?:youtube\\.com\\/watch\\?v=([a-zA-Z0-9_]+)|youtu\\.be\\/([a-zA-Z\\d_]+))(?:&.*)?$";
+  var youtubeRegex = "^(?:https?:\\/\\/)?(?:www\\.)?(?:youtube\\.com\\/watch\\?v=([a-zA-Z0-9_-]+)|youtu\\.be\\/([a-zA-Z\\d_-]+))(?:[?&].*)?$";
   var youtubeRegexValidation = /* @__PURE__ */ lmap(bifunctorEither)(function(x) {
     return [x];
   })(/* @__PURE__ */ regex(youtubeRegex)(noFlags));
@@ -4426,7 +4452,7 @@
       return v.value0;
     }
     ;
-    throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 58, column 1 - line 58, column 36): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 61, column 1 - line 61, column 36): " + [v.constructor.name]);
   };
   var getInputValue = function(ev) {
     return traverse2(value2)(bind2(bind2(target5(ev))(fromEventTarget))(fromElement3));
@@ -4440,38 +4466,46 @@
     }(path(url2));
     return alt5(maybeVQueryString)(lastPath);
   };
-  var youtubeUrlEventListener = function(ev) {
-    return genericErrorsHandler(function __do3() {
-      var rawValue = getInputValue(ev)();
-      var youtubeUrlV = maybe(invalid(["Empty YoutubeUrl Input"]))(youtubeUrlValidation)(rawValue);
-      var youtubeUrl = foldl3(function(v) {
-        return function(v1) {
-          return pure6(v1);
-        };
-      })(throwMinsiError(new InvalidInput(show4(rawValue))))(youtubeUrlV)();
-      var videoId = maybe(throwMinsiError(new InvalidInput(show4(rawValue))))(pure6)(extractYoutubeVideoId(youtubeUrl))();
-      var startTime = lookup3("t")(query(youtubeUrl));
-      log("Youtube Url Handler fired with value: " + (show1(videoId) + (" startTime: " + show22(startTime))))();
-      return embedVideo({
-        resultPreviewId,
-        videoId,
-        width: 1e3,
-        height: 500
-      })();
-    });
+  var youtubeUrlEventListener = function(cutStart) {
+    return function(cutEnd) {
+      return function(ev) {
+        return genericErrorsHandler(function __do3() {
+          var rawValue = getInputValue(ev)();
+          var youtubeUrlV = maybe(invalid(["Empty YoutubeUrl Input"]))(youtubeUrlValidation)(rawValue);
+          var youtubeUrl = foldl3(function(v) {
+            return function(v1) {
+              return pure6(v1);
+            };
+          })(throwMinsiError(new InvalidInput(show4(rawValue))))(youtubeUrlV)();
+          var videoId = maybe(throwMinsiError(new InvalidInput(show4(rawValue))))(pure6)(extractYoutubeVideoId(youtubeUrl))();
+          var startTime = lookup3("t")(query(youtubeUrl));
+          log("Youtube Url Handler fired with value: " + (show1(videoId) + (" startTime: " + show22(startTime))))();
+          return embedVideo({
+            resultPreviewId,
+            videoId,
+            width: 1e3,
+            height: 500
+          })();
+        });
+      };
+    };
   };
-  var setVideoHandlers = function(ytUrlEventTarget) {
-    return function __do3() {
-      var ytEvL = eventListener(youtubeUrlEventListener)();
-      addEventListener(input)(ytEvL)(false)(ytUrlEventTarget)();
-      return addEventListener(change)(ytEvL)(false)(ytUrlEventTarget)();
+  var setVideoHandlers = function(cutStart) {
+    return function(cutEnd) {
+      return function(ytUrlEventTarget) {
+        return function __do3() {
+          var ytEvL = eventListener(youtubeUrlEventListener(cutStart)(cutEnd))();
+          addEventListener(input)(ytEvL)(false)(ytUrlEventTarget)();
+          return addEventListener(change)(ytEvL)(false)(ytUrlEventTarget)();
+        };
+      };
     };
   };
 
   // output/Handlers.Handlers/index.js
   var setupEventHandlers = function(v) {
     var ytUrlEventTarget = toEventTarget(toElement(v.value0.value0.youtubeUrl));
-    return setVideoHandlers(ytUrlEventTarget);
+    return setVideoHandlers(v.value0.value0.cutStart)(v.value0.value0.cutEnd)(ytUrlEventTarget);
   };
 
   // output/Data.HTTP.Method/index.js
