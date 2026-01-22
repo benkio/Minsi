@@ -24,7 +24,7 @@ export const embedVideo = function (embedVideoConfig) {
       try {
         player.loadVideoById({
           videoId: embedVideoConfig.videoId,
-          // startSeconds: Number, // TODO: if the t param is passed
+          startSeconds: embedVideoConfig.startTime,
           // endSeconds: Number,
         });
         console.log("Video loaded using loadVideoById");
@@ -41,6 +41,8 @@ export const embedVideo = function (embedVideoConfig) {
           videoId: embedVideoConfig.videoId,
           playerVars: {
             playsinline: 1,
+            start: embedVideoConfig.startTime,
+            loop: 1,
           },
         });
         console.log("Player created successfully");
