@@ -2,6 +2,7 @@ module Handers.YoutubeVideo.Handler where
 
 import Web.DOM.Node (setTextContent)
 import Web.HTML.HTMLSpanElement as HSP
+import Web.HTML.HTMLButtonElement as HB
 import Effect.Class (liftEffect)
 import Data.Time.Duration (Milliseconds(..))
 import Web.Event.EventTarget (EventTarget, addEventListener, eventListener)
@@ -10,7 +11,7 @@ import Data.Int (fromString)
 import Data.String.Regex (regex, match)
 import Data.String.Regex.Flags (noFlags)
 import Data.Array.NonEmpty (index)
-import Data.Either(Either(..))
+import Data.Either (Either(..))
 import Data.String (toLower)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Components.HtmlIds (resultPreviewId)
@@ -26,7 +27,7 @@ import Prelude
 import Effect (Effect)
 import Effect.Timer (setInterval)
 import Effect.Aff (delay, launchAff_)
-import Web.DOM.Element (fromEventTarget)
+import Web.DOM.Element (fromEventTarget, toEventTarget)
 import Web.Event.Internal.Types (Event)
 import Web.HTML.HTMLInputElement as HI
 import Web.Event.Event (target)
@@ -35,15 +36,29 @@ import Handers.ErrorHandlers (genericErrorsHandler)
 import Data.Array (head, last)
 import Web.HTML.Event.EventTypes as E
 
-setVideoHandlers :: HI.HTMLInputElement -> HSP.HTMLSpanElement -> HI.HTMLInputElement -> EventTarget -> Effect Unit
-setVideoHandlers cutStart playbackPosition cutEnd ytUrlEventTarget = do
+data VideoEventTargets = VET
+  { cutStart :: HI.HTMLInputElement
+  , cutEnd :: HI.HTMLInputElement
+  , playbackPosition :: HSP.HTMLSpanElement
+  , setCutEndButton :: HB.HTMLButtonElement
+  , setCutStartButton :: HB.HTMLButtonElement
+  }
+
+setVideoHandlers :: VideoEventTargets -> EventTarget -> Effect Unit
+setVideoHandlers (VET { cutStart, setCutStartButton, playbackPosition, cutEnd, setCutEndButton }) ytUrlEventTarget = do
   ytEvL <- eventListener (youtubeUrlEventListener cutStart cutEnd)
   addEventListener E.input ytEvL false ytUrlEventTarget
   addEventListener E.change ytEvL false ytUrlEventTarget
-  --TODO: fix, not updating.
   _ <- setInterval 1000 (updatePlaybackPosition playbackPosition)
+  setCutStartButtonEvLV <- eventListener (setCutStartButtonEvL cutStart)
+  setCutEndButtonEvLV <- eventListener (setCutEndButtonEvL cutEnd)
+  addEventListener E.click setCutStartButtonEvLV false setCutStartButtonTarget
+  addEventListener E.click setCutEndButtonEvLV false setCutEndButtonTarget
   --TODO: Add the cut start position - cut end position handlers
   pure unit
+  where
+    setCutStartButtonTarget = toEventTarget (HB.toElement setCutStartButton)
+    setCutEndButtonTarget = toEventTarget (HB.toElement setCutEndButton)
 
 youtubeUrlEventListener :: HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
 youtubeUrlEventListener cutStart cutEnd ev = genericErrorsHandler $ do
@@ -53,10 +68,10 @@ youtubeUrlEventListener cutStart cutEnd ev = genericErrorsHandler $ do
   videoId <- (maybe (throwMinsiError (InvalidInput (show rawValue))) pure <<< extractYoutubeVideoId) youtubeUrl
   let startTime = extractYoutubeVideoStartTime youtubeUrl
   log ("Youtube Url Handler fired with value: " <> show videoId)
-  embedVideo { resultPreviewId: resultPreviewId, videoId: videoId, width: 1000, height: 500, startTime: startTime}
+  embedVideo { resultPreviewId: resultPreviewId, videoId: videoId, width: 1000, height: 500, startTime: startTime }
   launchAff_ $ do
-    whileM_ (pure (not (isPlayerReady unit))) (delay (Milliseconds 500.0))
-    let duration = getVideoDuration unit
+    whileM_ (liftEffect (not <$> isPlayerReady)) (delay (Milliseconds 500.0))
+    duration <- liftEffect getVideoDuration
     liftEffect $ HI.setMax (show duration) cutStart
     liftEffect $ HI.setValue (show startTime) cutStart
     liftEffect $ HI.setMax (show duration) cutEnd
@@ -88,9 +103,9 @@ type EmbedVideoConfig =
   }
 
 foreign import embedVideo :: EmbedVideoConfig -> Effect Unit
-foreign import getPlayerCurrentTime :: Unit -> Number
-foreign import getVideoDuration :: Unit -> Number
-foreign import isPlayerReady :: Unit -> Boolean
+foreign import getPlayerCurrentTime :: Effect Number
+foreign import getVideoDuration :: Effect Number
+foreign import isPlayerReady :: Effect Boolean
 
 --TODO: write tests
 extractYoutubeVideoStartTime :: URL -> Int
@@ -129,8 +144,15 @@ parseYouTubeT raw =
 
 updatePlaybackPosition :: HSP.HTMLSpanElement -> Effect Unit
 updatePlaybackPosition playbackPosition = do
-  log $ "updatePlayback position: " <> show playerReady
-  when playerReady $ setTextContent currentTime (HSP.toNode playbackPosition)
-  where
-    playerReady = isPlayerReady unit
-    currentTime = show $ getPlayerCurrentTime unit
+  playerReady <- isPlayerReady
+  currentTime <- getPlayerCurrentTime
+  when playerReady $ setTextContent (show currentTime) (HSP.toNode playbackPosition)
+
+setCutStartButtonEvL :: HI.HTMLInputElement -> Event -> Effect Unit
+setCutStartButtonEvL cutStart _ = do
+  currentTime <- getPlayerCurrentTime
+  HI.setValue (show currentTime) cutStart
+setCutEndButtonEvL :: HI.HTMLInputElement -> Event -> Effect Unit
+setCutEndButtonEvL cutEnd _ = do
+  currentTime <- getPlayerCurrentTime
+  HI.setValue (show currentTime) cutEnd

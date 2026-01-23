@@ -134,10 +134,10 @@
   };
   var applySecond = function(dictApply) {
     var apply1 = apply(dictApply);
-    var map10 = map(dictApply.Functor0());
+    var map11 = map(dictApply.Functor0());
     return function(a) {
       return function(b) {
-        return apply1(map10($$const(identity2))(a))(b);
+        return apply1(map11($$const(identity2))(a))(b);
       };
     };
   };
@@ -147,7 +147,7 @@
     return dict.pure;
   };
   var when = function(dictApplicative) {
-    var pure15 = pure(dictApplicative);
+    var pure14 = pure(dictApplicative);
     return function(v) {
       return function(v1) {
         if (v) {
@@ -155,7 +155,7 @@
         }
         ;
         if (!v) {
-          return pure15(unit);
+          return pure14(unit);
         }
         ;
         throw new Error("Failed pattern match at Control.Applicative (line 63, column 1 - line 63, column 63): " + [v.constructor.name, v1.constructor.name]);
@@ -164,10 +164,10 @@
   };
   var liftA1 = function(dictApplicative) {
     var apply3 = apply(dictApplicative.Apply0());
-    var pure15 = pure(dictApplicative);
+    var pure14 = pure(dictApplicative);
     return function(f) {
       return function(a) {
-        return apply3(pure15(f))(a);
+        return apply3(pure14(f))(a);
       };
     };
   };
@@ -213,9 +213,9 @@
     }
   };
   var join = function(dictBind) {
-    var bind12 = bind(dictBind);
+    var bind13 = bind(dictBind);
     return function(m) {
-      return bind12(m)(identity3);
+      return bind13(m)(identity3);
     };
   };
 
@@ -413,19 +413,6 @@
   };
   var showInt = {
     show: showIntImpl
-  };
-  var showBoolean = {
-    show: function(v) {
-      if (v) {
-        return "true";
-      }
-      ;
-      if (!v) {
-        return "false";
-      }
-      ;
-      throw new Error("Failed pattern match at Data.Show (line 29, column 1 - line 31, column 23): " + [v.constructor.name]);
-    }
   };
   var show = function(dict) {
     return dict.show;
@@ -956,6 +943,7 @@
   };
 
   // output/Web.HTML.HTMLButtonElement/index.js
+  var toElement = unsafeCoerce2;
   var fromElement = /* @__PURE__ */ unsafeReadProtoTagged("HTMLButtonElement");
 
   // output/Web.HTML.HTMLDivElement/index.js
@@ -984,7 +972,7 @@
   }
 
   // output/Web.HTML.HTMLInputElement/index.js
-  var toElement = unsafeCoerce2;
+  var toElement2 = unsafeCoerce2;
   var fromElement3 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLInputElement");
 
   // output/Web.HTML.HTMLSelectElement/index.js
@@ -1324,7 +1312,7 @@
   var traversableMaybe = {
     traverse: function(dictApplicative) {
       var pure9 = pure(dictApplicative);
-      var map10 = map(dictApplicative.Apply0().Functor0());
+      var map11 = map(dictApplicative.Apply0().Functor0());
       return function(v) {
         return function(v1) {
           if (v1 instanceof Nothing) {
@@ -1332,7 +1320,7 @@
           }
           ;
           if (v1 instanceof Just) {
-            return map10(Just.create)(v(v1.value0));
+            return map11(Just.create)(v(v1.value0));
           }
           ;
           throw new Error("Failed pattern match at Data.Traversable (line 115, column 1 - line 119, column 33): " + [v.constructor.name, v1.constructor.name]);
@@ -1341,14 +1329,14 @@
     },
     sequence: function(dictApplicative) {
       var pure9 = pure(dictApplicative);
-      var map10 = map(dictApplicative.Apply0().Functor0());
+      var map11 = map(dictApplicative.Apply0().Functor0());
       return function(v) {
         if (v instanceof Nothing) {
           return pure9(Nothing.value);
         }
         ;
         if (v instanceof Just) {
-          return map10(Just.create)(v.value0);
+          return map11(Just.create)(v.value0);
         }
         ;
         throw new Error("Failed pattern match at Data.Traversable (line 115, column 1 - line 119, column 33): " + [v.constructor.name]);
@@ -2352,10 +2340,10 @@
   var $$try = function(dictMonadError) {
     var catchError1 = catchError(dictMonadError);
     var Monad0 = dictMonadError.MonadThrow0().Monad0();
-    var map10 = map(Monad0.Bind1().Apply0().Functor0());
+    var map11 = map(Monad0.Bind1().Apply0().Functor0());
     var pure9 = pure(Monad0.Applicative0());
     return function(a) {
-      return catchError1(map10(Right.create)(a))(function($52) {
+      return catchError1(map11(Right.create)(a))(function($52) {
         return pure9(Left.create($52));
       });
     };
@@ -2967,7 +2955,7 @@
       }
     };
   };
-  var getPlayerCurrentTime = function() {
+  var getPlayerCurrentTime = () => {
     if (typeof player !== "undefined" && player !== null) {
       try {
         if (player.getCurrentTime && typeof player.getCurrentTime === "function") {
@@ -2979,7 +2967,7 @@
     }
     return 0;
   };
-  var getVideoDuration = function() {
+  var getVideoDuration = () => {
     if (typeof player !== "undefined" && player !== null) {
       try {
         if (player.getDuration && typeof player.getDuration === "function") {
@@ -2994,7 +2982,7 @@
     }
     return 100;
   };
-  var isPlayerReady = function() {
+  var isPlayerReady = () => {
     if (typeof player === "undefined" || player === null) {
       return false;
     }
@@ -3009,6 +2997,9 @@
         isReady = false;
       }
     }
+    console.log(
+      "hasGetDuration: " + hasGetDuration + " hasGetCurrentTime: " + hasGetCurrentTime + " isReady: " + isReady
+    );
     return hasGetDuration && hasGetCurrentTime && isReady;
   };
 
@@ -4258,11 +4249,11 @@
     };
   };
   var readArray = function(dictMonad) {
-    var pure15 = pure(applicativeExceptT(dictMonad));
+    var pure14 = pure(applicativeExceptT(dictMonad));
     var fail1 = fail(dictMonad);
     return function(value12) {
       if (isArray(value12)) {
-        return pure15(unsafeFromForeign(value12));
+        return pure14(unsafeFromForeign(value12));
       }
       ;
       if (otherwise) {
@@ -4273,12 +4264,12 @@
     };
   };
   var unsafeReadTagged = function(dictMonad) {
-    var pure15 = pure(applicativeExceptT(dictMonad));
+    var pure14 = pure(applicativeExceptT(dictMonad));
     var fail1 = fail(dictMonad);
     return function(tag) {
       return function(value12) {
         if (tagOf(value12) === tag) {
-          return pure15(unsafeFromForeign(value12));
+          return pure14(unsafeFromForeign(value12));
         }
         ;
         if (otherwise) {
@@ -4658,33 +4649,60 @@
 
   // output/Web.HTML.Event.EventTypes/index.js
   var input = "input";
+  var click2 = "click";
   var change = "change";
 
   // output/Handers.YoutubeVideo.Handler/index.js
-  var show4 = /* @__PURE__ */ show(showNumber);
-  var discard2 = /* @__PURE__ */ discard(discardUnit);
-  var show1 = /* @__PURE__ */ show(showBoolean);
   var when2 = /* @__PURE__ */ when(applicativeEffect);
+  var show4 = /* @__PURE__ */ show(showNumber);
   var join2 = /* @__PURE__ */ join(bindMaybe);
-  var bind2 = /* @__PURE__ */ bind(bindMaybe);
+  var bind12 = /* @__PURE__ */ bind(bindMaybe);
   var traverse2 = /* @__PURE__ */ traverse(traversableMaybe)(applicativeEffect);
   var lookup3 = /* @__PURE__ */ lookup(ordString);
   var alt5 = /* @__PURE__ */ alt(altMaybe);
   var foldl3 = /* @__PURE__ */ foldl(foldableV);
   var pure6 = /* @__PURE__ */ pure(applicativeEffect);
-  var show22 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(showString));
-  var show32 = /* @__PURE__ */ show(showString);
+  var show1 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(showString));
+  var discard2 = /* @__PURE__ */ discard(discardUnit);
+  var show22 = /* @__PURE__ */ show(showString);
   var discard22 = /* @__PURE__ */ discard2(bindAff);
   var whileM_2 = /* @__PURE__ */ whileM_(monadAff);
-  var pure12 = /* @__PURE__ */ pure(applicativeAff);
   var liftEffect3 = /* @__PURE__ */ liftEffect(monadEffectAff);
-  var show42 = /* @__PURE__ */ show(showInt);
+  var map8 = /* @__PURE__ */ map(functorEffect);
+  var not3 = /* @__PURE__ */ not(heytingAlgebraBoolean);
+  var bind2 = /* @__PURE__ */ bind(bindAff);
+  var show32 = /* @__PURE__ */ show(showInt);
+  var VET = /* @__PURE__ */ function() {
+    function VET2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    VET2.create = function(value0) {
+      return new VET2(value0);
+    };
+    return VET2;
+  }();
   var updatePlaybackPosition = function(playbackPosition) {
-    var playerReady = isPlayerReady(unit);
-    var currentTime2 = show4(getPlayerCurrentTime(unit));
     return function __do3() {
-      log("updatePlayback position: " + show1(playerReady))();
-      return when2(playerReady)(setTextContent(currentTime2)(toNode2(playbackPosition)))();
+      var playerReady = isPlayerReady();
+      var currentTime2 = getPlayerCurrentTime();
+      return when2(playerReady)(setTextContent(show4(currentTime2))(toNode2(playbackPosition)))();
+    };
+  };
+  var setCutStartButtonEvL = function(cutStart) {
+    return function(v) {
+      return function __do3() {
+        var currentTime2 = getPlayerCurrentTime();
+        return setValue2(show4(currentTime2))(cutStart)();
+      };
+    };
+  };
+  var setCutEndButtonEvL = function(cutEnd) {
+    return function(v) {
+      return function __do3() {
+        var currentTime2 = getPlayerCurrentTime();
+        return setValue2(show4(currentTime2))(cutEnd)();
+      };
     };
   };
   var pathToArray = function(v) {
@@ -4700,7 +4718,7 @@
       return v.value0;
     }
     ;
-    throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 76, column 1 - line 76, column 36): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 92, column 1 - line 92, column 36): " + [v.constructor.name]);
   };
   var parseUnit = function(str) {
     return function(unit2) {
@@ -4710,7 +4728,7 @@
       }
       ;
       if (v instanceof Right) {
-        var v1 = join2(bind2(match(v.value0)(str))(flip(index3)(1)));
+        var v1 = join2(bind12(match(v.value0)(str))(flip(index3)(1)));
         if (v1 instanceof Just) {
           return fromMaybe(0)(fromString(v1.value0));
         }
@@ -4719,10 +4737,10 @@
           return 0;
         }
         ;
-        throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 107, column 7 - line 109, column 21): " + [v1.constructor.name]);
+        throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 123, column 7 - line 125, column 21): " + [v1.constructor.name]);
       }
       ;
-      throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 104, column 3 - line 109, column 21): " + [v.constructor.name]);
+      throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 120, column 3 - line 125, column 21): " + [v.constructor.name]);
     };
   };
   var parseYouTubeT = function(raw) {
@@ -4737,32 +4755,32 @@
       var m = parseUnit(str)("m");
       var h = parseUnit(str)("h");
       var total = ((h * 3600 | 0) + (m * 60 | 0) | 0) + s | 0;
-      var $44 = total > 0;
-      if ($44) {
+      var $47 = total > 0;
+      if ($47) {
         return new Just(total);
       }
       ;
       return Nothing.value;
     }
     ;
-    throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 118, column 5 - line 127, column 52): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 134, column 5 - line 143, column 52): " + [v.constructor.name]);
   };
   var getInputValue = function(ev) {
-    return traverse2(value2)(bind2(bind2(target5(ev))(fromEventTarget))(fromElement3));
+    return traverse2(value2)(bind12(bind12(target5(ev))(fromEventTarget))(fromElement3));
   };
   var extractYoutubeVideoStartTime = function(url2) {
-    return fromMaybe(0)(bind2(lookup3("t")(query(url2)))(function(values) {
-      return bind2(head(values))(function(v) {
+    return fromMaybe(0)(bind12(lookup3("t")(query(url2)))(function(values) {
+      return bind12(head(values))(function(v) {
         return parseYouTubeT(v);
       });
     }));
   };
   var extractYoutubeVideoId = function(url2) {
     var maybeVQueryString = function(v) {
-      return bind2(lookup3("v")(v))(head);
+      return bind12(lookup3("v")(v))(head);
     }(query(url2));
-    var lastPath = function($45) {
-      return last(pathToArray($45));
+    var lastPath = function($56) {
+      return last(pathToArray($56));
     }(path(url2));
     return alt5(maybeVQueryString)(lastPath);
   };
@@ -4776,10 +4794,10 @@
             return function(v1) {
               return pure6(v1);
             };
-          })(throwMinsiError(new InvalidInput(show22(rawValue))))(youtubeUrlV)();
-          var videoId = maybe(throwMinsiError(new InvalidInput(show22(rawValue))))(pure6)(extractYoutubeVideoId(youtubeUrl))();
+          })(throwMinsiError(new InvalidInput(show1(rawValue))))(youtubeUrlV)();
+          var videoId = maybe(throwMinsiError(new InvalidInput(show1(rawValue))))(pure6)(extractYoutubeVideoId(youtubeUrl))();
           var startTime = extractYoutubeVideoStartTime(youtubeUrl);
-          log("Youtube Url Handler fired with value: " + show32(videoId))();
+          log("Youtube Url Handler fired with value: " + show22(videoId))();
           embedVideo({
             resultPreviewId,
             videoId,
@@ -4787,11 +4805,12 @@
             height: 500,
             startTime
           })();
-          return launchAff_(discard22(whileM_2(pure12(!isPlayerReady(unit)))(delay(500)))(function() {
-            var duration2 = getVideoDuration(unit);
-            return discard22(liftEffect3(setMax(show4(duration2))(cutStart)))(function() {
-              return discard22(liftEffect3(setValue2(show42(startTime))(cutStart)))(function() {
-                return liftEffect3(setMax(show4(duration2))(cutEnd));
+          return launchAff_(discard22(whileM_2(liftEffect3(map8(not3)(isPlayerReady)))(delay(500)))(function() {
+            return bind2(liftEffect3(getVideoDuration))(function(duration2) {
+              return discard22(liftEffect3(setMax(show4(duration2))(cutStart)))(function() {
+                return discard22(liftEffect3(setValue2(show32(startTime))(cutStart)))(function() {
+                  return liftEffect3(setMax(show4(duration2))(cutEnd));
+                });
               });
             });
           }))();
@@ -4799,26 +4818,34 @@
       };
     };
   };
-  var setVideoHandlers = function(cutStart) {
-    return function(playbackPosition) {
-      return function(cutEnd) {
-        return function(ytUrlEventTarget) {
-          return function __do3() {
-            var ytEvL = eventListener(youtubeUrlEventListener(cutStart)(cutEnd))();
-            addEventListener(input)(ytEvL)(false)(ytUrlEventTarget)();
-            addEventListener(change)(ytEvL)(false)(ytUrlEventTarget)();
-            setInterval2(1e3)(updatePlaybackPosition(playbackPosition))();
-            return unit;
-          };
-        };
+  var setVideoHandlers = function(v) {
+    return function(ytUrlEventTarget) {
+      var setCutStartButtonTarget = toEventTarget(toElement(v.value0.setCutStartButton));
+      var setCutEndButtonTarget = toEventTarget(toElement(v.value0.setCutEndButton));
+      return function __do3() {
+        var ytEvL = eventListener(youtubeUrlEventListener(v.value0.cutStart)(v.value0.cutEnd))();
+        addEventListener(input)(ytEvL)(false)(ytUrlEventTarget)();
+        addEventListener(change)(ytEvL)(false)(ytUrlEventTarget)();
+        setInterval2(1e3)(updatePlaybackPosition(v.value0.playbackPosition))();
+        var setCutStartButtonEvLV = eventListener(setCutStartButtonEvL(v.value0.cutStart))();
+        var setCutEndButtonEvLV = eventListener(setCutEndButtonEvL(v.value0.cutEnd))();
+        addEventListener(click2)(setCutStartButtonEvLV)(false)(setCutStartButtonTarget)();
+        addEventListener(click2)(setCutEndButtonEvLV)(false)(setCutEndButtonTarget)();
+        return unit;
       };
     };
   };
 
   // output/Handlers.Handlers/index.js
   var setupEventHandlers = function(v) {
-    var ytUrlEventTarget = toEventTarget(toElement(v.value0.value0.youtubeUrl));
-    return setVideoHandlers(v.value0.value0.cutStart)(v.value1.value0.playbackPosition)(v.value0.value0.cutEnd)(ytUrlEventTarget);
+    var ytUrlEventTarget = toEventTarget(toElement2(v.value0.value0.youtubeUrl));
+    return setVideoHandlers(new VET({
+      cutStart: v.value0.value0.cutStart,
+      cutEnd: v.value0.value0.cutEnd,
+      playbackPosition: v.value1.value0.playbackPosition,
+      setCutStartButton: v.value0.value0.setCutStartButton,
+      setCutEndButton: v.value0.value0.setCutEndButton
+    }))(ytUrlEventTarget);
   };
 
   // output/Data.HTTP.Method/index.js
@@ -5216,7 +5243,7 @@
   var voidRight2 = /* @__PURE__ */ voidRight(functorEffect);
   var mempty2 = /* @__PURE__ */ mempty(monoidCanceler);
   var thenOrCatch3 = /* @__PURE__ */ thenOrCatch2();
-  var map8 = /* @__PURE__ */ map(functorEffect);
+  var map9 = /* @__PURE__ */ map(functorEffect);
   var resolve3 = /* @__PURE__ */ resolve2();
   var alt6 = /* @__PURE__ */ alt(altMaybe);
   var map1 = /* @__PURE__ */ map(functorMaybe);
@@ -5227,9 +5254,9 @@
     return function(p) {
       return makeAff(function(cb) {
         return voidRight2(mempty2)(thenOrCatch3(function(a) {
-          return map8(resolve3)(cb(new Right(a)));
+          return map9(resolve3)(cb(new Right(a)));
         })(function(e) {
-          return map8(resolve3)(cb(new Left(customCoerce(e))));
+          return map9(resolve3)(cb(new Left(customCoerce(e))));
         })(p));
       });
     };
@@ -5299,22 +5326,22 @@
   // output/Fetch/index.js
   var $$void6 = /* @__PURE__ */ $$void(functorEffect);
   var thenOrCatch4 = /* @__PURE__ */ thenOrCatch2();
-  var map9 = /* @__PURE__ */ map(functorEffect);
+  var map10 = /* @__PURE__ */ map(functorEffect);
   var resolve4 = /* @__PURE__ */ resolve2();
   var bind4 = /* @__PURE__ */ bind(bindAff);
   var liftEffect5 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var $$new4 = /* @__PURE__ */ $$new2();
   var bindFlipped3 = /* @__PURE__ */ bindFlipped(bindAff);
   var fetchWithOptions2 = /* @__PURE__ */ fetchWithOptions();
-  var pure13 = /* @__PURE__ */ pure(applicativeAff);
+  var pure12 = /* @__PURE__ */ pure(applicativeAff);
   var toAbortableAff = function(abortController) {
     return function(p) {
       return makeAff(function(cb) {
         return function __do3() {
           $$void6(thenOrCatch4(function(a) {
-            return map9(resolve4)(cb(new Right(a)));
+            return map10(resolve4)(cb(new Right(a)));
           })(function(e) {
-            return map9(resolve4)(cb(new Left(coerce3(e))));
+            return map10(resolve4)(cb(new Left(coerce3(e))));
           })(p))();
           return effectCanceler(abort(abortController));
         };
@@ -5333,7 +5360,7 @@
                 return bind4(bindFlipped3(toAbortableAff(abortController))(liftEffect5(fetchWithOptions2(request)({
                   signal: signal2
                 }))))(function(cResponse) {
-                  return pure13(convert2(cResponse));
+                  return pure12(convert2(cResponse));
                 });
               });
             });
@@ -5349,7 +5376,7 @@
   var bindExceptT2 = /* @__PURE__ */ bindExceptT(monadIdentity);
   var except2 = /* @__PURE__ */ except(applicativeIdentity);
   var applicativeExceptT2 = /* @__PURE__ */ applicativeExceptT(monadIdentity);
-  var pure14 = /* @__PURE__ */ pure(applicativeExceptT2);
+  var pure13 = /* @__PURE__ */ pure(applicativeExceptT2);
   var compose1 = /* @__PURE__ */ compose(semigroupoidBuilder);
   var insert6 = /* @__PURE__ */ insert4()();
   var append3 = /* @__PURE__ */ append(semigroupNonEmptyList);
@@ -5367,7 +5394,7 @@
   var readForeignFieldsNilRowRo = {
     getFields: function(v) {
       return function(v1) {
-        return pure14(identity7);
+        return pure13(identity7);
       };
     }
   };

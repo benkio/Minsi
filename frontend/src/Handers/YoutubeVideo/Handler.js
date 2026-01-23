@@ -53,7 +53,7 @@ export const embedVideo = function (embedVideoConfig) {
     }
   };
 };
-export const getPlayerCurrentTime = function () {
+export const getPlayerCurrentTime = () => {
   if (typeof player !== "undefined" && player !== null) {
     try {
       if (
@@ -69,7 +69,7 @@ export const getPlayerCurrentTime = function () {
   return 0;
 };
 
-export const getVideoDuration = function () {
+export const getVideoDuration = () => {
   if (typeof player !== "undefined" && player !== null) {
     try {
       // Check if getDuration method exists and player is ready
@@ -87,7 +87,7 @@ export const getVideoDuration = function () {
   return 100; // Default fallback
 };
 
-export const isPlayerReady = function () {
+export const isPlayerReady = () => {
   // Check if player exists
   if (typeof player === "undefined" || player === null) {
     return false;
