@@ -13,7 +13,6 @@ import Data.URL (URL, Path(..), path, query)
 import Control.Alt ((<|>))
 import Prelude
 
---TODO: write tests
 extractYoutubeVideoId :: URL -> Maybe String
 extractYoutubeVideoId url =
   maybeVQueryString <|> lastPath
@@ -21,20 +20,17 @@ extractYoutubeVideoId url =
   maybeVQueryString = ((\v -> lookup "v" v >>= head) <<< query) url
   lastPath = (path >>> pathToArray >>> last) url
 
---TODO: write tests
 pathToArray :: Path -> Array String
 pathToArray PathEmpty = []
 pathToArray (PathAbsolute s) = s
 pathToArray (PathRelative s) = s
 
---TODO: write tests
 extractYoutubeVideoStartTime :: URL -> Int
 extractYoutubeVideoStartTime url = fromMaybe 0 $ do
   values <- (query >>> lookup "t") url
   v <- head values
   parseYouTubeT v
 
---TODO: write tests
 parseUnit :: String -> String -> Int
 parseUnit str unit =
   case regex ("(\\d+)" <> unit) noFlags of
@@ -44,7 +40,6 @@ parseUnit str unit =
         Just n -> fromMaybe 0 (fromString n)
         Nothing -> 0
 
---TODO: write tests
 parseYouTubeT :: String -> Maybe Int
 parseYouTubeT raw =
   let
