@@ -12,6 +12,6 @@ spec :: Spec Unit
 spec = do
   describe "cutVideoValidation" do
     it "should validate when the range is valid" $ liftEffect $
-      quickCheck (\(Range s e) -> isValid (cutVideoValidation s e))
+      quickCheck (\(Range s e) -> isValid (cutVideoValidation "testId" s e))
     it "should not validate when the range is invalid" $ liftEffect $
-      quickCheck (\(Range s e) -> not (isValid (cutVideoValidation (e + 1.0) s)))
+      quickCheck (\(Range s e) -> not (isValid (cutVideoValidation "testId" (e + 1.0) s)))

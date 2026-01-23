@@ -3,20 +3,27 @@ module Main.MinsiErrors where
 import Prelude
 import Effect (Effect)
 import Effect.Exception (error, throwException)
+import Data.String (joinWith)
+import Data.Map (Map, toUnfoldable)
+import Data.Tuple (Tuple(..))
 
 data MinsiError
   = HTMLElementNotFound String
   | MissingDependenciesError (Array String)
-  | InvalidInput String
+  | InvalidInput String String
+  | InvalidInputs (Map String String)
 
 instance Show MinsiError where
   show = case _ of
     HTMLElementNotFound id ->
       "HTML Element couldn't be loaded: " <> id
     MissingDependenciesError deps ->
-      "Missing following dependencies: " <> show deps
-    InvalidInput v ->
-      "Inserted an invalid Input: " <> v
+      joinWith "<br>" deps
+    InvalidInput id v ->
+      "[" <> id <> "] Invalid Input: " <> v
+    InvalidInputs vs ->
+      let errorMessages = map (\(Tuple k v) -> "[" <> k <> "] " <> v) (toUnfoldable vs)
+      in joinWith "<br>" errorMessages
 
 throwMinsiError :: forall a. MinsiError -> Effect a
 throwMinsiError =

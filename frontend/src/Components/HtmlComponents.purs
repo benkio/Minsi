@@ -45,6 +45,12 @@ type HtmlComponents = Tuple HtmlInputs HtmlOutputs
 
 loadComponents :: NonElementParentNode -> Effect HtmlComponents
 loadComponents doc = do
+  inputs <- loadHtmlInputs doc
+  outputs <- loadHtmlOutputs doc
+  pure (Tuple inputs outputs)
+
+loadHtmlInputs :: NonElementParentNode -> Effect HtmlInputs
+loadHtmlInputs doc = do
   rangeTuple <- loadCutRange doc
   youtubeUrl <- loadInput youtubeUrlId doc
   filename <- loadInput outputFilenameId doc
@@ -53,39 +59,41 @@ loadComponents doc = do
   title <- loadInput titleId doc
   applyButton <- loadButton applyId doc
   videoSource <- loadVideoSource doc
-  resultPreview <- loadDiv resultPreviewId doc
-  addSubtitleButton <- loadButton addSubtitleId doc
   setCutStartButton <- loadButton setCutStartButton doc
   setCutEndButton <- loadButton setCutEndButton doc
+  pure
+    ( HtmlInputs
+        { cutStart: fst rangeTuple
+        , cutEnd: snd rangeTuple
+        , youtubeUrl: youtubeUrl
+        , filename: filename
+        , reverseLoop: reverseLoop
+        , artist: artist
+        , title: title
+        , applyButton: applyButton
+        , videoSource: videoSource
+        , setCutStartButton: setCutStartButton
+        , setCutEndButton: setCutEndButton
+        }
+    )
+
+loadHtmlOutputs :: NonElementParentNode -> Effect HtmlOutputs
+loadHtmlOutputs doc = do
+  resultPreview <- loadDiv resultPreviewId doc
+  addSubtitleButton <- loadButton addSubtitleId doc
   minsiLog <- loadDiv minsiLogId doc
   playbackPosition <- loadSpan playbackPositionId doc
   cutStartValue <- loadSpan cutStartValueId doc
   cutEndValue <- loadSpan cutEndValueId doc
   pure
-    ( Tuple
-        ( HtmlInputs
-            { cutStart: fst rangeTuple
-            , cutEnd: snd rangeTuple
-            , youtubeUrl: youtubeUrl
-            , filename: filename
-            , reverseLoop: reverseLoop
-            , artist: artist
-            , title: title
-            , applyButton: applyButton
-            , videoSource: videoSource
-            , setCutStartButton: setCutStartButton
-            , setCutEndButton: setCutEndButton
-            }
-        )
-        ( HtmlOutputs
-            { resultPreview: resultPreview
-            , addSubtitleButton: addSubtitleButton
-            , minsiLog: minsiLog
-            , playbackPosition: playbackPosition
-            , cutStartValue: cutStartValue
-            , cutEndValue: cutEndValue
-            }
-        )
+    ( HtmlOutputs
+        { resultPreview: resultPreview
+        , addSubtitleButton: addSubtitleButton
+        , minsiLog: minsiLog
+        , playbackPosition: playbackPosition
+        , cutStartValue: cutStartValue
+        , cutEndValue: cutEndValue
+        }
     )
 
 -- Load Single Elements ---------------------------------------------------

@@ -1,5 +1,6 @@
 module Validations.YoutubeValidation where
 
+import Data.Map (Map, singleton)
 import Data.Maybe (maybe)
 import Prelude
 import Data.Validation.Semigroup (V(..), andThen, invalid)
@@ -12,10 +13,20 @@ import Validations.RegexValidation (matches)
 youtubeRegex :: String
 youtubeRegex = """^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)|youtu\.be\/([a-zA-Z\d_-]+))(?:[?&].*)?$"""
 
-youtubeRegexValidation :: V (Array String) Regex
-youtubeRegexValidation = V $ lmap (\x -> [ x ]) (regex youtubeRegex noFlags)
+youtubeRegexValidation :: String -> V (Map String String) Regex
+youtubeRegexValidation id = V $ lmap (\x -> singleton id x) (regex youtubeRegex noFlags)
 
-youtubeUrlValidation :: String -> V (Array String) URL
-youtubeUrlValidation v =
-  andThen (andThen youtubeRegexValidation (\ytRegex -> matches ytRegex v)) \urlString ->
-    maybe (invalid [ "Error validating youtube Url" ]) pure (fromString urlString)
+youtubeUrlValidation :: String -> String -> V (Map String String) URL
+youtubeUrlValidation id v =
+  lmap (\_ -> singleton id "Invalid Youtube URL") $
+    andThen (
+      andThen
+        (youtubeRegexValidation id)
+        (\ytRegex -> matches ytRegex id v)
+      )
+    (\urlString ->
+      maybe
+        (invalid (singleton id "Error validating youtube Url"))
+        pure
+        (fromString urlString)
+    )

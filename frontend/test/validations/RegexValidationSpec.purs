@@ -16,7 +16,7 @@ spec = do
     it "should return valid when string matches regex" $ liftEffect $ do
       either (const (pure unit))
         ( \regex -> do
-            let result = matches regex "hello"
+            let result = matches regex "testId" "hello"
             isValid result `shouldEqual` true
             case toEither result of
               Right str -> str `shouldEqual` "hello"
@@ -27,7 +27,7 @@ spec = do
     it "should return invalid when string does not match regex" $ liftEffect $ do
       either (const (pure unit))
         ( \regex -> do
-            let result = matches regex "world"
+            let result = matches regex "testId" "world"
             isValid result `shouldEqual` false
         )
         (regex "hello" noFlags)
@@ -35,8 +35,8 @@ spec = do
     it "should work with complex regex patterns" $ liftEffect $ do
       either (const (pure unit))
         ( \regex -> do
-            let validResult = matches regex "hello"
-            let invalidResult = matches regex "HELLO"
+            let validResult = matches regex "testId" "hello"
+            let invalidResult = matches regex "testId" "HELLO"
             isValid validResult `shouldEqual` true
             isValid invalidResult `shouldEqual` false
         )

@@ -4,6 +4,7 @@ import Data.Foldable (foldl)
 import Data.Maybe (Maybe, maybe)
 import Data.Traversable (traverse)
 import Data.Validation.Semigroup (invalid)
+import Data.Map (singleton)
 import Effect (Effect)
 import Effect.Console (log)
 import Handers.ErrorHandlers (genericErrorsHandler)
@@ -18,7 +19,7 @@ import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLSpanElement as HSP
 import Web.Event.Internal.Types (Event)
 import Web.HTML.Event.EventTypes as E
-import Components.HtmlIds (resultPreviewId)
+import Components.HtmlIds (resultPreviewId, youtubeUrlId)
 import Handers.YoutubeVideo.Foreign (embedVideo)
 import Handers.YoutubeVideo.YoutubeUrlExtraction (extractYoutubeVideoId, extractYoutubeVideoStartTime)
 import Handers.YoutubeVideo.CutButtonsHandlers (initializeCutInputs, setCutInputButtonEvL)
@@ -55,9 +56,9 @@ setVideoHandlers (VET { cutStart, setCutStartButton, playbackPosition, cutEnd, s
 youtubeUrlEventListener :: HI.HTMLInputElement -> HI.HTMLInputElement -> HSP.HTMLSpanElement -> HSP.HTMLSpanElement -> Event -> Effect Unit
 youtubeUrlEventListener cutStart cutEnd cutStartValue cutEndValue ev = genericErrorsHandler $ do
   rawValue <- getInputValue ev
-  let youtubeUrlV = maybe (invalid [ "Empty YoutubeUrl Input" ]) youtubeUrlValidation rawValue
-  youtubeUrl <- foldl (\_ v -> pure v) (throwMinsiError (InvalidInput (show rawValue))) youtubeUrlV
-  videoId <- (maybe (throwMinsiError (InvalidInput (show rawValue))) pure <<< extractYoutubeVideoId) youtubeUrl
+  let youtubeUrlV = maybe (invalid (singleton youtubeUrlId "Empty YoutubeUrl Input")) (\v -> youtubeUrlValidation youtubeUrlId v) rawValue
+  youtubeUrl <- foldl (\_ v -> pure v) (throwMinsiError (InvalidInput youtubeUrlId (show rawValue))) youtubeUrlV
+  videoId <- (maybe (throwMinsiError (InvalidInput youtubeUrlId (show rawValue))) pure <<< extractYoutubeVideoId) youtubeUrl
   let startTime = extractYoutubeVideoStartTime youtubeUrl
   log ("Youtube Url Handler fired with value: " <> show videoId)
   embedVideo { resultPreviewId: resultPreviewId, videoId: videoId, width: 1000, height: 500, startTime: startTime }

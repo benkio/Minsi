@@ -15,12 +15,12 @@ spec :: Spec Unit
 spec = do
   describe "nonEmptyRegex" do
     it "should be a valid regex pattern string" $ liftEffect $ do
-      let regexResult = nonEmptyRegexValidation
+      let regexResult = nonEmptyRegexValidation "testId"
       isValid regexResult `shouldEqual` true
 
   describe "nonEmptyRegexValidation" do
     it "should create a valid regex that matches non-empty strings" $ liftEffect $ do
-      let regexResult = nonEmptyRegexValidation
+      let regexResult = nonEmptyRegexValidation "testId"
       isValid regexResult `shouldEqual` true
       case toEither regexResult of
         Right regex -> do
@@ -34,10 +34,10 @@ spec = do
     it "should validate a non-empty string" $ liftEffect $
       quickCheck
         ( \(NonEmptyASCIIString s) ->
-            (isValid <<< nonEmptyValidation) s
+            (isValid <<< nonEmptyValidation "testId") s
         )
     it "should not validate a empty string" $ liftEffect $
       quickCheck
         ( \(EmptyASCIIString s) ->
-            (not <<< isValid <<< nonEmptyValidation) s
+            (not <<< isValid <<< nonEmptyValidation "testId") s
         )

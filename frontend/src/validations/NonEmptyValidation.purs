@@ -5,14 +5,21 @@ import Data.Validation.Semigroup (V(..), andThen)
 import Data.String.Regex (Regex, regex)
 import Data.String.Regex.Flags (noFlags)
 import Data.Bifunctor (lmap)
+import Data.Map (Map, singleton)
 import Validations.RegexValidation (matches)
 
 nonEmptyRegex :: String
 nonEmptyRegex = """[\S\s]*\S[\S\s]*"""
 
-nonEmptyRegexValidation :: V (Array String) Regex
-nonEmptyRegexValidation = V $ lmap (\x -> [ x ]) (regex nonEmptyRegex noFlags)
+nonEmptyRegexValidation :: String -> V (Map String String) Regex
+nonEmptyRegexValidation id =
+  V $ lmap
+        (\x -> singleton id x)
+        (regex nonEmptyRegex noFlags)
 
-nonEmptyValidation :: String -> V (Array String) String
-nonEmptyValidation v =
-  andThen nonEmptyRegexValidation (\r -> matches r v)
+nonEmptyValidation :: String -> String -> V (Map String String) String
+nonEmptyValidation id v =
+  lmap (\_ -> singleton id "value cannot be empty") $
+    andThen
+      (nonEmptyRegexValidation id)
+      (\r -> matches r id v)

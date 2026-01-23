@@ -61,16 +61,3 @@ instance WriteForeign WURL where
   writeImpl (WURL url) = writeImpl (toString url)
 
 derive newtype instance writeState :: WriteForeign State
-
--- stateToJson :: State -> Effect String
--- stateToJson (State { cutVideo, youtubeUrl, filename, reverseLoop, artist, title, subtitles }) = do
---   youtubeUrlString <- href youtubeUrl
---   pure $ writeJSON
---     { cutVideo: writeImpl cutVideo
---     , youtubeUrl: writeImpl youtubeUrlString
---     , filename: writeImpl filename
---     , reverseLoop: writeImpl reverseLoop
---     , artist: writeImpl artist
---     , title: writeImpl title
---     , subtitles: writeImpl subtitles
---     }

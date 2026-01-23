@@ -14,12 +14,12 @@ spec :: Spec Unit
 spec = do
   describe "youtubeRegex" do
     it "should be a valid regex pattern string" $ liftEffect $ do
-      let regexResult = youtubeRegexValidation
+      let regexResult = youtubeRegexValidation "testId"
       isValid regexResult `shouldEqual` true
 
   describe "youtubeRegexValidation" do
     it "should create a valid regex that matches youtube URLs" $ liftEffect $ do
-      let regexResult = youtubeRegexValidation
+      let regexResult = youtubeRegexValidation "testId"
       isValid regexResult `shouldEqual` true
       case toEither regexResult of
         Right regex -> do
@@ -30,10 +30,10 @@ spec = do
 
   describe "youtubeUrlValidation" do
     it "should validate a standard youtube.com URL" $ liftEffect $ do
-      let result = youtubeUrlValidation "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      let result = youtubeUrlValidation "testId" "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
       isValid result `shouldEqual` true
     it "should validate a standard youtube.com URL with time query parameter" $ liftEffect $ do
-      let result = youtubeUrlValidation "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10s"
+      let result = youtubeUrlValidation "testId" "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10s"
       isValid result `shouldEqual` true
     it "should validate a youtu.be short URL" $ liftEffect $ do
       let
@@ -42,17 +42,17 @@ spec = do
           , "https://youtu.be/dQw4w9WgXcQ"
           , "https://youtu.be/PHi-UNsm2Ds?t=364"
           ]
-      traverse_ (\i -> isValid (youtubeUrlValidation i) `shouldEqual` true) input
+      traverse_ (\i -> isValid (youtubeUrlValidation "testId" i) `shouldEqual` true) input
     it "should validate a youtube.com URL without www" $ liftEffect $ do
-      let result = youtubeUrlValidation "https://youtube.com/watch?v=dQw4w9WgXcQ"
+      let result = youtubeUrlValidation "testId" "https://youtube.com/watch?v=dQw4w9WgXcQ"
       isValid result `shouldEqual` true
     it "should validate a youtube.com URL without https" $ liftEffect $ do
-      let result = youtubeUrlValidation "http://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      let result = youtubeUrlValidation "testId" "http://www.youtube.com/watch?v=dQw4w9WgXcQ"
       isValid result `shouldEqual` true
     it "should reject an invalid URL" $ liftEffect $ do
-      isValid (youtubeUrlValidation "not a youtube url") `shouldEqual` false
+      isValid (youtubeUrlValidation "testId" "not a youtube url") `shouldEqual` false
     it "should reject an youtube URL without id" $ liftEffect $ do
-      isValid (youtubeUrlValidation "http://www.youtube.com/") `shouldEqual` false
-      isValid (youtubeUrlValidation "https://www.youtube.com/") `shouldEqual` false
-      isValid (youtubeUrlValidation "http://www.youtube.com") `shouldEqual` false
-      isValid (youtubeUrlValidation "https://www.youtube.com") `shouldEqual` false
+      isValid (youtubeUrlValidation "testId" "http://www.youtube.com/") `shouldEqual` false
+      isValid (youtubeUrlValidation "testId" "https://www.youtube.com/") `shouldEqual` false
+      isValid (youtubeUrlValidation "testId" "http://www.youtube.com") `shouldEqual` false
+      isValid (youtubeUrlValidation "testId" "https://www.youtube.com") `shouldEqual` false
