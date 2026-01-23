@@ -443,11 +443,11 @@
     return Just2;
   }();
   var showMaybe = function(dictShow) {
-    var show7 = show(dictShow);
+    var show9 = show(dictShow);
     return {
       show: function(v) {
         if (v instanceof Just) {
-          return "(Just " + (show7(v.value0) + ")");
+          return "(Just " + (show9(v.value0) + ")");
         }
         ;
         if (v instanceof Nothing) {
@@ -656,12 +656,12 @@
 
   // output/Control.Monad/index.js
   var ap = function(dictMonad) {
-    var bind7 = bind(dictMonad.Bind1());
+    var bind8 = bind(dictMonad.Bind1());
     var pure9 = pure(dictMonad.Applicative0());
     return function(f) {
       return function(a) {
-        return bind7(f)(function(f$prime) {
-          return bind7(a)(function(a$prime) {
+        return bind8(f)(function(f$prime) {
+          return bind8(a)(function(a$prime) {
             return pure9(f$prime(a$prime));
           });
         });
@@ -2516,12 +2516,12 @@
     };
   };
   var bindExceptT = function(dictMonad) {
-    var bind7 = bind(dictMonad.Bind1());
+    var bind8 = bind(dictMonad.Bind1());
     var pure9 = pure(dictMonad.Applicative0());
     return {
       bind: function(v) {
         return function(k) {
-          return bind7(v)(either(function($193) {
+          return bind8(v)(either(function($193) {
             return pure9(Left.create($193));
           })(function(a) {
             var v1 = k(a);
@@ -2907,100 +2907,88 @@
     });
   };
 
-  // output/Handers.YoutubeVideo.Handler/foreign.js
-  var player;
-  var embedVideo = function(embedVideoConfig) {
-    return function() {
-      if (typeof player !== "undefined" && player !== null) {
-        try {
-          if (player.getVideoData && typeof player.getVideoData === "function") {
-            const videoData = player.getVideoData();
-            const currentVideoId = videoData && videoData.video_id;
-            if (currentVideoId === embedVideoConfig.videoId) {
-              console.log("Video ID is the same, skipping reload");
-              return;
-            }
+  // output/Data.Validation.Semigroup/index.js
+  var V = function(x) {
+    return x;
+  };
+  var validation = function(v) {
+    return function(v1) {
+      return function(v2) {
+        if (v2 instanceof Left) {
+          return v(v2.value0);
+        }
+        ;
+        if (v2 instanceof Right) {
+          return v1(v2.value0);
+        }
+        ;
+        throw new Error("Failed pattern match at Data.Validation.Semigroup (line 48, column 1 - line 48, column 84): " + [v.constructor.name, v1.constructor.name, v2.constructor.name]);
+      };
+    };
+  };
+  var invalid = function($100) {
+    return V(Left.create($100));
+  };
+  var functorV = functorEither;
+  var foldableV = {
+    foldMap: function(dictMonoid) {
+      return validation($$const(mempty(dictMonoid)));
+    },
+    foldr: function(f) {
+      return function(b) {
+        return validation($$const(b))(flip(f)(b));
+      };
+    },
+    foldl: function(f) {
+      return function(b) {
+        return validation($$const(b))(f(b));
+      };
+    }
+  };
+  var applyV = function(dictSemigroup) {
+    var append12 = append(dictSemigroup);
+    return {
+      apply: function(v) {
+        return function(v1) {
+          if (v instanceof Left && v1 instanceof Left) {
+            return new Left(append12(v.value0)(v1.value0));
           }
-        } catch (e) {
-          console.log("Could not get current video data, proceeding with load");
-        }
-        try {
-          player.loadVideoById({
-            videoId: embedVideoConfig.videoId,
-            startSeconds: embedVideoConfig.startTime
-            // endSeconds: Number,
-          });
-          console.log("Video loaded using loadVideoById");
-        } catch (error3) {
-          console.error("Error loading video:", error3);
-          throw error3;
-        }
-      } else {
-        try {
-          player = new YT.Player(embedVideoConfig.resultPreviewId, {
-            height: embedVideoConfig.height,
-            width: embedVideoConfig.width,
-            videoId: embedVideoConfig.videoId,
-            playerVars: {
-              playsinline: 1,
-              start: embedVideoConfig.startTime,
-              loop: 1
-            }
-          });
-          console.log("Player created successfully");
-        } catch (error3) {
-          console.error("Error creating YouTube player:", error3);
-          throw error3;
-        }
+          ;
+          if (v instanceof Left) {
+            return new Left(v.value0);
+          }
+          ;
+          if (v1 instanceof Left) {
+            return new Left(v1.value0);
+          }
+          ;
+          if (v instanceof Right && v1 instanceof Right) {
+            return new Right(v.value0(v1.value0));
+          }
+          ;
+          throw new Error("Failed pattern match at Data.Validation.Semigroup (line 89, column 1 - line 93, column 54): " + [v.constructor.name, v1.constructor.name]);
+        };
+      },
+      Functor0: function() {
+        return functorV;
       }
     };
   };
-  var getPlayerCurrentTime = () => {
-    if (typeof player !== "undefined" && player !== null) {
-      try {
-        if (player.getCurrentTime && typeof player.getCurrentTime === "function") {
-          return player.getCurrentTime();
-        }
-      } catch (e) {
-        console.error("Error calling getCurrentTime:", e);
+  var applicativeV = function(dictSemigroup) {
+    var applyV1 = applyV(dictSemigroup);
+    return {
+      pure: function($108) {
+        return V(Right.create($108));
+      },
+      Apply0: function() {
+        return applyV1;
       }
-    }
-    return 0;
+    };
   };
-  var getVideoDuration = () => {
-    if (typeof player !== "undefined" && player !== null) {
-      try {
-        if (player.getDuration && typeof player.getDuration === "function") {
-          const duration2 = player.getDuration();
-          if (duration2 && !isNaN(duration2) && duration2 > 0) {
-            return duration2;
-          }
-        }
-      } catch (e) {
-        console.error("Error calling getDuration:", e);
-      }
-    }
-    return 100;
-  };
-  var isPlayerReady = () => {
-    if (typeof player === "undefined" || player === null) {
-      return false;
-    }
-    const hasGetDuration = player.getDuration && typeof player.getDuration === "function";
-    const hasGetCurrentTime = player.getCurrentTime && typeof player.getCurrentTime === "function";
-    let isReady = false;
-    if (hasGetDuration) {
-      try {
-        const duration2 = player.getDuration();
-        isReady = duration2 && !isNaN(duration2) && duration2 > 0;
-      } catch (e) {
-        isReady = false;
-      }
-    }
-    console.log(
-      "hasGetDuration: " + hasGetDuration + " hasGetCurrentTime: " + hasGetCurrentTime + " isReady: " + isReady
-    );
-    return hasGetDuration && hasGetCurrentTime && isReady;
+  var andThen = function(v1) {
+    return function(f) {
+      return validation(invalid)(f)(v1);
+    };
   };
 
   // output/Data.FunctorWithIndex/foreign.js
@@ -3331,13 +3319,13 @@
 
   // output/Control.Monad.Loops/index.js
   var whileM_ = function(dictMonad) {
-    var bind7 = bind(dictMonad.Bind1());
+    var bind8 = bind(dictMonad.Bind1());
     var pure9 = pure(dictMonad.Applicative0());
     return function(p) {
       return function(f) {
-        return bind7(p)(function(v) {
+        return bind8(p)(function(v) {
           if (v) {
-            return bind7(f)(function(v1) {
+            return bind8(f)(function(v1) {
               return whileM_(dictMonad)(p)(f);
             });
           }
@@ -3345,6 +3333,151 @@
           return pure9(unit);
         });
       };
+    };
+  };
+
+  // output/Handers.YoutubeVideo.Foreign/foreign.js
+  var player;
+  var embedVideo = function(embedVideoConfig) {
+    return function() {
+      if (typeof player !== "undefined" && player !== null) {
+        try {
+          if (player.getVideoData && typeof player.getVideoData === "function") {
+            const videoData = player.getVideoData();
+            const currentVideoId = videoData && videoData.video_id;
+            if (currentVideoId === embedVideoConfig.videoId) {
+              console.log("Video ID is the same, skipping reload");
+              return;
+            }
+          }
+        } catch (e) {
+          console.log("Could not get current video data, proceeding with load");
+        }
+        try {
+          player.loadVideoById({
+            videoId: embedVideoConfig.videoId,
+            startSeconds: embedVideoConfig.startTime
+            // endSeconds: Number,
+          });
+          console.log("Video loaded using loadVideoById");
+        } catch (error3) {
+          console.error("Error loading video:", error3);
+          throw error3;
+        }
+      } else {
+        try {
+          player = new YT.Player(embedVideoConfig.resultPreviewId, {
+            height: embedVideoConfig.height,
+            width: embedVideoConfig.width,
+            videoId: embedVideoConfig.videoId,
+            playerVars: {
+              playsinline: 1,
+              start: embedVideoConfig.startTime,
+              loop: 1
+            }
+          });
+          console.log("Player created successfully");
+        } catch (error3) {
+          console.error("Error creating YouTube player:", error3);
+          throw error3;
+        }
+      }
+    };
+  };
+  var getPlayerCurrentTime = () => {
+    if (typeof player !== "undefined" && player !== null) {
+      try {
+        if (player.getCurrentTime && typeof player.getCurrentTime === "function") {
+          return player.getCurrentTime();
+        }
+      } catch (e) {
+        console.error("Error calling getCurrentTime:", e);
+      }
+    }
+    return 0;
+  };
+  var getVideoDuration = () => {
+    if (typeof player !== "undefined" && player !== null) {
+      try {
+        if (player.getDuration && typeof player.getDuration === "function") {
+          const duration2 = player.getDuration();
+          if (duration2 && !isNaN(duration2) && duration2 > 0) {
+            return duration2;
+          }
+        }
+      } catch (e) {
+        console.error("Error calling getDuration:", e);
+      }
+    }
+    return 100;
+  };
+  var isPlayerReady = () => {
+    if (typeof player === "undefined" || player === null) {
+      return false;
+    }
+    const hasGetDuration = player.getDuration && typeof player.getDuration === "function";
+    const hasGetCurrentTime = player.getCurrentTime && typeof player.getCurrentTime === "function";
+    let isReady = false;
+    if (hasGetDuration) {
+      try {
+        const duration2 = player.getDuration();
+        isReady = duration2 && !isNaN(duration2) && duration2 > 0;
+      } catch (e) {
+        isReady = false;
+      }
+    }
+    return hasGetDuration && hasGetCurrentTime && isReady;
+  };
+
+  // output/Handers.YoutubeVideo.CutButtonsHandlers/index.js
+  var show3 = /* @__PURE__ */ show(showNumber);
+  var discard2 = /* @__PURE__ */ discard(discardUnit)(bindAff);
+  var whileM_2 = /* @__PURE__ */ whileM_(monadAff);
+  var liftEffect3 = /* @__PURE__ */ liftEffect(monadEffectAff);
+  var map5 = /* @__PURE__ */ map(functorEffect);
+  var not2 = /* @__PURE__ */ not(heytingAlgebraBoolean);
+  var bind12 = /* @__PURE__ */ bind(bindAff);
+  var show1 = /* @__PURE__ */ show(showInt);
+  var setCutStartButtonEvL = function(cutStart) {
+    return function(v) {
+      return function __do3() {
+        var currentTime2 = getPlayerCurrentTime();
+        return setValue2(show3(currentTime2))(cutStart)();
+      };
+    };
+  };
+  var setCutEndButtonEvL = function(cutEnd) {
+    return function(v) {
+      return function __do3() {
+        var currentTime2 = getPlayerCurrentTime();
+        return setValue2(show3(currentTime2))(cutEnd)();
+      };
+    };
+  };
+  var initializeCutInputs = function(cutStart) {
+    return function(cutEnd) {
+      return function(startTime) {
+        return launchAff_(discard2(whileM_2(liftEffect3(map5(not2)(isPlayerReady)))(delay(500)))(function() {
+          return bind12(liftEffect3(getVideoDuration))(function(duration2) {
+            return discard2(liftEffect3(setMax(show3(duration2))(cutStart)))(function() {
+              return discard2(liftEffect3(setValue2(show1(startTime))(cutStart)))(function() {
+                return liftEffect3(setMax(show3(duration2))(cutEnd));
+              });
+            });
+          });
+        }));
+      };
+    };
+  };
+
+  // output/Handers.YoutubeVideo.PlaybackPositionHandler/index.js
+  var when2 = /* @__PURE__ */ when(applicativeEffect);
+  var show4 = /* @__PURE__ */ show(showNumber);
+  var updatePlaybackPosition = function(playbackPosition) {
+    return function __do3() {
+      var playerReady = isPlayerReady();
+      var currentTime2 = getPlayerCurrentTime();
+      return when2(playerReady)(setTextContent(show4(currentTime2))(toNode2(playbackPosition)))();
     };
   };
 
@@ -3422,8 +3555,8 @@
   var push = /* @__PURE__ */ runSTFn2(pushImpl);
 
   // output/Data.Array.ST.Iterator/index.js
-  var map5 = /* @__PURE__ */ map(functorST);
-  var not2 = /* @__PURE__ */ not(heytingAlgebraBoolean);
+  var map6 = /* @__PURE__ */ map(functorST);
+  var not3 = /* @__PURE__ */ not(heytingAlgebraBoolean);
   var $$void4 = /* @__PURE__ */ $$void(functorST);
   var Iterator = /* @__PURE__ */ function() {
     function Iterator2(value0, value1) {
@@ -3448,13 +3581,13 @@
     };
   };
   var iterator = function(f) {
-    return map5(Iterator.create(f))(newSTRef(0));
+    return map6(Iterator.create(f))(newSTRef(0));
   };
   var iterate = function(iter) {
     return function(f) {
       return function __do3() {
         var $$break = newSTRef(false)();
-        while (map5(not2)(read2($$break))()) {
+        while (map6(not3)(read2($$break))()) {
           (function __do4() {
             var mx = next(iter)();
             if (mx instanceof Just) {
@@ -3932,7 +4065,7 @@
   var $$void5 = /* @__PURE__ */ $$void(functorST);
   var pure1 = /* @__PURE__ */ pure(applicativeST);
   var apply2 = /* @__PURE__ */ apply(applyST);
-  var map6 = /* @__PURE__ */ map(functorST);
+  var map7 = /* @__PURE__ */ map(functorST);
   var compactableMaybe = {
     compact: /* @__PURE__ */ join(bindMaybe),
     separate: function(v) {
@@ -4007,7 +4140,7 @@
             throw new Error("Failed pattern match at Data.Compactable (line 122, column 34 - line 124, column 31): " + [v.constructor.name]);
           }($109));
         })();
-        return apply2(map6(function(v) {
+        return apply2(map7(function(v) {
           return function(v1) {
             return {
               left: v,
@@ -4411,7 +4544,7 @@
   // output/Data.URL/index.js
   var filter4 = /* @__PURE__ */ filter3(filterableMaybe);
   var fromFoldable4 = /* @__PURE__ */ fromFoldable2(ordString)(foldableArray);
-  var map7 = /* @__PURE__ */ map(functorArray);
+  var map8 = /* @__PURE__ */ map(functorArray);
   var wrap3 = /* @__PURE__ */ wrap();
   var filter1 = /* @__PURE__ */ filter3(filterableArray);
   var PathEmpty = /* @__PURE__ */ function() {
@@ -4446,7 +4579,7 @@
       return queryLookupImpl(k)(u);
     };
     var ks = queryKeysImpl(u);
-    return fromFoldable4(map7(function(k) {
+    return fromFoldable4(map8(function(k) {
       return new Tuple(k, vals(k));
     })(ks));
   };
@@ -4478,100 +4611,98 @@
     return toMaybe(fromStringImpl2($255));
   };
 
-  // output/Data.Validation.Semigroup/index.js
-  var V = function(x) {
-    return x;
-  };
-  var validation = function(v) {
-    return function(v1) {
-      return function(v2) {
-        if (v2 instanceof Left) {
-          return v(v2.value0);
-        }
-        ;
-        if (v2 instanceof Right) {
-          return v1(v2.value0);
-        }
-        ;
-        throw new Error("Failed pattern match at Data.Validation.Semigroup (line 48, column 1 - line 48, column 84): " + [v.constructor.name, v1.constructor.name, v2.constructor.name]);
-      };
-    };
-  };
-  var invalid = function($100) {
-    return V(Left.create($100));
-  };
-  var functorV = functorEither;
-  var foldableV = {
-    foldMap: function(dictMonoid) {
-      return validation($$const(mempty(dictMonoid)));
-    },
-    foldr: function(f) {
-      return function(b) {
-        return validation($$const(b))(flip(f)(b));
-      };
-    },
-    foldl: function(f) {
-      return function(b) {
-        return validation($$const(b))(f(b));
-      };
+  // output/Handers.YoutubeVideo.YoutubeUrlExtraction/index.js
+  var join2 = /* @__PURE__ */ join(bindMaybe);
+  var bind2 = /* @__PURE__ */ bind(bindMaybe);
+  var lookup3 = /* @__PURE__ */ lookup(ordString);
+  var alt5 = /* @__PURE__ */ alt(altMaybe);
+  var pathToArray = function(v) {
+    if (v instanceof PathEmpty) {
+      return [];
     }
+    ;
+    if (v instanceof PathAbsolute) {
+      return v.value0;
+    }
+    ;
+    if (v instanceof PathRelative) {
+      return v.value0;
+    }
+    ;
+    throw new Error("Failed pattern match at Handers.YoutubeVideo.YoutubeUrlExtraction (line 25, column 1 - line 25, column 36): " + [v.constructor.name]);
   };
-  var applyV = function(dictSemigroup) {
-    var append12 = append(dictSemigroup);
-    return {
-      apply: function(v) {
-        return function(v1) {
-          if (v instanceof Left && v1 instanceof Left) {
-            return new Left(append12(v.value0)(v1.value0));
-          }
-          ;
-          if (v instanceof Left) {
-            return new Left(v.value0);
-          }
-          ;
-          if (v1 instanceof Left) {
-            return new Left(v1.value0);
-          }
-          ;
-          if (v instanceof Right && v1 instanceof Right) {
-            return new Right(v.value0(v1.value0));
-          }
-          ;
-          throw new Error("Failed pattern match at Data.Validation.Semigroup (line 89, column 1 - line 93, column 54): " + [v.constructor.name, v1.constructor.name]);
-        };
-      },
-      Functor0: function() {
-        return functorV;
+  var parseUnit = function(str) {
+    return function(unit2) {
+      var v = regex("(\\d+)" + unit2)(noFlags);
+      if (v instanceof Left) {
+        return 0;
       }
-    };
-  };
-  var applicativeV = function(dictSemigroup) {
-    var applyV1 = applyV(dictSemigroup);
-    return {
-      pure: function($108) {
-        return V(Right.create($108));
-      },
-      Apply0: function() {
-        return applyV1;
+      ;
+      if (v instanceof Right) {
+        var v1 = join2(bind2(match(v.value0)(str))(flip(index3)(1)));
+        if (v1 instanceof Just) {
+          return fromMaybe(0)(fromString(v1.value0));
+        }
+        ;
+        if (v1 instanceof Nothing) {
+          return 0;
+        }
+        ;
+        throw new Error("Failed pattern match at Handers.YoutubeVideo.YoutubeUrlExtraction (line 43, column 7 - line 45, column 21): " + [v1.constructor.name]);
       }
+      ;
+      throw new Error("Failed pattern match at Handers.YoutubeVideo.YoutubeUrlExtraction (line 40, column 3 - line 45, column 21): " + [v.constructor.name]);
     };
   };
-  var andThen = function(v1) {
-    return function(f) {
-      return validation(invalid)(f)(v1);
-    };
+  var parseYouTubeT = function(raw) {
+    var str = toLower(raw);
+    var v = fromString(str);
+    if (v instanceof Just) {
+      return new Just(v.value0);
+    }
+    ;
+    if (v instanceof Nothing) {
+      var s = parseUnit(str)("s");
+      var m = parseUnit(str)("m");
+      var h = parseUnit(str)("h");
+      var total = ((h * 3600 | 0) + (m * 60 | 0) | 0) + s | 0;
+      var $24 = total > 0;
+      if ($24) {
+        return new Just(total);
+      }
+      ;
+      return Nothing.value;
+    }
+    ;
+    throw new Error("Failed pattern match at Handers.YoutubeVideo.YoutubeUrlExtraction (line 54, column 5 - line 63, column 52): " + [v.constructor.name]);
+  };
+  var extractYoutubeVideoStartTime = function(url2) {
+    return fromMaybe(0)(bind2(lookup3("t")(query(url2)))(function(values) {
+      return bind2(head(values))(function(v) {
+        return parseYouTubeT(v);
+      });
+    }));
+  };
+  var extractYoutubeVideoId = function(url2) {
+    var maybeVQueryString = function(v) {
+      return bind2(lookup3("v")(v))(head);
+    }(query(url2));
+    var lastPath = function($25) {
+      return last(pathToArray($25));
+    }(path(url2));
+    return alt5(maybeVQueryString)(lastPath);
   };
 
   // output/Validations.RegexValidation/index.js
   var pure4 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupArray));
-  var show3 = /* @__PURE__ */ show(showRegex);
+  var show5 = /* @__PURE__ */ show(showRegex);
   var matches = function(v) {
     return function(v1) {
       if (test(v)(v1)) {
         return pure4(v1);
       }
       ;
-      return invalid(["Input does not matches the requested format, value: " + (v1 + (" regex: " + show3(v)))]);
+      return invalid(["Input does not matches the requested format, value: " + (v1 + (" regex: " + show5(v)))]);
     };
   };
 
@@ -4652,26 +4783,13 @@
   var click2 = "click";
   var change = "change";
 
-  // output/Handers.YoutubeVideo.Handler/index.js
-  var when2 = /* @__PURE__ */ when(applicativeEffect);
-  var show4 = /* @__PURE__ */ show(showNumber);
-  var join2 = /* @__PURE__ */ join(bindMaybe);
-  var bind12 = /* @__PURE__ */ bind(bindMaybe);
+  // output/Handers.YoutubeVideo.YoutubeVideoHandler/index.js
   var traverse2 = /* @__PURE__ */ traverse(traversableMaybe)(applicativeEffect);
-  var lookup3 = /* @__PURE__ */ lookup(ordString);
-  var alt5 = /* @__PURE__ */ alt(altMaybe);
+  var bind3 = /* @__PURE__ */ bind(bindMaybe);
   var foldl3 = /* @__PURE__ */ foldl(foldableV);
   var pure6 = /* @__PURE__ */ pure(applicativeEffect);
-  var show1 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(showString));
-  var discard2 = /* @__PURE__ */ discard(discardUnit);
-  var show22 = /* @__PURE__ */ show(showString);
-  var discard22 = /* @__PURE__ */ discard2(bindAff);
-  var whileM_2 = /* @__PURE__ */ whileM_(monadAff);
-  var liftEffect3 = /* @__PURE__ */ liftEffect(monadEffectAff);
-  var map8 = /* @__PURE__ */ map(functorEffect);
-  var not3 = /* @__PURE__ */ not(heytingAlgebraBoolean);
-  var bind2 = /* @__PURE__ */ bind(bindAff);
-  var show32 = /* @__PURE__ */ show(showInt);
+  var show6 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(showString));
+  var show12 = /* @__PURE__ */ show(showString);
   var VET = /* @__PURE__ */ function() {
     function VET2(value0) {
       this.value0 = value0;
@@ -4682,107 +4800,8 @@
     };
     return VET2;
   }();
-  var updatePlaybackPosition = function(playbackPosition) {
-    return function __do3() {
-      var playerReady = isPlayerReady();
-      var currentTime2 = getPlayerCurrentTime();
-      return when2(playerReady)(setTextContent(show4(currentTime2))(toNode2(playbackPosition)))();
-    };
-  };
-  var setCutStartButtonEvL = function(cutStart) {
-    return function(v) {
-      return function __do3() {
-        var currentTime2 = getPlayerCurrentTime();
-        return setValue2(show4(currentTime2))(cutStart)();
-      };
-    };
-  };
-  var setCutEndButtonEvL = function(cutEnd) {
-    return function(v) {
-      return function __do3() {
-        var currentTime2 = getPlayerCurrentTime();
-        return setValue2(show4(currentTime2))(cutEnd)();
-      };
-    };
-  };
-  var pathToArray = function(v) {
-    if (v instanceof PathEmpty) {
-      return [];
-    }
-    ;
-    if (v instanceof PathAbsolute) {
-      return v.value0;
-    }
-    ;
-    if (v instanceof PathRelative) {
-      return v.value0;
-    }
-    ;
-    throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 92, column 1 - line 92, column 36): " + [v.constructor.name]);
-  };
-  var parseUnit = function(str) {
-    return function(unit2) {
-      var v = regex("(\\d+)" + unit2)(noFlags);
-      if (v instanceof Left) {
-        return 0;
-      }
-      ;
-      if (v instanceof Right) {
-        var v1 = join2(bind12(match(v.value0)(str))(flip(index3)(1)));
-        if (v1 instanceof Just) {
-          return fromMaybe(0)(fromString(v1.value0));
-        }
-        ;
-        if (v1 instanceof Nothing) {
-          return 0;
-        }
-        ;
-        throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 123, column 7 - line 125, column 21): " + [v1.constructor.name]);
-      }
-      ;
-      throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 120, column 3 - line 125, column 21): " + [v.constructor.name]);
-    };
-  };
-  var parseYouTubeT = function(raw) {
-    var str = toLower(raw);
-    var v = fromString(str);
-    if (v instanceof Just) {
-      return new Just(v.value0);
-    }
-    ;
-    if (v instanceof Nothing) {
-      var s = parseUnit(str)("s");
-      var m = parseUnit(str)("m");
-      var h = parseUnit(str)("h");
-      var total = ((h * 3600 | 0) + (m * 60 | 0) | 0) + s | 0;
-      var $47 = total > 0;
-      if ($47) {
-        return new Just(total);
-      }
-      ;
-      return Nothing.value;
-    }
-    ;
-    throw new Error("Failed pattern match at Handers.YoutubeVideo.Handler (line 134, column 5 - line 143, column 52): " + [v.constructor.name]);
-  };
   var getInputValue = function(ev) {
-    return traverse2(value2)(bind12(bind12(target5(ev))(fromEventTarget))(fromElement3));
-  };
-  var extractYoutubeVideoStartTime = function(url2) {
-    return fromMaybe(0)(bind12(lookup3("t")(query(url2)))(function(values) {
-      return bind12(head(values))(function(v) {
-        return parseYouTubeT(v);
-      });
-    }));
-  };
-  var extractYoutubeVideoId = function(url2) {
-    var maybeVQueryString = function(v) {
-      return bind12(lookup3("v")(v))(head);
-    }(query(url2));
-    var lastPath = function($56) {
-      return last(pathToArray($56));
-    }(path(url2));
-    return alt5(maybeVQueryString)(lastPath);
+    return traverse2(value2)(bind3(bind3(target5(ev))(fromEventTarget))(fromElement3));
   };
   var youtubeUrlEventListener = function(cutStart) {
     return function(cutEnd) {
@@ -4794,10 +4813,10 @@
             return function(v1) {
               return pure6(v1);
             };
-          })(throwMinsiError(new InvalidInput(show1(rawValue))))(youtubeUrlV)();
-          var videoId = maybe(throwMinsiError(new InvalidInput(show1(rawValue))))(pure6)(extractYoutubeVideoId(youtubeUrl))();
+          })(throwMinsiError(new InvalidInput(show6(rawValue))))(youtubeUrlV)();
+          var videoId = maybe(throwMinsiError(new InvalidInput(show6(rawValue))))(pure6)(extractYoutubeVideoId(youtubeUrl))();
           var startTime = extractYoutubeVideoStartTime(youtubeUrl);
-          log("Youtube Url Handler fired with value: " + show22(videoId))();
+          log("Youtube Url Handler fired with value: " + show12(videoId))();
           embedVideo({
             resultPreviewId,
             videoId,
@@ -4805,15 +4824,7 @@
             height: 500,
             startTime
           })();
-          return launchAff_(discard22(whileM_2(liftEffect3(map8(not3)(isPlayerReady)))(delay(500)))(function() {
-            return bind2(liftEffect3(getVideoDuration))(function(duration2) {
-              return discard22(liftEffect3(setMax(show4(duration2))(cutStart)))(function() {
-                return discard22(liftEffect3(setValue2(show32(startTime))(cutStart)))(function() {
-                  return liftEffect3(setMax(show4(duration2))(cutEnd));
-                });
-              });
-            });
-          }))();
+          return initializeCutInputs(cutStart)(cutEnd)(startTime)();
         });
       };
     };
@@ -5086,7 +5097,7 @@
   }
 
   // output/Fetch.Internal.Request/index.js
-  var show5 = /* @__PURE__ */ show(showMethod);
+  var show7 = /* @__PURE__ */ show(showMethod);
   var toCoreRequestOptionsHelpe = {
     convertHelper: function(v) {
       return function(v1) {
@@ -5096,7 +5107,7 @@
   };
   var toCoreRequestOptionsConve9 = {
     convertImpl: function(v) {
-      return show5;
+      return show7;
     }
   };
   var $$new2 = function() {
@@ -5248,7 +5259,7 @@
   var alt6 = /* @__PURE__ */ alt(altMaybe);
   var map1 = /* @__PURE__ */ map(functorMaybe);
   var readString3 = /* @__PURE__ */ readString(monadIdentity);
-  var bind3 = /* @__PURE__ */ bind(bindAff);
+  var bind4 = /* @__PURE__ */ bind(bindAff);
   var liftEffect4 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var toAff$prime = function(customCoerce) {
     return function(p) {
@@ -5268,7 +5279,7 @@
   };
   var toAff = /* @__PURE__ */ toAff$prime(coerce3);
   var toAffE = function(f) {
-    return bind3(liftEffect4(f))(toAff);
+    return bind4(liftEffect4(f))(toAff);
   };
 
   // output/Fetch.Internal.Response/index.js
@@ -5328,7 +5339,7 @@
   var thenOrCatch4 = /* @__PURE__ */ thenOrCatch2();
   var map10 = /* @__PURE__ */ map(functorEffect);
   var resolve4 = /* @__PURE__ */ resolve2();
-  var bind4 = /* @__PURE__ */ bind(bindAff);
+  var bind5 = /* @__PURE__ */ bind(bindAff);
   var liftEffect5 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var $$new4 = /* @__PURE__ */ $$new2();
   var bindFlipped3 = /* @__PURE__ */ bindFlipped(bindAff);
@@ -5354,10 +5365,10 @@
         var convert3 = convert(dictToCoreRequestOptions);
         return function(url2) {
           return function(r) {
-            return bind4(liftEffect5($$new4(url2)(convert3(r))))(function(request) {
-              return bind4(liftEffect5(newImpl3))(function(abortController) {
+            return bind5(liftEffect5($$new4(url2)(convert3(r))))(function(request) {
+              return bind5(liftEffect5(newImpl3))(function(abortController) {
                 var signal2 = signal(abortController);
-                return bind4(bindFlipped3(toAbortableAff(abortController))(liftEffect5(fetchWithOptions2(request)({
+                return bind5(bindFlipped3(toAbortableAff(abortController))(liftEffect5(fetchWithOptions2(request)({
                   signal: signal2
                 }))))(function(cResponse) {
                   return pure12(convert2(cResponse));
@@ -5523,7 +5534,7 @@
   };
 
   // output/Yoga.JSON.Error/index.js
-  var show6 = /* @__PURE__ */ show(showInt);
+  var show8 = /* @__PURE__ */ show(showInt);
   var toJSONPath = function(fe) {
     var go2 = function(v) {
       if (v instanceof ForeignError) {
@@ -5535,7 +5546,7 @@
       }
       ;
       if (v instanceof ErrorAtIndex) {
-        return "[" + (show6(v.value0) + ("]" + go2(v.value1)));
+        return "[" + (show8(v.value0) + ("]" + go2(v.value1)));
       }
       ;
       if (v instanceof ErrorAtProperty && (v.value1 instanceof TypeMismatch && v.value1.value1 === "undefined")) {
@@ -5621,7 +5632,7 @@
 
   // output/Fetch.Yoga.Json/index.js
   var intercalateMap2 = /* @__PURE__ */ intercalateMap(foldable1NonEmptyList)(semigroupString);
-  var bind5 = /* @__PURE__ */ bind(bindAff);
+  var bind6 = /* @__PURE__ */ bind(bindAff);
   var throwError2 = /* @__PURE__ */ throwError(monadThrowAff);
   var pure7 = /* @__PURE__ */ pure(applicativeAff);
   var fromJSON = function(dictReadForeign) {
@@ -5633,7 +5644,7 @@
           return error($8($9));
         };
       }();
-      return bind5(json3)(function() {
+      return bind6(json3)(function() {
         var $10 = either(function($12) {
           return throwError2(toError2($12));
         })(pure7);
@@ -5648,7 +5659,7 @@
   var backendUrl = "http://localhost:8080/";
 
   // output/Main.CheckDependencies/index.js
-  var bind6 = /* @__PURE__ */ bind(bindAff);
+  var bind7 = /* @__PURE__ */ bind(bindAff);
   var fromJSON2 = /* @__PURE__ */ fromJSON(/* @__PURE__ */ readForeignRecord()(/* @__PURE__ */ readForeignFieldsCons({
     reflectSymbol: function() {
       return "missedDependencies";
@@ -5657,7 +5668,7 @@
   var liftEffect6 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var pure8 = /* @__PURE__ */ pure(applicativeAff);
   var missingDependencies = function(jsonText) {
-    return bind6(fromJSON2(jsonText))(function(v) {
+    return bind7(fromJSON2(jsonText))(function(v) {
       return liftEffect6(throwMinsiError(new MissingDependenciesError(v.missedDependencies)));
     });
   };
@@ -5665,7 +5676,7 @@
     return backendUrl + "checkDependencies";
   }();
   var checkDependecies = /* @__PURE__ */ function() {
-    return bind6(fetch2()()(toCoreRequestOptionsRowRo()()(toCoreRequestOptionsHelpe1(toCoreRequestOptionsConve9)()()()({
+    return bind7(fetch2()()(toCoreRequestOptionsRowRo()()(toCoreRequestOptionsHelpe1(toCoreRequestOptionsConve9)()()()({
       reflectSymbol: function() {
         return "method";
       }

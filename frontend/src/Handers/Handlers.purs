@@ -3,7 +3,7 @@ module Handlers.Handlers where
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlOutputs(..))
 import Data.Tuple (Tuple(..))
 import Effect (Effect)
-import Handers.YoutubeVideo.Handler (setVideoHandlers, VideoEventTargets(..))
+import Handers.YoutubeVideo.YoutubeVideoHandler (setVideoHandlers, VideoEventTargets(..))
 import Web.DOM.Element (toEventTarget)
 import Web.HTML.HTMLInputElement as HI
 import Prelude
