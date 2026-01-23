@@ -39,7 +39,7 @@ data HtmlOutputs = HtmlOutputs
   , playbackPosition :: HTMLSpanElement
     , cutStartValue  :: HTMLSpanElement
     , cutEndValue  :: HTMLSpanElement
-
+    , loadingModal :: HTMLDivElement
   }
 type HtmlComponents = Tuple HtmlInputs HtmlOutputs
 
@@ -85,6 +85,7 @@ loadHtmlOutputs doc = do
   playbackPosition <- loadSpan playbackPositionId doc
   cutStartValue <- loadSpan cutStartValueId doc
   cutEndValue <- loadSpan cutEndValueId doc
+  loadingModal <- loadDiv loadingModalId doc
   pure
     ( HtmlOutputs
         { resultPreview: resultPreview
@@ -93,6 +94,7 @@ loadHtmlOutputs doc = do
         , playbackPosition: playbackPosition
         , cutStartValue: cutStartValue
         , cutEndValue: cutEndValue
+        , loadingModal: loadingModal
         }
     )
 

@@ -1,5 +1,6 @@
 module Handlers.ApplyButtonHandler where
 
+import Components.Modal (showLoadingModal, hideLoadingModal)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Handers.ErrorHandlers (genericErrorsHandler)
 import Effect.Console (log)
@@ -15,6 +16,10 @@ import Web.HTML.Event.EventTypes as E
 import Web.Event.Internal.Types (Event)
 import Components.Window (getDocument)
 import Components.HtmlComponents (loadHtmlInputs)
+import Components.HtmlIds (loadingModalId)
+import Effect.Aff (delay, launchAff_)
+import Effect.Class (liftEffect)
+import Data.Time.Duration (Milliseconds(..))
 
 setApplyButtonHandler :: HB.HTMLButtonElement -> Effect Unit
 setApplyButtonHandler applyButton = do
@@ -31,3 +36,8 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   case toEither stateV of
     Left errors -> throwMinsiError (InvalidInputs errors)
     Right _ -> log ("State converted")
+  showLoadingModal loadingModalId
+  launchAff_ do
+    delay (Milliseconds 5000.0)
+    liftEffect $ hideLoadingModal loadingModalId
+  pure unit

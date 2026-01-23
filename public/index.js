@@ -2172,6 +2172,7 @@
   var playbackPositionId = "playbackPosition";
   var outputFilenameId = "outputFilename";
   var minsiLogId = "minsiLog";
+  var loadingModalId = "loadingModal";
   var cutStartValueId = "cutStartValue";
   var cutStartId = "cutStart";
   var cutEndValueId = "cutEndValue";
@@ -2335,13 +2336,15 @@
       var playbackPosition = loadSpan(playbackPositionId)(doc)();
       var cutStartValue = loadSpan(cutStartValueId)(doc)();
       var cutEndValue = loadSpan(cutEndValueId)(doc)();
+      var loadingModal = loadDiv(loadingModalId)(doc)();
       return new HtmlOutputs({
         resultPreview,
         addSubtitleButton,
         minsiLog,
         playbackPosition,
         cutStartValue,
-        cutEndValue
+        cutEndValue,
+        loadingModal
       });
     };
   };
@@ -2387,7 +2390,7 @@
   var fromElement7 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLUListElement");
 
   // output/Web.HTML.Window/foreign.js
-  function document(window2) {
+  function document2(window2) {
     return function() {
       return window2.document;
     };
@@ -2409,7 +2412,7 @@
   };
   var getDocument = function __do() {
     var w = windowImpl();
-    var d = document(w)();
+    var d = document2(w)();
     return toNonElementParentNode(d);
   };
 
@@ -3950,7 +3953,7 @@
     var errorLines = split("<br>")(errorMessage);
     return function __do3() {
       var w = windowImpl();
-      var htmlDoc = document(w)();
+      var htmlDoc = document2(w)();
       var doc = toDocument(htmlDoc);
       var ulElementRaw = createElement("ul")(doc)();
       var ulElement = function() {
@@ -5450,6 +5453,22 @@
     };
   };
 
+  // output/Components.Modal/foreign.js
+  function showLoadingModal(id2) {
+    return function() {
+      const el = document.getElementById(id2);
+      const modal = bootstrap.Modal.getOrCreateInstance(el);
+      modal.show();
+    };
+  }
+  function hideLoadingModal(id2) {
+    return function() {
+      const el = document.getElementById(id2);
+      const modal = bootstrap.Modal.getOrCreateInstance(el);
+      modal.hide();
+    };
+  }
+
   // output/Validations.CutVideoValidation/index.js
   var show5 = /* @__PURE__ */ show(showNumber);
   var pure7 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(/* @__PURE__ */ semigroupMap()(ordString)(semigroupString)));
@@ -5543,21 +5562,31 @@
   };
 
   // output/Handlers.ApplyButtonHandler/index.js
+  var discard3 = /* @__PURE__ */ discard(discardUnit);
+  var discard23 = /* @__PURE__ */ discard3(bindAff);
+  var liftEffect4 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var applyButtonEventListener = function(v) {
     return genericErrorsHandler(function __do3() {
       var doc = getDocument();
       var inputs = loadHtmlInputs(doc)();
       var stateV = fromHtmlInputs(inputs)();
-      var v1 = toEither(stateV);
-      if (v1 instanceof Left) {
-        return throwMinsiError(new InvalidInputs(v1.value0))();
-      }
-      ;
-      if (v1 instanceof Right) {
-        return log("State converted")();
-      }
-      ;
-      throw new Error("Failed pattern match at Handlers.ApplyButtonHandler (line 31, column 3 - line 33, column 39): " + [v1.constructor.name]);
+      (function() {
+        var v1 = toEither(stateV);
+        if (v1 instanceof Left) {
+          return throwMinsiError(new InvalidInputs(v1.value0))();
+        }
+        ;
+        if (v1 instanceof Right) {
+          return log("State converted")();
+        }
+        ;
+        throw new Error("Failed pattern match at Handlers.ApplyButtonHandler (line 36, column 3 - line 38, column 39): " + [v1.constructor.name]);
+      })();
+      showLoadingModal(loadingModalId)();
+      launchAff_(discard23(delay(5e3))(function() {
+        return liftEffect4(hideLoadingModal(loadingModalId));
+      }))();
+      return unit;
     });
   };
   var setApplyButtonHandler = function(applyButton) {
@@ -5992,7 +6021,7 @@
   var map1 = /* @__PURE__ */ map(functorMaybe);
   var readString3 = /* @__PURE__ */ readString(monadIdentity);
   var bind4 = /* @__PURE__ */ bind(bindAff);
-  var liftEffect4 = /* @__PURE__ */ liftEffect(monadEffectAff);
+  var liftEffect5 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var toAff$prime = function(customCoerce) {
     return function(p) {
       return makeAff(function(cb) {
@@ -6011,7 +6040,7 @@
   };
   var toAff = /* @__PURE__ */ toAff$prime(coerce3);
   var toAffE = function(f) {
-    return bind4(liftEffect4(f))(toAff);
+    return bind4(liftEffect5(f))(toAff);
   };
 
   // output/Fetch.Internal.Response/index.js
@@ -6072,7 +6101,7 @@
   var map12 = /* @__PURE__ */ map(functorEffect);
   var resolve4 = /* @__PURE__ */ resolve2();
   var bind5 = /* @__PURE__ */ bind(bindAff);
-  var liftEffect5 = /* @__PURE__ */ liftEffect(monadEffectAff);
+  var liftEffect6 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var $$new4 = /* @__PURE__ */ $$new2();
   var bindFlipped3 = /* @__PURE__ */ bindFlipped(bindAff);
   var fetchWithOptions2 = /* @__PURE__ */ fetchWithOptions();
@@ -6097,10 +6126,10 @@
         var convert3 = convert(dictToCoreRequestOptions);
         return function(url3) {
           return function(r) {
-            return bind5(liftEffect5($$new4(url3)(convert3(r))))(function(request) {
-              return bind5(liftEffect5(newImpl3))(function(abortController) {
+            return bind5(liftEffect6($$new4(url3)(convert3(r))))(function(request) {
+              return bind5(liftEffect6(newImpl3))(function(abortController) {
                 var signal2 = signal(abortController);
-                return bind5(bindFlipped3(toAbortableAff(abortController))(liftEffect5(fetchWithOptions2(request)({
+                return bind5(bindFlipped3(toAbortableAff(abortController))(liftEffect6(fetchWithOptions2(request)({
                   signal: signal2
                 }))))(function(cResponse) {
                   return pure12(convert2(cResponse));
@@ -6397,11 +6426,11 @@
       return "missedDependencies";
     }
   })(/* @__PURE__ */ readForeignArray(readForeignString))(readForeignFieldsNilRowRo)()()));
-  var liftEffect6 = /* @__PURE__ */ liftEffect(monadEffectAff);
+  var liftEffect7 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var pure9 = /* @__PURE__ */ pure(applicativeAff);
   var missingDependencies = function(jsonText) {
     return bind7(fromJSON2(jsonText))(function(v) {
-      return liftEffect6(throwMinsiError(new MissingDependenciesError(v.missedDependencies)));
+      return liftEffect7(throwMinsiError(new MissingDependenciesError(v.missedDependencies)));
     });
   };
   var checkDependeciesEndpoint = /* @__PURE__ */ function() {
