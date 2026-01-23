@@ -109,10 +109,10 @@
     return dict.map;
   };
   var mapFlipped = function(dictFunctor) {
-    var map14 = map(dictFunctor);
+    var map15 = map(dictFunctor);
     return function(fa) {
       return function(f) {
-        return map14(f)(fa);
+        return map15(f)(fa);
       };
     };
   };
@@ -120,9 +120,9 @@
     return map(dictFunctor)($$const(unit));
   };
   var voidRight = function(dictFunctor) {
-    var map14 = map(dictFunctor);
+    var map15 = map(dictFunctor);
     return function(x) {
-      return map14($$const(x));
+      return map15($$const(x));
     };
   };
   var functorArray = {
@@ -142,10 +142,10 @@
   };
   var applySecond = function(dictApply) {
     var apply1 = apply(dictApply);
-    var map14 = map(dictApply.Functor0());
+    var map15 = map(dictApply.Functor0());
     return function(a) {
       return function(b) {
-        return apply1(map14($$const(identity2))(a))(b);
+        return apply1(map15($$const(identity2))(a))(b);
       };
     };
   };
@@ -993,7 +993,7 @@
       };
     }
     return function(apply4) {
-      return function(map14) {
+      return function(map15) {
         return function(pure10) {
           return function(f) {
             return function(array) {
@@ -1002,14 +1002,14 @@
                   case 0:
                     return pure10([]);
                   case 1:
-                    return map14(array1)(f(array[bot]));
+                    return map15(array1)(f(array[bot]));
                   case 2:
-                    return apply4(map14(array2)(f(array[bot])))(f(array[bot + 1]));
+                    return apply4(map15(array2)(f(array[bot])))(f(array[bot + 1]));
                   case 3:
-                    return apply4(apply4(map14(array3)(f(array[bot])))(f(array[bot + 1])))(f(array[bot + 2]));
+                    return apply4(apply4(map15(array3)(f(array[bot])))(f(array[bot + 1])))(f(array[bot + 2]));
                   default:
                     var pivot = bot + Math.floor((top2 - bot) / 4) * 2;
-                    return apply4(map14(concat2)(go2(bot, pivot)))(go2(pivot, top2));
+                    return apply4(map15(concat2)(go2(bot, pivot)))(go2(pivot, top2));
                 }
               }
               return go2(0, array.length);
@@ -1028,7 +1028,7 @@
   var traversableMaybe = {
     traverse: function(dictApplicative) {
       var pure10 = pure(dictApplicative);
-      var map14 = map(dictApplicative.Apply0().Functor0());
+      var map15 = map(dictApplicative.Apply0().Functor0());
       return function(v) {
         return function(v1) {
           if (v1 instanceof Nothing) {
@@ -1036,7 +1036,7 @@
           }
           ;
           if (v1 instanceof Just) {
-            return map14(Just.create)(v(v1.value0));
+            return map15(Just.create)(v(v1.value0));
           }
           ;
           throw new Error("Failed pattern match at Data.Traversable (line 115, column 1 - line 119, column 33): " + [v.constructor.name, v1.constructor.name]);
@@ -1045,14 +1045,14 @@
     },
     sequence: function(dictApplicative) {
       var pure10 = pure(dictApplicative);
-      var map14 = map(dictApplicative.Apply0().Functor0());
+      var map15 = map(dictApplicative.Apply0().Functor0());
       return function(v) {
         if (v instanceof Nothing) {
           return pure10(Nothing.value);
         }
         ;
         if (v instanceof Just) {
-          return map14(Just.create)(v.value0);
+          return map15(Just.create)(v.value0);
         }
         ;
         throw new Error("Failed pattern match at Data.Traversable (line 115, column 1 - line 119, column 33): " + [v.constructor.name]);
@@ -2168,7 +2168,8 @@
   var setCutStartButton = "setCutStartButton";
   var setCutEndButton = "setCutEndButton";
   var reverseLoopGifId = "reverseLoopGif";
-  var resultPreviewId = "resultPreview";
+  var resultVideoId = "resultVideo";
+  var resultPreviewId = "youtubeResultPreview";
   var playbackPositionId = "playbackPosition";
   var outputFilenameId = "outputFilename";
   var minsiLogId = "minsiLog";
@@ -2260,6 +2261,9 @@
   var toNode2 = unsafeCoerce2;
   var fromElement5 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLSpanElement");
 
+  // output/Web.HTML.HTMLVideoElement/index.js
+  var fromElement6 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLVideoElement");
+
   // output/Components.HtmlComponents/index.js
   var HtmlOutputs = /* @__PURE__ */ function() {
     function HtmlOutputs2(value0) {
@@ -2282,6 +2286,9 @@
     return HtmlInputs2;
   }();
   var loadVideoSource = /* @__PURE__ */ loadHtmlElement(videoSourceId)(fromElement4);
+  var loadVideo = function(id2) {
+    return loadHtmlElement(id2)(fromElement6);
+  };
   var loadSpan = function(id2) {
     return loadHtmlElement(id2)(fromElement5);
   };
@@ -2337,6 +2344,7 @@
       var cutStartValue = loadSpan(cutStartValueId)(doc)();
       var cutEndValue = loadSpan(cutEndValueId)(doc)();
       var loadingModal = loadDiv(loadingModalId)(doc)();
+      var resultVideo = loadVideo(resultVideoId)(doc)();
       return new HtmlOutputs({
         resultPreview,
         addSubtitleButton,
@@ -2344,7 +2352,8 @@
         playbackPosition,
         cutStartValue,
         cutEndValue,
-        loadingModal
+        loadingModal,
+        resultVideo
       });
     };
   };
@@ -2383,11 +2392,11 @@
 
   // output/Web.HTML.HTMLLIElement/index.js
   var toElement3 = unsafeCoerce2;
-  var fromElement6 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLLIElement");
+  var fromElement7 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLLIElement");
 
   // output/Web.HTML.HTMLUListElement/index.js
   var toElement4 = unsafeCoerce2;
-  var fromElement7 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLUListElement");
+  var fromElement8 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLUListElement");
 
   // output/Web.HTML.Window/foreign.js
   function document2(window2) {
@@ -3341,10 +3350,10 @@
   var $$try = function(dictMonadError) {
     var catchError1 = catchError(dictMonadError);
     var Monad0 = dictMonadError.MonadThrow0().Monad0();
-    var map14 = map(Monad0.Bind1().Apply0().Functor0());
+    var map15 = map(Monad0.Bind1().Apply0().Functor0());
     var pure10 = pure(Monad0.Applicative0());
     return function(a) {
-      return catchError1(map14(Right.create)(a))(function($52) {
+      return catchError1(map15(Right.create)(a))(function($52) {
         return pure10(Left.create($52));
       });
     };
@@ -3464,7 +3473,7 @@
     return x;
   };
   var withExceptT = function(dictFunctor) {
-    var map14 = map(dictFunctor);
+    var map15 = map(dictFunctor);
     return function(f) {
       return function(v) {
         var mapLeft = function(v1) {
@@ -3480,7 +3489,7 @@
             throw new Error("Failed pattern match at Control.Monad.Except.Trans (line 43, column 3 - line 43, column 32): " + [v1.constructor.name, v2.constructor.name]);
           };
         };
-        return map14(mapLeft(f))(v);
+        return map15(mapLeft(f))(v);
       };
     };
   };
@@ -3493,10 +3502,10 @@
     };
   };
   var functorExceptT = function(dictFunctor) {
-    var map14 = map(dictFunctor);
+    var map15 = map(dictFunctor);
     return {
       map: function(f) {
-        return mapExceptT(map14(map5(f)));
+        return mapExceptT(map15(map5(f)));
       }
     };
   };
@@ -3957,7 +3966,7 @@
       var doc = toDocument(htmlDoc);
       var ulElementRaw = createElement("ul")(doc)();
       var ulElement = function() {
-        var v = fromElement7(ulElementRaw);
+        var v = fromElement8(ulElementRaw);
         if (v instanceof Nothing) {
           return throwMinsiError(new HTMLElementNotFound("ul"))();
         }
@@ -3973,7 +3982,7 @@
         return function __do4() {
           var liElementRaw = createElement("li")(doc)();
           var liElement = function() {
-            var v = fromElement6(liElementRaw);
+            var v = fromElement7(liElementRaw);
             if (v instanceof Nothing) {
               return throwMinsiError(new HTMLElementNotFound("li"))();
             }
@@ -4359,17 +4368,6 @@
     };
   };
 
-  // output/Handers.YoutubeVideo.PlaybackPositionHandler/index.js
-  var when2 = /* @__PURE__ */ when(applicativeEffect);
-  var show3 = /* @__PURE__ */ show(showNumber);
-  var updatePlaybackPosition = function(playbackPosition) {
-    return function __do3() {
-      var playerReady = isPlayerReady();
-      var currentTime2 = getPlayerCurrentTime();
-      return when2(playerReady)(setTextContent(show3(currentTime2))(toNode2(playbackPosition)))();
-    };
-  };
-
   // output/Data.Array/foreign.js
   var replicateFill = function(count, value12) {
     if (count < 1) {
@@ -4390,6 +4388,9 @@
   var length3 = function(xs) {
     return xs.length;
   };
+  var unconsImpl = function(empty7, next2, xs) {
+    return xs.length === 0 ? empty7({}) : next2(xs[0])(xs.slice(1));
+  };
   var indexImpl = function(just, nothing, xs, i) {
     return i < 0 || i >= xs.length ? nothing : just(xs[i]);
   };
@@ -4407,6 +4408,9 @@
         no.push(x);
     }
     return { yes, no };
+  };
+  var sliceImpl = function(s, e, l) {
+    return l.slice(s, e);
   };
 
   // output/Data.Array.ST/foreign.js
@@ -4526,6 +4530,24 @@
   };
 
   // output/Data.Array/index.js
+  var tail = /* @__PURE__ */ function() {
+    return runFn3(unconsImpl)($$const(Nothing.value))(function(v) {
+      return function(xs) {
+        return new Just(xs);
+      };
+    });
+  }();
+  var slice = /* @__PURE__ */ runFn3(sliceImpl);
+  var take = function(n) {
+    return function(xs) {
+      var $152 = n < 1;
+      if ($152) {
+        return [];
+      }
+      ;
+      return slice(0)(n)(xs);
+    };
+  };
   var singleton4 = function(a) {
     return [a];
   };
@@ -4539,6 +4561,63 @@
   var last = function(xs) {
     return index2(xs)(length3(xs) - 1 | 0);
   };
+  var span2 = function(p) {
+    return function(arr) {
+      var go2 = function($copy_i) {
+        var $tco_done = false;
+        var $tco_result;
+        function $tco_loop(i) {
+          var v = index2(arr)(i);
+          if (v instanceof Just) {
+            var $156 = p(v.value0);
+            if ($156) {
+              $copy_i = i + 1 | 0;
+              return;
+            }
+            ;
+            $tco_done = true;
+            return new Just(i);
+          }
+          ;
+          if (v instanceof Nothing) {
+            $tco_done = true;
+            return Nothing.value;
+          }
+          ;
+          throw new Error("Failed pattern match at Data.Array (line 1035, column 5 - line 1037, column 25): " + [v.constructor.name]);
+        }
+        ;
+        while (!$tco_done) {
+          $tco_result = $tco_loop($copy_i);
+        }
+        ;
+        return $tco_result;
+      };
+      var breakIndex = go2(0);
+      if (breakIndex instanceof Just && breakIndex.value0 === 0) {
+        return {
+          init: [],
+          rest: arr
+        };
+      }
+      ;
+      if (breakIndex instanceof Just) {
+        return {
+          init: slice(0)(breakIndex.value0)(arr),
+          rest: slice(breakIndex.value0)(length3(arr))(arr)
+        };
+      }
+      ;
+      if (breakIndex instanceof Nothing) {
+        return {
+          init: arr,
+          rest: []
+        };
+      }
+      ;
+      throw new Error("Failed pattern match at Data.Array (line 1022, column 3 - line 1028, column 30): " + [breakIndex.constructor.name]);
+    };
+  };
   var head = function(xs) {
     return index2(xs)(0);
   };
@@ -4551,6 +4630,34 @@
         return $189(f($190));
       };
     }());
+  };
+
+  // output/Data.String.CodeUnits/foreign.js
+  var fromCharArray = function(a) {
+    return a.join("");
+  };
+  var toCharArray = function(s) {
+    return s.split("");
+  };
+
+  // output/Handers.YoutubeVideo.PlaybackPositionHandler/index.js
+  var show3 = /* @__PURE__ */ show(showNumber);
+  var map8 = /* @__PURE__ */ map(functorMaybe);
+  var when2 = /* @__PURE__ */ when(applicativeEffect);
+  var updatePlaybackPosition = function(playbackPosition) {
+    var formatToThreeDecimals = function(v) {
+      var v1 = span2(function(x) {
+        return x !== ".";
+      })(toCharArray(show3(v)));
+      var num = fromCharArray(v1.init);
+      var dec = maybe("0")(fromCharArray)(map8(take(3))(tail(v1.rest)));
+      return num + ("." + dec);
+    };
+    return function __do3() {
+      var playerReady = isPlayerReady();
+      var currentTime2 = getPlayerCurrentTime();
+      return when2(playerReady)(setTextContent(formatToThreeDecimals(currentTime2))(toNode2(playbackPosition)))();
+    };
   };
 
   // output/Data.Array.NonEmpty/index.js
@@ -4710,7 +4817,7 @@
   var $$void5 = /* @__PURE__ */ $$void(functorST);
   var pure1 = /* @__PURE__ */ pure(applicativeST);
   var apply2 = /* @__PURE__ */ apply(applyST);
-  var map8 = /* @__PURE__ */ map(functorST);
+  var map9 = /* @__PURE__ */ map(functorST);
   var compactableMaybe = {
     compact: /* @__PURE__ */ join(bindMaybe),
     separate: function(v) {
@@ -4785,7 +4892,7 @@
             throw new Error("Failed pattern match at Data.Compactable (line 122, column 34 - line 124, column 31): " + [v.constructor.name]);
           }($109));
         })();
-        return apply2(map8(function(v) {
+        return apply2(map9(function(v) {
           return function(v1) {
             return {
               left: v,
@@ -5189,7 +5296,7 @@
   // output/Data.URL/index.js
   var filter4 = /* @__PURE__ */ filter3(filterableMaybe);
   var fromFoldable4 = /* @__PURE__ */ fromFoldable(ordString)(foldableArray);
-  var map9 = /* @__PURE__ */ map(functorArray);
+  var map10 = /* @__PURE__ */ map(functorArray);
   var wrap3 = /* @__PURE__ */ wrap();
   var filter1 = /* @__PURE__ */ filter3(filterableArray);
   var PathEmpty = /* @__PURE__ */ function() {
@@ -5224,7 +5331,7 @@
       return queryLookupImpl(k)(u);
     };
     var ks = queryKeysImpl(u);
-    return fromFoldable4(map9(function(k) {
+    return fromFoldable4(map10(function(k) {
       return new Tuple(k, vals(k));
     })(ks));
   };
@@ -5510,7 +5617,7 @@
   // output/Model.State.StateFromHtml/index.js
   var mapFlipped2 = /* @__PURE__ */ mapFlipped(functorEffect);
   var apply3 = /* @__PURE__ */ apply(/* @__PURE__ */ applyV(/* @__PURE__ */ semigroupMap()(ordString)(semigroupString)));
-  var map10 = /* @__PURE__ */ map(functorV);
+  var map11 = /* @__PURE__ */ map(functorV);
   var youtubeUrlFromHTMLInput = function(youtubeUrlComponent) {
     return function __do3() {
       var urlString = value2(youtubeUrlComponent)();
@@ -5539,7 +5646,7 @@
       var reverseLoopValue = checked(v.value0.reverseLoop)();
       var artistV = nonEmptyFromHtmlInput(v.value0.artist)(artistId)();
       var titleV = nonEmptyFromHtmlInput(v.value0.title)(titleId)();
-      return apply3(apply3(apply3(apply3(map10(function(v1) {
+      return apply3(apply3(apply3(apply3(map11(function(v1) {
         return function(v2) {
           return function(v3) {
             return function(v4) {
@@ -6015,7 +6122,7 @@
   var voidRight2 = /* @__PURE__ */ voidRight(functorEffect);
   var mempty2 = /* @__PURE__ */ mempty(monoidCanceler);
   var thenOrCatch3 = /* @__PURE__ */ thenOrCatch2();
-  var map11 = /* @__PURE__ */ map(functorEffect);
+  var map12 = /* @__PURE__ */ map(functorEffect);
   var resolve3 = /* @__PURE__ */ resolve2();
   var alt6 = /* @__PURE__ */ alt(altMaybe);
   var map1 = /* @__PURE__ */ map(functorMaybe);
@@ -6026,9 +6133,9 @@
     return function(p) {
       return makeAff(function(cb) {
         return voidRight2(mempty2)(thenOrCatch3(function(a) {
-          return map11(resolve3)(cb(new Right(a)));
+          return map12(resolve3)(cb(new Right(a)));
         })(function(e) {
-          return map11(resolve3)(cb(new Left(customCoerce(e))));
+          return map12(resolve3)(cb(new Left(customCoerce(e))));
         })(p));
       });
     };
@@ -6098,7 +6205,7 @@
   // output/Fetch/index.js
   var $$void6 = /* @__PURE__ */ $$void(functorEffect);
   var thenOrCatch4 = /* @__PURE__ */ thenOrCatch2();
-  var map12 = /* @__PURE__ */ map(functorEffect);
+  var map13 = /* @__PURE__ */ map(functorEffect);
   var resolve4 = /* @__PURE__ */ resolve2();
   var bind5 = /* @__PURE__ */ bind(bindAff);
   var liftEffect6 = /* @__PURE__ */ liftEffect(monadEffectAff);
@@ -6111,9 +6218,9 @@
       return makeAff(function(cb) {
         return function __do3() {
           $$void6(thenOrCatch4(function(a) {
-            return map12(resolve4)(cb(new Right(a)));
+            return map13(resolve4)(cb(new Right(a)));
           })(function(e) {
-            return map12(resolve4)(cb(new Left(coerce3(e))));
+            return map13(resolve4)(cb(new Left(coerce3(e))));
           })(p))();
           return effectCanceler(abort(abortController));
         };
@@ -6153,7 +6260,7 @@
   var insert6 = /* @__PURE__ */ insert4()();
   var append3 = /* @__PURE__ */ append(semigroupNonEmptyList);
   var functorExceptT2 = /* @__PURE__ */ functorExceptT(functorIdentity);
-  var map13 = /* @__PURE__ */ map(functorExceptT2);
+  var map14 = /* @__PURE__ */ map(functorExceptT2);
   var map22 = /* @__PURE__ */ map(functorNonEmptyList);
   var bindFlipped4 = /* @__PURE__ */ bindFlipped(bindExceptT2);
   var composeKleisliFlipped2 = /* @__PURE__ */ composeKleisliFlipped(bindExceptT2);
@@ -6253,7 +6360,7 @@
                   var name15 = reflectSymbol2($$Proxy.value);
                   var enrichErrorWithPropName = withExcept(map22(ErrorAtProperty.create(name15)));
                   var value12 = enrichErrorWithPropName(bindFlipped4(readImpl5)(readProp2(name15)(obj)));
-                  var first = map13(insert42($$Proxy.value))(value12);
+                  var first = map14(insert42($$Proxy.value))(value12);
                   return except2(function() {
                     var v1 = runExcept(rest);
                     var v2 = runExcept(first);
@@ -6288,7 +6395,7 @@
       var getFields1 = getFields(dictReadForeignFields);
       return {
         readImpl: function(o) {
-          return map13(flip(build)({}))(getFields1($$Proxy.value)(o));
+          return map14(flip(build)({}))(getFields1($$Proxy.value)(o));
         }
       };
     };

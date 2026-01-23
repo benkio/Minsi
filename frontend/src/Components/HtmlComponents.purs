@@ -16,6 +16,8 @@ import Web.HTML.HTMLSelectElement (HTMLSelectElement)
 import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.HTMLSpanElement (HTMLSpanElement)
 import Web.HTML.HTMLSpanElement as HSP
+import Web.HTML.HTMLVideoElement (HTMLVideoElement)
+import Web.HTML.HTMLVideoElement as HV
 import Data.Tuple (Tuple(..), fst, snd)
 
 data HtmlInputs = HtmlInputs
@@ -40,6 +42,7 @@ data HtmlOutputs = HtmlOutputs
     , cutStartValue  :: HTMLSpanElement
     , cutEndValue  :: HTMLSpanElement
     , loadingModal :: HTMLDivElement
+    , resultVideo :: HTMLVideoElement
   }
 type HtmlComponents = Tuple HtmlInputs HtmlOutputs
 
@@ -86,6 +89,7 @@ loadHtmlOutputs doc = do
   cutStartValue <- loadSpan cutStartValueId doc
   cutEndValue <- loadSpan cutEndValueId doc
   loadingModal <- loadDiv loadingModalId doc
+  resultVideo <- loadVideo resultVideoId doc
   pure
     ( HtmlOutputs
         { resultPreview: resultPreview
@@ -95,6 +99,7 @@ loadHtmlOutputs doc = do
         , cutStartValue: cutStartValue
         , cutEndValue: cutEndValue
         , loadingModal: loadingModal
+        , resultVideo: resultVideo
         }
     )
 
@@ -120,3 +125,6 @@ loadVideoSource = loadHtmlElement videoSourceId HS.fromElement
 
 loadSpan :: String -> NonElementParentNode -> Effect HTMLSpanElement
 loadSpan id = loadHtmlElement id HSP.fromElement
+
+loadVideo :: String -> NonElementParentNode -> Effect HTMLVideoElement
+loadVideo id = loadHtmlElement id HV.fromElement

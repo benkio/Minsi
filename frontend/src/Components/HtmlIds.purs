@@ -28,7 +28,7 @@ youtubeUrlId :: String
 youtubeUrlId = "youtubeUrl"
 
 resultPreviewId :: String
-resultPreviewId = "resultPreview"
+resultPreviewId = "youtubeResultPreview"
 
 cutVideoId :: String
 cutVideoId = "cutVideoButton"
@@ -56,3 +56,6 @@ setCutEndButton = "setCutEndButton"
 
 loadingModalId :: String
 loadingModalId = "loadingModal"
+
+resultVideoId :: String
+resultVideoId = "resultVideo"

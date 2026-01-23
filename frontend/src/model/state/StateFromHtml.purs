@@ -11,7 +11,7 @@ import Data.Validation.Semigroup (V)
 import Validations.YoutubeValidation (youtubeUrlValidation)
 import Validations.NonEmptyValidation (nonEmptyValidation)
 import Validations.CutVideoValidation (cutVideoValidation)
-import Components.HtmlIds (youtubeUrlId, outputFilenameId, artistId, titleId, cutStartId, cutEndId)
+import Components.HtmlIds (youtubeUrlId, outputFilenameId, artistId, titleId, cutStartId)
 
 fromHtmlInputs :: HtmlInputs -> Effect (V (Map String String) State)
 fromHtmlInputs (HtmlInputs { cutStart, cutEnd, youtubeUrl: youtubeUrlInput, filename: filenameInput, reverseLoop: reverseLoopInput, artist: artistInput, title: titleInput }) = do
