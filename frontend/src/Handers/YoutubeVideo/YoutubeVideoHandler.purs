@@ -12,7 +12,7 @@ import Prelude
 import Validations.YoutubeValidation (youtubeUrlValidation)
 import Web.DOM.Element (fromEventTarget, toEventTarget)
 import Web.Event.Event (target)
-import Web.Event.EventTarget (EventTarget, addEventListener, eventListener)
+import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLSpanElement as HSP
@@ -21,7 +21,7 @@ import Web.HTML.Event.EventTypes as E
 import Components.HtmlIds (resultPreviewId)
 import Handers.YoutubeVideo.Foreign (embedVideo)
 import Handers.YoutubeVideo.YoutubeUrlExtraction (extractYoutubeVideoId, extractYoutubeVideoStartTime)
-import Handers.YoutubeVideo.CutButtonsHandlers (initializeCutInputs, setCutEndButtonEvL, setCutStartButtonEvL)
+import Handers.YoutubeVideo.CutButtonsHandlers (initializeCutInputs, setCutInputButtonEvL)
 import Handers.YoutubeVideo.PlaybackPositionHandler (updatePlaybackPosition)
 import Effect.Timer (setInterval)
 
@@ -31,20 +31,22 @@ data VideoEventTargets = VET
   , playbackPosition :: HSP.HTMLSpanElement
   , setCutEndButton :: HB.HTMLButtonElement
   , setCutStartButton :: HB.HTMLButtonElement
+  , youtubeUrl :: HI.HTMLInputElement
   }
 
-setVideoHandlers :: VideoEventTargets -> EventTarget -> Effect Unit
-setVideoHandlers (VET { cutStart, setCutStartButton, playbackPosition, cutEnd, setCutEndButton }) ytUrlEventTarget = do
+setVideoHandlers :: VideoEventTargets -> Effect Unit
+setVideoHandlers (VET { cutStart, setCutStartButton, playbackPosition, cutEnd, setCutEndButton, youtubeUrl: youtubeUrl })  = do
   ytEvL <- eventListener (youtubeUrlEventListener cutStart cutEnd)
   addEventListener E.input ytEvL false ytUrlEventTarget
   addEventListener E.change ytEvL false ytUrlEventTarget
   _ <- setInterval 1000 (updatePlaybackPosition playbackPosition)
-  setCutStartButtonEvLV <- eventListener (setCutStartButtonEvL cutStart)
-  setCutEndButtonEvLV <- eventListener (setCutEndButtonEvL cutEnd)
+  setCutStartButtonEvLV <- eventListener (setCutInputButtonEvL cutStart)
+  setCutEndButtonEvLV <- eventListener (setCutInputButtonEvL cutEnd)
   addEventListener E.click setCutStartButtonEvLV false setCutStartButtonTarget
   addEventListener E.click setCutEndButtonEvLV false setCutEndButtonTarget
   pure unit
   where
+    ytUrlEventTarget = toEventTarget (HI.toElement youtubeUrl)
     setCutStartButtonTarget = toEventTarget (HB.toElement setCutStartButton)
     setCutEndButtonTarget = toEventTarget (HB.toElement setCutEndButton)
 

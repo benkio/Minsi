@@ -37,26 +37,30 @@ data HtmlOutputs = HtmlOutputs
   , addSubtitleButton :: HTMLButtonElement
   , minsiLog :: HTMLDivElement
   , playbackPosition :: HTMLSpanElement
-  }
+    , cutStartValue  :: HTMLSpanElement
+    , cutEndValue  :: HTMLSpanElement
 
+  }
 type HtmlComponents = Tuple HtmlInputs HtmlOutputs
 
 loadComponents :: NonElementParentNode -> Effect HtmlComponents
 loadComponents doc = do
   rangeTuple <- loadCutRange doc
-  youtubeUrl <- loadYoutubeUrl doc
-  filename <- loadFilename doc
-  reverseLoop <- loadReverseLoop doc
-  artist <- loadArtist doc
-  title <- loadTitle doc
-  applyButton <- loadApplyButton doc
+  youtubeUrl <- loadInput youtubeUrlId doc
+  filename <- loadInput outputFilenameId doc
+  reverseLoop <- loadInput reverseLoopGifId doc
+  artist <- loadInput artistId doc
+  title <- loadInput titleId doc
+  applyButton <- loadButton applyId doc
   videoSource <- loadVideoSource doc
-  resultPreview <- loadResultPreview doc
-  addSubtitleButton <- loadAddSubtitleButton doc
-  setCutStartButton <- loadSetCutStartButton doc
-  setCutEndButton <- loadSetCutEndButton doc
-  minsiLog <- loadMinsiLog doc
-  playbackPosition <- loadPlaybackPosition doc
+  resultPreview <- loadDiv resultPreviewId doc
+  addSubtitleButton <- loadButton addSubtitleId doc
+  setCutStartButton <- loadButton setCutStartButton doc
+  setCutEndButton <- loadButton setCutEndButton doc
+  minsiLog <- loadDiv minsiLogId doc
+  playbackPosition <- loadSpan playbackPositionId doc
+  cutStartValue <- loadSpan cutStartValueId doc
+  cutEndValue <- loadSpan cutStartValueId doc
   pure
     ( Tuple
         ( HtmlInputs
@@ -78,17 +82,19 @@ loadComponents doc = do
             , addSubtitleButton: addSubtitleButton
             , minsiLog: minsiLog
             , playbackPosition: playbackPosition
+            , cutStartValue: cutStartValue
+            , cutEndValue: cutEndValue
             }
         )
     )
 
 -- Load Single Elements ---------------------------------------------------
 
-loadArtist :: NonElementParentNode -> Effect HTMLInputElement
-loadArtist = loadHtmlElement artistId HI.fromElement
+loadInput :: String -> NonElementParentNode -> Effect HTMLInputElement
+loadInput id = loadHtmlElement id HI.fromElement
 
-loadApplyButton :: NonElementParentNode -> Effect HTMLButtonElement
-loadApplyButton = loadHtmlElement applyId HB.fromElement
+loadButton :: String -> NonElementParentNode -> Effect HTMLButtonElement
+loadButton id = loadHtmlElement id HB.fromElement
 
 loadCutRange :: NonElementParentNode -> Effect (Tuple HTMLInputElement HTMLInputElement)
 loadCutRange doc = do
@@ -96,38 +102,11 @@ loadCutRange doc = do
   cutEnd <- loadHtmlElement cutEndId HI.fromElement doc
   pure (Tuple cutStart cutEnd)
 
-loadCutVideoButton :: NonElementParentNode -> Effect HTMLButtonElement
-loadCutVideoButton = loadHtmlElement cutVideoId HB.fromElement
-
-loadFilename :: NonElementParentNode -> Effect HTMLInputElement
-loadFilename = loadHtmlElement outputFilenameId HI.fromElement
-
-loadAddSubtitleButton :: NonElementParentNode -> Effect HTMLButtonElement
-loadAddSubtitleButton = loadHtmlElement addSubtitleId HB.fromElement
-
-loadResultPreview :: NonElementParentNode -> Effect HTMLDivElement
-loadResultPreview = loadHtmlElement resultPreviewId HD.fromElement
-
-loadReverseLoop :: NonElementParentNode -> Effect HTMLInputElement
-loadReverseLoop = loadHtmlElement reverseLoopGifId HI.fromElement
-
-loadTitle :: NonElementParentNode -> Effect HTMLInputElement
-loadTitle = loadHtmlElement titleId HI.fromElement
-
-loadYoutubeUrl :: NonElementParentNode -> Effect HTMLInputElement
-loadYoutubeUrl = loadHtmlElement youtubeUrlId HI.fromElement
+loadDiv :: String -> NonElementParentNode -> Effect HTMLDivElement
+loadDiv id = loadHtmlElement id HD.fromElement
 
 loadVideoSource :: NonElementParentNode -> Effect HTMLSelectElement
 loadVideoSource = loadHtmlElement videoSourceId HS.fromElement
 
-loadMinsiLog :: NonElementParentNode -> Effect HTMLDivElement
-loadMinsiLog = loadHtmlElement minsiLogId HD.fromElement
-
-loadPlaybackPosition :: NonElementParentNode -> Effect HTMLSpanElement
-loadPlaybackPosition = loadHtmlElement playbackPositionId HSP.fromElement
-
-loadSetCutStartButton :: NonElementParentNode -> Effect HTMLButtonElement
-loadSetCutStartButton = loadHtmlElement setCutStartButton HB.fromElement
-
-loadSetCutEndButton :: NonElementParentNode -> Effect HTMLButtonElement
-loadSetCutEndButton = loadHtmlElement setCutEndButton HB.fromElement
+loadSpan :: String -> NonElementParentNode -> Effect HTMLSpanElement
+loadSpan id = loadHtmlElement id HSP.fromElement

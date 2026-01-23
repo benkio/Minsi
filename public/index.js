@@ -4629,7 +4629,7 @@
       return v.value0;
     }
     ;
-    throw new Error("Failed pattern match at Handers.YoutubeVideo.YoutubeUrlExtraction (line 25, column 1 - line 25, column 36): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at Handers.YoutubeVideo.YoutubeUrlExtraction (line 23, column 1 - line 23, column 36): " + [v.constructor.name]);
   };
   var parseUnit = function(str) {
     return function(unit2) {
@@ -4648,10 +4648,10 @@
           return 0;
         }
         ;
-        throw new Error("Failed pattern match at Handers.YoutubeVideo.YoutubeUrlExtraction (line 43, column 7 - line 45, column 21): " + [v1.constructor.name]);
+        throw new Error("Failed pattern match at Handers.YoutubeVideo.YoutubeUrlExtraction (line 39, column 7 - line 41, column 21): " + [v1.constructor.name]);
       }
       ;
-      throw new Error("Failed pattern match at Handers.YoutubeVideo.YoutubeUrlExtraction (line 40, column 3 - line 45, column 21): " + [v.constructor.name]);
+      throw new Error("Failed pattern match at Handers.YoutubeVideo.YoutubeUrlExtraction (line 36, column 3 - line 41, column 21): " + [v.constructor.name]);
     };
   };
   var parseYouTubeT = function(raw) {
@@ -4674,7 +4674,7 @@
       return Nothing.value;
     }
     ;
-    throw new Error("Failed pattern match at Handers.YoutubeVideo.YoutubeUrlExtraction (line 54, column 5 - line 63, column 52): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at Handers.YoutubeVideo.YoutubeUrlExtraction (line 49, column 5 - line 58, column 52): " + [v.constructor.name]);
   };
   var extractYoutubeVideoStartTime = function(url2) {
     return fromMaybe(0)(bind2(lookup3("t")(query(url2)))(function(values) {
@@ -4830,33 +4830,32 @@
     };
   };
   var setVideoHandlers = function(v) {
-    return function(ytUrlEventTarget) {
-      var setCutStartButtonTarget = toEventTarget(toElement(v.value0.setCutStartButton));
-      var setCutEndButtonTarget = toEventTarget(toElement(v.value0.setCutEndButton));
-      return function __do3() {
-        var ytEvL = eventListener(youtubeUrlEventListener(v.value0.cutStart)(v.value0.cutEnd))();
-        addEventListener(input)(ytEvL)(false)(ytUrlEventTarget)();
-        addEventListener(change)(ytEvL)(false)(ytUrlEventTarget)();
-        setInterval2(1e3)(updatePlaybackPosition(v.value0.playbackPosition))();
-        var setCutStartButtonEvLV = eventListener(setCutStartButtonEvL(v.value0.cutStart))();
-        var setCutEndButtonEvLV = eventListener(setCutEndButtonEvL(v.value0.cutEnd))();
-        addEventListener(click2)(setCutStartButtonEvLV)(false)(setCutStartButtonTarget)();
-        addEventListener(click2)(setCutEndButtonEvLV)(false)(setCutEndButtonTarget)();
-        return unit;
-      };
+    var ytUrlEventTarget = toEventTarget(toElement2(v.value0.youtubeUrl));
+    var setCutStartButtonTarget = toEventTarget(toElement(v.value0.setCutStartButton));
+    var setCutEndButtonTarget = toEventTarget(toElement(v.value0.setCutEndButton));
+    return function __do3() {
+      var ytEvL = eventListener(youtubeUrlEventListener(v.value0.cutStart)(v.value0.cutEnd))();
+      addEventListener(input)(ytEvL)(false)(ytUrlEventTarget)();
+      addEventListener(change)(ytEvL)(false)(ytUrlEventTarget)();
+      setInterval2(1e3)(updatePlaybackPosition(v.value0.playbackPosition))();
+      var setCutStartButtonEvLV = eventListener(setCutStartButtonEvL(v.value0.cutStart))();
+      var setCutEndButtonEvLV = eventListener(setCutEndButtonEvL(v.value0.cutEnd))();
+      addEventListener(click2)(setCutStartButtonEvLV)(false)(setCutStartButtonTarget)();
+      addEventListener(click2)(setCutEndButtonEvLV)(false)(setCutEndButtonTarget)();
+      return unit;
     };
   };
 
   // output/Handlers.Handlers/index.js
   var setupEventHandlers = function(v) {
-    var ytUrlEventTarget = toEventTarget(toElement2(v.value0.value0.youtubeUrl));
     return setVideoHandlers(new VET({
       cutStart: v.value0.value0.cutStart,
       cutEnd: v.value0.value0.cutEnd,
       playbackPosition: v.value1.value0.playbackPosition,
       setCutStartButton: v.value0.value0.setCutStartButton,
-      setCutEndButton: v.value0.value0.setCutEndButton
-    }))(ytUrlEventTarget);
+      setCutEndButton: v.value0.value0.setCutEndButton,
+      youtubeUrl: v.value0.value0.youtubeUrl
+    }));
   };
 
   // output/Data.HTTP.Method/index.js

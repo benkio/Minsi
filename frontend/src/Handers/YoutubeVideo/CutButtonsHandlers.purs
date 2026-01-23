@@ -10,15 +10,10 @@ import Web.HTML.HTMLInputElement as HI
 import Handers.YoutubeVideo.Foreign (getPlayerCurrentTime, getVideoDuration, isPlayerReady)
 import Prelude
 
-setCutStartButtonEvL :: HI.HTMLInputElement -> Event -> Effect Unit
-setCutStartButtonEvL cutStart _ = do
+setCutInputButtonEvL :: HI.HTMLInputElement -> Event -> Effect Unit
+setCutInputButtonEvL cutInput _ = do
   currentTime <- getPlayerCurrentTime
-  HI.setValue (show currentTime) cutStart
-
-setCutEndButtonEvL :: HI.HTMLInputElement -> Event -> Effect Unit
-setCutEndButtonEvL cutEnd _ = do
-  currentTime <- getPlayerCurrentTime
-  HI.setValue (show currentTime) cutEnd
+  HI.setValue (show currentTime) cutInput
 
 initializeCutInputs :: HI.HTMLInputElement -> HI.HTMLInputElement -> Int -> Effect Unit
 initializeCutInputs cutStart cutEnd startTime = launchAff_ $ do
