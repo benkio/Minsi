@@ -846,7 +846,9 @@
   var playbackPositionId = "playbackPosition";
   var outputFilenameId = "outputFilename";
   var minsiLogId = "minsiLog";
+  var cutStartValueId = "cutStartValue";
   var cutStartId = "cutStart";
+  var cutEndValueId = "cutEndValue";
   var cutEndId = "cutEnd";
   var artistId = "artist";
   var applyId = "applyButton";
@@ -1003,16 +1005,16 @@
     };
     return HtmlInputs2;
   }();
-  var loadYoutubeUrl = /* @__PURE__ */ loadHtmlElement(youtubeUrlId)(fromElement3);
   var loadVideoSource = /* @__PURE__ */ loadHtmlElement(videoSourceId)(fromElement4);
-  var loadTitle = /* @__PURE__ */ loadHtmlElement(titleId)(fromElement3);
-  var loadSetCutStartButton = /* @__PURE__ */ loadHtmlElement(setCutStartButton)(fromElement);
-  var loadSetCutEndButton = /* @__PURE__ */ loadHtmlElement(setCutEndButton)(fromElement);
-  var loadReverseLoop = /* @__PURE__ */ loadHtmlElement(reverseLoopGifId)(fromElement3);
-  var loadResultPreview = /* @__PURE__ */ loadHtmlElement(resultPreviewId)(fromElement2);
-  var loadPlaybackPosition = /* @__PURE__ */ loadHtmlElement(playbackPositionId)(fromElement5);
-  var loadMinsiLog = /* @__PURE__ */ loadHtmlElement(minsiLogId)(fromElement2);
-  var loadFilename = /* @__PURE__ */ loadHtmlElement(outputFilenameId)(fromElement3);
+  var loadSpan = function(id2) {
+    return loadHtmlElement(id2)(fromElement5);
+  };
+  var loadInput = function(id2) {
+    return loadHtmlElement(id2)(fromElement3);
+  };
+  var loadDiv = function(id2) {
+    return loadHtmlElement(id2)(fromElement2);
+  };
   var loadCutRange = function(doc) {
     return function __do3() {
       var cutStart = loadHtmlElement(cutStartId)(fromElement3)(doc)();
@@ -1020,25 +1022,27 @@
       return new Tuple(cutStart, cutEnd);
     };
   };
-  var loadArtist = /* @__PURE__ */ loadHtmlElement(artistId)(fromElement3);
-  var loadApplyButton = /* @__PURE__ */ loadHtmlElement(applyId)(fromElement);
-  var loadAddSubtitleButton = /* @__PURE__ */ loadHtmlElement(addSubtitleId)(fromElement);
+  var loadButton = function(id2) {
+    return loadHtmlElement(id2)(fromElement);
+  };
   var loadComponents = function(doc) {
     return function __do3() {
       var rangeTuple = loadCutRange(doc)();
-      var youtubeUrl = loadYoutubeUrl(doc)();
-      var filename = loadFilename(doc)();
-      var reverseLoop = loadReverseLoop(doc)();
-      var artist = loadArtist(doc)();
-      var title2 = loadTitle(doc)();
-      var applyButton = loadApplyButton(doc)();
+      var youtubeUrl = loadInput(youtubeUrlId)(doc)();
+      var filename = loadInput(outputFilenameId)(doc)();
+      var reverseLoop = loadInput(reverseLoopGifId)(doc)();
+      var artist = loadInput(artistId)(doc)();
+      var title2 = loadInput(titleId)(doc)();
+      var applyButton = loadButton(applyId)(doc)();
       var videoSource = loadVideoSource(doc)();
-      var resultPreview = loadResultPreview(doc)();
-      var addSubtitleButton = loadAddSubtitleButton(doc)();
-      var setCutStartButton2 = loadSetCutStartButton(doc)();
-      var setCutEndButton2 = loadSetCutEndButton(doc)();
-      var minsiLog = loadMinsiLog(doc)();
-      var playbackPosition = loadPlaybackPosition(doc)();
+      var resultPreview = loadDiv(resultPreviewId)(doc)();
+      var addSubtitleButton = loadButton(addSubtitleId)(doc)();
+      var setCutStartButton2 = loadButton(setCutStartButton)(doc)();
+      var setCutEndButton2 = loadButton(setCutEndButton)(doc)();
+      var minsiLog = loadDiv(minsiLogId)(doc)();
+      var playbackPosition = loadSpan(playbackPositionId)(doc)();
+      var cutStartValue = loadSpan(cutStartValueId)(doc)();
+      var cutEndValue = loadSpan(cutEndValueId)(doc)();
       return new Tuple(new HtmlInputs({
         cutStart: fst(rangeTuple),
         cutEnd: snd(rangeTuple),
@@ -1055,7 +1059,9 @@
         resultPreview,
         addSubtitleButton,
         minsiLog,
-        playbackPosition
+        playbackPosition,
+        cutStartValue,
+        cutEndValue
       }));
     };
   };
@@ -2884,7 +2890,7 @@
   var writeToMinsiLog = function(errorMessage) {
     return function __do3() {
       var doc = getDocument();
-      var minsiLog = loadMinsiLog(doc)();
+      var minsiLog = loadDiv(minsiLogId)(doc)();
       var minsiLogNode = toNode(minsiLog);
       setTextContent(errorMessage)(minsiLogNode)();
       return $$void3(setTimeout2(5e3)(setTextContent("")(minsiLogNode)))();
@@ -2899,7 +2905,7 @@
       return catchError2(writeToMinsiLog(message(v.value0)))($$const(raiseErrorAlert(message(v.value0))));
     }
     ;
-    throw new Error("Failed pattern match at Handers.ErrorHandlers (line 21, column 1 - line 21, column 70): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at Handers.ErrorHandlers (line 22, column 1 - line 22, column 70): " + [v.constructor.name]);
   };
   var genericErrorsHandler = function(p) {
     return catchError2(p)(function(e) {
@@ -3429,43 +3435,169 @@
     return hasGetDuration && hasGetCurrentTime && isReady;
   };
 
+  // output/Web.DOM.Element/foreign.js
+  var getProp = function(name15) {
+    return function(doctype) {
+      return doctype[name15];
+    };
+  };
+  var _namespaceURI = getProp("namespaceURI");
+  var _prefix = getProp("prefix");
+  var localName = getProp("localName");
+  var tagName = getProp("tagName");
+
+  // output/Web.DOM.ParentNode/foreign.js
+  var getEffProp2 = function(name15) {
+    return function(node) {
+      return function() {
+        return node[name15];
+      };
+    };
+  };
+  var children = getEffProp2("children");
+  var _firstElementChild = getEffProp2("firstElementChild");
+  var _lastElementChild = getEffProp2("lastElementChild");
+  var childElementCount = getEffProp2("childElementCount");
+
+  // output/Web.DOM.Element/index.js
+  var toEventTarget = unsafeCoerce2;
+  var fromEventTarget = /* @__PURE__ */ unsafeReadProtoTagged("Element");
+
+  // output/Web.Event.EventTarget/foreign.js
+  function eventListener(fn) {
+    return function() {
+      return function(event) {
+        return fn(event)();
+      };
+    };
+  }
+  function addEventListener(type) {
+    return function(listener) {
+      return function(useCapture) {
+        return function(target6) {
+          return function() {
+            return target6.addEventListener(type, listener, useCapture);
+          };
+        };
+      };
+    };
+  }
+
+  // output/Web.HTML.Event.EventTypes/index.js
+  var input = "input";
+  var click2 = "click";
+  var change = "change";
+
+  // output/Handlers.CutRangeHandler/index.js
+  var CRET = /* @__PURE__ */ function() {
+    function CRET2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    CRET2.create = function(value0) {
+      return new CRET2(value0);
+    };
+    return CRET2;
+  }();
+  var updateCutValue = function(cutInput) {
+    return function(cutValueSpan) {
+      return function __do3() {
+        var inputValue = value2(cutInput)();
+        return setTextContent(inputValue)(toNode2(cutValueSpan))();
+      };
+    };
+  };
+  var updateCutStartValue = function(cutStart) {
+    return function(cutStartValue) {
+      return function __do3() {
+        var inputValue = value2(cutStart)();
+        return setTextContent(inputValue)(toNode2(cutStartValue))();
+      };
+    };
+  };
+  var updateCutEndValue = function(cutEnd) {
+    return function(cutEndValue) {
+      return function __do3() {
+        var inputValue = value2(cutEnd)();
+        return setTextContent(inputValue)(toNode2(cutEndValue))();
+      };
+    };
+  };
+  var cutStartEventListener = function(cutStart) {
+    return function(cutStartValue) {
+      return function(v) {
+        return function __do3() {
+          var inputValue = value2(cutStart)();
+          return setTextContent(inputValue)(toNode2(cutStartValue))();
+        };
+      };
+    };
+  };
+  var cutEndEventListener = function(cutEnd) {
+    return function(cutEndValue) {
+      return function(v) {
+        return function __do3() {
+          var inputValue = value2(cutEnd)();
+          return setTextContent(inputValue)(toNode2(cutEndValue))();
+        };
+      };
+    };
+  };
+  var setCutRangeHandlers = function(v) {
+    var cutStartEventTarget = toEventTarget(toElement2(v.value0.cutStart));
+    var cutEndEventTarget = toEventTarget(toElement2(v.value0.cutEnd));
+    return function __do3() {
+      var cutStartEvL = eventListener(cutStartEventListener(v.value0.cutStart)(v.value0.cutStartValue))();
+      var cutEndEvL = eventListener(cutEndEventListener(v.value0.cutEnd)(v.value0.cutEndValue))();
+      addEventListener(input)(cutStartEvL)(false)(cutStartEventTarget)();
+      addEventListener(change)(cutStartEvL)(false)(cutStartEventTarget)();
+      addEventListener(input)(cutEndEvL)(false)(cutEndEventTarget)();
+      addEventListener(change)(cutEndEvL)(false)(cutEndEventTarget)();
+      return unit;
+    };
+  };
+
   // output/Handers.YoutubeVideo.CutButtonsHandlers/index.js
+  var discard2 = /* @__PURE__ */ discard(discardUnit);
   var show3 = /* @__PURE__ */ show(showNumber);
-  var discard2 = /* @__PURE__ */ discard(discardUnit)(bindAff);
+  var discard22 = /* @__PURE__ */ discard2(bindAff);
   var whileM_2 = /* @__PURE__ */ whileM_(monadAff);
   var liftEffect3 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var map5 = /* @__PURE__ */ map(functorEffect);
   var not2 = /* @__PURE__ */ not(heytingAlgebraBoolean);
   var bind12 = /* @__PURE__ */ bind(bindAff);
   var show1 = /* @__PURE__ */ show(showInt);
-  var setCutStartButtonEvL = function(cutStart) {
-    return function(v) {
-      return function __do3() {
-        var currentTime2 = getPlayerCurrentTime();
-        return setValue2(show3(currentTime2))(cutStart)();
-      };
-    };
-  };
-  var setCutEndButtonEvL = function(cutEnd) {
-    return function(v) {
-      return function __do3() {
-        var currentTime2 = getPlayerCurrentTime();
-        return setValue2(show3(currentTime2))(cutEnd)();
+  var setCutInputButtonEvL = function(cutInput) {
+    return function(cutValueSpan) {
+      return function(v) {
+        return function __do3() {
+          var currentTime2 = getPlayerCurrentTime();
+          setValue2(show3(currentTime2))(cutInput)();
+          return updateCutValue(cutInput)(cutValueSpan)();
+        };
       };
     };
   };
   var initializeCutInputs = function(cutStart) {
     return function(cutEnd) {
-      return function(startTime) {
-        return launchAff_(discard2(whileM_2(liftEffect3(map5(not2)(isPlayerReady)))(delay(500)))(function() {
-          return bind12(liftEffect3(getVideoDuration))(function(duration2) {
-            return discard2(liftEffect3(setMax(show3(duration2))(cutStart)))(function() {
-              return discard2(liftEffect3(setValue2(show1(startTime))(cutStart)))(function() {
-                return liftEffect3(setMax(show3(duration2))(cutEnd));
+      return function(cutStartValue) {
+        return function(cutEndValue) {
+          return function(startTime) {
+            return launchAff_(discard22(whileM_2(liftEffect3(map5(not2)(isPlayerReady)))(delay(500)))(function() {
+              return bind12(liftEffect3(getVideoDuration))(function(duration2) {
+                return discard22(liftEffect3(setMax(show3(duration2))(cutStart)))(function() {
+                  return discard22(liftEffect3(setValue2(show1(startTime))(cutStart)))(function() {
+                    return discard22(liftEffect3(setMax(show3(duration2))(cutEnd)))(function() {
+                      return discard22(liftEffect3(updateCutStartValue(cutStart)(cutStartValue)))(function() {
+                        return liftEffect3(updateCutEndValue(cutEnd)(cutEndValue));
+                      });
+                    });
+                  });
+                });
               });
-            });
-          });
-        }));
+            }));
+          };
+        };
       };
     };
   };
@@ -4696,7 +4828,7 @@
   // output/Validations.RegexValidation/index.js
   var pure4 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupArray));
   var show5 = /* @__PURE__ */ show(showRegex);
-  var matches = function(v) {
+  var matches2 = function(v) {
     return function(v1) {
       if (test(v)(v1)) {
         return pure4(v1);
@@ -4714,39 +4846,11 @@
   })(/* @__PURE__ */ regex(youtubeRegex)(noFlags));
   var youtubeUrlValidation = function(v) {
     return andThen(andThen(youtubeRegexValidation)(function(ytRegex) {
-      return matches(ytRegex)(v);
+      return matches2(ytRegex)(v);
     }))(function(urlString) {
       return maybe(invalid(["Error validating youtube Url"]))(pure5)(fromString2(urlString));
     });
   };
-
-  // output/Web.DOM.Element/foreign.js
-  var getProp = function(name15) {
-    return function(doctype) {
-      return doctype[name15];
-    };
-  };
-  var _namespaceURI = getProp("namespaceURI");
-  var _prefix = getProp("prefix");
-  var localName = getProp("localName");
-  var tagName = getProp("tagName");
-
-  // output/Web.DOM.ParentNode/foreign.js
-  var getEffProp2 = function(name15) {
-    return function(node) {
-      return function() {
-        return node[name15];
-      };
-    };
-  };
-  var children = getEffProp2("children");
-  var _firstElementChild = getEffProp2("firstElementChild");
-  var _lastElementChild = getEffProp2("lastElementChild");
-  var childElementCount = getEffProp2("childElementCount");
-
-  // output/Web.DOM.Element/index.js
-  var toEventTarget = unsafeCoerce2;
-  var fromEventTarget = /* @__PURE__ */ unsafeReadProtoTagged("Element");
 
   // output/Web.Event.Event/foreign.js
   function _target(e) {
@@ -4757,31 +4861,6 @@
   var target5 = function($3) {
     return toMaybe(_target($3));
   };
-
-  // output/Web.Event.EventTarget/foreign.js
-  function eventListener(fn) {
-    return function() {
-      return function(event) {
-        return fn(event)();
-      };
-    };
-  }
-  function addEventListener(type) {
-    return function(listener) {
-      return function(useCapture) {
-        return function(target6) {
-          return function() {
-            return target6.addEventListener(type, listener, useCapture);
-          };
-        };
-      };
-    };
-  }
-
-  // output/Web.HTML.Event.EventTypes/index.js
-  var input = "input";
-  var click2 = "click";
-  var change = "change";
 
   // output/Handers.YoutubeVideo.YoutubeVideoHandler/index.js
   var traverse2 = /* @__PURE__ */ traverse(traversableMaybe)(applicativeEffect);
@@ -4805,27 +4884,31 @@
   };
   var youtubeUrlEventListener = function(cutStart) {
     return function(cutEnd) {
-      return function(ev) {
-        return genericErrorsHandler(function __do3() {
-          var rawValue = getInputValue(ev)();
-          var youtubeUrlV = maybe(invalid(["Empty YoutubeUrl Input"]))(youtubeUrlValidation)(rawValue);
-          var youtubeUrl = foldl3(function(v) {
-            return function(v1) {
-              return pure6(v1);
-            };
-          })(throwMinsiError(new InvalidInput(show6(rawValue))))(youtubeUrlV)();
-          var videoId = maybe(throwMinsiError(new InvalidInput(show6(rawValue))))(pure6)(extractYoutubeVideoId(youtubeUrl))();
-          var startTime = extractYoutubeVideoStartTime(youtubeUrl);
-          log("Youtube Url Handler fired with value: " + show12(videoId))();
-          embedVideo({
-            resultPreviewId,
-            videoId,
-            width: 1e3,
-            height: 500,
-            startTime
-          })();
-          return initializeCutInputs(cutStart)(cutEnd)(startTime)();
-        });
+      return function(cutStartValue) {
+        return function(cutEndValue) {
+          return function(ev) {
+            return genericErrorsHandler(function __do3() {
+              var rawValue = getInputValue(ev)();
+              var youtubeUrlV = maybe(invalid(["Empty YoutubeUrl Input"]))(youtubeUrlValidation)(rawValue);
+              var youtubeUrl = foldl3(function(v) {
+                return function(v1) {
+                  return pure6(v1);
+                };
+              })(throwMinsiError(new InvalidInput(show6(rawValue))))(youtubeUrlV)();
+              var videoId = maybe(throwMinsiError(new InvalidInput(show6(rawValue))))(pure6)(extractYoutubeVideoId(youtubeUrl))();
+              var startTime = extractYoutubeVideoStartTime(youtubeUrl);
+              log("Youtube Url Handler fired with value: " + show12(videoId))();
+              embedVideo({
+                resultPreviewId,
+                videoId,
+                width: 1e3,
+                height: 500,
+                startTime
+              })();
+              return initializeCutInputs(cutStart)(cutEnd)(cutStartValue)(cutEndValue)(startTime)();
+            });
+          };
+        };
       };
     };
   };
@@ -4834,12 +4917,12 @@
     var setCutStartButtonTarget = toEventTarget(toElement(v.value0.setCutStartButton));
     var setCutEndButtonTarget = toEventTarget(toElement(v.value0.setCutEndButton));
     return function __do3() {
-      var ytEvL = eventListener(youtubeUrlEventListener(v.value0.cutStart)(v.value0.cutEnd))();
+      var ytEvL = eventListener(youtubeUrlEventListener(v.value0.cutStart)(v.value0.cutEnd)(v.value0.cutStartValue)(v.value0.cutEndValue))();
       addEventListener(input)(ytEvL)(false)(ytUrlEventTarget)();
       addEventListener(change)(ytEvL)(false)(ytUrlEventTarget)();
       setInterval2(1e3)(updatePlaybackPosition(v.value0.playbackPosition))();
-      var setCutStartButtonEvLV = eventListener(setCutStartButtonEvL(v.value0.cutStart))();
-      var setCutEndButtonEvLV = eventListener(setCutEndButtonEvL(v.value0.cutEnd))();
+      var setCutStartButtonEvLV = eventListener(setCutInputButtonEvL(v.value0.cutStart)(v.value0.cutStartValue))();
+      var setCutEndButtonEvLV = eventListener(setCutInputButtonEvL(v.value0.cutEnd)(v.value0.cutEndValue))();
       addEventListener(click2)(setCutStartButtonEvLV)(false)(setCutStartButtonTarget)();
       addEventListener(click2)(setCutEndButtonEvLV)(false)(setCutEndButtonTarget)();
       return unit;
@@ -4848,14 +4931,24 @@
 
   // output/Handlers.Handlers/index.js
   var setupEventHandlers = function(v) {
-    return setVideoHandlers(new VET({
-      cutStart: v.value0.value0.cutStart,
-      cutEnd: v.value0.value0.cutEnd,
-      playbackPosition: v.value1.value0.playbackPosition,
-      setCutStartButton: v.value0.value0.setCutStartButton,
-      setCutEndButton: v.value0.value0.setCutEndButton,
-      youtubeUrl: v.value0.value0.youtubeUrl
-    }));
+    return function __do3() {
+      setCutRangeHandlers(new CRET({
+        cutStart: v.value0.value0.cutStart,
+        cutEnd: v.value0.value0.cutEnd,
+        cutEndValue: v.value1.value0.cutEndValue,
+        cutStartValue: v.value1.value0.cutStartValue
+      }))();
+      return setVideoHandlers(new VET({
+        cutStart: v.value0.value0.cutStart,
+        cutEnd: v.value0.value0.cutEnd,
+        playbackPosition: v.value1.value0.playbackPosition,
+        setCutStartButton: v.value0.value0.setCutStartButton,
+        setCutEndButton: v.value0.value0.setCutEndButton,
+        youtubeUrl: v.value0.value0.youtubeUrl,
+        cutStartValue: v.value1.value0.cutStartValue,
+        cutEndValue: v.value1.value0.cutEndValue
+      }))();
+    };
   };
 
   // output/Data.HTTP.Method/index.js

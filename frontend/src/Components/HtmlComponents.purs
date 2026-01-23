@@ -60,7 +60,7 @@ loadComponents doc = do
   minsiLog <- loadDiv minsiLogId doc
   playbackPosition <- loadSpan playbackPositionId doc
   cutStartValue <- loadSpan cutStartValueId doc
-  cutEndValue <- loadSpan cutStartValueId doc
+  cutEndValue <- loadSpan cutEndValueId doc
   pure
     ( Tuple
         ( HtmlInputs

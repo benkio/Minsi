@@ -10,6 +10,6 @@ import Prelude
 setupEventHandlers :: HtmlComponents -> Effect Unit
 setupEventHandlers (Tuple (HtmlInputs { cutStart, cutEnd, youtubeUrl, setCutStartButton, setCutEndButton }) (HtmlOutputs { playbackPosition, cutEndValue, cutStartValue })) = do
   setCutRangeHandlers (CRET {cutStart:cutStart, cutEnd:cutEnd, cutEndValue: cutEndValue, cutStartValue:cutStartValue})
-  setVideoHandlers (VET { cutStart: cutStart, cutEnd: cutEnd, playbackPosition: playbackPosition, setCutStartButton: setCutStartButton, setCutEndButton: setCutEndButton, youtubeUrl: youtubeUrl })
+  setVideoHandlers (VET { cutStart: cutStart, cutEnd: cutEnd, playbackPosition: playbackPosition, setCutStartButton: setCutStartButton, setCutEndButton: setCutEndButton, youtubeUrl: youtubeUrl, cutStartValue: cutStartValue, cutEndValue: cutEndValue })
   -- TODO: Add Apply Button Handler
 

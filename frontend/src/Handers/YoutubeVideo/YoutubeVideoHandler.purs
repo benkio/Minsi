@@ -32,16 +32,18 @@ data VideoEventTargets = VET
   , setCutEndButton :: HB.HTMLButtonElement
   , setCutStartButton :: HB.HTMLButtonElement
   , youtubeUrl :: HI.HTMLInputElement
+  , cutStartValue :: HSP.HTMLSpanElement
+  , cutEndValue :: HSP.HTMLSpanElement
   }
 
 setVideoHandlers :: VideoEventTargets -> Effect Unit
-setVideoHandlers (VET { cutStart, setCutStartButton, playbackPosition, cutEnd, setCutEndButton, youtubeUrl: youtubeUrl })  = do
-  ytEvL <- eventListener (youtubeUrlEventListener cutStart cutEnd)
+setVideoHandlers (VET { cutStart, setCutStartButton, playbackPosition, cutEnd, setCutEndButton, youtubeUrl: youtubeUrl, cutStartValue, cutEndValue })  = do
+  ytEvL <- eventListener (youtubeUrlEventListener cutStart cutEnd cutStartValue cutEndValue)
   addEventListener E.input ytEvL false ytUrlEventTarget
   addEventListener E.change ytEvL false ytUrlEventTarget
   _ <- setInterval 1000 (updatePlaybackPosition playbackPosition)
-  setCutStartButtonEvLV <- eventListener (setCutInputButtonEvL cutStart)
-  setCutEndButtonEvLV <- eventListener (setCutInputButtonEvL cutEnd)
+  setCutStartButtonEvLV <- eventListener (setCutInputButtonEvL cutStart cutStartValue)
+  setCutEndButtonEvLV <- eventListener (setCutInputButtonEvL cutEnd cutEndValue)
   addEventListener E.click setCutStartButtonEvLV false setCutStartButtonTarget
   addEventListener E.click setCutEndButtonEvLV false setCutEndButtonTarget
   pure unit
@@ -50,8 +52,8 @@ setVideoHandlers (VET { cutStart, setCutStartButton, playbackPosition, cutEnd, s
     setCutStartButtonTarget = toEventTarget (HB.toElement setCutStartButton)
     setCutEndButtonTarget = toEventTarget (HB.toElement setCutEndButton)
 
-youtubeUrlEventListener :: HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
-youtubeUrlEventListener cutStart cutEnd ev = genericErrorsHandler $ do
+youtubeUrlEventListener :: HI.HTMLInputElement -> HI.HTMLInputElement -> HSP.HTMLSpanElement -> HSP.HTMLSpanElement -> Event -> Effect Unit
+youtubeUrlEventListener cutStart cutEnd cutStartValue cutEndValue ev = genericErrorsHandler $ do
   rawValue <- getInputValue ev
   let youtubeUrlV = maybe (invalid [ "Empty YoutubeUrl Input" ]) youtubeUrlValidation rawValue
   youtubeUrl <- foldl (\_ v -> pure v) (throwMinsiError (InvalidInput (show rawValue))) youtubeUrlV
@@ -59,7 +61,7 @@ youtubeUrlEventListener cutStart cutEnd ev = genericErrorsHandler $ do
   let startTime = extractYoutubeVideoStartTime youtubeUrl
   log ("Youtube Url Handler fired with value: " <> show videoId)
   embedVideo { resultPreviewId: resultPreviewId, videoId: videoId, width: 1000, height: 500, startTime: startTime }
-  initializeCutInputs cutStart cutEnd startTime
+  initializeCutInputs cutStart cutEnd cutStartValue cutEndValue startTime
 
 getInputValue :: Event -> Effect (Maybe String)
 getInputValue ev =
