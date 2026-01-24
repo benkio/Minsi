@@ -1,15 +1,13 @@
 module Endpoints.Compute where
 
-import Data.Either (Either(..))
 import Effect.Aff (Aff)
-import Effect.Class (liftEffect)
 import Fetch (Method(..), fetch)
-import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Main.Config (backendUrl)
 import Model.ProcessStatus (ProcessStatus)
 import Model.State.State (State)
-import Yoga.JSON (writeJSON, readJSON)
 import Prelude
+import Yoga.JSON (writeJSON)
+import Endpoints.ResponseParser (decodeJsonResponse)
 
 type ComputeResponse = { status :: ProcessStatus }
 
@@ -24,24 +22,4 @@ callCompute state = do
       , body: writeJSON state
       , headers: { "Content-Type": "application/json" }
       }
-  bodyText <- response.text
-  when (bodyText == "") do
-    liftEffect $
-      throwMinsiError
-        ( JSONParsingError
-            ( "compute: empty response body"
-                <> " (http " <> show response.status <> " " <> response.statusText <> ")"
-            )
-        )
-  case (readJSON bodyText :: Either _ ComputeResponse) of
-    Left err ->
-      liftEffect $
-        throwMinsiError
-          ( JSONParsingError
-              ( "compute: " <> show err
-                  <> " (http " <> show response.status <> " " <> response.statusText <> ")"
-                  <> " body=" <> bodyText
-              )
-          )
-    Right decoded ->
-      pure decoded
+  decodeJsonResponse "compute" response
