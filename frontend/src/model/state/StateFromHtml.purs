@@ -14,7 +14,17 @@ import Validations.CutVideoValidation (cutVideoValidation)
 import Components.HtmlIds (youtubeUrlId, outputFilenameId, artistId, titleId, cutStartId)
 
 fromHtmlInputs :: HtmlInputs -> Effect (V (Map String String) State)
-fromHtmlInputs (HtmlInputs { cutStart, cutEnd, youtubeUrl: youtubeUrlInput, filename: filenameInput, reverseLoop: reverseLoopInput, artist: artistInput, title: titleInput }) = do
+fromHtmlInputs
+  ( HtmlInputs
+      { cutStart
+      , cutEnd
+      , youtubeUrl: youtubeUrlInput
+      , filename: filenameInput
+      , reverseLoop: reverseLoopInput
+      , artist: artistInput
+      , title: titleInput
+      }
+  ) = do
   cutVideoV <- cutVideoFromHtmlRange cutStart cutEnd
   youtubeUrlV <- youtubeUrlFromHTMLInput youtubeUrlInput
   filenameV <- nonEmptyFromHtmlInput filenameInput outputFilenameId
@@ -27,7 +37,15 @@ fromHtmlInputs (HtmlInputs { cutStart, cutEnd, youtubeUrl: youtubeUrlInput, file
     filename <- filenameV
     artist <- artistV
     title <- titleV
-    in State { cutVideo: cutVideo, youtubeUrl: WURL youtubeUrl, filename: filename, reverseLoop: reverseLoopValue, artist: artist, title: title, subtitles: [] }
+    in State
+        { cutVideo: cutVideo
+        , youtubeUrl: WURL youtubeUrl
+        , filename: filename
+        , reverseLoop: reverseLoopValue
+        , artist: artist
+        , title: title
+        , subtitles: []
+        }
 
 cutVideoFromHtmlRange :: HTMLInputElement -> HTMLInputElement -> Effect (V (Map String String) DurationRange)
 cutVideoFromHtmlRange cutStart cutEnd = do

@@ -19,7 +19,7 @@ data CutRangeTargets = CRET
   }
 
 setCutRangeHandlers :: CutRangeTargets -> Effect Unit
-setCutRangeHandlers (CRET {cutStart, cutEnd, cutStartValue, cutEndValue}) = do
+setCutRangeHandlers (CRET { cutStart, cutEnd, cutStartValue, cutEndValue }) = do
   cutStartEvL <- eventListener (cutStartEventListener cutStart cutStartValue)
   cutEndEvL <- eventListener (cutEndEventListener cutEnd cutEndValue)
   addEventListener E.input cutStartEvL false cutStartEventTarget

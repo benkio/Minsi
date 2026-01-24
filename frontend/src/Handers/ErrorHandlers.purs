@@ -33,7 +33,8 @@ genericErrorsHandler p =
 
 genericErrorsHandlerEither :: forall a. Either Error a -> Effect Unit
 genericErrorsHandlerEither (Right _) = pure unit
-genericErrorsHandlerEither (Left e) = catchError (writeToMinsiLog (message e)) (const (raiseErrorAlert (message e)))
+genericErrorsHandlerEither (Left e) =
+  catchError (writeToMinsiLog (message e)) (const (raiseErrorAlert (message e)))
 
 writeToMinsiLog :: String -> Effect Unit
 writeToMinsiLog errorMessage = do
@@ -57,13 +58,15 @@ createErrorList errorMessage = do
     Nothing -> throwMinsiError (HTMLElementNotFound "ul")
     Just u -> pure u
   let ulNode = E.toNode (ULH.toElement ulElement)
-  _ <- traverse (\line -> do
-    liElementRaw <- createElement "li" doc
-    liElement <- case LIH.fromElement liElementRaw of
-      Nothing -> throwMinsiError (HTMLElementNotFound "li")
-      Just l -> pure l
-    let liNode = E.toNode (LIH.toElement liElement)
-    setTextContent line liNode
-    appendChild liNode ulNode
-    ) errorLines
+  _ <- traverse
+    ( \line -> do
+        liElementRaw <- createElement "li" doc
+        liElement <- case LIH.fromElement liElementRaw of
+          Nothing -> throwMinsiError (HTMLElementNotFound "li")
+          Just l -> pure l
+        let liNode = E.toNode (LIH.toElement liElement)
+        setTextContent line liNode
+        appendChild liNode ulNode
+    )
+    errorLines
   pure ulElement

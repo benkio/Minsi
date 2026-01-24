@@ -82,15 +82,17 @@ searchFontInDirs font = do
 searchFontInDir :: String -> FilePath -> Effect Boolean
 searchFontInDir font dir = catchError check (\e -> error (message e) *> pure false)
   where
-  check = do
+    check = do
     dirFiles <-
       readdir dir
         <#> map (\f -> dir <> "/" <> f)
         >>= traverse (\f -> map (\s -> Tuple s f) <<< hush <$> try (stat f))
         <#> catMaybes
     let { no: files, yes: dirs } = partition (fst >>> isDirectory) dirFiles
-    if any (snd >>> checkFileMatch font) files then pure true
-    else anyM (snd >>> searchFontInDir font) (fromFoldable dirs)
+      if any (snd >>> checkFileMatch font) files then
+        pure true
+      else
+        anyM (snd >>> searchFontInDir font) (fromFoldable dirs)
 
 checkFileMatch :: String -> String -> Boolean
 checkFileMatch font file =

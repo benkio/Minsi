@@ -1,8 +1,8 @@
 module Handlers.ApplyButtonHandler where
 
-import Components.HtmlComponents (loadComponents, HtmlVisualElements(..))
+import Components.HtmlComponents (HtmlVisualElements(..), loadComponents)
 import Components.HtmlIds (loadingModalId, videoSourceId)
-import Components.Modal (showLoadingModal, hideLoadingModal)
+import Components.Modal (hideLoadingModal, showLoadingModal)
 import Components.Window (getDocument)
 import Data.Either (Either(..))
 import Data.Time.Duration (Milliseconds(..))
@@ -51,9 +51,8 @@ applyButtonEventListener _ = genericErrorsHandler $ do
       scrollToVideoSource
   pure unit
 
-
 showHiddenElements :: HtmlVisualElements -> Effect Unit
-showHiddenElements (HtmlVisualElements {videoSourceRow, videoRow, subtitlesRow}) = do
+showHiddenElements (HtmlVisualElements { videoSourceRow, videoRow, subtitlesRow }) = do
   removeClass "d-none" videoSourceRow
   removeClass "d-none" videoRow
   removeClass "d-none" subtitlesRow

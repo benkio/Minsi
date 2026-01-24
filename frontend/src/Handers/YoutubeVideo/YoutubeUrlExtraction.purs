@@ -17,8 +17,8 @@ extractYoutubeVideoId :: URL -> Maybe String
 extractYoutubeVideoId url =
   maybeVQueryString <|> lastPath
   where
-  maybeVQueryString = ((\v -> lookup "v" v >>= head) <<< query) url
-  lastPath = (path >>> pathToArray >>> last) url
+    maybeVQueryString = ((\v -> lookup "v" v >>= head) <<< query) url
+    lastPath = (path >>> pathToArray >>> last) url
 
 pathToArray :: Path -> Array String
 pathToArray PathEmpty = []

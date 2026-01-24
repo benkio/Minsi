@@ -8,8 +8,40 @@ import Handers.YoutubeVideo.YoutubeVideoHandler (setVideoHandlers, VideoEventTar
 import Prelude
 
 setupEventHandlers :: HtmlComponents -> Effect Unit
-setupEventHandlers { htmlInputs: HtmlInputs { cutStart, cutEnd, youtubeUrl, setCutStartButton, setCutEndButton, applyButton }, htmlOutputs: HtmlOutputs { playbackPosition, cutEndValue, cutStartValue } } = do
-  setCutRangeHandlers (CRET {cutStart:cutStart, cutEnd:cutEnd, cutEndValue: cutEndValue, cutStartValue:cutStartValue})
-  setVideoHandlers (VET { cutStart: cutStart, cutEnd: cutEnd, playbackPosition: playbackPosition, setCutStartButton: setCutStartButton, setCutEndButton: setCutEndButton, youtubeUrl: youtubeUrl, cutStartValue: cutStartValue, cutEndValue: cutEndValue })
+setupEventHandlers
+  { htmlInputs: HtmlInputs
+      { cutStart
+      , cutEnd
+      , youtubeUrl
+      , setCutStartButton
+      , setCutEndButton
+      , applyButton
+      }
+  , htmlOutputs: HtmlOutputs
+      { playbackPosition
+      , cutEndValue
+      , cutStartValue
+      }
+  } = do
+  setCutRangeHandlers
+    ( CRET
+        { cutStart: cutStart
+        , cutEnd: cutEnd
+        , cutEndValue: cutEndValue
+        , cutStartValue: cutStartValue
+        }
+    )
+  setVideoHandlers
+    ( VET
+        { cutStart: cutStart
+        , cutEnd: cutEnd
+        , playbackPosition: playbackPosition
+        , setCutStartButton: setCutStartButton
+        , setCutEndButton: setCutEndButton
+        , youtubeUrl: youtubeUrl
+        , cutStartValue: cutStartValue
+        , cutEndValue: cutEndValue
+        }
+    )
   setApplyButtonHandler applyButton
 

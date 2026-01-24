@@ -19,14 +19,14 @@ youtubeRegexValidation id = V $ lmap (\x -> singleton id x) (regex youtubeRegex 
 youtubeUrlValidation :: String -> String -> V (Map String String) URL
 youtubeUrlValidation id v =
   lmap (\_ -> singleton id "Invalid Youtube URL") $
-    andThen (
-      andThen
-        (youtubeRegexValidation id)
-        (\ytRegex -> matches ytRegex id v)
+    andThen
+      ( andThen
+          (youtubeRegexValidation id)
+          (\ytRegex -> matches ytRegex id v)
       )
-    (\urlString ->
-      maybe
-        (invalid (singleton id "Error validating youtube Url"))
-        pure
-        (fromString urlString)
-    )
+      ( \urlString ->
+          maybe
+            (invalid (singleton id "Error validating youtube Url"))
+            pure
+            (fromString urlString)
+      )

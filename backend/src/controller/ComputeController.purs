@@ -15,6 +15,12 @@ computeController = do
   setResponseHeader "Access-Control-Allow-Origin" "*"
   stateParsingResult :: _ (State) <- getBody
   case runExcept stateParsingResult of
-    Left errors -> liftEffect $ log ("Failed to parse state: " <> show errors)
-    Right (State state) -> liftEffect $ log ("Successfully parsed state - artist: " <> state.artist <> ", title: " <> state.title)
+    Left errors ->
+      liftEffect $ log ("Failed to parse state: " <> show errors)
+    Right (State state) ->
+      liftEffect $
+        log
+          ( "Successfully parsed state - artist: " <> state.artist <> ", title: "
+              <> state.title
+          )
   setStatus 200 *> end

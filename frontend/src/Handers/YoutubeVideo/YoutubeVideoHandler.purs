@@ -38,7 +38,18 @@ data VideoEventTargets = VET
   }
 
 setVideoHandlers :: VideoEventTargets -> Effect Unit
-setVideoHandlers (VET { cutStart, setCutStartButton, playbackPosition, cutEnd, setCutEndButton, youtubeUrl: youtubeUrl, cutStartValue, cutEndValue })  = do
+setVideoHandlers
+  ( VET
+      { cutStart
+      , setCutStartButton
+      , playbackPosition
+      , cutEnd
+      , setCutEndButton
+      , youtubeUrl: youtubeUrl
+      , cutStartValue
+      , cutEndValue
+      }
+  ) = do
   ytEvL <- eventListener (youtubeUrlEventListener cutStart cutEnd cutStartValue cutEndValue)
   addEventListener E.input ytEvL false ytUrlEventTarget
   addEventListener E.change ytEvL false ytUrlEventTarget
@@ -61,7 +72,13 @@ youtubeUrlEventListener cutStart cutEnd cutStartValue cutEndValue ev = genericEr
   videoId <- (maybe (throwMinsiError (InvalidInput youtubeUrlId (show rawValue))) pure <<< extractYoutubeVideoId) youtubeUrl
   let startTime = extractYoutubeVideoStartTime youtubeUrl
   log ("Youtube Url Handler fired with value: " <> show videoId)
-  embedVideo { resultPreviewId: resultPreviewId, videoId: videoId, width: 1000, height: 500, startTime: startTime }
+  embedVideo
+    { resultPreviewId: resultPreviewId
+    , videoId: videoId
+    , width: 1000
+    , height: 500
+    , startTime: startTime
+    }
   initializeCutInputs cutStart cutEnd cutStartValue cutEndValue startTime
 
 getInputValue :: Event -> Effect (Maybe String)

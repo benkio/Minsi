@@ -52,23 +52,25 @@ spec = do
         reverseLoop = false
         artist = "Test Artist"
         title = "Test Title"
-        subtitle = Subtitle
-          { videoPosition: DurationRange { start: Milliseconds 10.0, end: Milliseconds 20.0 }
-          , value: "Test subtitle"
-          , font: Impact
-          , size: 24
-          , color: White
-          , screenPosition: Top
-          }
-        state = State
-          { cutVideo: cutVideo
-          , youtubeUrl: youtubeUrl
-          , filename: filename
-          , reverseLoop: reverseLoop
-          , artist: artist
-          , title: title
-          , subtitles: [ subtitle ]
-          }
+        subtitle =
+          Subtitle
+            { videoPosition: DurationRange { start: Milliseconds 10.0, end: Milliseconds 20.0 }
+            , value: "Test subtitle"
+            , font: Impact
+            , size: 24
+            , color: White
+            , screenPosition: Top
+            }
+        state =
+          State
+            { cutVideo: cutVideo
+            , youtubeUrl: youtubeUrl
+            , filename: filename
+            , reverseLoop: reverseLoop
+            , artist: artist
+            , title: title
+            , subtitles: [ subtitle ]
+            }
 
       -- Encode to JSON
       let jsonString = writeJSON state

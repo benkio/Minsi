@@ -2144,7 +2144,7 @@
   var loadHtmlElement = function(id2) {
     return function(f) {
       return function(doc) {
-        return function __do3() {
+        return function __do4() {
           var maybeComponent = getElementById(id2)(doc)();
           var maybeComponentElement = bind1(maybeComponent)(f);
           if (maybeComponentElement instanceof Nothing) {
@@ -2163,8 +2163,11 @@
 
   // output/Components.HtmlIds/index.js
   var youtubeUrlId = "youtubeUrl";
+  var videoSourceRowId = "videoSourceRowId";
   var videoSourceId = "videoSource";
+  var videoRowId = "videoRowId";
   var titleId = "title";
+  var subtitlesRowId = "subtitlesRowId";
   var setCutStartButton = "setCutStartButton";
   var setCutEndButton = "setCutEndButton";
   var reverseLoopGifId = "reverseLoopGif";
@@ -2181,6 +2184,37 @@
   var artistId = "artist";
   var applyId = "applyButton";
   var addSubtitleId = "addSubtitleButton";
+
+  // output/Control.Monad.Error.Class/index.js
+  var throwError = function(dict) {
+    return dict.throwError;
+  };
+  var monadThrowEffect = {
+    throwError: throwException,
+    Monad0: function() {
+      return monadEffect;
+    }
+  };
+  var monadErrorEffect = {
+    catchError: /* @__PURE__ */ flip(catchException),
+    MonadThrow0: function() {
+      return monadThrowEffect;
+    }
+  };
+  var catchError = function(dict) {
+    return dict.catchError;
+  };
+  var $$try = function(dictMonadError) {
+    var catchError1 = catchError(dictMonadError);
+    var Monad0 = dictMonadError.MonadThrow0().Monad0();
+    var map15 = map(Monad0.Bind1().Apply0().Functor0());
+    var pure10 = pure(Monad0.Applicative0());
+    return function(a) {
+      return catchError1(map15(Right.create)(a))(function($52) {
+        return pure10(Left.create($52));
+      });
+    };
+  };
 
   // output/Web.Internal.FFI/foreign.js
   function _unsafeReadProtoTagged(nothing, just, name15, value12) {
@@ -2217,7 +2251,11 @@
 
   // output/Web.HTML.HTMLDivElement/index.js
   var toNode = unsafeCoerce2;
+  var toElement2 = unsafeCoerce2;
   var fromElement2 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLDivElement");
+
+  // output/Web.HTML.HTMLIFrameElement/index.js
+  var fromElement3 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLIFrameElement");
 
   // output/Web.HTML.HTMLInputElement/foreign.js
   function checked(input2) {
@@ -2251,20 +2289,51 @@
   }
 
   // output/Web.HTML.HTMLInputElement/index.js
-  var toElement2 = unsafeCoerce2;
-  var fromElement3 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLInputElement");
+  var toElement3 = unsafeCoerce2;
+  var fromElement4 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLInputElement");
 
   // output/Web.HTML.HTMLSelectElement/index.js
-  var fromElement4 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLSelectElement");
+  var fromElement5 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLSelectElement");
 
   // output/Web.HTML.HTMLSpanElement/index.js
   var toNode2 = unsafeCoerce2;
-  var fromElement5 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLSpanElement");
+  var fromElement6 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLSpanElement");
 
   // output/Web.HTML.HTMLVideoElement/index.js
-  var fromElement6 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLVideoElement");
+  var fromElement7 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLVideoElement");
 
   // output/Components.HtmlComponents/index.js
+  var catchError2 = /* @__PURE__ */ catchError(monadErrorEffect);
+  var ResultPreviewDiv = /* @__PURE__ */ function() {
+    function ResultPreviewDiv2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    ResultPreviewDiv2.create = function(value0) {
+      return new ResultPreviewDiv2(value0);
+    };
+    return ResultPreviewDiv2;
+  }();
+  var ResultPreviewIframe = /* @__PURE__ */ function() {
+    function ResultPreviewIframe2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    ResultPreviewIframe2.create = function(value0) {
+      return new ResultPreviewIframe2(value0);
+    };
+    return ResultPreviewIframe2;
+  }();
+  var HtmlVisualElements = /* @__PURE__ */ function() {
+    function HtmlVisualElements2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    HtmlVisualElements2.create = function(value0) {
+      return new HtmlVisualElements2(value0);
+    };
+    return HtmlVisualElements2;
+  }();
   var HtmlOutputs = /* @__PURE__ */ function() {
     function HtmlOutputs2(value0) {
       this.value0 = value0;
@@ -2285,23 +2354,46 @@
     };
     return HtmlInputs2;
   }();
-  var loadVideoSource = /* @__PURE__ */ loadHtmlElement(videoSourceId)(fromElement4);
+  var loadVideoSource = /* @__PURE__ */ loadHtmlElement(videoSourceId)(fromElement5);
   var loadVideo = function(id2) {
-    return loadHtmlElement(id2)(fromElement6);
+    return loadHtmlElement(id2)(fromElement7);
   };
   var loadSpan = function(id2) {
-    return loadHtmlElement(id2)(fromElement5);
+    return loadHtmlElement(id2)(fromElement6);
   };
   var loadInput = function(id2) {
-    return loadHtmlElement(id2)(fromElement3);
+    return loadHtmlElement(id2)(fromElement4);
   };
   var loadDiv = function(id2) {
     return loadHtmlElement(id2)(fromElement2);
   };
+  var loadHtmlVisualElements = function(doc) {
+    return function __do4() {
+      var videoSourceRow = loadDiv(videoSourceRowId)(doc)();
+      var videoRow = loadDiv(videoRowId)(doc)();
+      var subtitlesRow = loadDiv(subtitlesRowId)(doc)();
+      return new HtmlVisualElements({
+        videoSourceRow,
+        videoRow,
+        subtitlesRow
+      });
+    };
+  };
+  var loadResultPreview = function(doc) {
+    return catchError2(function __do4() {
+      var div2 = loadDiv(resultPreviewId)(doc)();
+      return new ResultPreviewDiv(div2);
+    })(function(v) {
+      return function __do4() {
+        var iframe = loadHtmlElement(resultPreviewId)(fromElement3)(doc)();
+        return new ResultPreviewIframe(iframe);
+      };
+    });
+  };
   var loadCutRange = function(doc) {
-    return function __do3() {
-      var cutStart = loadHtmlElement(cutStartId)(fromElement3)(doc)();
-      var cutEnd = loadHtmlElement(cutEndId)(fromElement3)(doc)();
+    return function __do4() {
+      var cutStart = loadHtmlElement(cutStartId)(fromElement4)(doc)();
+      var cutEnd = loadHtmlElement(cutEndId)(fromElement4)(doc)();
       return new Tuple(cutStart, cutEnd);
     };
   };
@@ -2309,7 +2401,7 @@
     return loadHtmlElement(id2)(fromElement);
   };
   var loadHtmlInputs = function(doc) {
-    return function __do3() {
+    return function __do4() {
       var rangeTuple = loadCutRange(doc)();
       var youtubeUrl = loadInput(youtubeUrlId)(doc)();
       var filename = loadInput(outputFilenameId)(doc)();
@@ -2336,8 +2428,8 @@
     };
   };
   var loadHtmlOutputs = function(doc) {
-    return function __do3() {
-      var resultPreview = loadDiv(resultPreviewId)(doc)();
+    return function __do4() {
+      var resultPreview = loadResultPreview(doc)();
       var addSubtitleButton = loadButton(addSubtitleId)(doc)();
       var minsiLog = loadDiv(minsiLogId)(doc)();
       var playbackPosition = loadSpan(playbackPositionId)(doc)();
@@ -2358,10 +2450,15 @@
     };
   };
   var loadComponents = function(doc) {
-    return function __do3() {
+    return function __do4() {
       var inputs = loadHtmlInputs(doc)();
       var outputs = loadHtmlOutputs(doc)();
-      return new Tuple(inputs, outputs);
+      var visualElements = loadHtmlVisualElements(doc)();
+      return {
+        htmlInputs: inputs,
+        htmlOutputs: outputs,
+        htmlVisualElements: visualElements
+      };
     };
   };
 
@@ -2391,17 +2488,31 @@
   };
 
   // output/Web.HTML.HTMLLIElement/index.js
-  var toElement3 = unsafeCoerce2;
-  var fromElement7 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLLIElement");
+  var toElement4 = unsafeCoerce2;
+  var fromElement8 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLLIElement");
 
   // output/Web.HTML.HTMLUListElement/index.js
-  var toElement4 = unsafeCoerce2;
-  var fromElement8 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLUListElement");
+  var toElement5 = unsafeCoerce2;
+  var fromElement9 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLUListElement");
+
+  // output/Web.HTML.Location/foreign.js
+  function setHash(hash2) {
+    return function(location2) {
+      return function() {
+        location2.hash = hash2;
+      };
+    };
+  }
 
   // output/Web.HTML.Window/foreign.js
   function document2(window2) {
     return function() {
       return window2.document;
+    };
+  }
+  function location(window2) {
+    return function() {
+      return window2.location;
     };
   }
   function alert(str) {
@@ -2414,7 +2525,7 @@
 
   // output/Components.Window/index.js
   var raiseErrorAlert = function(msg) {
-    return function __do3() {
+    return function __do4() {
       var w = windowImpl();
       return alert("\u{1F63E}!!! ERROR !!! \u{1F63E}\n" + msg)(w)();
     };
@@ -3328,37 +3439,6 @@
   }();
   var _sequential = Aff.Seq;
 
-  // output/Control.Monad.Error.Class/index.js
-  var throwError = function(dict) {
-    return dict.throwError;
-  };
-  var monadThrowEffect = {
-    throwError: throwException,
-    Monad0: function() {
-      return monadEffect;
-    }
-  };
-  var monadErrorEffect = {
-    catchError: /* @__PURE__ */ flip(catchException),
-    MonadThrow0: function() {
-      return monadThrowEffect;
-    }
-  };
-  var catchError = function(dict) {
-    return dict.catchError;
-  };
-  var $$try = function(dictMonadError) {
-    var catchError1 = catchError(dictMonadError);
-    var Monad0 = dictMonadError.MonadThrow0().Monad0();
-    var map15 = map(Monad0.Bind1().Apply0().Functor0());
-    var pure10 = pure(Monad0.Applicative0());
-    return function(a) {
-      return catchError1(map15(Right.create)(a))(function($52) {
-        return pure10(Left.create($52));
-      });
-    };
-  };
-
   // output/Control.Monad.ST.Internal/foreign.js
   var map_ = function(f) {
     return function(a) {
@@ -3712,7 +3792,7 @@
     return _makeFiber(ffiUtil, aff);
   };
   var launchAff = function(aff) {
-    return function __do3() {
+    return function __do4() {
       var fiber = makeFiber(aff)();
       fiber.run();
       return fiber;
@@ -3893,6 +3973,11 @@
   var _prefix = getProp("prefix");
   var localName = getProp("localName");
   var tagName = getProp("tagName");
+  function classList(element) {
+    return function() {
+      return element.classList;
+    };
+  }
 
   // output/Web.DOM.ParentNode/foreign.js
   var getEffProp2 = function(name15) {
@@ -3957,16 +4042,16 @@
   var pure3 = /* @__PURE__ */ pure(applicativeEffect);
   var traverse2 = /* @__PURE__ */ traverse(traversableArray)(applicativeEffect);
   var $$void3 = /* @__PURE__ */ $$void(functorEffect);
-  var catchError2 = /* @__PURE__ */ catchError(monadErrorEffect);
+  var catchError3 = /* @__PURE__ */ catchError(monadErrorEffect);
   var createErrorList = function(errorMessage) {
     var errorLines = split("<br>")(errorMessage);
-    return function __do3() {
+    return function __do4() {
       var w = windowImpl();
       var htmlDoc = document2(w)();
       var doc = toDocument(htmlDoc);
       var ulElementRaw = createElement("ul")(doc)();
       var ulElement = function() {
-        var v = fromElement8(ulElementRaw);
+        var v = fromElement9(ulElementRaw);
         if (v instanceof Nothing) {
           return throwMinsiError(new HTMLElementNotFound("ul"))();
         }
@@ -3977,12 +4062,12 @@
         ;
         throw new Error("Failed pattern match at Handers.ErrorHandlers (line 56, column 16 - line 58, column 21): " + [v.constructor.name]);
       }();
-      var ulNode = toNode3(toElement4(ulElement));
+      var ulNode = toNode3(toElement5(ulElement));
       traverse2(function(line) {
-        return function __do4() {
+        return function __do5() {
           var liElementRaw = createElement("li")(doc)();
           var liElement = function() {
-            var v = fromElement7(liElementRaw);
+            var v = fromElement8(liElementRaw);
             if (v instanceof Nothing) {
               return throwMinsiError(new HTMLElementNotFound("li"))();
             }
@@ -3993,7 +4078,7 @@
             ;
             throw new Error("Failed pattern match at Handers.ErrorHandlers (line 62, column 18 - line 64, column 23): " + [v.constructor.name]);
           }();
-          var liNode = toNode3(toElement3(liElement));
+          var liNode = toNode3(toElement4(liElement));
           setTextContent(line)(liNode)();
           return appendChild(liNode)(ulNode)();
         };
@@ -4002,19 +4087,19 @@
     };
   };
   var writeToMinsiLog = function(errorMessage) {
-    return function __do3() {
+    return function __do4() {
       var doc = getDocument();
       var minsiLog = loadDiv(minsiLogId)(doc)();
       var errorList = createErrorList(errorMessage)();
       var minsiLogNode = toNode(minsiLog);
-      var errorListNode = toNode3(toElement4(errorList));
+      var errorListNode = toNode3(toElement5(errorList));
       appendChild(errorListNode)(minsiLogNode)();
       return $$void3(setTimeout2(5e3)(removeChild(errorListNode)(minsiLogNode)))();
     };
   };
   var genericErrorsHandler = function(p) {
-    return catchError2(p)(function(e) {
-      return catchError2(writeToMinsiLog(message(e)))($$const(raiseErrorAlert(message(e))));
+    return catchError3(p)(function(e) {
+      return catchError3(writeToMinsiLog(message(e)))($$const(raiseErrorAlert(message(e))));
     });
   };
   var genericErrorsHandlerEither = function(v) {
@@ -4023,7 +4108,7 @@
     }
     ;
     if (v instanceof Left) {
-      return catchError2(writeToMinsiLog(message(v.value0)))($$const(raiseErrorAlert(message(v.value0))));
+      return catchError3(writeToMinsiLog(message(v.value0)))($$const(raiseErrorAlert(message(v.value0))));
     }
     ;
     throw new Error("Failed pattern match at Handers.ErrorHandlers (line 34, column 1 - line 34, column 70): " + [v.constructor.name]);
@@ -4267,7 +4352,7 @@
   }();
   var updateCutValue = function(cutInput) {
     return function(cutValueSpan) {
-      return function __do3() {
+      return function __do4() {
         var inputValue = value2(cutInput)();
         return setTextContent(inputValue)(toNode2(cutValueSpan))();
       };
@@ -4275,7 +4360,7 @@
   };
   var updateCutStartValue = function(cutStart) {
     return function(cutStartValue) {
-      return function __do3() {
+      return function __do4() {
         var inputValue = value2(cutStart)();
         return setTextContent(inputValue)(toNode2(cutStartValue))();
       };
@@ -4283,7 +4368,7 @@
   };
   var updateCutEndValue = function(cutEnd) {
     return function(cutEndValue) {
-      return function __do3() {
+      return function __do4() {
         var inputValue = value2(cutEnd)();
         return setTextContent(inputValue)(toNode2(cutEndValue))();
       };
@@ -4292,7 +4377,7 @@
   var cutStartEventListener = function(cutStart) {
     return function(cutStartValue) {
       return function(v) {
-        return function __do3() {
+        return function __do4() {
           var inputValue = value2(cutStart)();
           return setTextContent(inputValue)(toNode2(cutStartValue))();
         };
@@ -4302,7 +4387,7 @@
   var cutEndEventListener = function(cutEnd) {
     return function(cutEndValue) {
       return function(v) {
-        return function __do3() {
+        return function __do4() {
           var inputValue = value2(cutEnd)();
           return setTextContent(inputValue)(toNode2(cutEndValue))();
         };
@@ -4310,9 +4395,9 @@
     };
   };
   var setCutRangeHandlers = function(v) {
-    var cutStartEventTarget = toEventTarget(toElement2(v.value0.cutStart));
-    var cutEndEventTarget = toEventTarget(toElement2(v.value0.cutEnd));
-    return function __do3() {
+    var cutStartEventTarget = toEventTarget(toElement3(v.value0.cutStart));
+    var cutEndEventTarget = toEventTarget(toElement3(v.value0.cutEnd));
+    return function __do4() {
       var cutStartEvL = eventListener(cutStartEventListener(v.value0.cutStart)(v.value0.cutStartValue))();
       var cutEndEvL = eventListener(cutEndEventListener(v.value0.cutEnd)(v.value0.cutEndValue))();
       addEventListener(input)(cutStartEvL)(false)(cutStartEventTarget)();
@@ -4336,7 +4421,7 @@
   var setCutInputButtonEvL = function(cutInput) {
     return function(cutValueSpan) {
       return function(v) {
-        return function __do3() {
+        return function __do4() {
           var currentTime2 = getPlayerCurrentTime();
           setValue2(show2(currentTime2))(cutInput)();
           return updateCutValue(cutInput)(cutValueSpan)();
@@ -4465,7 +4550,7 @@
     return Iterator2;
   }();
   var next = function(v) {
-    return function __do3() {
+    return function __do4() {
       var i = read2(v.value1)();
       modify(function(v1) {
         return v1 + 1 | 0;
@@ -4478,10 +4563,10 @@
   };
   var iterate = function(iter) {
     return function(f) {
-      return function __do3() {
+      return function __do4() {
         var $$break = newSTRef(false)();
         while (map7(not3)(read2($$break))()) {
-          (function __do4() {
+          (function __do5() {
             var mx = next(iter)();
             if (mx instanceof Just) {
               return f(mx.value0)();
@@ -4653,7 +4738,7 @@
       var dec = maybe("0")(fromCharArray)(map8(take(3))(tail(v1.rest)));
       return num + ("." + dec);
     };
-    return function __do3() {
+    return function __do4() {
       var playerReady = isPlayerReady();
       var currentTime2 = getPlayerCurrentTime();
       return when2(playerReady)(setTextContent(formatToThreeDecimals(currentTime2))(toNode2(playbackPosition)))();
@@ -4851,7 +4936,7 @@
   };
   var compactableArray = {
     compact: function(xs) {
-      return function __do3() {
+      return function __do4() {
         var result = newSTArray();
         var iter = iterator(function(v) {
           return index2(xs)(v);
@@ -4873,7 +4958,7 @@
       }();
     },
     separate: function(xs) {
-      return function __do3() {
+      return function __do4() {
         var ls = newSTArray();
         var rs = newSTArray();
         var iter = iterator(function(v) {
@@ -5509,14 +5594,14 @@
     return VET2;
   }();
   var getInputValue = function(ev) {
-    return traverse3(value2)(bind3(bind3(target5(ev))(fromEventTarget))(fromElement3));
+    return traverse3(value2)(bind3(bind3(target5(ev))(fromEventTarget))(fromElement4));
   };
   var youtubeUrlEventListener = function(cutStart) {
     return function(cutEnd) {
       return function(cutStartValue) {
         return function(cutEndValue) {
           return function(ev) {
-            return genericErrorsHandler(function __do3() {
+            return genericErrorsHandler(function __do4() {
               var rawValue = getInputValue(ev)();
               var youtubeUrlV = maybe(invalid(singleton3(youtubeUrlId)("Empty YoutubeUrl Input")))(function(v) {
                 return youtubeUrlValidation(youtubeUrlId)(v);
@@ -5544,10 +5629,10 @@
     };
   };
   var setVideoHandlers = function(v) {
-    var ytUrlEventTarget = toEventTarget(toElement2(v.value0.youtubeUrl));
+    var ytUrlEventTarget = toEventTarget(toElement3(v.value0.youtubeUrl));
     var setCutStartButtonTarget = toEventTarget(toElement(v.value0.setCutStartButton));
     var setCutEndButtonTarget = toEventTarget(toElement(v.value0.setCutEndButton));
-    return function __do3() {
+    return function __do4() {
       var ytEvL = eventListener(youtubeUrlEventListener(v.value0.cutStart)(v.value0.cutEnd)(v.value0.cutStartValue)(v.value0.cutEndValue))();
       addEventListener(input)(ytEvL)(false)(ytUrlEventTarget)();
       addEventListener(change)(ytEvL)(false)(ytUrlEventTarget)();
@@ -5619,7 +5704,7 @@
   var apply3 = /* @__PURE__ */ apply(/* @__PURE__ */ applyV(/* @__PURE__ */ semigroupMap()(ordString)(semigroupString)));
   var map11 = /* @__PURE__ */ map(functorV);
   var youtubeUrlFromHTMLInput = function(youtubeUrlComponent) {
-    return function __do3() {
+    return function __do4() {
       var urlString = value2(youtubeUrlComponent)();
       return youtubeUrlValidation(youtubeUrlId)(urlString);
     };
@@ -5631,7 +5716,7 @@
   };
   var cutVideoFromHtmlRange = function(cutStart) {
     return function(cutEnd) {
-      return function __do3() {
+      return function __do4() {
         var start2 = valueAsNumber(cutStart)();
         var end = valueAsNumber(cutEnd)();
         return cutVideoValidation(cutStartId)(start2)(end);
@@ -5639,7 +5724,7 @@
     };
   };
   var fromHtmlInputs = function(v) {
-    return function __do3() {
+    return function __do4() {
       var cutVideoV = cutVideoFromHtmlRange(v.value0.cutStart)(v.value0.cutEnd)();
       var youtubeUrlV = youtubeUrlFromHTMLInput(v.value0.youtubeUrl)();
       var filenameV = nonEmptyFromHtmlInput(v.value0.filename)(outputFilenameId)();
@@ -5668,15 +5753,45 @@
     };
   };
 
+  // output/Web.DOM.DOMTokenList/foreign.js
+  function remove(list) {
+    return function(token) {
+      return function() {
+        return list.remove(token);
+      };
+    };
+  }
+
   // output/Handlers.ApplyButtonHandler/index.js
   var discard3 = /* @__PURE__ */ discard(discardUnit);
   var discard23 = /* @__PURE__ */ discard3(bindAff);
   var liftEffect4 = /* @__PURE__ */ liftEffect(monadEffectAff);
+  var scrollToVideoSource = function __do2() {
+    var w = windowImpl();
+    var loc = location(w)();
+    return setHash("#" + videoSourceId)(loc)();
+  };
+  var removeClass = function(className2) {
+    return function(div2) {
+      var element = toElement2(div2);
+      return function __do4() {
+        var classList2 = classList(element)();
+        return remove(classList2)(className2)();
+      };
+    };
+  };
+  var showHiddenElements = function(v) {
+    return function __do4() {
+      removeClass("d-none")(v.value0.videoSourceRow)();
+      removeClass("d-none")(v.value0.videoRow)();
+      return removeClass("d-none")(v.value0.subtitlesRow)();
+    };
+  };
   var applyButtonEventListener = function(v) {
-    return genericErrorsHandler(function __do3() {
+    return genericErrorsHandler(function __do4() {
       var doc = getDocument();
-      var inputs = loadHtmlInputs(doc)();
-      var stateV = fromHtmlInputs(inputs)();
+      var components = loadComponents(doc)();
+      var stateV = fromHtmlInputs(components.htmlInputs)();
       (function() {
         var v1 = toEither(stateV);
         if (v1 instanceof Left) {
@@ -5687,18 +5802,22 @@
           return log("State converted")();
         }
         ;
-        throw new Error("Failed pattern match at Handlers.ApplyButtonHandler (line 36, column 3 - line 38, column 39): " + [v1.constructor.name]);
+        throw new Error("Failed pattern match at Handlers.ApplyButtonHandler (line 42, column 3 - line 44, column 39): " + [v1.constructor.name]);
       })();
       showLoadingModal(loadingModalId)();
       launchAff_(discard23(delay(5e3))(function() {
-        return liftEffect4(hideLoadingModal(loadingModalId));
+        return liftEffect4(function __do5() {
+          hideLoadingModal(loadingModalId)();
+          showHiddenElements(components.htmlVisualElements)();
+          return scrollToVideoSource();
+        });
       }))();
       return unit;
     });
   };
   var setApplyButtonHandler = function(applyButton) {
     var applyButtonEventTarget = toEventTarget(toElement(applyButton));
-    return function __do3() {
+    return function __do4() {
       var applyButtonEvL = eventListener(applyButtonEventListener)();
       return addEventListener(click2)(applyButtonEvL)(false)(applyButtonEventTarget)();
     };
@@ -5706,24 +5825,24 @@
 
   // output/Handlers.Handlers/index.js
   var setupEventHandlers = function(v) {
-    return function __do3() {
+    return function __do4() {
       setCutRangeHandlers(new CRET({
-        cutStart: v.value0.value0.cutStart,
-        cutEnd: v.value0.value0.cutEnd,
-        cutEndValue: v.value1.value0.cutEndValue,
-        cutStartValue: v.value1.value0.cutStartValue
+        cutStart: v.htmlInputs.value0.cutStart,
+        cutEnd: v.htmlInputs.value0.cutEnd,
+        cutEndValue: v.htmlOutputs.value0.cutEndValue,
+        cutStartValue: v.htmlOutputs.value0.cutStartValue
       }))();
       setVideoHandlers(new VET({
-        cutStart: v.value0.value0.cutStart,
-        cutEnd: v.value0.value0.cutEnd,
-        playbackPosition: v.value1.value0.playbackPosition,
-        setCutStartButton: v.value0.value0.setCutStartButton,
-        setCutEndButton: v.value0.value0.setCutEndButton,
-        youtubeUrl: v.value0.value0.youtubeUrl,
-        cutStartValue: v.value1.value0.cutStartValue,
-        cutEndValue: v.value1.value0.cutEndValue
+        cutStart: v.htmlInputs.value0.cutStart,
+        cutEnd: v.htmlInputs.value0.cutEnd,
+        playbackPosition: v.htmlOutputs.value0.playbackPosition,
+        setCutStartButton: v.htmlInputs.value0.setCutStartButton,
+        setCutEndButton: v.htmlInputs.value0.setCutEndButton,
+        youtubeUrl: v.htmlInputs.value0.youtubeUrl,
+        cutStartValue: v.htmlOutputs.value0.cutStartValue,
+        cutEndValue: v.htmlOutputs.value0.cutEndValue
       }))();
-      return setApplyButtonHandler(v.value0.value0.applyButton)();
+      return setApplyButtonHandler(v.htmlInputs.value0.applyButton)();
     };
   };
 
@@ -6216,7 +6335,7 @@
   var toAbortableAff = function(abortController) {
     return function(p) {
       return makeAff(function(cb) {
-        return function __do3() {
+        return function __do4() {
           $$void6(thenOrCatch4(function(a) {
             return map13(resolve4)(cb(new Right(a)));
           })(function(e) {
@@ -6560,7 +6679,7 @@
   }();
 
   // output/Main/index.js
-  var program = function __do2() {
+  var program = function __do3() {
     runAff_(genericErrorsHandlerEither)(checkDependecies)();
     var doc = getDocument();
     var htmlComponents = loadComponents(doc)();

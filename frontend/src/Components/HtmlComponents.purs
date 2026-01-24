@@ -1,11 +1,35 @@
 module Components.HtmlComponents where
 
-import Control.Monad.Error.Class (catchError)
-import Prelude (bind, pure)
 import Components.HTMLComponentsLoader (loadHtmlElement)
-import Web.DOM.NonElementParentNode (NonElementParentNode)
+import Components.HtmlIds
+  ( addSubtitleId
+  , applyId
+  , artistId
+  , cutEndId
+  , cutEndValueId
+  , cutStartId
+  , cutStartValueId
+  , loadingModalId
+  , minsiLogId
+  , outputFilenameId
+  , playbackPositionId
+  , resultPreviewId
+  , resultVideoId
+  , reverseLoopGifId
+  , setCutEndButton
+  , setCutStartButton
+  , subtitlesRowId
+  , titleId
+  , videoRowId
+  , videoSourceId
+  , videoSourceRowId
+  , youtubeUrlId
+  )
+import Control.Monad.Error.Class (catchError)
+import Data.Tuple (Tuple(..), fst, snd)
 import Effect (Effect)
-import Components.HtmlIds (videoSourceRowId, videoRowId, subtitlesRowId, youtubeUrlId, outputFilenameId, reverseLoopGifId, artistId, titleId, applyId, cutStartId, cutEndId, setCutStartButton, setCutEndButton, resultPreviewId, addSubtitleId, minsiLogId, playbackPositionId, cutStartValueId, cutEndValueId, loadingModalId, resultVideoId, videoSourceId)
+import Prelude (bind, pure)
+import Web.DOM.NonElementParentNode (NonElementParentNode)
 import Web.HTML.HTMLInputElement (HTMLInputElement)
 import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLButtonElement (HTMLButtonElement)
@@ -45,20 +69,22 @@ data HtmlOutputs = HtmlOutputs
   , addSubtitleButton :: HTMLButtonElement
   , minsiLog :: HTMLDivElement
   , playbackPosition :: HTMLSpanElement
-  , cutStartValue  :: HTMLSpanElement
-  , cutEndValue  :: HTMLSpanElement
+  , cutStartValue :: HTMLSpanElement
+  , cutEndValue :: HTMLSpanElement
   , loadingModal :: HTMLDivElement
   , resultVideo :: HTMLVideoElement
   }
-data HtmlVisualElements = HtmlVisualElements {
-  videoSourceRow :: HTMLDivElement
+
+data HtmlVisualElements = HtmlVisualElements
+  { videoSourceRow :: HTMLDivElement
   , videoRow :: HTMLDivElement
   , subtitlesRow :: HTMLDivElement
   }
-type HtmlComponents = {
-  htmlInputs:: HtmlInputs
-  ,htmlOutputs:: HtmlOutputs
-  ,htmlVisualElements:: HtmlVisualElements
+
+type HtmlComponents =
+  { htmlInputs :: HtmlInputs
+  , htmlOutputs :: HtmlOutputs
+  , htmlVisualElements :: HtmlVisualElements
   }
 
 loadComponents :: NonElementParentNode -> Effect HtmlComponents
@@ -66,7 +92,11 @@ loadComponents doc = do
   inputs <- loadHtmlInputs doc
   outputs <- loadHtmlOutputs doc
   visualElements <- loadHtmlVisualElements doc
-  pure { htmlInputs: inputs, htmlOutputs: outputs, htmlVisualElements: visualElements }
+  pure
+    { htmlInputs: inputs
+    , htmlOutputs: outputs
+    , htmlVisualElements: visualElements
+    }
 
 loadHtmlInputs :: NonElementParentNode -> Effect HtmlInputs
 loadHtmlInputs doc = do
@@ -161,9 +191,11 @@ loadVideo id = loadHtmlElement id HV.fromElement
 loadResultPreview :: NonElementParentNode -> Effect ResultPreview
 loadResultPreview doc = do
   catchError
-    (do
-      div <- loadDiv resultPreviewId doc
-      pure (ResultPreviewDiv div))
-    (\_ -> do
-      iframe <- loadHtmlElement resultPreviewId IF.fromElement doc
-      pure (ResultPreviewIframe iframe))
+    ( do
+        div <- loadDiv resultPreviewId doc
+        pure (ResultPreviewDiv div)
+    )
+    ( \_ -> do
+        iframe <- loadHtmlElement resultPreviewId IF.fromElement doc
+        pure (ResultPreviewIframe iframe)
+    )
