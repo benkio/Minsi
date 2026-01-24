@@ -1,14 +1,11 @@
 module Model.State where
 
 import Prelude
-
-import Data.Either (either)
+import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Milliseconds)
-import Effect.Exception (try, message)
-import Effect.Unsafe (unsafePerformEffect)
 import Node.Path (FilePath)
 import Foreign.Generic.Class (class Decode)
-import Node.URL (URL, new)
+import Data.URL (URL, fromString)
 import Yoga.JSON
   ( class ReadForeign
   , readImpl
@@ -94,12 +91,9 @@ derive newtype instance ReadForeign State
 instance ReadForeign WURL where
   readImpl f = do
     s <- readImpl f
-    let urlResult = unsafePerformEffect $ try (new s)
-    url <- either
-      (\err -> fail $ TypeMismatch "URL" $ "Invalid URL: " <> message err)
-      pure
-      urlResult
-    pure (WURL url)
+    case fromString s of
+      Nothing -> fail $ TypeMismatch "URL" $ "Invalid URL: " <> s
+      Just url -> pure (WURL url)
 
 instance Decode State where
   decode = readImpl

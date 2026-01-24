@@ -1,27 +1,32 @@
 module Controller.ComputeController where
 
+import Effect (Effect)
+
 import Prelude
 import Effect.Class (liftEffect)
 import Effect.Console (log)
 import Data.Either (Either(Left, Right))
 import Control.Monad.Except (runExcept)
-import Model.ProcessStatus (ProcessStatus(..))
 import Model.State (State(..))
 import Node.Express.Request (getBody)
 import Node.Express.Handler (Handler)
-import Node.Express.Response (sendJson, setResponseHeader, setStatus, end)
+import Node.Express.Response (sendJson, setStatus, end)
+import Node.ChildProcess (execSync)
+import Node.Buffer (toString)
+import Node.Encoding (Encoding(..))
 
 computeController :: Handler
 computeController = do
-  stateParsingResult :: _ (State) <- getBody
+  stateParsingResult <- getBody
   case runExcept stateParsingResult of
-    Left errors ->
+    Left errors -> do
       liftEffect $ log ("Failed to parse state: " <> show errors)
-    Right (State state) ->
-      liftEffect $
-        log
-          ( "Successfully parsed state - artist: " <> state.artist <> ", title: "
-              <> state.title
-          )
-  --TODO: Add a simple async shell call to echo and log it for now
-  setStatus 200 *> end
+      setStatus 400 *> sendJson { error: "Bad Request: Failed to parse state" } *> end
+    Right state -> liftEffect (compute state) *> setStatus 200 *> end
+
+compute :: State -> Effect Unit
+compute _ = do
+  resultBuffer <- execSync "echo whoowhooo"
+  result <- toString UTF8 resultBuffer
+  log result
+

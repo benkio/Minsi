@@ -8,6 +8,5 @@ import Prelude
 
 statusController :: Handler
 statusController = do
-  delay 
   let processStatus = Succeed
   setStatus 200 *> sendJson (buildResponse processStatus)

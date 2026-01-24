@@ -1,5 +1,7 @@
 module Api.Router where
 
+import Controller.ErrorHandlers (generalErrorHandler)
+
 import Node.Express.Handler (Handler)
 import Prelude
 import Node.Express.App (App, post)
@@ -10,10 +12,13 @@ import Controller.StatusController (statusController)
 
 router :: App
 router = do
-  post "/checkDependencies" (defaultResponseSettings *> checkDependenciesController)
-  post "/compute"           (defaultResponseSettings *> computeController          )
-  post "/status"            (defaultResponseSettings *> statusController           )
+  post "/checkDependencies" (controllerLogic checkDependenciesController)
+  post "/compute"           (controllerLogic computeController          )
+  post "/status"            (controllerLogic statusController           )
 
 
 defaultResponseSettings :: Handler
 defaultResponseSettings = setResponseHeader "Access-Control-Allow-Origin" "*"
+
+controllerLogic :: Handler -> Handler
+controllerLogic logic = generalErrorHandler $ defaultResponseSettings *> logic
