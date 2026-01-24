@@ -4,7 +4,7 @@ import Prelude
 
 import Model.ProcessStatus (ProcessStatus(..))
 import Response.CheckDependenciesResponse (buildResponse) as CheckDependenciesResponse
-import Response.ComputeResponse (buildResponse) as ComputeResponse
+import Response.StatusResponse (buildResponse) as StatusResponse
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Yoga.JSON (writeJSON)
@@ -12,8 +12,8 @@ import Yoga.JSON (writeJSON)
 spec :: Spec Unit
 spec = do
   describe "Response JSON encoding" do
-    it "encodes ComputeResponse" do
-      let json = writeJSON (ComputeResponse.buildResponse Succeed)
+    it "encodes StatusResponse" do
+      let json = writeJSON (StatusResponse.buildResponse Succeed)
       json `shouldEqual` """{"status":"Succeed"}"""
 
     it "encodes CheckDependenciesResponse" do

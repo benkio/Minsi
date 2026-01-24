@@ -1,6 +1,6 @@
-module Endpoints.ResponseParser
-  ( decodeJsonResponse
-  ) where
+module Endpoints.ResponseParser where
+
+import Effect (Effect)
 
 import Data.Either (Either(..))
 import Effect.Aff (Aff)
@@ -10,8 +10,10 @@ import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Prelude
 import Yoga.JSON (class ReadForeign, readJSON)
 
--- Decode a JSON response body into `a`, raising a MinsiError on failure.
--- `context` is used to improve error messages (e.g. "compute", "checkDependencies").
+validateResponse :: Response -> Effect Response
+validateResponse response =
+  if response.ok then pure response else throwMinsiError (ErrorResponse (response.status))
+
 decodeJsonResponse :: forall a. ReadForeign a => String -> Response -> Aff a
 decodeJsonResponse context response = do
   bodyText <- response.text

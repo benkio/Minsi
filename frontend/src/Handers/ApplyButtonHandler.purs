@@ -43,10 +43,9 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   state <- (either (throwMinsiError <<< InvalidInputs) pure <<< toEither) stateV
   showLoadingModal loadingModalId
   runAff_ genericErrorsHandlerEither do
-    delay (Milliseconds 5000.0)
     response <- callCompute state
+    delay (Milliseconds 5000.0)
     liftEffect do
-      log ("Compute response status: " <> show response.status)
       hideLoadingModal loadingModalId
       showHiddenElements components.htmlVisualElements
       scrollToVideoSource

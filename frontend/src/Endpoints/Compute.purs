@@ -1,20 +1,20 @@
 module Endpoints.Compute where
 
-import Effect.Aff (Aff)
-import Fetch (Method(..), fetch)
+import Effect.Class (liftEffect)
+
+import Model.State.State (State(..))
+import Endpoints.ResponseParser (validateResponse)
 import Main.Config (backendUrl)
-import Model.ProcessStatus (ProcessStatus)
-import Model.State.State (State)
-import Prelude
+import Effect.Aff (Aff)
 import Yoga.JSON (writeJSON)
 import Endpoints.ResponseParser (decodeJsonResponse)
-
-type ComputeResponse = { status :: ProcessStatus }
+import Prelude
+import Fetch (Response, fetch, Method(..))
 
 computeEndpoint :: String
 computeEndpoint = backendUrl <> "compute"
 
-callCompute :: State -> Aff ComputeResponse
+callCompute :: State -> Aff Response
 callCompute state = do
   response <-
     fetch computeEndpoint
@@ -22,4 +22,4 @@ callCompute state = do
       , body: writeJSON state
       , headers: { "Content-Type": "application/json" }
       }
-  decodeJsonResponse "compute" response
+  liftEffect $ validateResponse response

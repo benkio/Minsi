@@ -437,11 +437,11 @@
     return Just2;
   }();
   var showMaybe = function(dictShow) {
-    var show11 = show(dictShow);
+    var show10 = show(dictShow);
     return {
       show: function(v) {
         if (v instanceof Just) {
-          return "(Just " + (show11(v.value0) + ")");
+          return "(Just " + (show10(v.value0) + ")");
         }
         ;
         if (v instanceof Nothing) {
@@ -1174,12 +1174,12 @@
     };
   };
   var showNonEmpty = function(dictShow) {
-    var show11 = show(dictShow);
+    var show10 = show(dictShow);
     return function(dictShow1) {
       var show15 = show(dictShow1);
       return {
         show: function(v) {
-          return "(NonEmpty " + (show11(v.value0) + (" " + (show15(v.value1) + ")")));
+          return "(NonEmpty " + (show10(v.value0) + (" " + (show15(v.value1) + ")")));
         }
       };
     };
@@ -1387,22 +1387,22 @@
     }
   };
   var showList = function(dictShow) {
-    var show11 = show(dictShow);
+    var show10 = show(dictShow);
     return {
       show: function(v) {
         if (v instanceof Nil) {
           return "Nil";
         }
         ;
-        return "(" + (intercalate2(" : ")(map3(show11)(v)) + " : Nil)");
+        return "(" + (intercalate2(" : ")(map3(show10)(v)) + " : Nil)");
       }
     };
   };
   var showNonEmptyList = function(dictShow) {
-    var show11 = show(showNonEmpty(dictShow)(showList(dictShow)));
+    var show10 = show(showNonEmpty(dictShow)(showList(dictShow)));
     return {
       show: function(v) {
-        return "(NonEmptyList " + (show11(v) + ")");
+        return "(NonEmptyList " + (show10(v) + ")");
       }
     };
   };
@@ -1979,12 +1979,12 @@
 
   // output/Control.Monad/index.js
   var ap = function(dictMonad) {
-    var bind9 = bind(dictMonad.Bind1());
+    var bind8 = bind(dictMonad.Bind1());
     var pure16 = pure(dictMonad.Applicative0());
     return function(f) {
       return function(a) {
-        return bind9(f)(function(f$prime) {
-          return bind9(a)(function(a$prime) {
+        return bind8(f)(function(f$prime) {
+          return bind8(a)(function(a$prime) {
             return pure16(f$prime(a$prime));
           });
         });
@@ -2053,6 +2053,7 @@
   // output/Main.MinsiErrors/index.js
   var map5 = /* @__PURE__ */ map(functorArray);
   var toUnfoldable2 = /* @__PURE__ */ toUnfoldable(unfoldableArray);
+  var show2 = /* @__PURE__ */ show(showInt);
   var HTMLElementNotFound = /* @__PURE__ */ function() {
     function HTMLElementNotFound2(value0) {
       this.value0 = value0;
@@ -2106,6 +2107,16 @@
     };
     return JSONParsingError2;
   }();
+  var ErrorResponse = /* @__PURE__ */ function() {
+    function ErrorResponse2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    ErrorResponse2.create = function(value0) {
+      return new ErrorResponse2(value0);
+    };
+    return ErrorResponse2;
+  }();
   var showMinsiError = {
     show: function(v) {
       if (v instanceof HTMLElementNotFound) {
@@ -2131,13 +2142,17 @@
         return "Error while parsing: " + v.value0;
       }
       ;
-      throw new Error("Failed pattern match at Main.MinsiErrors (line 18, column 10 - line 28, column 59): " + [v.constructor.name]);
+      if (v instanceof ErrorResponse) {
+        return "Got a Response with status \u2260 200: " + show2(v.value0);
+      }
+      ;
+      throw new Error("Failed pattern match at Main.MinsiErrors (line 19, column 10 - line 30, column 80): " + [v.constructor.name]);
     }
   };
   var throwMinsiError = /* @__PURE__ */ function() {
-    var $18 = show(showMinsiError);
-    return function($19) {
-      return throwException(error($18($19)));
+    var $20 = show(showMinsiError);
+    return function($21) {
+      return throwException(error($20($21)));
     };
   }();
 
@@ -2752,7 +2767,7 @@
       var runTick = 0;
       var status2 = SUSPENDED;
       var step2 = aff;
-      var fail3 = null;
+      var fail2 = null;
       var interrupt = null;
       var bhead = null;
       var btail = null;
@@ -2780,14 +2795,14 @@
                 }
               } catch (e) {
                 status2 = RETURN;
-                fail3 = util.left(e);
+                fail2 = util.left(e);
                 step2 = null;
               }
               break;
             case STEP_RESULT:
               if (util.isLeft(step2)) {
                 status2 = RETURN;
-                fail3 = step2;
+                fail2 = step2;
                 step2 = null;
               } else if (bhead === null) {
                 status2 = RETURN;
@@ -2840,7 +2855,7 @@
                   return;
                 case THROW:
                   status2 = RETURN;
-                  fail3 = util.left(step2._1);
+                  fail2 = util.left(step2._1);
                   step2 = null;
                   break;
                 // Enqueue the Catch so that we can call the error handler later on
@@ -2892,7 +2907,7 @@
               btail = null;
               if (attempts === null) {
                 status2 = COMPLETED;
-                step2 = interrupt || fail3 || step2;
+                step2 = interrupt || fail2 || step2;
               } else {
                 tmp = attempts._3;
                 attempt = attempts._1;
@@ -2904,15 +2919,15 @@
                   case CATCH:
                     if (interrupt && interrupt !== tmp && bracketCount === 0) {
                       status2 = RETURN;
-                    } else if (fail3) {
+                    } else if (fail2) {
                       status2 = CONTINUE;
-                      step2 = attempt._2(util.fromLeft(fail3));
-                      fail3 = null;
+                      step2 = attempt._2(util.fromLeft(fail2));
+                      fail2 = null;
                     }
                     break;
                   // We cannot resume from an unmasked interrupt or exception.
                   case RESUME:
-                    if (interrupt && interrupt !== tmp && bracketCount === 0 || fail3) {
+                    if (interrupt && interrupt !== tmp && bracketCount === 0 || fail2) {
                       status2 = RETURN;
                     } else {
                       bhead = attempt._1;
@@ -2927,7 +2942,7 @@
                   // should not run either.
                   case BRACKET:
                     bracketCount--;
-                    if (fail3 === null) {
+                    if (fail2 === null) {
                       result = util.fromRight(step2);
                       attempts = new Aff2(CONS, new Aff2(RELEASE, attempt._2, result), attempts, tmp);
                       if (interrupt === tmp || bracketCount > 0) {
@@ -2939,21 +2954,21 @@
                   // Enqueue the appropriate handler. We increase the bracket count
                   // because it should not be cancelled.
                   case RELEASE:
-                    attempts = new Aff2(CONS, new Aff2(FINALIZED, step2, fail3), attempts, interrupt);
+                    attempts = new Aff2(CONS, new Aff2(FINALIZED, step2, fail2), attempts, interrupt);
                     status2 = CONTINUE;
                     if (interrupt && interrupt !== tmp && bracketCount === 0) {
                       step2 = attempt._1.killed(util.fromLeft(interrupt))(attempt._2);
-                    } else if (fail3) {
-                      step2 = attempt._1.failed(util.fromLeft(fail3))(attempt._2);
+                    } else if (fail2) {
+                      step2 = attempt._1.failed(util.fromLeft(fail2))(attempt._2);
                     } else {
                       step2 = attempt._1.completed(util.fromRight(step2))(attempt._2);
                     }
-                    fail3 = null;
+                    fail2 = null;
                     bracketCount++;
                     break;
                   case FINALIZER:
                     bracketCount++;
-                    attempts = new Aff2(CONS, new Aff2(FINALIZED, step2, fail3), attempts, interrupt);
+                    attempts = new Aff2(CONS, new Aff2(FINALIZED, step2, fail2), attempts, interrupt);
                     status2 = CONTINUE;
                     step2 = attempt._1;
                     break;
@@ -2961,7 +2976,7 @@
                     bracketCount--;
                     status2 = RETURN;
                     step2 = attempt._1;
-                    fail3 = attempt._2;
+                    fail2 = attempt._2;
                     break;
                 }
               }
@@ -2974,9 +2989,9 @@
                 }
               }
               joins = null;
-              if (interrupt && fail3) {
+              if (interrupt && fail2) {
                 setTimeout(function() {
-                  throw util.fromLeft(fail3);
+                  throw util.fromLeft(fail2);
                 }, 0);
               } else if (util.isLeft(step2) && rethrow) {
                 setTimeout(function() {
@@ -3042,7 +3057,7 @@
                 }
                 status2 = RETURN;
                 step2 = null;
-                fail3 = null;
+                fail2 = null;
                 run3(++runTick);
               }
               break;
@@ -3053,7 +3068,7 @@
               if (bracketCount === 0) {
                 status2 = RETURN;
                 step2 = null;
-                fail3 = null;
+                fail2 = null;
               }
           }
           return canceler;
@@ -3157,13 +3172,13 @@
         return kills2;
       }
       function join3(result, head3, tail3) {
-        var fail3, step2, lhs, rhs, tmp, kid;
+        var fail2, step2, lhs, rhs, tmp, kid;
         if (util.isLeft(result)) {
-          fail3 = result;
+          fail2 = result;
           step2 = null;
         } else {
           step2 = result;
-          fail3 = null;
+          fail2 = null;
         }
         loop: while (true) {
           lhs = null;
@@ -3174,7 +3189,7 @@
             return;
           }
           if (head3 === null) {
-            cb(fail3 || step2)();
+            cb(fail2 || step2)();
             return;
           }
           if (head3._3 !== EMPTY) {
@@ -3182,29 +3197,29 @@
           }
           switch (head3.tag) {
             case MAP:
-              if (fail3 === null) {
+              if (fail2 === null) {
                 head3._3 = util.right(head3._1(util.fromRight(step2)));
                 step2 = head3._3;
               } else {
-                head3._3 = fail3;
+                head3._3 = fail2;
               }
               break;
             case APPLY:
               lhs = head3._1._3;
               rhs = head3._2._3;
-              if (fail3) {
-                head3._3 = fail3;
+              if (fail2) {
+                head3._3 = fail2;
                 tmp = true;
                 kid = killId++;
-                kills[kid] = kill(early, fail3 === lhs ? head3._2 : head3._1, function() {
+                kills[kid] = kill(early, fail2 === lhs ? head3._2 : head3._1, function() {
                   return function() {
                     delete kills[kid];
                     if (tmp) {
                       tmp = false;
                     } else if (tail3 === null) {
-                      join3(fail3, null, null);
+                      join3(fail2, null, null);
                     } else {
-                      join3(fail3, tail3._1, tail3._2);
+                      join3(fail2, tail3._1, tail3._2);
                     }
                   };
                 });
@@ -3226,9 +3241,9 @@
                 return;
               }
               if (lhs !== EMPTY && util.isLeft(lhs) && rhs !== EMPTY && util.isLeft(rhs)) {
-                fail3 = step2 === lhs ? rhs : lhs;
+                fail2 = step2 === lhs ? rhs : lhs;
                 step2 = null;
-                head3._3 = fail3;
+                head3._3 = fail2;
               } else {
                 head3._3 = step2;
                 tmp = true;
@@ -3644,12 +3659,12 @@
     };
   };
   var bindExceptT = function(dictMonad) {
-    var bind9 = bind(dictMonad.Bind1());
+    var bind8 = bind(dictMonad.Bind1());
     var pure16 = pure(dictMonad.Applicative0());
     return {
       bind: function(v) {
         return function(k) {
-          return bind9(v)(either(function($193) {
+          return bind8(v)(either(function($193) {
             return pure16(Left.create($193));
           })(function(a) {
             var v1 = k(a);
@@ -4250,13 +4265,13 @@
 
   // output/Control.Monad.Loops/index.js
   var whileM_ = function(dictMonad) {
-    var bind9 = bind(dictMonad.Bind1());
+    var bind8 = bind(dictMonad.Bind1());
     var pure16 = pure(dictMonad.Applicative0());
     return function(p) {
       return function(f) {
-        return bind9(p)(function(v) {
+        return bind8(p)(function(v) {
           if (v) {
-            return bind9(f)(function(v1) {
+            return bind8(f)(function(v1) {
               return whileM_(dictMonad)(p)(f);
             });
           }
@@ -4456,7 +4471,7 @@
 
   // output/Handers.YoutubeVideo.CutButtonsHandlers/index.js
   var discard2 = /* @__PURE__ */ discard(discardUnit);
-  var show2 = /* @__PURE__ */ show(showNumber);
+  var show3 = /* @__PURE__ */ show(showNumber);
   var discard22 = /* @__PURE__ */ discard2(bindAff);
   var whileM_2 = /* @__PURE__ */ whileM_(monadAff);
   var liftEffect3 = /* @__PURE__ */ liftEffect(monadEffectAff);
@@ -4469,7 +4484,7 @@
       return function(v) {
         return function __do4() {
           var currentTime2 = getPlayerCurrentTime();
-          setValue2(show2(currentTime2))(cutInput)();
+          setValue2(show3(currentTime2))(cutInput)();
           return updateCutValue(cutInput)(cutValueSpan)();
         };
       };
@@ -4482,9 +4497,9 @@
           return function(startTime) {
             return launchAff_(discard22(whileM_2(liftEffect3(map8(not2)(isPlayerReady)))(delay(500)))(function() {
               return bind12(liftEffect3(getVideoDuration))(function(duration2) {
-                return discard22(liftEffect3(setMax(show2(duration2))(cutStart)))(function() {
+                return discard22(liftEffect3(setMax(show3(duration2))(cutStart)))(function() {
                   return discard22(liftEffect3(setValue2(show1(startTime))(cutStart)))(function() {
-                    return discard22(liftEffect3(setMax(show2(duration2))(cutEnd)))(function() {
+                    return discard22(liftEffect3(setMax(show3(duration2))(cutEnd)))(function() {
                       return discard22(liftEffect3(updateCutStartValue(cutStart)(cutStartValue)))(function() {
                         return liftEffect3(updateCutEndValue(cutEnd)(cutEndValue));
                       });
@@ -4773,14 +4788,14 @@
   };
 
   // output/Handers.YoutubeVideo.PlaybackPositionHandler/index.js
-  var show3 = /* @__PURE__ */ show(showNumber);
+  var show4 = /* @__PURE__ */ show(showNumber);
   var identity8 = /* @__PURE__ */ identity(categoryFn);
   var append2 = /* @__PURE__ */ append(semigroupArray);
   var when2 = /* @__PURE__ */ when(applicativeEffect);
   var formatToThreeDecimals = function(v) {
     var v1 = span2(function(x) {
       return x !== ".";
-    })(toCharArray(show3(v)));
+    })(toCharArray(show4(v)));
     var num = fromCharArray(v1.init);
     var decChars = maybe([])(identity8)(tail(v1.rest));
     var dec3 = take(3)(append2(decChars)(replicate(3)("0")));
@@ -5212,7 +5227,7 @@
   }();
 
   // output/Foreign/index.js
-  var show4 = /* @__PURE__ */ show(showString);
+  var show5 = /* @__PURE__ */ show(showString);
   var show12 = /* @__PURE__ */ show(showInt);
   var ForeignError = /* @__PURE__ */ function() {
     function ForeignError2(value0) {
@@ -5268,7 +5283,7 @@
   var showForeignError = {
     show: function(v) {
       if (v instanceof ForeignError) {
-        return "(ForeignError " + (show4(v.value0) + ")");
+        return "(ForeignError " + (show5(v.value0) + ")");
       }
       ;
       if (v instanceof ErrorAtIndex) {
@@ -5276,11 +5291,11 @@
       }
       ;
       if (v instanceof ErrorAtProperty) {
-        return "(ErrorAtProperty " + (show4(v.value0) + (" " + (show(showForeignError)(v.value1) + ")")));
+        return "(ErrorAtProperty " + (show5(v.value0) + (" " + (show(showForeignError)(v.value1) + ")")));
       }
       ;
       if (v instanceof TypeMismatch) {
-        return "(TypeMismatch " + (show4(v.value0) + (" " + (show4(v.value1) + ")")));
+        return "(TypeMismatch " + (show5(v.value0) + (" " + (show5(v.value1) + ")")));
       }
       ;
       throw new Error("Failed pattern match at Foreign (line 69, column 1 - line 73, column 89): " + [v.constructor.name]);
@@ -5342,11 +5357,11 @@
 
   // output/Foreign.Index/index.js
   var unsafeReadProp = function(dictMonad) {
-    var fail3 = fail(dictMonad);
+    var fail2 = fail(dictMonad);
     var pure16 = pure(applicativeExceptT(dictMonad));
     return function(k) {
       return function(value12) {
-        return unsafeReadPropImpl(fail3(new TypeMismatch("object", typeOf(value12))), pure16, k, value12);
+        return unsafeReadPropImpl(fail2(new TypeMismatch("object", typeOf(value12))), pure16, k, value12);
       };
     };
   };
@@ -5656,7 +5671,7 @@
   var bind3 = /* @__PURE__ */ bind(bindMaybe);
   var foldl3 = /* @__PURE__ */ foldl(foldableV);
   var pure6 = /* @__PURE__ */ pure(applicativeEffect);
-  var show5 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(showString));
+  var show6 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(showString));
   var show13 = /* @__PURE__ */ show(showString);
   var VET = /* @__PURE__ */ function() {
     function VET2(value0) {
@@ -5685,8 +5700,8 @@
                 return function(v1) {
                   return pure6(v1);
                 };
-              })(throwMinsiError(new InvalidInput(youtubeUrlId, show5(rawValue))))(youtubeUrlV)();
-              var videoId = maybe(throwMinsiError(new InvalidInput(youtubeUrlId, show5(rawValue))))(pure6)(extractYoutubeVideoId(youtubeUrl))();
+              })(throwMinsiError(new InvalidInput(youtubeUrlId, show6(rawValue))))(youtubeUrlV)();
+              var videoId = maybe(throwMinsiError(new InvalidInput(youtubeUrlId, show6(rawValue))))(pure6)(extractYoutubeVideoId(youtubeUrl))();
               var startTime = extractYoutubeVideoStartTime(youtubeUrl);
               log("Youtube Url Handler fired with value: " + show13(videoId))();
               embedVideo({
@@ -5919,6 +5934,308 @@
     }
   };
 
+  // output/Yoga.JSON/foreign.js
+  function reviver(key, value12) {
+    if (key === "big") {
+      return BigInt(value12);
+    }
+    return value12;
+  }
+  var _parseJSON2 = (payload) => JSON.parse(payload, reviver);
+  function replacer(key, value12) {
+    if (typeof value12 === "bigint") {
+      return value12.toString();
+    }
+    return value12;
+  }
+  var _unsafeStringify2 = (data) => JSON.stringify(data, replacer);
+
+  // output/Yoga.JSON/index.js
+  var identity9 = /* @__PURE__ */ identity(categoryBuilder);
+  var readString3 = /* @__PURE__ */ readString(monadIdentity);
+  var bindExceptT2 = /* @__PURE__ */ bindExceptT(monadIdentity);
+  var pure7 = /* @__PURE__ */ pure(applicativeNonEmptyList);
+  var except2 = /* @__PURE__ */ except(applicativeIdentity);
+  var applicativeExceptT2 = /* @__PURE__ */ applicativeExceptT(monadIdentity);
+  var pure12 = /* @__PURE__ */ pure(applicativeExceptT2);
+  var map12 = /* @__PURE__ */ map(functorArray);
+  var unwrap3 = /* @__PURE__ */ unwrap();
+  var compose1 = /* @__PURE__ */ compose(semigroupoidBuilder);
+  var insert6 = /* @__PURE__ */ insert4()();
+  var append4 = /* @__PURE__ */ append(semigroupNonEmptyList);
+  var functorExceptT2 = /* @__PURE__ */ functorExceptT(functorIdentity);
+  var map1 = /* @__PURE__ */ map(functorExceptT2);
+  var map22 = /* @__PURE__ */ map(functorNonEmptyList);
+  var bindFlipped3 = /* @__PURE__ */ bindFlipped(bindExceptT2);
+  var lmap3 = /* @__PURE__ */ lmap(bifunctorEither);
+  var composeKleisliFlipped2 = /* @__PURE__ */ composeKleisliFlipped(bindExceptT2);
+  var readProp2 = /* @__PURE__ */ readProp(monadIdentity);
+  var mapWithIndex3 = /* @__PURE__ */ mapWithIndex(functorWithIndexArray);
+  var readArray2 = /* @__PURE__ */ readArray(monadIdentity);
+  var writeForeignString2 = {
+    writeImpl: unsafeToForeign
+  };
+  var writeForeignNumber = {
+    writeImpl: unsafeToForeign
+  };
+  var writeForeignInt = {
+    writeImpl: unsafeToForeign
+  };
+  var writeForeignFieldsNilRowR = {
+    writeImplFields: function(v) {
+      return function(v1) {
+        return identity9;
+      };
+    }
+  };
+  var writeForeignBoolean = {
+    writeImpl: unsafeToForeign
+  };
+  var readForeignString = {
+    readImpl: readString3
+  };
+  var readForeignFieldsNilRowRo = {
+    getFields: function(v) {
+      return function(v1) {
+        return pure12(identity9);
+      };
+    }
+  };
+  var writeImplFields = function(dict) {
+    return dict.writeImplFields;
+  };
+  var writeForeignRecord = function() {
+    return function(dictWriteForeignFields) {
+      var writeImplFields1 = writeImplFields(dictWriteForeignFields);
+      return {
+        writeImpl: function(rec) {
+          var steps = writeImplFields1($$Proxy.value)(rec);
+          return unsafeToForeign(build(steps)({}));
+        }
+      };
+    };
+  };
+  var writeImpl2 = function(dict) {
+    return dict.writeImpl;
+  };
+  var writeImpl1 = /* @__PURE__ */ writeImpl2(writeForeignNumber);
+  var writeJSON = function(dictWriteForeign) {
+    var $469 = writeImpl2(dictWriteForeign);
+    return function($470) {
+      return _unsafeStringify2($469($470));
+    };
+  };
+  var writeForeignArray = function(dictWriteForeign) {
+    var writeImpl5 = writeImpl2(dictWriteForeign);
+    return {
+      writeImpl: function(xs) {
+        return unsafeToForeign(map12(writeImpl5)(xs));
+      }
+    };
+  };
+  var writeForeignFieldsCons = function(dictIsSymbol) {
+    var get3 = get(dictIsSymbol)();
+    var insert42 = insert6(dictIsSymbol);
+    return function(dictWriteForeign) {
+      var writeImpl5 = writeImpl2(dictWriteForeign);
+      return function(dictWriteForeignFields) {
+        var writeImplFields1 = writeImplFields(dictWriteForeignFields);
+        return function() {
+          return function() {
+            return function() {
+              return {
+                writeImplFields: function(v) {
+                  return function(rec) {
+                    var rest = writeImplFields1($$Proxy.value)(rec);
+                    var value12 = writeImpl5(get3($$Proxy.value)(rec));
+                    var result = compose1(insert42($$Proxy.value)(value12))(rest);
+                    return result;
+                  };
+                }
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+  var writeForeignMilliseconds = {
+    writeImpl: function($481) {
+      return writeImpl1(unwrap3($481));
+    }
+  };
+  var sequenceCombining = function(dictMonoid) {
+    var append22 = append(dictMonoid.Semigroup0());
+    var mempty3 = mempty(dictMonoid);
+    return function(dictFoldable) {
+      var foldl5 = foldl(dictFoldable);
+      return function(dictApplicative) {
+        var pure23 = pure(dictApplicative);
+        var fn = function(acc) {
+          return function(elem3) {
+            var v = runExcept(elem3);
+            if (acc instanceof Left && v instanceof Left) {
+              return new Left(append4(acc.value0)(v.value0));
+            }
+            ;
+            if (acc instanceof Left && v instanceof Right) {
+              return new Left(acc.value0);
+            }
+            ;
+            if (acc instanceof Right && v instanceof Right) {
+              return new Right(append22(acc.value0)(pure23(v.value0)));
+            }
+            ;
+            if (acc instanceof Right && v instanceof Left) {
+              return new Left(v.value0);
+            }
+            ;
+            throw new Error("Failed pattern match at Yoga.JSON (line 653, column 5 - line 657, column 37): " + [acc.constructor.name, v.constructor.name]);
+          };
+        };
+        var $505 = foldl5(fn)(new Right(mempty3));
+        return function($506) {
+          return except2($505($506));
+        };
+      };
+    };
+  };
+  var sequenceCombining1 = /* @__PURE__ */ sequenceCombining(monoidArray)(foldableArray)(applicativeArray);
+  var readImpl2 = function(dict) {
+    return dict.readImpl;
+  };
+  var readAtIdx = function(dictReadForeign) {
+    var readImpl5 = readImpl2(dictReadForeign);
+    return function(i) {
+      return function(f) {
+        return withExcept(map22(ErrorAtIndex.create(i)))(readImpl5(f));
+      };
+    };
+  };
+  var readForeignArray = function(dictReadForeign) {
+    return {
+      readImpl: composeKleisliFlipped2(function() {
+        var $542 = mapWithIndex3(readAtIdx(dictReadForeign));
+        return function($543) {
+          return sequenceCombining1($542($543));
+        };
+      }())(readArray2)
+    };
+  };
+  var parseJSON = /* @__PURE__ */ function() {
+    var $548 = lmap3(function($551) {
+      return pure7(ForeignError.create(message($551)));
+    });
+    var $549 = runEffectFn1(_parseJSON2);
+    return function($550) {
+      return ExceptT(Identity($548(unsafePerformEffect($$try($549($550))))));
+    };
+  }();
+  var readJSON = function(dictReadForeign) {
+    var $552 = composeKleisliFlipped2(readImpl2(dictReadForeign))(parseJSON);
+    return function($553) {
+      return runExcept($552($553));
+    };
+  };
+  var getFields = function(dict) {
+    return dict.getFields;
+  };
+  var readForeignFieldsCons = function(dictIsSymbol) {
+    var reflectSymbol2 = reflectSymbol(dictIsSymbol);
+    var insert42 = insert6(dictIsSymbol);
+    return function(dictReadForeign) {
+      var readImpl5 = readImpl2(dictReadForeign);
+      return function(dictReadForeignFields) {
+        var getFields1 = getFields(dictReadForeignFields);
+        return function() {
+          return function() {
+            return {
+              getFields: function(v) {
+                return function(obj) {
+                  var rest = getFields1($$Proxy.value)(obj);
+                  var name15 = reflectSymbol2($$Proxy.value);
+                  var enrichErrorWithPropName = withExcept(map22(ErrorAtProperty.create(name15)));
+                  var value12 = enrichErrorWithPropName(bindFlipped3(readImpl5)(readProp2(name15)(obj)));
+                  var first = map1(insert42($$Proxy.value))(value12);
+                  return except2(function() {
+                    var v1 = runExcept(rest);
+                    var v2 = runExcept(first);
+                    if (v2 instanceof Right && v1 instanceof Right) {
+                      return new Right(compose1(v2.value0)(v1.value0));
+                    }
+                    ;
+                    if (v2 instanceof Left && v1 instanceof Left) {
+                      return new Left(append4(v2.value0)(v1.value0));
+                    }
+                    ;
+                    if (v2 instanceof Right && v1 instanceof Left) {
+                      return new Left(v1.value0);
+                    }
+                    ;
+                    if (v2 instanceof Left && v1 instanceof Right) {
+                      return new Left(v2.value0);
+                    }
+                    ;
+                    throw new Error("Failed pattern match at Yoga.JSON (line 360, column 5 - line 364, column 33): " + [v2.constructor.name, v1.constructor.name]);
+                  }());
+                };
+              }
+            };
+          };
+        };
+      };
+    };
+  };
+  var readForeignRecord = function() {
+    return function(dictReadForeignFields) {
+      var getFields1 = getFields(dictReadForeignFields);
+      return {
+        readImpl: function(o) {
+          return map1(flip(build)({}))(getFields1($$Proxy.value)(o));
+        }
+      };
+    };
+  };
+
+  // output/Endpoints.ResponseParser/index.js
+  var pure8 = /* @__PURE__ */ pure(applicativeEffect);
+  var bind4 = /* @__PURE__ */ bind(bindAff);
+  var liftEffect4 = /* @__PURE__ */ liftEffect(monadEffectAff);
+  var show7 = /* @__PURE__ */ show(showInt);
+  var show14 = /* @__PURE__ */ show(/* @__PURE__ */ showNonEmptyList(showForeignError));
+  var pure13 = /* @__PURE__ */ pure(applicativeAff);
+  var validateResponse = function(response) {
+    if (response.ok) {
+      return pure8(response);
+    }
+    ;
+    return throwMinsiError(new ErrorResponse(response.status));
+  };
+  var decodeJsonResponse = function(dictReadForeign) {
+    var readJSON2 = readJSON(dictReadForeign);
+    return function(context) {
+      return function(response) {
+        return bind4(response.text)(function(bodyText) {
+          var $13 = bodyText === "";
+          if ($13) {
+            return liftEffect4(throwMinsiError(new JSONParsingError(context + (": empty response body" + (" (http " + (show7(response.status) + (" " + (response.statusText + ")"))))))));
+          }
+          ;
+          var v = readJSON2(bodyText);
+          if (v instanceof Left) {
+            return liftEffect4(throwMinsiError(new JSONParsingError(context + (": " + (show14(v.value0) + (" (http " + (show7(response.status) + (" " + (response.statusText + (")" + (" body=" + bodyText)))))))))));
+          }
+          ;
+          if (v instanceof Right) {
+            return pure13(v.value0);
+          }
+          ;
+          throw new Error("Failed pattern match at Endpoints.ResponseParser (line 29, column 5 - line 40, column 21): " + [v.constructor.name]);
+        });
+      };
+    };
+  };
+
   // output/Data.String.CaseInsensitive/index.js
   var compare2 = /* @__PURE__ */ compare(ordString);
   var CaseInsensitiveString = function(x) {
@@ -5970,13 +6287,13 @@
   }();
 
   // output/JS.Fetch.RequestBody/foreign.js
-  function fromString3(a) {
+  function fromString5(a) {
     return a;
   }
 
   // output/Fetch.Internal.RequestBody/index.js
   var toRequestBodyString = {
-    toRequestBody: fromString3
+    toRequestBody: fromString5
   };
   var toRequestBody = function(dict) {
     return dict.toRequestBody;
@@ -5994,7 +6311,7 @@
 
   // output/Fetch.Internal.Request/index.js
   var fromRecord2 = /* @__PURE__ */ fromRecord();
-  var show6 = /* @__PURE__ */ show(showMethod);
+  var show8 = /* @__PURE__ */ show(showMethod);
   var toCoreRequestOptionsHelpe = {
     convertHelper: function(v) {
       return function(v1) {
@@ -6019,7 +6336,7 @@
   };
   var toCoreRequestOptionsConve9 = {
     convertImpl: function(v) {
-      return show6;
+      return show8;
     }
   };
   var $$new2 = function() {
@@ -6166,20 +6483,20 @@
   var voidRight2 = /* @__PURE__ */ voidRight(functorEffect);
   var mempty2 = /* @__PURE__ */ mempty(monoidCanceler);
   var thenOrCatch3 = /* @__PURE__ */ thenOrCatch2();
-  var map12 = /* @__PURE__ */ map(functorEffect);
+  var map13 = /* @__PURE__ */ map(functorEffect);
   var resolve3 = /* @__PURE__ */ resolve2();
   var alt6 = /* @__PURE__ */ alt(altMaybe);
-  var map1 = /* @__PURE__ */ map(functorMaybe);
-  var readString3 = /* @__PURE__ */ readString(monadIdentity);
-  var bind4 = /* @__PURE__ */ bind(bindAff);
-  var liftEffect4 = /* @__PURE__ */ liftEffect(monadEffectAff);
+  var map14 = /* @__PURE__ */ map(functorMaybe);
+  var readString4 = /* @__PURE__ */ readString(monadIdentity);
+  var bind5 = /* @__PURE__ */ bind(bindAff);
+  var liftEffect5 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var toAff$prime = function(customCoerce) {
     return function(p) {
       return makeAff(function(cb) {
         return voidRight2(mempty2)(thenOrCatch3(function(a) {
-          return map12(resolve3)(cb(new Right(a)));
+          return map13(resolve3)(cb(new Right(a)));
         })(function(e) {
-          return map12(resolve3)(cb(new Left(customCoerce(e))));
+          return map13(resolve3)(cb(new Left(customCoerce(e))));
         })(p));
       });
     };
@@ -6187,11 +6504,11 @@
   var coerce3 = function(rej) {
     return fromMaybe$prime(function(v) {
       return error("Promise failed, couldn't extract JS Error or String");
-    })(alt6(toError(rej))(map1(error)(hush(runExcept(readString3(unsafeToForeign(rej)))))));
+    })(alt6(toError(rej))(map14(error)(hush(runExcept(readString4(unsafeToForeign(rej)))))));
   };
   var toAff = /* @__PURE__ */ toAff$prime(coerce3);
   var toAffE = function(f) {
-    return bind4(liftEffect4(f))(toAff);
+    return bind5(liftEffect5(f))(toAff);
   };
 
   // output/Fetch.Internal.Response/index.js
@@ -6249,22 +6566,22 @@
   // output/Fetch/index.js
   var $$void6 = /* @__PURE__ */ $$void(functorEffect);
   var thenOrCatch4 = /* @__PURE__ */ thenOrCatch2();
-  var map13 = /* @__PURE__ */ map(functorEffect);
+  var map15 = /* @__PURE__ */ map(functorEffect);
   var resolve4 = /* @__PURE__ */ resolve2();
-  var bind5 = /* @__PURE__ */ bind(bindAff);
-  var liftEffect5 = /* @__PURE__ */ liftEffect(monadEffectAff);
+  var bind6 = /* @__PURE__ */ bind(bindAff);
+  var liftEffect6 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var $$new4 = /* @__PURE__ */ $$new2();
-  var bindFlipped3 = /* @__PURE__ */ bindFlipped(bindAff);
+  var bindFlipped4 = /* @__PURE__ */ bindFlipped(bindAff);
   var fetchWithOptions2 = /* @__PURE__ */ fetchWithOptions();
-  var pure12 = /* @__PURE__ */ pure(applicativeAff);
+  var pure14 = /* @__PURE__ */ pure(applicativeAff);
   var toAbortableAff = function(abortController) {
     return function(p) {
       return makeAff(function(cb) {
         return function __do4() {
           $$void6(thenOrCatch4(function(a) {
-            return map13(resolve4)(cb(new Right(a)));
+            return map15(resolve4)(cb(new Right(a)));
           })(function(e) {
-            return map13(resolve4)(cb(new Left(coerce3(e))));
+            return map15(resolve4)(cb(new Left(coerce3(e))));
           })(p))();
           return effectCanceler(abort(abortController));
         };
@@ -6277,13 +6594,13 @@
         var convert3 = convert(dictToCoreRequestOptions);
         return function(url3) {
           return function(r) {
-            return bind5(liftEffect5($$new4(url3)(convert3(r))))(function(request) {
-              return bind5(liftEffect5(newImpl3))(function(abortController) {
+            return bind6(liftEffect6($$new4(url3)(convert3(r))))(function(request) {
+              return bind6(liftEffect6(newImpl3))(function(abortController) {
                 var signal2 = signal(abortController);
-                return bind5(bindFlipped3(toAbortableAff(abortController))(liftEffect5(fetchWithOptions2(request)({
+                return bind6(bindFlipped4(toAbortableAff(abortController))(liftEffect6(fetchWithOptions2(request)({
                   signal: signal2
                 }))))(function(cResponse) {
-                  return pure12(convert2(cResponse));
+                  return pure14(convert2(cResponse));
                 });
               });
             });
@@ -6295,332 +6612,6 @@
 
   // output/Main.Config/index.js
   var backendUrl = "http://localhost:8080/";
-
-  // output/Yoga.JSON/foreign.js
-  function reviver(key, value12) {
-    if (key === "big") {
-      return BigInt(value12);
-    }
-    return value12;
-  }
-  var _parseJSON2 = (payload) => JSON.parse(payload, reviver);
-  function replacer(key, value12) {
-    if (typeof value12 === "bigint") {
-      return value12.toString();
-    }
-    return value12;
-  }
-  var _unsafeStringify2 = (data) => JSON.stringify(data, replacer);
-
-  // output/Yoga.JSON/index.js
-  var identity9 = /* @__PURE__ */ identity(categoryBuilder);
-  var readString4 = /* @__PURE__ */ readString(monadIdentity);
-  var bindExceptT2 = /* @__PURE__ */ bindExceptT(monadIdentity);
-  var pure7 = /* @__PURE__ */ pure(applicativeNonEmptyList);
-  var except2 = /* @__PURE__ */ except(applicativeIdentity);
-  var applicativeExceptT2 = /* @__PURE__ */ applicativeExceptT(monadIdentity);
-  var pure13 = /* @__PURE__ */ pure(applicativeExceptT2);
-  var map14 = /* @__PURE__ */ map(functorArray);
-  var unwrap3 = /* @__PURE__ */ unwrap();
-  var compose1 = /* @__PURE__ */ compose(semigroupoidBuilder);
-  var insert6 = /* @__PURE__ */ insert4()();
-  var append4 = /* @__PURE__ */ append(semigroupNonEmptyList);
-  var functorExceptT2 = /* @__PURE__ */ functorExceptT(functorIdentity);
-  var map15 = /* @__PURE__ */ map(functorExceptT2);
-  var map22 = /* @__PURE__ */ map(functorNonEmptyList);
-  var bindFlipped4 = /* @__PURE__ */ bindFlipped(bindExceptT2);
-  var lmap3 = /* @__PURE__ */ lmap(bifunctorEither);
-  var composeKleisliFlipped2 = /* @__PURE__ */ composeKleisliFlipped(bindExceptT2);
-  var readProp2 = /* @__PURE__ */ readProp(monadIdentity);
-  var mapWithIndex3 = /* @__PURE__ */ mapWithIndex(functorWithIndexArray);
-  var readArray2 = /* @__PURE__ */ readArray(monadIdentity);
-  var writeForeignString2 = {
-    writeImpl: unsafeToForeign
-  };
-  var writeForeignNumber = {
-    writeImpl: unsafeToForeign
-  };
-  var writeForeignInt = {
-    writeImpl: unsafeToForeign
-  };
-  var writeForeignFieldsNilRowR = {
-    writeImplFields: function(v) {
-      return function(v1) {
-        return identity9;
-      };
-    }
-  };
-  var writeForeignBoolean = {
-    writeImpl: unsafeToForeign
-  };
-  var readForeignString = {
-    readImpl: readString4
-  };
-  var readForeignFieldsNilRowRo = {
-    getFields: function(v) {
-      return function(v1) {
-        return pure13(identity9);
-      };
-    }
-  };
-  var writeImplFields = function(dict) {
-    return dict.writeImplFields;
-  };
-  var writeForeignRecord = function() {
-    return function(dictWriteForeignFields) {
-      var writeImplFields1 = writeImplFields(dictWriteForeignFields);
-      return {
-        writeImpl: function(rec) {
-          var steps = writeImplFields1($$Proxy.value)(rec);
-          return unsafeToForeign(build(steps)({}));
-        }
-      };
-    };
-  };
-  var writeImpl2 = function(dict) {
-    return dict.writeImpl;
-  };
-  var writeImpl1 = /* @__PURE__ */ writeImpl2(writeForeignNumber);
-  var writeJSON = function(dictWriteForeign) {
-    var $469 = writeImpl2(dictWriteForeign);
-    return function($470) {
-      return _unsafeStringify2($469($470));
-    };
-  };
-  var writeForeignArray = function(dictWriteForeign) {
-    var writeImpl5 = writeImpl2(dictWriteForeign);
-    return {
-      writeImpl: function(xs) {
-        return unsafeToForeign(map14(writeImpl5)(xs));
-      }
-    };
-  };
-  var writeForeignFieldsCons = function(dictIsSymbol) {
-    var get3 = get(dictIsSymbol)();
-    var insert42 = insert6(dictIsSymbol);
-    return function(dictWriteForeign) {
-      var writeImpl5 = writeImpl2(dictWriteForeign);
-      return function(dictWriteForeignFields) {
-        var writeImplFields1 = writeImplFields(dictWriteForeignFields);
-        return function() {
-          return function() {
-            return function() {
-              return {
-                writeImplFields: function(v) {
-                  return function(rec) {
-                    var rest = writeImplFields1($$Proxy.value)(rec);
-                    var value12 = writeImpl5(get3($$Proxy.value)(rec));
-                    var result = compose1(insert42($$Proxy.value)(value12))(rest);
-                    return result;
-                  };
-                }
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  var writeForeignMilliseconds = {
-    writeImpl: function($481) {
-      return writeImpl1(unwrap3($481));
-    }
-  };
-  var sequenceCombining = function(dictMonoid) {
-    var append22 = append(dictMonoid.Semigroup0());
-    var mempty3 = mempty(dictMonoid);
-    return function(dictFoldable) {
-      var foldl5 = foldl(dictFoldable);
-      return function(dictApplicative) {
-        var pure23 = pure(dictApplicative);
-        var fn = function(acc) {
-          return function(elem3) {
-            var v = runExcept(elem3);
-            if (acc instanceof Left && v instanceof Left) {
-              return new Left(append4(acc.value0)(v.value0));
-            }
-            ;
-            if (acc instanceof Left && v instanceof Right) {
-              return new Left(acc.value0);
-            }
-            ;
-            if (acc instanceof Right && v instanceof Right) {
-              return new Right(append22(acc.value0)(pure23(v.value0)));
-            }
-            ;
-            if (acc instanceof Right && v instanceof Left) {
-              return new Left(v.value0);
-            }
-            ;
-            throw new Error("Failed pattern match at Yoga.JSON (line 653, column 5 - line 657, column 37): " + [acc.constructor.name, v.constructor.name]);
-          };
-        };
-        var $505 = foldl5(fn)(new Right(mempty3));
-        return function($506) {
-          return except2($505($506));
-        };
-      };
-    };
-  };
-  var sequenceCombining1 = /* @__PURE__ */ sequenceCombining(monoidArray)(foldableArray)(applicativeArray);
-  var readImpl2 = function(dict) {
-    return dict.readImpl;
-  };
-  var readAtIdx = function(dictReadForeign) {
-    var readImpl5 = readImpl2(dictReadForeign);
-    return function(i) {
-      return function(f) {
-        return withExcept(map22(ErrorAtIndex.create(i)))(readImpl5(f));
-      };
-    };
-  };
-  var readForeignArray = function(dictReadForeign) {
-    return {
-      readImpl: composeKleisliFlipped2(function() {
-        var $542 = mapWithIndex3(readAtIdx(dictReadForeign));
-        return function($543) {
-          return sequenceCombining1($542($543));
-        };
-      }())(readArray2)
-    };
-  };
-  var parseJSON = /* @__PURE__ */ function() {
-    var $548 = lmap3(function($551) {
-      return pure7(ForeignError.create(message($551)));
-    });
-    var $549 = runEffectFn1(_parseJSON2);
-    return function($550) {
-      return ExceptT(Identity($548(unsafePerformEffect($$try($549($550))))));
-    };
-  }();
-  var readJSON = function(dictReadForeign) {
-    var $552 = composeKleisliFlipped2(readImpl2(dictReadForeign))(parseJSON);
-    return function($553) {
-      return runExcept($552($553));
-    };
-  };
-  var getFields = function(dict) {
-    return dict.getFields;
-  };
-  var readForeignFieldsCons = function(dictIsSymbol) {
-    var reflectSymbol2 = reflectSymbol(dictIsSymbol);
-    var insert42 = insert6(dictIsSymbol);
-    return function(dictReadForeign) {
-      var readImpl5 = readImpl2(dictReadForeign);
-      return function(dictReadForeignFields) {
-        var getFields1 = getFields(dictReadForeignFields);
-        return function() {
-          return function() {
-            return {
-              getFields: function(v) {
-                return function(obj) {
-                  var rest = getFields1($$Proxy.value)(obj);
-                  var name15 = reflectSymbol2($$Proxy.value);
-                  var enrichErrorWithPropName = withExcept(map22(ErrorAtProperty.create(name15)));
-                  var value12 = enrichErrorWithPropName(bindFlipped4(readImpl5)(readProp2(name15)(obj)));
-                  var first = map15(insert42($$Proxy.value))(value12);
-                  return except2(function() {
-                    var v1 = runExcept(rest);
-                    var v2 = runExcept(first);
-                    if (v2 instanceof Right && v1 instanceof Right) {
-                      return new Right(compose1(v2.value0)(v1.value0));
-                    }
-                    ;
-                    if (v2 instanceof Left && v1 instanceof Left) {
-                      return new Left(append4(v2.value0)(v1.value0));
-                    }
-                    ;
-                    if (v2 instanceof Right && v1 instanceof Left) {
-                      return new Left(v1.value0);
-                    }
-                    ;
-                    if (v2 instanceof Left && v1 instanceof Right) {
-                      return new Left(v2.value0);
-                    }
-                    ;
-                    throw new Error("Failed pattern match at Yoga.JSON (line 360, column 5 - line 364, column 33): " + [v2.constructor.name, v1.constructor.name]);
-                  }());
-                };
-              }
-            };
-          };
-        };
-      };
-    };
-  };
-  var readForeignRecord = function() {
-    return function(dictReadForeignFields) {
-      var getFields1 = getFields(dictReadForeignFields);
-      return {
-        readImpl: function(o) {
-          return map15(flip(build)({}))(getFields1($$Proxy.value)(o));
-        }
-      };
-    };
-  };
-
-  // output/Model.ProcessStatus/index.js
-  var bind6 = /* @__PURE__ */ bind(/* @__PURE__ */ bindExceptT(monadIdentity));
-  var readImpl3 = /* @__PURE__ */ readImpl2(readForeignString);
-  var pure8 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeExceptT(monadIdentity));
-  var fail2 = /* @__PURE__ */ fail(monadIdentity);
-  var Pending = /* @__PURE__ */ function() {
-    function Pending2() {
-    }
-    ;
-    Pending2.value = new Pending2();
-    return Pending2;
-  }();
-  var Succeed = /* @__PURE__ */ function() {
-    function Succeed2() {
-    }
-    ;
-    Succeed2.value = new Succeed2();
-    return Succeed2;
-  }();
-  var Failed = /* @__PURE__ */ function() {
-    function Failed2() {
-    }
-    ;
-    Failed2.value = new Failed2();
-    return Failed2;
-  }();
-  var showProcessStatus = {
-    show: function(v) {
-      if (v instanceof Pending) {
-        return "Pending";
-      }
-      ;
-      if (v instanceof Succeed) {
-        return "Succeed";
-      }
-      ;
-      if (v instanceof Failed) {
-        return "Failed";
-      }
-      ;
-      throw new Error("Failed pattern match at Model.ProcessStatus (line 12, column 1 - line 15, column 25): " + [v.constructor.name]);
-    }
-  };
-  var readForeignProcessStatus = {
-    readImpl: function(f) {
-      return bind6(readImpl3(f))(function(s) {
-        if (s === "Pending") {
-          return pure8(Pending.value);
-        }
-        ;
-        if (s === "Succeed") {
-          return pure8(Succeed.value);
-        }
-        ;
-        if (s === "Failed") {
-          return pure8(Failed.value);
-        }
-        ;
-        return fail2(new TypeMismatch("ProcessStatus", "Invalid ProcessStatus: " + s));
-      });
-    }
-  };
 
   // output/Model.State.State/index.js
   var writeImpl3 = /* @__PURE__ */ writeImpl2(writeForeignString2);
@@ -6824,17 +6815,7 @@
     }
   })(toCoreRequestOptionsHelpe)()())()())()()));
   var writeJSON2 = /* @__PURE__ */ writeJSON(writeState);
-  var discard3 = /* @__PURE__ */ discard(discardUnit)(bindAff);
-  var when3 = /* @__PURE__ */ when(applicativeAff);
-  var liftEffect6 = /* @__PURE__ */ liftEffect(monadEffectAff);
-  var show7 = /* @__PURE__ */ show(showInt);
-  var readJSON2 = /* @__PURE__ */ readJSON(/* @__PURE__ */ readForeignRecord()(/* @__PURE__ */ readForeignFieldsCons({
-    reflectSymbol: function() {
-      return "status";
-    }
-  })(readForeignProcessStatus)(readForeignFieldsNilRowRo)()()));
-  var show14 = /* @__PURE__ */ show(/* @__PURE__ */ showNonEmptyList(showForeignError));
-  var pure9 = /* @__PURE__ */ pure(applicativeAff);
+  var liftEffect7 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var computeEndpoint = /* @__PURE__ */ function() {
     return backendUrl + "compute";
   }();
@@ -6846,35 +6827,22 @@
         "Content-Type": "application/json"
       }
     }))(function(response) {
-      return bind7(response.text)(function(bodyText) {
-        return discard3(when3(bodyText === "")(liftEffect6(throwMinsiError(new JSONParsingError("compute: empty response body" + (" (http " + (show7(response.status) + (" " + (response.statusText + ")")))))))))(function() {
-          var v = readJSON2(bodyText);
-          if (v instanceof Left) {
-            return liftEffect6(throwMinsiError(new JSONParsingError("compute: " + (show14(v.value0) + (" (http " + (show7(response.status) + (" " + (response.statusText + (")" + (" body=" + bodyText))))))))));
-          }
-          ;
-          if (v instanceof Right) {
-            return pure9(v.value0);
-          }
-          ;
-          throw new Error("Failed pattern match at Endpoints.Compute (line 36, column 3 - line 47, column 19): " + [v.constructor.name]);
-        });
-      });
+      return liftEffect7(validateResponse(response));
     });
   };
 
   // output/Validations.CutVideoValidation/index.js
-  var show8 = /* @__PURE__ */ show(showNumber);
-  var pure10 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(/* @__PURE__ */ semigroupMap()(ordString)(semigroupString)));
+  var show9 = /* @__PURE__ */ show(showNumber);
+  var pure9 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(/* @__PURE__ */ semigroupMap()(ordString)(semigroupString)));
   var cutVideoValidation = function(id2) {
     return function(start2) {
       return function(end) {
         var $8 = start2 > end;
         if ($8) {
-          return invalid(singleton3(id2)("start > end: " + (show8(start2) + (" " + show8(end)))));
+          return invalid(singleton3(id2)("start > end: " + (show9(start2) + (" " + show9(end)))));
         }
         ;
-        return pure10({
+        return pure9({
           start: start2,
           end
         });
@@ -6965,12 +6933,11 @@
   }
 
   // output/Handlers.ApplyButtonHandler/index.js
-  var discard4 = /* @__PURE__ */ discard(discardUnit);
-  var pure11 = /* @__PURE__ */ pure(applicativeEffect);
-  var discard23 = /* @__PURE__ */ discard4(bindAff);
+  var discard3 = /* @__PURE__ */ discard(discardUnit);
+  var pure10 = /* @__PURE__ */ pure(applicativeEffect);
   var bind13 = /* @__PURE__ */ bind(bindAff);
-  var liftEffect7 = /* @__PURE__ */ liftEffect(monadEffectAff);
-  var show9 = /* @__PURE__ */ show(showProcessStatus);
+  var discard23 = /* @__PURE__ */ discard3(bindAff);
+  var liftEffect8 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var scrollToVideoSource = function __do2() {
     var w = windowImpl();
     var loc = location(w)();
@@ -6997,14 +6964,13 @@
       var doc = getDocument();
       var components = loadComponents(doc)();
       var stateV = fromHtmlInputs(components.htmlInputs)();
-      var state3 = either(function($17) {
-        return throwMinsiError(InvalidInputs.create($17));
-      })(pure11)(toEither(stateV))();
+      var state3 = either(function($16) {
+        return throwMinsiError(InvalidInputs.create($16));
+      })(pure10)(toEither(stateV))();
       showLoadingModal(loadingModalId)();
-      runAff_(genericErrorsHandlerEither)(discard23(delay(5e3))(function() {
-        return bind13(callCompute(state3))(function(response) {
-          return liftEffect7(function __do5() {
-            log("Compute response status: " + show9(response.status))();
+      runAff_(genericErrorsHandlerEither)(bind13(callCompute(state3))(function(response) {
+        return discard23(delay(5e3))(function() {
+          return liftEffect8(function __do5() {
             hideLoadingModal(loadingModalId)();
             showHiddenElements(components.htmlVisualElements)();
             return scrollToVideoSource();
@@ -7046,20 +7012,17 @@
   };
 
   // output/Endpoints.CheckDependencies/index.js
-  var bind8 = /* @__PURE__ */ bind(bindAff);
-  var pure14 = /* @__PURE__ */ pure(applicativeAff);
-  var readJSON3 = /* @__PURE__ */ readJSON(/* @__PURE__ */ readForeignRecord()(/* @__PURE__ */ readForeignFieldsCons({
+  var pure11 = /* @__PURE__ */ pure(applicativeAff);
+  var decodeJsonResponse2 = /* @__PURE__ */ decodeJsonResponse(/* @__PURE__ */ readForeignRecord()(/* @__PURE__ */ readForeignFieldsCons({
     reflectSymbol: function() {
       return "missedDependencies";
     }
   })(/* @__PURE__ */ readForeignArray(readForeignString))(readForeignFieldsNilRowRo)()()));
-  var liftEffect8 = /* @__PURE__ */ liftEffect(monadEffectAff);
-  var show10 = /* @__PURE__ */ show(/* @__PURE__ */ showNonEmptyList(showForeignError));
   var checkDependeciesEndpoint = /* @__PURE__ */ function() {
     return backendUrl + "checkDependencies";
   }();
   var callCheckDependencies = /* @__PURE__ */ function() {
-    return bind8(fetch2()()(toCoreRequestOptionsRowRo()()(toCoreRequestOptionsHelpe1(toCoreRequestOptionsConve9)()()()({
+    return bind(bindAff)(fetch2()()(toCoreRequestOptionsRowRo()()(toCoreRequestOptionsHelpe1(toCoreRequestOptionsConve9)()()()({
       reflectSymbol: function() {
         return "method";
       }
@@ -7067,23 +7030,12 @@
       method: POST.value
     }))(function(response) {
       if (response.ok) {
-        return pure14({
+        return pure11({
           missedDependencies: []
         });
       }
       ;
-      return bind8(response.text)(function(bodyText) {
-        var v = readJSON3(bodyText);
-        if (v instanceof Left) {
-          return liftEffect8(throwMinsiError(new JSONParsingError("checkDependencies: " + (show10(v.value0) + (" body=" + bodyText)))));
-        }
-        ;
-        if (v instanceof Right) {
-          return pure14(v.value0);
-        }
-        ;
-        throw new Error("Failed pattern match at Endpoints.CheckDependencies (line 24, column 5 - line 28, column 21): " + [v.constructor.name]);
-      });
+      return decodeJsonResponse2("checkDependencies")(response);
     });
   }();
 

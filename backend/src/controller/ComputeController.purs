@@ -9,12 +9,10 @@ import Model.ProcessStatus (ProcessStatus(..))
 import Model.State (State(..))
 import Node.Express.Request (getBody)
 import Node.Express.Handler (Handler)
-import Node.Express.Response (sendJson, setResponseHeader, setStatus)
-import Response.ComputeResponse (buildResponse)
+import Node.Express.Response (sendJson, setResponseHeader, setStatus, end)
 
 computeController :: Handler
 computeController = do
-  setResponseHeader "Access-Control-Allow-Origin" "*"
   stateParsingResult :: _ (State) <- getBody
   case runExcept stateParsingResult of
     Left errors ->
@@ -26,7 +24,4 @@ computeController = do
               <> state.title
           )
   --TODO: Add a simple async shell call to echo and log it for now
-
-  -- Return just a status code here and create another endpoint for the status. enabling long polling
-  let processStatus = Succeed
-  setStatus 200 *> sendJson (buildResponse processStatus)
+  setStatus 200 *> end

@@ -13,6 +13,7 @@ data MinsiError
   | InvalidInput String String
   | InvalidInputs (Map String String)
   | JSONParsingError String
+  | ErrorResponse Int
 
 instance Show MinsiError where
   show = case _ of
@@ -26,6 +27,7 @@ instance Show MinsiError where
       let errorMessages = map (\(Tuple k v) -> "[" <> k <> "] " <> v) (toUnfoldable vs)
       in joinWith "<br>" errorMessages
     JSONParsingError err -> "Error while parsing: " <> err
+    ErrorResponse status -> "Got a Response with status ≠ 200: " <> show status
 
 throwMinsiError :: forall a. MinsiError -> Effect a
 throwMinsiError =

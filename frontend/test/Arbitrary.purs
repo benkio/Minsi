@@ -53,4 +53,3 @@ instance Arbitrary DecimalNumber where
     frac <- chooseInt 0 9999
     let n = toNumber whole + (toNumber frac / 10000.0)
     pure (DecimalNumber n)
-
