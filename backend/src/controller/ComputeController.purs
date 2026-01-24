@@ -5,10 +5,12 @@ import Effect.Class (liftEffect)
 import Effect.Console (log)
 import Data.Either (Either(Left, Right))
 import Control.Monad.Except (runExcept)
+import Model.ProcessStatus (ProcessStatus(..))
 import Model.State (State(..))
 import Node.Express.Request (getBody)
 import Node.Express.Handler (Handler)
-import Node.Express.Response (end, setResponseHeader, setStatus)
+import Node.Express.Response (sendJson, setResponseHeader, setStatus)
+import Response.ComputeResponse (buildResponse)
 
 computeController :: Handler
 computeController = do
@@ -23,4 +25,5 @@ computeController = do
           ( "Successfully parsed state - artist: " <> state.artist <> ", title: "
               <> state.title
           )
-  setStatus 200 *> end
+  let processStatus = Succeed
+  setStatus 200 *> sendJson (buildResponse processStatus)
