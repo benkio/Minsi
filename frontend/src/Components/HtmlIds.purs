@@ -59,3 +59,12 @@ loadingModalId = "loadingModal"
 
 resultVideoId :: String
 resultVideoId = "resultVideo"
+
+videoSourceRowId :: String
+videoSourceRowId = "videoSourceRowId"
+
+videoRowId :: String
+videoRowId = "videoRowId"
+
+subtitlesRowId :: String
+subtitlesRowId = "subtitlesRowId"

@@ -127,7 +127,9 @@
             </div>
 
             <div class="w-100 w-md-75 mx-auto px-3 pb-3">
-              <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+              <div
+                class="d-flex justify-content-between align-items-center flex-wrap gap-2"
+              >
                 <button id="setCutStartButton" class="btn btn-primary">
                   Set Start Position
                 </button>
@@ -163,7 +165,7 @@
       </div>
 
       <!-- Video Source -->
-      <div class="row mt-4 d-none">
+      <div class="row mt-4 d-none" id="videoSourceRowId">
         <div class="col-12 text-center">
           <select
             name="videoSource"
@@ -177,21 +179,20 @@
       </div>
 
       <!-- Video Row -->
-      <div class="row mt-4 d-none">
+      <div class="row mt-4 d-none" id="videoRowId">
         <div class="col-12">
           <video
             id="resultVideo"
-            class="w-100 vh-100 bg-dark"
-            style="object-fit: contain;"
+            class="w-100 bg-dark"
+            style="object-fit: contain; height: 75vh"
             controls
           ></video>
         </div>
       </div>
 
       <!-- Subtitles -->
-      <div class="row mt-4 d-none">
+      <div class="row mt-4 d-none" id="subtitlesRowId">
         <div class="col-12 col-xl-10 mx-auto">
-
           <div class="table-responsive">
             <table
               class="table table-bordered table-sm bg-white shadow-sm align-middle"

@@ -1,11 +1,11 @@
 module Components.HtmlComponents where
 
+import Control.Monad.Error.Class (catchError)
 import Prelude (bind, pure)
-
 import Components.HTMLComponentsLoader (loadHtmlElement)
 import Web.DOM.NonElementParentNode (NonElementParentNode)
 import Effect (Effect)
-import Components.HtmlIds
+import Components.HtmlIds (videoSourceRowId, videoRowId, subtitlesRowId, youtubeUrlId, outputFilenameId, reverseLoopGifId, artistId, titleId, applyId, cutStartId, cutEndId, setCutStartButton, setCutEndButton, resultPreviewId, addSubtitleId, minsiLogId, playbackPositionId, cutStartValueId, cutEndValueId, loadingModalId, resultVideoId, videoSourceId)
 import Web.HTML.HTMLInputElement (HTMLInputElement)
 import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLButtonElement (HTMLButtonElement)
@@ -18,6 +18,8 @@ import Web.HTML.HTMLSpanElement (HTMLSpanElement)
 import Web.HTML.HTMLSpanElement as HSP
 import Web.HTML.HTMLVideoElement (HTMLVideoElement)
 import Web.HTML.HTMLVideoElement as HV
+import Web.HTML.HTMLIFrameElement (HTMLIFrameElement)
+import Web.HTML.HTMLIFrameElement as IF
 import Data.Tuple (Tuple(..), fst, snd)
 
 data HtmlInputs = HtmlInputs
@@ -34,23 +36,37 @@ data HtmlInputs = HtmlInputs
   , setCutStartButton :: HTMLButtonElement
   }
 
+data ResultPreview
+  = ResultPreviewDiv HTMLDivElement
+  | ResultPreviewIframe HTMLIFrameElement
+
 data HtmlOutputs = HtmlOutputs
-  { resultPreview :: HTMLDivElement
+  { resultPreview :: ResultPreview
   , addSubtitleButton :: HTMLButtonElement
   , minsiLog :: HTMLDivElement
   , playbackPosition :: HTMLSpanElement
-    , cutStartValue  :: HTMLSpanElement
-    , cutEndValue  :: HTMLSpanElement
-    , loadingModal :: HTMLDivElement
-    , resultVideo :: HTMLVideoElement
+  , cutStartValue  :: HTMLSpanElement
+  , cutEndValue  :: HTMLSpanElement
+  , loadingModal :: HTMLDivElement
+  , resultVideo :: HTMLVideoElement
   }
-type HtmlComponents = Tuple HtmlInputs HtmlOutputs
+data HtmlVisualElements = HtmlVisualElements {
+  videoSourceRow :: HTMLDivElement
+  , videoRow :: HTMLDivElement
+  , subtitlesRow :: HTMLDivElement
+  }
+type HtmlComponents = {
+  htmlInputs:: HtmlInputs
+  ,htmlOutputs:: HtmlOutputs
+  ,htmlVisualElements:: HtmlVisualElements
+  }
 
 loadComponents :: NonElementParentNode -> Effect HtmlComponents
 loadComponents doc = do
   inputs <- loadHtmlInputs doc
   outputs <- loadHtmlOutputs doc
-  pure (Tuple inputs outputs)
+  visualElements <- loadHtmlVisualElements doc
+  pure { htmlInputs: inputs, htmlOutputs: outputs, htmlVisualElements: visualElements }
 
 loadHtmlInputs :: NonElementParentNode -> Effect HtmlInputs
 loadHtmlInputs doc = do
@@ -82,7 +98,7 @@ loadHtmlInputs doc = do
 
 loadHtmlOutputs :: NonElementParentNode -> Effect HtmlOutputs
 loadHtmlOutputs doc = do
-  resultPreview <- loadDiv resultPreviewId doc
+  resultPreview <- loadResultPreview doc
   addSubtitleButton <- loadButton addSubtitleId doc
   minsiLog <- loadDiv minsiLogId doc
   playbackPosition <- loadSpan playbackPositionId doc
@@ -100,6 +116,19 @@ loadHtmlOutputs doc = do
         , cutEndValue: cutEndValue
         , loadingModal: loadingModal
         , resultVideo: resultVideo
+        }
+    )
+
+loadHtmlVisualElements :: NonElementParentNode -> Effect HtmlVisualElements
+loadHtmlVisualElements doc = do
+  videoSourceRow <- loadDiv videoSourceRowId doc
+  videoRow <- loadDiv videoRowId doc
+  subtitlesRow <- loadDiv subtitlesRowId doc
+  pure
+    ( HtmlVisualElements
+        { videoSourceRow: videoSourceRow
+        , videoRow: videoRow
+        , subtitlesRow: subtitlesRow
         }
     )
 
@@ -128,3 +157,13 @@ loadSpan id = loadHtmlElement id HSP.fromElement
 
 loadVideo :: String -> NonElementParentNode -> Effect HTMLVideoElement
 loadVideo id = loadHtmlElement id HV.fromElement
+
+loadResultPreview :: NonElementParentNode -> Effect ResultPreview
+loadResultPreview doc = do
+  catchError
+    (do
+      div <- loadDiv resultPreviewId doc
+      pure (ResultPreviewDiv div))
+    (\_ -> do
+      iframe <- loadHtmlElement resultPreviewId IF.fromElement doc
+      pure (ResultPreviewIframe iframe))
