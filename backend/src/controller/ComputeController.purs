@@ -25,5 +25,8 @@ computeController = do
           ( "Successfully parsed state - artist: " <> state.artist <> ", title: "
               <> state.title
           )
+  --TODO: Add a simple async shell call to echo and log it for now
+
+  -- Return just a status code here and create another endpoint for the status. enabling long polling
   let processStatus = Succeed
   setStatus 200 *> sendJson (buildResponse processStatus)

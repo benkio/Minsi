@@ -27,8 +27,13 @@ program = do
 -- TODOs --------------------------------
 {-
 
-- Add the Apply button handler that takes the htmlinputs, convert
-  them to state and send them to the compute endpoint if the
-  conversion is successful. disable the button until the call ends
-- Add subtitle logic
+- Apply button handler:
+  - long polling on the backend status for the process
+  - Change the text of the modal: replace the spinner with an emoji, show it for a sec and then move to the next phase.
+
+--- Add subtitle logic Frontend ---
+- Load the video from the output folder (where the backend generated the output)
+- Add the button handler for adding more subtitles
+- Add the subtitle loanding logic (HTML components and into the state)
+- Add a button to send the subtitles, probably a clone of the ApplyButton or really similar
 -}
