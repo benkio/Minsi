@@ -1,6 +1,6 @@
 module Handers.YoutubeVideo.PlaybackPositionHandler where
 
-import Data.Array (span, tail, take)
+import Data.Array (replicate, span, tail, take)
 import Data.Maybe (maybe)
 import Data.String.CodeUnits (fromCharArray, toCharArray)
 import Effect (Effect)
@@ -14,12 +14,14 @@ updatePlaybackPosition playbackPosition = do
   playerReady <- isPlayerReady
   currentTime <- getPlayerCurrentTime
   when playerReady $ setTextContent (formatToThreeDecimals currentTime) (HSP.toNode playbackPosition)
-  where
-    formatToThreeDecimals :: Number -> String
-    formatToThreeDecimals v =
-      let
-        { init: i, rest: r } = span (\x -> x /= '.') <<< toCharArray $ show v
-        num = fromCharArray i
-        dec = maybe "0" fromCharArray $ take 3 <$> tail r
-      in
-        num <> "." <> dec
+
+formatToThreeDecimals :: Number -> String
+formatToThreeDecimals v =
+  let
+    { init: i, rest: r } = span (\x -> x /= '.') <<< toCharArray $ show v
+    num = fromCharArray i
+    decChars = maybe [] identity (tail r)
+    dec3 = take 3 (decChars <> replicate 3 '0')
+    dec = fromCharArray dec3
+  in
+    num <> "." <> dec

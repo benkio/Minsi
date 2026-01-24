@@ -2,12 +2,12 @@ module Test.Arbitrary where
 
 import Prelude
 import Test.QuickCheck.Arbitrary (class Arbitrary, arbitrary)
-import Test.QuickCheck.Gen (Gen, suchThat, chooseInt, arrayOf1, arrayOf, elements)
+import Test.QuickCheck.Gen (Gen, suchThat, chooseInt, arrayOf, elements)
 import Data.Char (fromCharCode)
 import Data.String.CodeUnits (fromCharArray)
 import Data.Maybe (maybe)
-import Data.Array.NonEmpty (toArray)
 import Data.Array.NonEmpty.Internal (NonEmptyArray(..))
+import Data.Int (toNumber)
 
 data Range = Range Number Number
 
@@ -19,6 +19,9 @@ instance Arbitrary Range where
 
 newtype NonEmptyASCIIString = NonEmptyASCIIString String
 newtype EmptyASCIIString = EmptyASCIIString String
+
+-- A “regular” (non-scientific) non-negative decimal number for formatting tests
+newtype DecimalNumber = DecimalNumber Number
 
 instance Arbitrary NonEmptyASCIIString where
   arbitrary = do
@@ -43,4 +46,11 @@ nonWhitespaceASCIIChar = do
   -- ASCII codes 33-126 exclude space (32) and other control chars
   code <- chooseInt 33 126
   maybe nonWhitespaceASCIIChar pure (fromCharCode code)
+
+instance Arbitrary DecimalNumber where
+  arbitrary = do
+    whole <- chooseInt 0 9999
+    frac <- chooseInt 0 9999
+    let n = toNumber whole + (toNumber frac / 10000.0)
+    pure (DecimalNumber n)
 

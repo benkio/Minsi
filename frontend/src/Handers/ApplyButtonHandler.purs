@@ -4,13 +4,13 @@ import Components.HtmlComponents (HtmlVisualElements(..), loadComponents)
 import Components.HtmlIds (loadingModalId, videoSourceId)
 import Components.Modal (hideLoadingModal, showLoadingModal)
 import Components.Window (getDocument)
-import Data.Either (Either(..))
+import Data.Either (either)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Validation.Semigroup (toEither)
 import Effect (Effect)
 import Effect.Aff (delay, launchAff_)
 import Effect.Class (liftEffect)
-import Effect.Console (log)
+import Endpoints.Compute (callCompute)
 import Handers.ErrorHandlers (genericErrorsHandler)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.State.StateFromHtml (fromHtmlInputs)
@@ -39,13 +39,12 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   doc <- getDocument
   components <- loadComponents doc
   stateV <- fromHtmlInputs components.htmlInputs
-  case toEither stateV of
-    Left errors -> throwMinsiError (InvalidInputs errors)
-    Right _ -> log ("State converted")
+  state <- (either (throwMinsiError <<< InvalidInputs) pure <<< toEither) stateV
   showLoadingModal loadingModalId
   launchAff_ do
     delay (Milliseconds 5000.0)
-    liftEffect $ do
+    _ <- callCompute state
+    liftEffect do
       hideLoadingModal loadingModalId
       showHiddenElements components.htmlVisualElements
       scrollToVideoSource
