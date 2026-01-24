@@ -22,8 +22,11 @@ newtype EmptyASCIIString = EmptyASCIIString String
 
 instance Arbitrary NonEmptyASCIIString where
   arbitrary = do
-    chars <- arrayOf1 asciiChar
-    (pure <<< NonEmptyASCIIString <<< fromCharArray <<< toArray) chars
+    -- Ensure at least one non-whitespace character
+    nonWhitespaceChar <- nonWhitespaceASCIIChar
+    otherChars <- arrayOf asciiChar
+    let allChars = [ nonWhitespaceChar ] <> otherChars
+    (pure <<< NonEmptyASCIIString <<< fromCharArray) allChars
 
 instance Arbitrary EmptyASCIIString where
   arbitrary =
@@ -34,4 +37,10 @@ asciiChar :: Gen Char
 asciiChar = do
   code <- chooseInt 32 126
   maybe asciiChar pure (fromCharCode code)
+
+nonWhitespaceASCIIChar :: Gen Char
+nonWhitespaceASCIIChar = do
+  -- ASCII codes 33-126 exclude space (32) and other control chars
+  code <- chooseInt 33 126
+  maybe nonWhitespaceASCIIChar pure (fromCharCode code)
 
