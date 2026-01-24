@@ -22,7 +22,6 @@ to generate this file without the comments in this block.
   , "either"
   , "exceptions"
   , "fetch"
-  , "fetch-yoga-json"
   , "foldable-traversable"
   , "foreign"
   , "foreign-object"

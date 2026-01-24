@@ -1,10 +1,13 @@
 module Endpoints.CheckDependencies where
 
+import Data.Either (Either(..))
 import Effect.Aff (Aff)
+import Effect.Class (liftEffect)
 import Fetch (Method(..), fetch)
-import Fetch.Yoga.Json (fromJSON)
 import Main.Config (backendUrl)
+import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Prelude
+import Yoga.JSON (readJSON)
 
 type MissingDependenciesResponse = { missedDependencies :: Array String }
 
@@ -17,5 +20,9 @@ callCheckDependencies = do
   if response.ok then
     pure { missedDependencies: [] }
   else do
-    decoded :: MissingDependenciesResponse <- fromJSON response.json
-    pure decoded
+    bodyText <- response.text
+    case (readJSON bodyText :: Either _ MissingDependenciesResponse) of
+      Left err ->
+        liftEffect $ throwMinsiError (JSONParsingError ("checkDependencies: " <> show err <> " body=" <> bodyText))
+      Right decoded ->
+        pure decoded

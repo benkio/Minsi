@@ -1,9 +1,10 @@
 module Response.ComputeResponse where
 
 import Model.ProcessStatus (ProcessStatus)
+import Prelude
 
-type ComputeResponse = { status :: ProcessStatus }
+type ComputeResponse = { status :: String }
 
 buildResponse :: ProcessStatus -> ComputeResponse
 buildResponse status =
-  { status: status }
+  { status: show status }

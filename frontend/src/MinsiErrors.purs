@@ -12,6 +12,7 @@ data MinsiError
   | MissingDependenciesError (Array String)
   | InvalidInput String String
   | InvalidInputs (Map String String)
+  | JSONParsingError String
 
 instance Show MinsiError where
   show = case _ of
@@ -24,6 +25,7 @@ instance Show MinsiError where
     InvalidInputs vs ->
       let errorMessages = map (\(Tuple k v) -> "[" <> k <> "] " <> v) (toUnfoldable vs)
       in joinWith "<br>" errorMessages
+    JSONParsingError err -> "Error while parsing: " <> err
 
 throwMinsiError :: forall a. MinsiError -> Effect a
 throwMinsiError =

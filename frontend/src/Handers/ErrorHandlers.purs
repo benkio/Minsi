@@ -1,5 +1,6 @@
 module Handers.ErrorHandlers where
 
+import Effect.Console (log)
 import Components.HtmlIds (minsiLogId)
 import Prelude
 import Components.HtmlComponents (loadDiv)
@@ -28,13 +29,15 @@ genericErrorsHandler :: Effect Unit -> Effect Unit
 genericErrorsHandler p =
   catchError p
     ( \e ->
-        catchError (writeToMinsiLog (message e)) (const (raiseErrorAlert (message e)))
+        let errorMessage = message e
+        in log errorMessage *> catchError (writeToMinsiLog errorMessage) (const (raiseErrorAlert errorMessage))
     )
 
 genericErrorsHandlerEither :: forall a. Either Error a -> Effect Unit
 genericErrorsHandlerEither (Right _) = pure unit
 genericErrorsHandlerEither (Left e) =
-  catchError (writeToMinsiLog (message e)) (const (raiseErrorAlert (message e)))
+  let errorMessage = message e
+  in log errorMessage *> catchError (writeToMinsiLog errorMessage) (const (raiseErrorAlert errorMessage))
 
 writeToMinsiLog :: String -> Effect Unit
 writeToMinsiLog errorMessage = do
