@@ -6,8 +6,8 @@ import Data.Foldable (null)
 import Effect (Effect)
 import Effect.Class (liftEffect)
 import Node.Express.Handler (Handler)
-import Node.Express.Response (end, sendJson, setResponseHeader, setStatus)
-import Prelude (bind, discard, (*>), (<$>), (<*>), (<>))
+import Node.Express.Response (end, sendJson, setStatus)
+import Prelude (bind, (*>), (<$>), (<*>), (<>))
 import Response.CheckDependenciesResponse (buildResponse)
 
 checkDependenciesController :: Handler

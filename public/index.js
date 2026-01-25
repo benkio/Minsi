@@ -221,9 +221,9 @@
     }
   };
   var join = function(dictBind) {
-    var bind14 = bind(dictBind);
+    var bind13 = bind(dictBind);
     return function(m) {
-      return bind14(m)(identity3);
+      return bind13(m)(identity3);
     };
   };
 
@@ -2124,7 +2124,7 @@
       }
       ;
       if (v instanceof MissingDependenciesError) {
-        return joinWith("<br>")(v.value0);
+        return "Dependency Error: <br>" + joinWith("<br>")(v.value0);
       }
       ;
       if (v instanceof InvalidInput) {
@@ -6933,8 +6933,10 @@
   }
 
   // output/Handlers.ApplyButtonHandler/index.js
+  var discard3 = /* @__PURE__ */ discard(discardUnit);
   var pure10 = /* @__PURE__ */ pure(applicativeEffect);
-  var bind13 = /* @__PURE__ */ bind(bindAff);
+  var discard23 = /* @__PURE__ */ discard3(bindAff);
+  var $$void7 = /* @__PURE__ */ $$void(functorAff);
   var liftEffect8 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var scrollToVideoSource = function __do2() {
     var w = windowImpl();
@@ -6962,11 +6964,11 @@
       var doc = getDocument();
       var components = loadComponents(doc)();
       var stateV = fromHtmlInputs(components.htmlInputs)();
-      var state3 = either(function($15) {
-        return throwMinsiError(InvalidInputs.create($15));
+      var state3 = either(function($16) {
+        return throwMinsiError(InvalidInputs.create($16));
       })(pure10)(toEither(stateV))();
       showLoadingModal(loadingModalId)();
-      runAff_(genericErrorsHandlerEither)(bind13(callCompute(state3))(function(response) {
+      runAff_(genericErrorsHandlerEither)(discard23($$void7(callCompute(state3)))(function() {
         return liftEffect8(function __do5() {
           hideLoadingModal(loadingModalId)();
           showHiddenElements(components.htmlVisualElements)();

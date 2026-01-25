@@ -1,10 +1,10 @@
 module CheckDependencies.SoftwareCheck where
 
+import Effect.Console (log)
 import Data.Foldable (foldM)
 import Effect (Effect)
-import Effect.Exception (catchException)
+import Effect.Exception (catchException, message)
 import Node.ChildProcess (execSync)
-import Node.ChildProcess.Types (Exit(..))
 import Prelude
 
 -- Check Software Dependecies ---------------------------------------------
@@ -20,12 +20,12 @@ checkSoftwareDependencies =
 
 softwareDependencies :: Array String
 softwareDependencies =
-  [ "ffmpeg"
-  , "yt-dlp"
-  , "id3v2"
-  , "fc-list"
+  [ "ffmpeg -version"
+  , "yt-dlp --version"
+  , "id3v2 --version"
+  , "fc-list --version"
   ]
 
 checkSoftwareDependency :: String -> Effect Boolean
 checkSoftwareDependency command =
-  catchException (\_ -> pure false) (const true <$> execSync (command <> " --version"))
+  catchException (\e -> log (message e) *> pure false) (const true <$> execSync command)

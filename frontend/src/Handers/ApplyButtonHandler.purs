@@ -1,15 +1,13 @@
 module Handlers.ApplyButtonHandler where
 
-import Effect.Console (log)
 import Components.HtmlComponents (HtmlVisualElements(..), loadComponents)
 import Components.HtmlIds (loadingModalId, videoSourceId)
 import Components.Modal (hideLoadingModal, showLoadingModal)
 import Components.Window (getDocument)
 import Data.Either (either)
-import Data.Time.Duration (Milliseconds(..))
 import Data.Validation.Semigroup (toEither)
 import Effect (Effect)
-import Effect.Aff (delay, runAff_)
+import Effect.Aff (runAff_)
 import Effect.Class (liftEffect)
 import Endpoints.Compute (callCompute)
 import Handers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
@@ -43,7 +41,7 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   state <- (either (throwMinsiError <<< InvalidInputs) pure <<< toEither) stateV
   showLoadingModal loadingModalId
   runAff_ genericErrorsHandlerEither do
-    response <- callCompute state
+    void $ callCompute state
     liftEffect do
       hideLoadingModal loadingModalId
       showHiddenElements components.htmlVisualElements

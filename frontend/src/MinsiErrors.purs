@@ -20,7 +20,7 @@ instance Show MinsiError where
     HTMLElementNotFound id ->
       "HTML Element couldn't be loaded: " <> id
     MissingDependenciesError deps ->
-      joinWith "<br>" deps
+      "Dependency Error: <br>" <> joinWith "<br>" deps
     InvalidInput id v ->
       "[" <> id <> "] Invalid Input: " <> v
     InvalidInputs vs ->

@@ -1,8 +1,8 @@
 module Command.Ytdlp where
 
 import Constants (mp4)
-import Data.Time.Duration (Milliseconds(..))
-import Ffmpeg (millisToString, millisecondsToSecondsString, secondsToString)
+import Data.Time.Duration (Milliseconds)
+import Ffmpeg (millisecondsToSecondsString)
 import Prelude
 import Effect (Effect)
 import Data.Maybe (Maybe(..))
@@ -10,10 +10,7 @@ import Data.Array (uncons)
 import Control.Monad.Error.Class (catchError)
 import Model.State (WURL(..))
 import Data.URL (toString)
-import Data.String.CodeUnits (dropRight)
 import Node.Buffer (Buffer)
-import Node.Buffer as B
-import Node.Encoding (Encoding(..))
 import MinsiError (MinsiError(..),throwMinsiError)
 import Command.Command (runCommand)
 

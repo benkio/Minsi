@@ -8,7 +8,6 @@ import Effect (Effect)
 import Control.Monad.Error.Class (catchError)
 import Effect.Exception (message)
 import Node.ChildProcess (execSync)
-import Node.ChildProcess.Types (Exit(..))
 import Node.Buffer (Buffer)
 import MinsiError (MinsiError, throwMinsiError)
 

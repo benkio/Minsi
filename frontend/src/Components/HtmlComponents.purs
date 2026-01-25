@@ -44,7 +44,6 @@ import Web.HTML.HTMLVideoElement (HTMLVideoElement)
 import Web.HTML.HTMLVideoElement as HV
 import Web.HTML.HTMLIFrameElement (HTMLIFrameElement)
 import Web.HTML.HTMLIFrameElement as IF
-import Data.Tuple (Tuple(..), fst, snd)
 
 data HtmlInputs = HtmlInputs
   { cutStart :: HTMLInputElement
