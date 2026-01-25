@@ -14,6 +14,7 @@ import Node.Buffer (Buffer)
 import Node.Buffer as B
 import Node.Encoding (Encoding(..))
 import MinsiError (MinsiError(..),throwMinsiError)
+import Command.Command (runCommand)
 
 ytdlpSupportedBrowserCookies :: Array String
 ytdlpSupportedBrowserCookies = [
@@ -30,22 +31,14 @@ ytdlpSupportedBrowserCookies = [
     ]
 
 getYtdlpOutputUrl :: String -> WURL -> Effect Buffer
-getYtdlpOutputUrl cookie (WURL url) = do
-  let urlString = toString url
-  let args = if cookie == "" then
+getYtdlpOutputUrl cookie (WURL url) =
+  runCommand args YtdlpError "yt-dlp"
+  where
+    urlString = toString url
+    args = if cookie == "" then
         [ "-f", "best[ext=mp4]", "-g", urlString ]
       else
         [ "-f", "best[ext=mp4]", "-g", "--cookies-from-browser", cookie, urlString ]
-  catchError
-    ( do
-        result <- spawnSync "yt-dlp" args
-        case result.exitStatus of
-          Normally _ -> pure result.stdout
-          e -> throwMinsiError (YtdlpError (show e))
-    )
-    ( \e -> throwMinsiError (YtdlpError (message e))
-    )
-
 --TODO: add local filepath as inputs
 findYtpUrl :: WURL -> Effect String
 findYtpUrl youtubeUri =
