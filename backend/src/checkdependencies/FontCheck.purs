@@ -18,7 +18,7 @@ import Effect (Effect)
 import Effect.Console (error)
 import Effect.Exception (catchException, message, try)
 import Node.Buffer (toString)
-import Node.ChildProcess (spawnSync)
+import Node.ChildProcess (execSync)
 import Node.ChildProcess.Types (Exit(..))
 import Node.Encoding (Encoding(..))
 import Node.FS.Stats (isDirectory)
@@ -69,10 +69,8 @@ searchFont font = do
 
 fcListSearch :: String -> Effect Boolean
 fcListSearch font = catchException (\e -> error (message e) *> pure false) $ do
-  fontListResult <- spawnSync "fc-list" []
-  case fontListResult.exitStatus of
-    Normally _ -> any (includes font) <<< lines <$> toString UTF8 fontListResult.stdout
-    _ -> pure false
+  fontListResult <- execSync "fc-list"
+  any (includes font) <<< lines <$> toString UTF8 fontListResult
 
 searchFontInDirs :: String -> Effect Boolean
 searchFontInDirs font = do

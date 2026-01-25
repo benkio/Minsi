@@ -1,5 +1,8 @@
 module Command.Ytdlp where
 
+import Constants (mp4)
+import Data.Time.Duration (Milliseconds(..))
+import Ffmpeg (millisToString, millisecondsToSecondsString, secondsToString)
 import Prelude
 import Effect (Effect)
 import Data.Maybe (Maybe(..))
@@ -16,6 +19,7 @@ import Command.Command (runCommand)
 
 ytdlpSupportedBrowserCookies :: Array String
 ytdlpSupportedBrowserCookies = [
+    "",
     "chrome",
     "chromium",
     "firefox",
@@ -24,27 +28,29 @@ ytdlpSupportedBrowserCookies = [
     "edge",
     "opera",
     "vivaldi",
-    "whale",
-    ""
+    "whale"
     ]
 
-getYtdlpOutputUrl :: String -> WURL -> Effect Buffer
-getYtdlpOutputUrl cookie (WURL url) =
+getYtdlpOutputUrl :: String -> WURL -> String -> String -> String -> Effect Buffer
+getYtdlpOutputUrl cookie (WURL url) filepath start end =
   runCommand args YtdlpError "yt-dlp"
   where
     urlString = toString url
     args = if cookie == "" then
-        [ "-f", "best[ext=mp4]", "-g", urlString ]
+        [ "-f", "\"best[ext=mp4]\"", "--download-sections", show ("*" <> start <> "-" <> end), "-o", show filepath, show urlString ]
       else
-        [ "-f", "best[ext=mp4]", "-g", "--cookies-from-browser", cookie, urlString ]
---TODO: add local filepath as inputs
-findYtpUrl :: WURL -> Effect String
-findYtpUrl youtubeUri =
-  tryCookies ytdlpSupportedBrowserCookies youtubeUri
+        [ "-f", "\"best[ext=mp4]\"", "--cookies-from-browser", cookie, "--download-sections", show ("*" <> start <> "-" <> end), "-o", show filepath, show urlString ]
+
+downloadVideo :: WURL -> String -> Milliseconds -> Milliseconds -> Effect Unit
+downloadVideo youtubeUri filename start end = do
+  filepath <- mp4 filename
+  tryCookies ytdlpSupportedBrowserCookies youtubeUri filepath
   where
-    tryCookies :: Array String -> WURL -> Effect String
-    tryCookies cookies url =
+    startStr = millisecondsToSecondsString start (Just '.')
+    endStr = millisecondsToSecondsString end (Just '.')
+    tryCookies :: Array String -> WURL -> String -> Effect Unit
+    tryCookies cookies url filepath =
       case uncons cookies of
         Just {head:c, tail:cs} ->
-          catchError (getYtdlpOutputUrl c url >>= B.toString UTF8 <#> dropRight 1) (\_ -> tryCookies cs url)
+          catchError (void (getYtdlpOutputUrl c url filepath startStr endStr)) (\_ -> tryCookies cs url filepath)
         Nothing -> throwMinsiError (YtdlpError "All yt-dlp cookie attempts failed")

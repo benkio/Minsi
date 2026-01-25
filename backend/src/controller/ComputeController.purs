@@ -1,8 +1,8 @@
 module Controller.ComputeController where
 
-import Ffmpeg (downloadVideo)
+--import Ffmpeg (downloadVideo)
 
-import Command.Ytdlp (findYtpUrl)
+import Command.Ytdlp (downloadVideo)
 
 import Effect (Effect)
 import Prelude
@@ -29,7 +29,7 @@ compute (State { youtubeUrl,filename, cutVideo: (DurationRange {start:start, end
   --TODO: check if a previous execution exists for the filename
   -- yes -> kill it
   -- then -> delete all remaining files
-  urlString <- findYtpUrl youtubeUrl
-  log urlString
-  downloadVideo urlString filename start end
+  downloadVideo youtubeUrl filename start end
+  --log urlString
+  --downloadVideo urlString filename start end
   log "endDownloadVideo"

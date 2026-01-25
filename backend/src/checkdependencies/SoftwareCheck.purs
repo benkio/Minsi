@@ -3,9 +3,9 @@ module CheckDependencies.SoftwareCheck where
 import Data.Foldable (foldM)
 import Effect (Effect)
 import Effect.Exception (catchException)
-import Node.ChildProcess (spawnSync)
+import Node.ChildProcess (execSync)
 import Node.ChildProcess.Types (Exit(..))
-import Prelude (pure, ($), (<$>), (<>))
+import Prelude
 
 -- Check Software Dependecies ---------------------------------------------
 
@@ -28,9 +28,4 @@ softwareDependencies =
 
 checkSoftwareDependency :: String -> Effect Boolean
 checkSoftwareDependency command =
-  catchException (\_ -> pure false) $
-    ( \x -> case x.exitStatus of
-        Normally _ -> true
-        _ -> false
-    )
-      <$> spawnSync command [ "--version" ]
+  catchException (\_ -> pure false) (const true <$> execSync (command <> " --version"))

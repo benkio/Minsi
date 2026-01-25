@@ -6889,7 +6889,7 @@
       return function __do4() {
         var start2 = valueAsNumber(cutStart)();
         var end = valueAsNumber(cutEnd)();
-        return cutVideoValidation(cutStartId)(start2)(end);
+        return cutVideoValidation(cutStartId)(start2 * 1e3)(end * 1e3);
       };
     };
   };
@@ -6933,10 +6933,8 @@
   }
 
   // output/Handlers.ApplyButtonHandler/index.js
-  var discard3 = /* @__PURE__ */ discard(discardUnit);
   var pure10 = /* @__PURE__ */ pure(applicativeEffect);
   var bind13 = /* @__PURE__ */ bind(bindAff);
-  var discard23 = /* @__PURE__ */ discard3(bindAff);
   var liftEffect8 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var scrollToVideoSource = function __do2() {
     var w = windowImpl();
@@ -6964,17 +6962,15 @@
       var doc = getDocument();
       var components = loadComponents(doc)();
       var stateV = fromHtmlInputs(components.htmlInputs)();
-      var state3 = either(function($16) {
-        return throwMinsiError(InvalidInputs.create($16));
+      var state3 = either(function($15) {
+        return throwMinsiError(InvalidInputs.create($15));
       })(pure10)(toEither(stateV))();
       showLoadingModal(loadingModalId)();
       runAff_(genericErrorsHandlerEither)(bind13(callCompute(state3))(function(response) {
-        return discard23(delay(5e3))(function() {
-          return liftEffect8(function __do5() {
-            hideLoadingModal(loadingModalId)();
-            showHiddenElements(components.htmlVisualElements)();
-            return scrollToVideoSource();
-          });
+        return liftEffect8(function __do5() {
+          hideLoadingModal(loadingModalId)();
+          showHiddenElements(components.htmlVisualElements)();
+          return scrollToVideoSource();
         });
       }))();
       return unit;

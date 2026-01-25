@@ -44,7 +44,6 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   showLoadingModal loadingModalId
   runAff_ genericErrorsHandlerEither do
     response <- callCompute state
-    delay (Milliseconds 5000.0)
     liftEffect do
       hideLoadingModal loadingModalId
       showHiddenElements components.htmlVisualElements
