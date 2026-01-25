@@ -6,7 +6,7 @@ import Effect (Effect)
 import Prelude
 import Effect.Class (liftEffect)
 import Effect.Console (log)
-import Data.Either (Either(Left, Right), either)
+import Data.Either (Either(Left, Right))
 import Control.Monad.Except (runExcept)
 import Model.State (State(..))
 import Node.Express.Request (getBody)
@@ -27,8 +27,5 @@ compute (State { youtubeUrl }) = do
   --TODO: check if a previous execution exists for the filename
   -- yes -> kill it
   -- then -> delete all remaining files
-  result <- findYtpUrl youtubeUrl
-  either
-    (\err -> log ("Error: " <> show err))
-    (\urlString -> log urlString)
-    result
+  urlString <- findYtpUrl youtubeUrl
+  log urlString

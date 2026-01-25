@@ -2,11 +2,10 @@ module Command.Ytdlp where
 
 import Prelude
 import Effect (Effect)
-import Data.Either (Either(..), either)
 import Data.Maybe (Maybe(..))
 import Data.Array (uncons)
 import Control.Monad.Error.Class (catchError)
-import Effect.Exception (Error, error)
+import Effect.Exception (message)
 import Model.State (WURL(..))
 import Data.URL (toString)
 import Node.ChildProcess (spawnSync)
@@ -14,6 +13,7 @@ import Node.ChildProcess.Types (Exit(..))
 import Node.Buffer (Buffer)
 import Node.Buffer as B
 import Node.Encoding (Encoding(..))
+import MinsiError (MinsiError(..),throwMinsiError)
 
 ytdlpSupportedBrowserCookies :: Array String
 ytdlpSupportedBrowserCookies = [
@@ -29,7 +29,7 @@ ytdlpSupportedBrowserCookies = [
     ""
     ]
 
-getYtdlpOutputUrl :: String -> WURL -> Effect (Either Error Buffer)
+getYtdlpOutputUrl :: String -> WURL -> Effect Buffer
 getYtdlpOutputUrl cookie (WURL url) = do
   let urlString = toString url
   let args = if cookie == "" then
@@ -40,18 +40,20 @@ getYtdlpOutputUrl cookie (WURL url) = do
     ( do
         result <- spawnSync "yt-dlp" args
         case result.exitStatus of
-          Normally _ -> pure (Right result.stdout)
-          _ -> pure (Left (error "yt-dlp command failed"))
+          Normally _ -> pure result.stdout
+          e -> throwMinsiError (YtdlpError (show e))
     )
-    ( \e -> pure (Left e)
+    ( \e -> throwMinsiError (YtdlpError (message e))
     )
 
-findYtpUrl :: WURL -> Effect (Either Error String)
+--TODO: add local filepath as inputs
+findYtpUrl :: WURL -> Effect String
 findYtpUrl youtubeUri =
   tryCookies ytdlpSupportedBrowserCookies youtubeUri
   where
-    tryCookies :: Array String -> WURL -> Effect (Either Error String)
+    tryCookies :: Array String -> WURL -> Effect String
     tryCookies cookies url =
       case uncons cookies of
-        Just {head:c, tail:cs} -> either (\_ -> tryCookies cs url) (\b -> B.toString UTF8 b <#> Right) =<< (getYtdlpOutputUrl c url)
-        Nothing -> pure (Left (error "All yt-dlp cookie attempts failed"))
+        Just {head:c, tail:cs} ->
+          catchError (getYtdlpOutputUrl c url >>= B.toString UTF8) (\_ -> tryCookies cs url)
+        Nothing -> throwMinsiError (YtdlpError "All yt-dlp cookie attempts failed")
