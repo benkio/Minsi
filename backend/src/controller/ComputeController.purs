@@ -1,5 +1,7 @@
 module Controller.ComputeController where
 
+import Ffmpeg (downloadVideo)
+
 import Command.Ytdlp (findYtpUrl)
 
 import Effect (Effect)
@@ -8,7 +10,7 @@ import Effect.Class (liftEffect)
 import Effect.Console (log)
 import Data.Either (Either(Left, Right))
 import Control.Monad.Except (runExcept)
-import Model.State (State(..))
+import Model.State (State(..), DurationRange(..))
 import Node.Express.Request (getBody)
 import Node.Express.Handler (Handler)
 import Node.Express.Response (sendJson, setStatus, end)
@@ -23,9 +25,11 @@ computeController = do
     Right state -> liftEffect (compute state) *> setStatus 200 *> end
 
 compute :: State -> Effect Unit
-compute (State { youtubeUrl }) = do
+compute (State { youtubeUrl,filename, cutVideo: (DurationRange {start:start, end:end}) }) = do
   --TODO: check if a previous execution exists for the filename
   -- yes -> kill it
   -- then -> delete all remaining files
   urlString <- findYtpUrl youtubeUrl
   log urlString
+  downloadVideo urlString filename start end
+  log "endDownloadVideo"

@@ -12,6 +12,9 @@ import Effect (Effect)
 import MinsiError (MinsiError(..))
 import Prelude
 import Text.Printf (formatInt)
+import Effect.Console (log)
+import Node.Buffer as B
+import Node.Encoding (Encoding(..))
 
 secondsToString :: Int -> String
 secondsToString seconds =
@@ -33,12 +36,15 @@ millisecondsToSecondsString ms Nothing = millisToString ms ','
 millisecondsToSecondsString ms (Just c) = millisToString ms c
 
 downloadVideo :: String -> String -> Milliseconds -> Milliseconds -> Effect Unit
-downloadVideo videoSource filename start end =
-  void $ mp4 filename >>= \f -> runCommand (args `snoc` f) FfmpegVideoError "ffmpeg"
+downloadVideo videoSource filename start end = do
+  f <- mp4 filename
+  b <- runCommand (args `snoc` f) FfmpegVideoError "ffmpeg"
+  s <- B.toString UTF8 b
+  log s
   where
-    startStr = millisecondsToSecondsString start Nothing
-    endStr = millisecondsToSecondsString end Nothing
-    args = [ "-hide_banner", "-loglevel", "warning", "-i", videoSource, "-ss", startStr, "-to", endStr]
+    startStr = millisecondsToSecondsString start (Just '.')
+    endStr = millisecondsToSecondsString end (Just '.')
+    args = [ "-hide_banner", "-loglevel", "warning", "-i", show videoSource, "-ss", startStr, "-to", endStr]
 
 downloadMp3 :: Effect Unit
 downloadMp3 = pure unit
