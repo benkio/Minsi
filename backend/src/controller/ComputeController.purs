@@ -3,7 +3,6 @@ module Controller.ComputeController where
 import Command.Ytdlp (findYtpUrl)
 
 import Effect (Effect)
-
 import Prelude
 import Effect.Class (liftEffect)
 import Effect.Console (log)
@@ -13,8 +12,6 @@ import Model.State (State(..))
 import Node.Express.Request (getBody)
 import Node.Express.Handler (Handler)
 import Node.Express.Response (sendJson, setStatus, end)
-import Node.Buffer (toString)
-import Node.Encoding (Encoding(..))
 
 computeController :: Handler
 computeController = do
@@ -27,12 +24,11 @@ computeController = do
 
 compute :: State -> Effect Unit
 compute (State { youtubeUrl }) = do
+  --TODO: check if a previous execution exists for the filename
+  -- yes -> kill it
+  -- then -> delete all remaining files
   result <- findYtpUrl youtubeUrl
   either
     (\err -> log ("Error: " <> show err))
-    (\buffer -> do
-      resultString <- toString UTF8 buffer
-      log resultString
-    )
+    (\urlString -> log urlString)
     result
-

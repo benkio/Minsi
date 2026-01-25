@@ -45,9 +45,7 @@ nonWhitespaceASCIIChar :: Gen Char
 nonWhitespaceASCIIChar = do
   -- ASCII codes 33-126 exclude space (32) and other control chars
   code <- chooseInt 33 126
-  maybe nonWhitespaceASCIIChar pure (fromCharCode code)
-
-instance Arbitrary DecimalNumber where
+  maybe nonWhitespaceASCIIChar pure (fromCharCode code)instance Arbitrary DecimalNumber where
   arbitrary = do
     whole <- chooseInt 0 9999
     frac <- chooseInt 0 9999

@@ -39,6 +39,7 @@ The following system dependencies are required for video processing:
 3. **Open the application:**
    - Navigate to `http://localhost:8080` in your browser
    - The server will serve the frontend from the `public/` folder
+   - The files will be stored in the `/output` folder
 
 ## Motivation
 

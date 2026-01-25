@@ -2,9 +2,9 @@ module Command.Ytdlp where
 
 import Prelude
 import Effect (Effect)
-import Data.Either (Either(..))
+import Data.Either (Either(..), either)
 import Data.Maybe (Maybe(..))
-import Data.Array (head, drop)
+import Data.Array (uncons)
 import Control.Monad.Error.Class (catchError)
 import Effect.Exception (Error, error)
 import Model.State (WURL(..))
@@ -12,6 +12,8 @@ import Data.URL (toString)
 import Node.ChildProcess (spawnSync)
 import Node.ChildProcess.Types (Exit(..))
 import Node.Buffer (Buffer)
+import Node.Buffer as B
+import Node.Encoding (Encoding(..))
 
 ytdlpSupportedBrowserCookies :: Array String
 ytdlpSupportedBrowserCookies = [
@@ -44,23 +46,12 @@ getYtdlpOutputUrl cookie (WURL url) = do
     ( \e -> pure (Left e)
     )
 
-findYtpUrl :: WURL -> Effect (Either Error Buffer)
-findYtpUrl youtubeUri = 
-  case head ytdlpSupportedBrowserCookies of
-    Nothing -> pure (Left (error "No browser cookies configured"))
-    Just firstCookie -> do
-      firstResult <- getYtdlpOutputUrl firstCookie youtubeUri
-      case firstResult of
-        Right buffer -> pure (Right buffer)
-        Left _ -> tryRemainingCookies (drop 1 ytdlpSupportedBrowserCookies) youtubeUri
+findYtpUrl :: WURL -> Effect (Either Error String)
+findYtpUrl youtubeUri =
+  tryCookies ytdlpSupportedBrowserCookies youtubeUri
   where
-    tryRemainingCookies :: Array String -> WURL -> Effect (Either Error Buffer)
-    tryRemainingCookies [] _ = pure (Left (error "All yt-dlp cookie attempts failed"))
-    tryRemainingCookies cookies url = 
-      case head cookies of
+    tryCookies :: Array String -> WURL -> Effect (Either Error String)
+    tryCookies cookies url =
+      case uncons cookies of
+        Just {head:c, tail:cs} -> either (\_ -> tryCookies cs url) (\b -> B.toString UTF8 b <#> Right) =<< (getYtdlpOutputUrl c url)
         Nothing -> pure (Left (error "All yt-dlp cookie attempts failed"))
-        Just cookie -> do
-          result <- getYtdlpOutputUrl cookie url
-          case result of
-            Right buffer -> pure (Right buffer)
-            Left _ -> tryRemainingCookies (drop 1 cookies) url
