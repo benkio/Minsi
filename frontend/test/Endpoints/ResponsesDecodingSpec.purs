@@ -1,9 +1,11 @@
 module Test.Endpoints.ResponsesDecodingSpec where
 
+import Prelude
+
 import Data.Either (Either(..))
 import Endpoints.CheckDependencies (MissingDependenciesResponse)
 import Endpoints.Status (StatusResponse)
-import Prelude
+import Model.ProcessStatus (ProcessStatus(..))
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (fail, shouldEqual)
 import Yoga.JSON (readJSON)
@@ -27,7 +29,7 @@ spec = do
       case res of
         Left err -> fail $ "Expected StatusResponse(Pending) to decode, but got error: " <> show err
         Right { status } ->
-          status `shouldEqual` "Pending"
+          status `shouldEqual` Pending
 
     it "decodes StatusResponse.status = Succeed" do
       let
@@ -36,7 +38,7 @@ spec = do
       case res of
         Left err -> fail $ "Expected StatusResponse(Succeed) to decode, but got error: " <> show err
         Right { status } ->
-          status `shouldEqual` "Succeed"
+          status `shouldEqual` Succeed
 
     it "decodes StatusResponse.status = Failed" do
       let
@@ -45,5 +47,5 @@ spec = do
       case res of
         Left err -> fail $ "Expected StatusResponse(Failed) to decode, but got error: " <> show err
         Right { status } ->
-          status `shouldEqual` "Failed"
+          status `shouldEqual` Failed
 

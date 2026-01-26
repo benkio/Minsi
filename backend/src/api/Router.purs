@@ -1,21 +1,21 @@
 module Api.Router where
 
-import Controller.ErrorHandlers (generalErrorHandler)
-
-import Node.Express.Handler (Handler)
 import Prelude
-import Node.Express.App (App, post)
+
 import Controller.CheckDependenciesController (checkDependenciesController)
-import Node.Express.Response (setResponseHeader)
 import Controller.ComputeController (computeController)
+import Controller.ErrorHandlers (generalErrorHandler)
 import Controller.StatusController (statusController)
+import InMemoryDB (Store)
+import Node.Express.App (App, post)
+import Node.Express.Handler (Handler)
+import Node.Express.Response (setResponseHeader)
 
-router :: App
-router = do
-  post "/checkDependencies" (controllerLogic checkDependenciesController)
-  post "/compute"           (controllerLogic computeController          )
-  post "/status"            (controllerLogic statusController           )
-
+router :: Store -> App
+router store = do
+  post "/checkDependencies" (controllerLogic (checkDependenciesController store))
+  post "/compute"           (controllerLogic (computeController store))
+  post "/status"            (controllerLogic (statusController store))
 
 defaultResponseSettings :: Handler
 defaultResponseSettings = setResponseHeader "Access-Control-Allow-Origin" "*"

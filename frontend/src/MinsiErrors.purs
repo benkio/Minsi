@@ -14,6 +14,7 @@ data MinsiError
   | InvalidInputs (Map String String)
   | JSONParsingError String
   | ErrorResponse Int
+  | ComputeFailed String
 
 instance Show MinsiError where
   show = case _ of
@@ -28,6 +29,7 @@ instance Show MinsiError where
       in joinWith "<br>" errorMessages
     JSONParsingError err -> "Error while parsing: " <> err
     ErrorResponse status -> "Got a Response with status ≠ 200: " <> show status
+    ComputeFailed msg -> "Compute failed: " <> msg
 
 throwMinsiError :: forall a. MinsiError -> Effect a
 throwMinsiError =

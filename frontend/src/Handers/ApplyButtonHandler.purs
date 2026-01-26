@@ -1,27 +1,26 @@
 module Handlers.ApplyButtonHandler where
 
-import Effect.Aff (delay, launchAff_)
-
-import Data.Time.Duration (Milliseconds(..))
-
-import Effect.Console (log)
-
 import Prelude
 
-import Components.HtmlComponents (HtmlOutputs(..), HtmlVisualElements(..), loadComponents)
+import Components.HtmlComponents (HtmlVisualElements(..), loadComponents)
 import Components.HtmlIds (loadingModalId, videoSourceId)
 import Components.Modal (hideLoadingModal, showLoadingModal)
 import Components.Window (getDocument)
 import Constants (mp4)
+import Control.Monad.Rec.Class (Step(..), tailRecM)
 import Data.Either (either)
 import Data.Newtype (unwrap)
+import Data.Time.Duration (Milliseconds(..))
 import Data.Validation.Semigroup (toEither)
 import Effect (Effect)
-import Effect.Aff (runAff_)
+import Effect.Aff (Aff, delay, runAff_)
+import Effect.Class (liftEffect)
+import Effect.Console (log)
 import Endpoints.Compute (callCompute)
+import Endpoints.Status (callStatus)
 import Handers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
-import Model.State.State (State)
+import Model.ProcessStatus (ProcessStatus(..))
 import Model.State.StateFromHtml (fromHtmlInputs)
 import Web.DOM.DOMTokenList as DOMTokenList
 import Web.DOM.Element (toEventTarget)
@@ -32,9 +31,8 @@ import Web.HTML (window)
 import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLDivElement as HTMLDivElement
-import Web.HTML.HTMLVideoElement (HTMLVideoElement)
-import Web.HTML.HTMLMediaElement (setSrc, load)
-import Web.HTML.HTMLVideoElement (toHTMLMediaElement)
+import Web.HTML.HTMLMediaElement (setSrc, load, pause, play)
+import Web.HTML.HTMLVideoElement (HTMLVideoElement, toHTMLMediaElement)
 import Web.HTML.Location (setHash)
 import Web.HTML.Window (location)
 
@@ -51,23 +49,33 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   components <- loadComponents doc
   stateV <- fromHtmlInputs components.htmlInputs
   state <- (either (throwMinsiError <<< InvalidInputs) pure <<< toEither) stateV
+  let filename = (unwrap state).filename
+  let filepath = mp4 filename
   showLoadingModal loadingModalId
   runAff_ (\result -> do
     genericErrorsHandlerEither result
     log "return from server, show elements and set src"
     showHiddenElements components.htmlVisualElements
-    let videoFilePath = mp4 (unwrap state).filename
-        videoMediaElement = (unwrap components.htmlOutputs).resultVideo
-    setVideoSrc videoFilePath videoMediaElement
     log "hide modal, and scroll"
     hideLoadingModal loadingModalId
     scrollToVideoSource
-  ) (void (callCompute state) *> delay (Milliseconds 500.0))
+    let videoMediaElement = (unwrap components.htmlOutputs).resultVideo
+    setVideoSrc filepath videoMediaElement
+  ) (void (callCompute state) *> waitForStatus filename)
+
+waitForStatus :: String -> Aff Unit
+waitForStatus filename = tailRecM pollStatus unit
+  where
+    pollStatus _ = do
+      response <- callStatus filename
+      case response.status of
+        Pending -> delay (Milliseconds 500.0) $> Loop unit
+        Succeed -> pure $ Done unit
+        Failed -> liftEffect $ throwMinsiError (ComputeFailed "Video download failed")
 
 setVideoSrc :: String -> HTMLVideoElement -> Effect Unit
 setVideoSrc filepath video = do
-  setSrc "" videoMediaElement
-  load videoMediaElement
+  pause videoMediaElement
   setSrc filepath videoMediaElement
   load videoMediaElement
   where

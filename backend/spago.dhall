@@ -21,7 +21,6 @@
   , "node-path"
   , "open-foreign-generic"
   , "ordered-collections"
-  , "posix-types"
   , "prelude"
   , "printf"
   , "refs"

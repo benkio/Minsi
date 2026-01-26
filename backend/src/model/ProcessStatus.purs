@@ -7,6 +7,8 @@ data ProcessStatus
   | Succeed
   | Failed
 
+derive instance Eq ProcessStatus
+
 instance Show ProcessStatus where
   show Pending = "Pending"
   show Succeed = "Succeed"

@@ -1,12 +1,37 @@
 module Controller.StatusController where
 
-import Node.Express.Handler (Handler)
-import Node.Express.Response (sendJson, setStatus)
-import Response.StatusResponse (buildResponse)
-import Model.ProcessStatus (ProcessStatus(Succeed))
 import Prelude
 
-statusController :: Handler
-statusController = do
-  let processStatus = Succeed
-  setStatus 200 *> sendJson (buildResponse processStatus)
+import Control.Monad.Except (runExcept)
+import Data.Either (either)
+import Data.Maybe (maybe)
+import Effect.Class (liftEffect)
+import Effect.Console (log)
+import InMemoryDB (Store, lookup)
+import Model.ProcessStatus (ProcessStatus(..))
+import Node.Express.Handler (Handler)
+import Node.Express.Request (getBody)
+import Node.Express.Response (sendJson, setStatus, end)
+import Response.StatusResponse (buildResponse)
+
+statusController :: Store -> Handler
+statusController store = do
+  bodyResult <- getBody
+  either badRequest (handleStatus store) (runExcept bodyResult)
+
+badRequest :: forall a. Show a => a -> Handler
+badRequest errors = do
+  liftEffect $ log ("Failed to parse request body: " <> show errors)
+  setStatus 400 *> sendJson { error: "Bad Request" } *> end
+
+handleStatus :: Store -> { filename :: String } -> Handler
+handleStatus store body = do
+  maybeStatus <- liftEffect $ lookup body.filename store
+  maybe notFound (respondWithStatus store body.filename) maybeStatus
+
+notFound :: Handler
+notFound = setStatus 404 *> sendJson { error: "Not found" } *> end
+
+respondWithStatus :: Store -> String -> ProcessStatus -> Handler
+respondWithStatus store filename status =
+  setStatus 200 *> sendJson (buildResponse status) *> end
