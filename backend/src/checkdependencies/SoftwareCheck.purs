@@ -1,11 +1,13 @@
 module CheckDependencies.SoftwareCheck where
 
+import Node.Library.Execa (execaCommandSync)
+import Data.Either (isRight)
 import Effect.Console (log)
 import Data.Foldable (foldM)
 import Effect (Effect)
 import Effect.Exception (catchException, message)
-import Node.ChildProcess (execSync)
 import Prelude
+import Node.Library.Execa.Which (whichSync, defaultWhichOptions)
 
 -- Check Software Dependecies ---------------------------------------------
 
@@ -20,12 +22,12 @@ checkSoftwareDependencies =
 
 softwareDependencies :: Array String
 softwareDependencies =
-  [ "ffmpeg -version"
-  , "yt-dlp --version"
-  , "id3v2 --version"
-  , "fc-list --version"
+  [ "ffmpeg"
+  , "yt-dlp"
+  , "id3v2"
+  , "fc-list"
   ]
 
 checkSoftwareDependency :: String -> Effect Boolean
 checkSoftwareDependency command =
-  catchException (\e -> log (message e) *> pure false) (const true <$> execSync command)
+  catchException (\e -> log (message e) *> pure false) (isRight <$> whichSync command defaultWhichOptions)

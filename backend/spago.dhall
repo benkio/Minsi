@@ -1,6 +1,7 @@
 { name = "my-project"
 , dependencies =
-  [ "arrays"
+  [ "aff"
+  , "arrays"
   , "console"
   , "datetime"
   , "effect"
@@ -15,6 +16,7 @@
   , "monad-loops"
   , "node-buffer"
   , "node-child-process"
+  , "node-execa"
   , "node-fs"
   , "node-path"
   , "open-foreign-generic"

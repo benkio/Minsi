@@ -6970,11 +6970,13 @@
       showLoadingModal(loadingModalId)();
       runAff_(genericErrorsHandlerEither)(discard23($$void7(callCompute(state3)))(function() {
         return liftEffect8(function __do5() {
+          log("got response from the server")();
           hideLoadingModal(loadingModalId)();
           showHiddenElements(components.htmlVisualElements)();
           return scrollToVideoSource();
         });
       }))();
+      log("Apply Button Done")();
       return unit;
     });
   };

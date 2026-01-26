@@ -1,5 +1,7 @@
 module Handlers.ApplyButtonHandler where
 
+import Effect.Console (log)
+
 import Components.HtmlComponents (HtmlVisualElements(..), loadComponents)
 import Components.HtmlIds (loadingModalId, videoSourceId)
 import Components.Modal (hideLoadingModal, showLoadingModal)
@@ -43,9 +45,11 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   runAff_ genericErrorsHandlerEither do
     void $ callCompute state
     liftEffect do
+      log "got response from the server"
       hideLoadingModal loadingModalId
       showHiddenElements components.htmlVisualElements
       scrollToVideoSource
+  log "Apply Button Done"
   pure unit
 
 showHiddenElements :: HtmlVisualElements -> Effect Unit

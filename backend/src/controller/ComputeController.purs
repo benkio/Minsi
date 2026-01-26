@@ -1,10 +1,9 @@
 module Controller.ComputeController where
 
---import Ffmpeg (downloadVideo)
-
 import Command.Ytdlp (downloadVideo)
 
 import Effect (Effect)
+import Effect.Aff (launchAff_)
 import Prelude
 import Effect.Class (liftEffect)
 import Effect.Console (log)
@@ -25,11 +24,10 @@ computeController = do
     Right state -> liftEffect (compute state) *> setStatus 200 *> end
 
 compute :: State -> Effect Unit
-compute (State { youtubeUrl,filename, cutVideo: (DurationRange {start:start, end:end}) }) = do
+compute (State { youtubeUrl, filename, cutVideo: (DurationRange {start: start, end: end}) }) = do
   --TODO: check if a previous execution exists for the filename
   -- yes -> kill it
   -- then -> delete all remaining files
-  downloadVideo youtubeUrl filename start end
-  --log urlString
-  --downloadVideo urlString filename start end
-  log "endDownloadVideo"
+  log "Starting video download in background..."
+  launchAff_ $ void $ downloadVideo youtubeUrl filename start end
+  log "Video download launched, returning HTTP response"
