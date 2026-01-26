@@ -32,6 +32,7 @@ to generate this file without the comments in this block.
   , "monad-loops"
   , "newtype"
   , "node-path"
+  , "now"
   , "ordered-collections"
   , "partial"
   , "prelude"

@@ -31,10 +31,11 @@ import Web.HTML (window)
 import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLDivElement as HTMLDivElement
-import Web.HTML.HTMLMediaElement (setSrc, load, pause, play)
+import Web.HTML.HTMLMediaElement (load, pause, setSrc)
 import Web.HTML.HTMLVideoElement (HTMLVideoElement, toHTMLMediaElement)
 import Web.HTML.Location (setHash)
 import Web.HTML.Window (location)
+import Effect.Now (now)
 
 setApplyButtonHandler :: HB.HTMLButtonElement -> Effect Unit
 setApplyButtonHandler applyButton = do
@@ -75,8 +76,10 @@ waitForStatus filename = tailRecM pollStatus unit
 
 setVideoSrc :: String -> HTMLVideoElement -> Effect Unit
 setVideoSrc filepath video = do
+  timestamp <- now
+  let cacheBustedPath = filepath <> "?t=" <> show timestamp
   pause videoMediaElement
-  setSrc filepath videoMediaElement
+  setSrc cacheBustedPath videoMediaElement
   load videoMediaElement
   where
     videoMediaElement = toHTMLMediaElement video

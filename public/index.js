@@ -445,11 +445,11 @@
     return Just2;
   }();
   var showMaybe = function(dictShow) {
-    var show10 = show(dictShow);
+    var show16 = show(dictShow);
     return {
       show: function(v) {
         if (v instanceof Just) {
-          return "(Just " + (show10(v.value0) + ")");
+          return "(Just " + (show16(v.value0) + ")");
         }
         ;
         if (v instanceof Nothing) {
@@ -1182,12 +1182,12 @@
     };
   };
   var showNonEmpty = function(dictShow) {
-    var show10 = show(dictShow);
+    var show16 = show(dictShow);
     return function(dictShow1) {
-      var show15 = show(dictShow1);
+      var show17 = show(dictShow1);
       return {
         show: function(v) {
-          return "(NonEmpty " + (show10(v.value0) + (" " + (show15(v.value1) + ")")));
+          return "(NonEmpty " + (show16(v.value0) + (" " + (show17(v.value1) + ")")));
         }
       };
     };
@@ -1395,22 +1395,22 @@
     }
   };
   var showList = function(dictShow) {
-    var show10 = show(dictShow);
+    var show16 = show(dictShow);
     return {
       show: function(v) {
         if (v instanceof Nil) {
           return "Nil";
         }
         ;
-        return "(" + (intercalate2(" : ")(map3(show10)(v)) + " : Nil)");
+        return "(" + (intercalate2(" : ")(map3(show16)(v)) + " : Nil)");
       }
     };
   };
   var showNonEmptyList = function(dictShow) {
-    var show10 = show(showNonEmpty(dictShow)(showList(dictShow)));
+    var show16 = show(showNonEmpty(dictShow)(showList(dictShow)));
     return {
       show: function(v) {
-        return "(NonEmptyList " + (show10(v) + ")");
+        return "(NonEmptyList " + (show16(v) + ")");
       }
     };
   };
@@ -3809,6 +3809,14 @@
     };
   };
 
+  // output/Data.Time.Duration/index.js
+  var show3 = /* @__PURE__ */ show(showNumber);
+  var showMilliseconds = {
+    show: function(v) {
+      return "(Milliseconds " + (show3(v) + ")");
+    }
+  };
+
   // output/Effect.Unsafe/foreign.js
   var unsafePerformEffect = function(f) {
     return f();
@@ -4550,7 +4558,7 @@
 
   // output/Handers.YoutubeVideo.CutButtonsHandlers/index.js
   var discard2 = /* @__PURE__ */ discard(discardUnit);
-  var show3 = /* @__PURE__ */ show(showNumber);
+  var show4 = /* @__PURE__ */ show(showNumber);
   var discard22 = /* @__PURE__ */ discard2(bindAff);
   var whileM_2 = /* @__PURE__ */ whileM_(monadAff);
   var liftEffect3 = /* @__PURE__ */ liftEffect(monadEffectAff);
@@ -4563,7 +4571,7 @@
       return function(v) {
         return function __do4() {
           var currentTime2 = getPlayerCurrentTime();
-          setValue2(show3(currentTime2))(cutInput)();
+          setValue2(show4(currentTime2))(cutInput)();
           return updateCutValue(cutInput)(cutValueSpan)();
         };
       };
@@ -4576,9 +4584,9 @@
           return function(startTime) {
             return launchAff_(discard22(whileM_2(liftEffect3(map8(not2)(isPlayerReady)))(delay(500)))(function() {
               return bind13(liftEffect3(getVideoDuration))(function(duration2) {
-                return discard22(liftEffect3(setMax(show3(duration2))(cutStart)))(function() {
+                return discard22(liftEffect3(setMax(show4(duration2))(cutStart)))(function() {
                   return discard22(liftEffect3(setValue2(show1(startTime))(cutStart)))(function() {
-                    return discard22(liftEffect3(setMax(show3(duration2))(cutEnd)))(function() {
+                    return discard22(liftEffect3(setMax(show4(duration2))(cutEnd)))(function() {
                       return discard22(liftEffect3(updateCutStartValue(cutStart)(cutStartValue)))(function() {
                         return liftEffect3(updateCutEndValue(cutEnd)(cutEndValue));
                       });
@@ -4867,14 +4875,14 @@
   };
 
   // output/Handers.YoutubeVideo.PlaybackPositionHandler/index.js
-  var show4 = /* @__PURE__ */ show(showNumber);
+  var show5 = /* @__PURE__ */ show(showNumber);
   var identity8 = /* @__PURE__ */ identity(categoryFn);
   var append2 = /* @__PURE__ */ append(semigroupArray);
   var when2 = /* @__PURE__ */ when(applicativeEffect);
   var formatToThreeDecimals = function(v) {
     var v1 = span2(function(x) {
       return x !== ".";
-    })(toCharArray(show4(v)));
+    })(toCharArray(show5(v)));
     var num = fromCharArray(v1.init);
     var decChars = maybe([])(identity8)(tail(v1.rest));
     var dec3 = take(3)(append2(decChars)(replicate(3)("0")));
@@ -5306,7 +5314,7 @@
   }();
 
   // output/Foreign/index.js
-  var show5 = /* @__PURE__ */ show(showString);
+  var show6 = /* @__PURE__ */ show(showString);
   var show12 = /* @__PURE__ */ show(showInt);
   var ForeignError = /* @__PURE__ */ function() {
     function ForeignError2(value0) {
@@ -5362,7 +5370,7 @@
   var showForeignError = {
     show: function(v) {
       if (v instanceof ForeignError) {
-        return "(ForeignError " + (show5(v.value0) + ")");
+        return "(ForeignError " + (show6(v.value0) + ")");
       }
       ;
       if (v instanceof ErrorAtIndex) {
@@ -5370,11 +5378,11 @@
       }
       ;
       if (v instanceof ErrorAtProperty) {
-        return "(ErrorAtProperty " + (show5(v.value0) + (" " + (show(showForeignError)(v.value1) + ")")));
+        return "(ErrorAtProperty " + (show6(v.value0) + (" " + (show(showForeignError)(v.value1) + ")")));
       }
       ;
       if (v instanceof TypeMismatch) {
-        return "(TypeMismatch " + (show5(v.value0) + (" " + (show5(v.value1) + ")")));
+        return "(TypeMismatch " + (show6(v.value0) + (" " + (show6(v.value1) + ")")));
       }
       ;
       throw new Error("Failed pattern match at Foreign (line 69, column 1 - line 73, column 89): " + [v.constructor.name]);
@@ -5750,7 +5758,7 @@
   var bind3 = /* @__PURE__ */ bind(bindMaybe);
   var foldl3 = /* @__PURE__ */ foldl(foldableV);
   var pure6 = /* @__PURE__ */ pure(applicativeEffect);
-  var show6 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(showString));
+  var show7 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(showString));
   var show13 = /* @__PURE__ */ show(showString);
   var VET = /* @__PURE__ */ function() {
     function VET2(value0) {
@@ -5779,8 +5787,8 @@
                 return function(v1) {
                   return pure6(v1);
                 };
-              })(throwMinsiError(new InvalidInput(youtubeUrlId, show6(rawValue))))(youtubeUrlV)();
-              var videoId = maybe(throwMinsiError(new InvalidInput(youtubeUrlId, show6(rawValue))))(pure6)(extractYoutubeVideoId(youtubeUrl))();
+              })(throwMinsiError(new InvalidInput(youtubeUrlId, show7(rawValue))))(youtubeUrlV)();
+              var videoId = maybe(throwMinsiError(new InvalidInput(youtubeUrlId, show7(rawValue))))(pure6)(extractYoutubeVideoId(youtubeUrl))();
               var startTime = extractYoutubeVideoStartTime(youtubeUrl);
               log("Youtube Url Handler fired with value: " + show13(videoId))();
               embedVideo({
@@ -5835,6 +5843,19 @@
   var mp4 = function(filename) {
     return outputPath + (filename + ".mp4");
   };
+
+  // output/Data.DateTime.Instant/index.js
+  var show8 = /* @__PURE__ */ show(showMilliseconds);
+  var showInstant = {
+    show: function(v) {
+      return "(Instant " + (show8(v) + ")");
+    }
+  };
+
+  // output/Effect.Now/foreign.js
+  function now() {
+    return Date.now();
+  }
 
   // output/Data.HTTP.Method/index.js
   var OPTIONS = /* @__PURE__ */ function() {
@@ -6286,7 +6307,7 @@
   var pure8 = /* @__PURE__ */ pure(applicativeEffect);
   var bind4 = /* @__PURE__ */ bind(bindAff);
   var liftEffect4 = /* @__PURE__ */ liftEffect(monadEffectAff);
-  var show7 = /* @__PURE__ */ show(showInt);
+  var show9 = /* @__PURE__ */ show(showInt);
   var show14 = /* @__PURE__ */ show(/* @__PURE__ */ showNonEmptyList(showForeignError));
   var pure13 = /* @__PURE__ */ pure(applicativeAff);
   var validateResponse = function(response) {
@@ -6303,12 +6324,12 @@
         return bind4(response.text)(function(bodyText) {
           var $13 = bodyText === "";
           if ($13) {
-            return liftEffect4(throwMinsiError(new JSONParsingError(context + (": empty response body" + (" (http " + (show7(response.status) + (" " + (response.statusText + ")"))))))));
+            return liftEffect4(throwMinsiError(new JSONParsingError(context + (": empty response body" + (" (http " + (show9(response.status) + (" " + (response.statusText + ")"))))))));
           }
           ;
           var v = readJSON2(bodyText);
           if (v instanceof Left) {
-            return liftEffect4(throwMinsiError(new JSONParsingError(context + (": " + (show14(v.value0) + (" (http " + (show7(response.status) + (" " + (response.statusText + (")" + (" body=" + bodyText)))))))))));
+            return liftEffect4(throwMinsiError(new JSONParsingError(context + (": " + (show14(v.value0) + (" (http " + (show9(response.status) + (" " + (response.statusText + (")" + (" body=" + bodyText)))))))))));
           }
           ;
           if (v instanceof Right) {
@@ -6396,7 +6417,7 @@
 
   // output/Fetch.Internal.Request/index.js
   var fromRecord2 = /* @__PURE__ */ fromRecord();
-  var show8 = /* @__PURE__ */ show(showMethod);
+  var show10 = /* @__PURE__ */ show(showMethod);
   var toCoreRequestOptionsHelpe = {
     convertHelper: function(v) {
       return function(v1) {
@@ -6421,7 +6442,7 @@
   };
   var toCoreRequestOptionsConve9 = {
     convertImpl: function(v) {
-      return show8;
+      return show10;
     }
   };
   var $$new2 = function() {
@@ -7005,14 +7026,14 @@
   };
 
   // output/Validations.CutVideoValidation/index.js
-  var show9 = /* @__PURE__ */ show(showNumber);
+  var show11 = /* @__PURE__ */ show(showNumber);
   var pure10 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(/* @__PURE__ */ semigroupMap()(ordString)(semigroupString)));
   var cutVideoValidation = function(id2) {
     return function(start2) {
       return function(end) {
         var $8 = start2 > end;
         if ($8) {
-          return invalid(singleton3(id2)("start > end: " + (show9(start2) + (" " + show9(end)))));
+          return invalid(singleton3(id2)("start > end: " + (show11(start2) + (" " + show11(end)))));
         }
         ;
         return pure10({
@@ -7111,6 +7132,7 @@
   var pure11 = /* @__PURE__ */ pure(applicativeAff);
   var liftEffect8 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var tailRecM3 = /* @__PURE__ */ tailRecM(monadRecAff);
+  var show15 = /* @__PURE__ */ show(showInstant);
   var pure15 = /* @__PURE__ */ pure(applicativeEffect);
   var unwrap4 = /* @__PURE__ */ unwrap();
   var applySecond3 = /* @__PURE__ */ applySecond(applyAff);
@@ -7130,7 +7152,7 @@
           return liftEffect8(throwMinsiError(new ComputeFailed("Video download failed")));
         }
         ;
-        throw new Error("Failed pattern match at Handlers.ApplyButtonHandler (line 71, column 7 - line 74, column 87): " + [response.status.constructor.name]);
+        throw new Error("Failed pattern match at Handlers.ApplyButtonHandler (line 72, column 7 - line 75, column 87): " + [response.status.constructor.name]);
       });
     };
     return tailRecM3(pollStatus)(unit);
@@ -7139,8 +7161,10 @@
     return function(video) {
       var videoMediaElement = toHTMLMediaElement(video);
       return function __do4() {
+        var timestamp = now();
+        var cacheBustedPath = filepath + ("?t=" + show15(timestamp));
         pause(videoMediaElement)();
-        setSrc5(filepath)(videoMediaElement)();
+        setSrc5(cacheBustedPath)(videoMediaElement)();
         return load(videoMediaElement)();
       };
     };
@@ -7171,8 +7195,8 @@
       var doc = getDocument();
       var components = loadComponents(doc)();
       var stateV = fromHtmlInputs(components.htmlInputs)();
-      var state3 = either(function($23) {
-        return throwMinsiError(InvalidInputs.create($23));
+      var state3 = either(function($24) {
+        return throwMinsiError(InvalidInputs.create($24));
       })(pure15)(toEither(stateV))();
       var filename = unwrap4(state3).filename;
       var filepath = mp4(filename);
