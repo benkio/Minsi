@@ -14,8 +14,8 @@ import Node.Express.Response (setResponseHeader)
 router :: Store -> App
 router store = do
   post "/checkDependencies" (controllerLogic (checkDependenciesController store))
-  post "/compute"           (controllerLogic (computeController store))
-  post "/status"            (controllerLogic (statusController store))
+  post "/compute" (controllerLogic (computeController store))
+  post "/status" (controllerLogic (statusController store))
 
 defaultResponseSettings :: Handler
 defaultResponseSettings = setResponseHeader "Access-Control-Allow-Origin" "*"

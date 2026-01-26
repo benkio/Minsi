@@ -4,8 +4,10 @@ import Foreign (ForeignError(..), fail)
 import Prelude
 import Yoga.JSON (class ReadForeign, readImpl)
 
-data ProcessStatus =
-  Pending | Succeed | Failed
+data ProcessStatus
+  = Pending
+  | Succeed
+  | Failed
 
 derive instance Eq ProcessStatus
 

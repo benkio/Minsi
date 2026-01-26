@@ -23,21 +23,25 @@ import Data.String (split)
 import Data.String.Pattern (Pattern(..))
 import Data.Traversable (traverse)
 import Data.Maybe (Maybe(..))
-import Main.MinsiErrors (MinsiError(..), throwMinsiError)
+import Main.MinsiError (MinsiError(..), throwMinsiError)
 
 genericErrorsHandler :: Effect Unit -> Effect Unit
 genericErrorsHandler p =
   catchError p
     ( \e ->
-        let errorMessage = message e
-        in log errorMessage *> catchError (writeToMinsiLog errorMessage) (const (raiseErrorAlert errorMessage))
+        let
+          errorMessage = message e
+        in
+          log errorMessage *> catchError (writeToMinsiLog errorMessage) (const (raiseErrorAlert errorMessage))
     )
 
 genericErrorsHandlerEither :: forall a. Either Error a -> Effect Unit
 genericErrorsHandlerEither (Right _) = pure unit
 genericErrorsHandlerEither (Left e) =
-  let errorMessage = message e
-  in log errorMessage *> catchError (writeToMinsiLog errorMessage) (const (raiseErrorAlert errorMessage))
+  let
+    errorMessage = message e
+  in
+    log errorMessage *> catchError (writeToMinsiLog errorMessage) (const (raiseErrorAlert errorMessage))
 
 writeToMinsiLog :: String -> Effect Unit
 writeToMinsiLog errorMessage = do

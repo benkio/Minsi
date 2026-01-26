@@ -37,7 +37,8 @@ fromHtmlInputs
     filename <- filenameV
     artist <- artistV
     title <- titleV
-    in State
+    in
+      State
         { cutVideo: cutVideo
         , youtubeUrl: WURL youtubeUrl
         , filename: filename

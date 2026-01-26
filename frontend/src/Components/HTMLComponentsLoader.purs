@@ -2,7 +2,7 @@ module Components.HTMLComponentsLoader where
 
 import Prelude (bind, pure, (>>=))
 import Web.DOM.NonElementParentNode (NonElementParentNode, getElementById)
-import Main.MinsiErrors (MinsiError(..), throwMinsiError)
+import Main.MinsiError (MinsiError(..), throwMinsiError)
 import Effect (Effect)
 import Data.Maybe (Maybe(..))
 import Web.DOM.Internal.Types (Element)

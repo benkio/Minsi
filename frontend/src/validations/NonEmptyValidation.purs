@@ -14,8 +14,8 @@ nonEmptyRegex = """[\S\s]*\S[\S\s]*"""
 nonEmptyRegexValidation :: String -> V (Map String String) Regex
 nonEmptyRegexValidation id =
   V $ lmap
-        (\x -> singleton id x)
-        (regex nonEmptyRegex noFlags)
+    (\x -> singleton id x)
+    (regex nonEmptyRegex noFlags)
 
 nonEmptyValidation :: String -> String -> V (Map String String) String
 nonEmptyValidation id v =

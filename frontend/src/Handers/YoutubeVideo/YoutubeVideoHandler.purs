@@ -8,7 +8,7 @@ import Data.Map (singleton)
 import Effect (Effect)
 import Effect.Console (log)
 import Handers.ErrorHandlers (genericErrorsHandler)
-import Main.MinsiErrors (MinsiError(..), throwMinsiError)
+import Main.MinsiError (MinsiError(..), throwMinsiError)
 import Prelude
 import Validations.YoutubeValidation (youtubeUrlValidation)
 import Web.DOM.Element (fromEventTarget, toEventTarget)
@@ -60,9 +60,9 @@ setVideoHandlers
   addEventListener E.click setCutEndButtonEvLV false setCutEndButtonTarget
   pure unit
   where
-    ytUrlEventTarget = toEventTarget (HI.toElement youtubeUrl)
-    setCutStartButtonTarget = toEventTarget (HB.toElement setCutStartButton)
-    setCutEndButtonTarget = toEventTarget (HB.toElement setCutEndButton)
+  ytUrlEventTarget = toEventTarget (HI.toElement youtubeUrl)
+  setCutStartButtonTarget = toEventTarget (HB.toElement setCutStartButton)
+  setCutEndButtonTarget = toEventTarget (HB.toElement setCutEndButton)
 
 youtubeUrlEventListener :: HI.HTMLInputElement -> HI.HTMLInputElement -> HSP.HTMLSpanElement -> HSP.HTMLSpanElement -> Event -> Effect Unit
 youtubeUrlEventListener cutStart cutEnd cutStartValue cutEndValue ev = genericErrorsHandler $ do

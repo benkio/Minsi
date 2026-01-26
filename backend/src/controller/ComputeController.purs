@@ -2,7 +2,10 @@ module Controller.ComputeController where
 
 import Prelude
 
+import Command.Ffmpeg (extractMp3)
+import Command.Id3v2 (addId3Tags)
 import Command.Ytdlp (downloadVideo)
+import Data.Foldable (sum)
 import Control.Monad.Error.Class (catchError)
 import Control.Monad.Except (runExcept)
 import Data.Either (Either(Left, Right))
@@ -28,18 +31,29 @@ computeController store = do
     Right state -> liftEffect (compute state store) *> setStatus 200 *> end
 
 compute :: State -> Store -> Effect Unit
-compute (State { youtubeUrl, filename, cutVideo: (DurationRange {start: start, end: end}) }) store = do
+compute (State { youtubeUrl, filename, cutVideo: (DurationRange { start: start, end: end }), artist, title }) store = do
   --TODO: check if a previous execution exists for the filename
   -- yes -> kill it
   -- then -> delete all remaining files
   insert filename Pending store
   log "Starting video download in background..."
   launchAff_ $ catchError
-    (downloadVideo youtubeUrl filename start end >>= \result ->
-      liftEffect $ insert filename (exitToStatus result.exit) store)
+    ( do
+        cutResult <- downloadVideo youtubeUrl filename start end
+        mp3result <- extractMp3 filename
+        id3result <- addId3Tags filename artist title
+        let
+          totalExitCode = (sum <<< map exitToInt)
+            [ cutResult.exit
+            , mp3result.exit
+            , id3result.exit -- , gifResult.exit
+            ]
+          processResult = if totalExitCode == 0 then Succeed else Failed
+        liftEffect $ insert filename processResult store
+    )
     (\_ -> liftEffect $ insert filename Failed store)
   log "Video download launched, returning HTTP response"
 
-exitToStatus :: Exit -> ProcessStatus
-exitToStatus (Normally 0) = Succeed
-exitToStatus _ = Failed
+exitToInt :: Exit -> Int
+exitToInt (Normally 0) = 0
+exitToInt _ = 1

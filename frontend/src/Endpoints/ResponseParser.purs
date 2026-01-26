@@ -6,7 +6,7 @@ import Data.Either (Either(..))
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
 import Fetch (Response)
-import Main.MinsiErrors (MinsiError(..), throwMinsiError)
+import Main.MinsiError (MinsiError(..), throwMinsiError)
 import Prelude
 import Yoga.JSON (class ReadForeign, readJSON)
 
@@ -22,7 +22,11 @@ decodeJsonResponse context response = do
       throwMinsiError
         ( JSONParsingError
             ( context <> ": empty response body"
-                <> " (http " <> show response.status <> " " <> response.statusText <> ")"
+                <> " (http "
+                <> show response.status
+                <> " "
+                <> response.statusText
+                <> ")"
             )
         )
   else
@@ -32,8 +36,13 @@ decodeJsonResponse context response = do
           throwMinsiError
             ( JSONParsingError
                 ( context <> ": " <> show err
-                    <> " (http " <> show response.status <> " " <> response.statusText <> ")"
-                    <> " body=" <> bodyText
+                    <> " (http "
+                    <> show response.status
+                    <> " "
+                    <> response.statusText
+                    <> ")"
+                    <> " body="
+                    <> bodyText
                 )
             )
       Right decoded ->

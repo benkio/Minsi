@@ -16,12 +16,12 @@ import Prelude
 
 runCommand :: Array String -> (String -> MinsiError) -> String -> Aff ExecaProcess
 runCommand args errorConstructor commandExecutable =
-    catchError
+  catchError
     ( do
         liftEffect $ log ("Execute Command: " <> commandExecutable <> " " <> show (intercalate " " args))
         win <- liftEffect isWindows
         let shell = if win then "cmd.exe" else "/bin/sh"
-        execa commandExecutable args (\options -> options {shell = Just shell, timeout = Just {killSignal: stringSignal "SIGTERM", milliseconds: Milliseconds 300000.0}})
+        execa commandExecutable args (\options -> options { shell = Just shell, timeout = Just { killSignal: stringSignal "SIGTERM", milliseconds: Milliseconds 300000.0 } })
     )
     ( \e -> liftEffect $ throwMinsiError (errorConstructor (message e))
     )

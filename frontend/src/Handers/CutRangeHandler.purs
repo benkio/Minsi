@@ -28,8 +28,8 @@ setCutRangeHandlers (CRET { cutStart, cutEnd, cutStartValue, cutEndValue }) = do
   addEventListener E.change cutEndEvL false cutEndEventTarget
   pure unit
   where
-    cutStartEventTarget = toEventTarget (HI.toElement cutStart)
-    cutEndEventTarget = toEventTarget (HI.toElement cutEnd)
+  cutStartEventTarget = toEventTarget (HI.toElement cutStart)
+  cutEndEventTarget = toEventTarget (HI.toElement cutEnd)
 
 cutStartEventListener :: HI.HTMLInputElement -> HS.HTMLSpanElement -> Event -> Effect Unit
 cutStartEventListener cutStart cutStartValue _ = do

@@ -1,4 +1,4 @@
-module Main.MinsiErrors where
+module Main.MinsiError where
 
 import Prelude
 import Effect (Effect)
@@ -25,8 +25,10 @@ instance Show MinsiError where
     InvalidInput id v ->
       "[" <> id <> "] Invalid Input: " <> v
     InvalidInputs vs ->
-      let errorMessages = map (\(Tuple k v) -> "[" <> k <> "] " <> v) (toUnfoldable vs)
-      in joinWith "<br>" errorMessages
+      let
+        errorMessages = map (\(Tuple k v) -> "[" <> k <> "] " <> v) (toUnfoldable vs)
+      in
+        joinWith "<br>" errorMessages
     JSONParsingError err -> "Error while parsing: " <> err
     ErrorResponse status -> "Got a Response with status ≠ 200: " <> show status
     ComputeFailed msg -> "Compute failed: " <> msg

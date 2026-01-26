@@ -19,7 +19,7 @@ import Effect.Console (log)
 import Endpoints.Compute (callCompute)
 import Endpoints.Status (callStatus)
 import Handers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
-import Main.MinsiErrors (MinsiError(..), throwMinsiError)
+import Main.MinsiError (MinsiError(..), throwMinsiError)
 import Model.ProcessStatus (ProcessStatus(..))
 import Model.State.StateFromHtml (fromHtmlInputs)
 import Web.DOM.DOMTokenList as DOMTokenList
@@ -42,7 +42,7 @@ setApplyButtonHandler applyButton = do
   applyButtonEvL <- eventListener applyButtonEventListener
   addEventListener E.click applyButtonEvL false applyButtonEventTarget
   where
-    applyButtonEventTarget = toEventTarget (HB.toElement applyButton)
+  applyButtonEventTarget = toEventTarget (HB.toElement applyButton)
 
 applyButtonEventListener :: Event -> Effect Unit
 applyButtonEventListener _ = genericErrorsHandler $ do
@@ -53,26 +53,28 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   let filename = (unwrap state).filename
   let filepath = mp4 filename
   showLoadingModal loadingModalId
-  runAff_ (\result -> do
-    genericErrorsHandlerEither result
-    log "return from server, show elements and set src"
-    showHiddenElements components.htmlVisualElements
-    log "hide modal, and scroll"
-    hideLoadingModal loadingModalId
-    scrollToVideoSource
-    let videoMediaElement = (unwrap components.htmlOutputs).resultVideo
-    setVideoSrc filepath videoMediaElement
-  ) (void (callCompute state) *> waitForStatus filename)
+  runAff_
+    ( \result -> do
+        genericErrorsHandlerEither result
+        log "return from server, show elements and set src"
+        showHiddenElements components.htmlVisualElements
+        log "hide modal, and scroll"
+        hideLoadingModal loadingModalId
+        scrollToVideoSource
+        let videoMediaElement = (unwrap components.htmlOutputs).resultVideo
+        setVideoSrc filepath videoMediaElement
+    )
+    (void (callCompute state) *> waitForStatus filename)
 
 waitForStatus :: String -> Aff Unit
 waitForStatus filename = tailRecM pollStatus unit
   where
-    pollStatus _ = do
-      response <- callStatus filename
-      case response.status of
-        Pending -> delay (Milliseconds 500.0) $> Loop unit
-        Succeed -> pure $ Done unit
-        Failed -> liftEffect $ throwMinsiError (ComputeFailed "Video download failed")
+  pollStatus _ = do
+    response <- callStatus filename
+    case response.status of
+      Pending -> delay (Milliseconds 500.0) $> Loop unit
+      Succeed -> pure $ Done unit
+      Failed -> liftEffect $ throwMinsiError (ComputeFailed "Video download failed")
 
 setVideoSrc :: String -> HTMLVideoElement -> Effect Unit
 setVideoSrc filepath video = do
@@ -82,7 +84,7 @@ setVideoSrc filepath video = do
   setSrc cacheBustedPath videoMediaElement
   load videoMediaElement
   where
-    videoMediaElement = toHTMLMediaElement video
+  videoMediaElement = toHTMLMediaElement video
 
 showHiddenElements :: HtmlVisualElements -> Effect Unit
 showHiddenElements (HtmlVisualElements { videoSourceRow, videoRow, subtitlesRow }) = do

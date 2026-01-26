@@ -1,7 +1,5 @@
 module Main where
 
-import Handers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
-
 import Prelude
 
 import Components.HtmlComponents (loadComponents)
@@ -9,8 +7,9 @@ import Components.Window (getDocument)
 import Effect (Effect)
 import Effect.Aff (runAff_)
 import Effect.Console (log)
-import Main.CheckDependencies (checkDependecies)
+import Handers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
 import Handlers.Handlers (setupEventHandlers)
+import Main.CheckDependencies (checkDependecies)
 
 main :: Effect Unit
 main = genericErrorsHandler program
