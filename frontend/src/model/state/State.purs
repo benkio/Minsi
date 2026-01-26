@@ -1,8 +1,9 @@
 module Model.State.State where
 
+import Data.Newtype (class Newtype)
 import Data.Time.Duration (Milliseconds)
-import Node.Path (FilePath)
 import Data.URL (URL, toString)
+import Node.Path (FilePath)
 import Yoga.JSON (class WriteForeign, writeImpl)
 
 -------------------------------------------------------------------------------
@@ -61,3 +62,4 @@ instance WriteForeign WURL where
   writeImpl (WURL url) = writeImpl (toString url)
 
 derive newtype instance writeState :: WriteForeign State
+derive instance Newtype State _

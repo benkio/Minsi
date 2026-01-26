@@ -36,9 +36,9 @@ getYtdlpOutputUrl cookie (WURL url) filepath start end =
   where
     urlString = toString url
     args = if cookie == "" then
-        [ "-f", "\"best[ext=mp4]\"", "--download-sections", show ("*" <> start <> "-" <> end), "-o", show filepath, show urlString ]
+        [ "-f", "\"best[ext=mp4]\"", "--force-overwrite", "--download-sections", show ("*" <> start <> "-" <> end), "-o", show filepath, show urlString ]
       else
-        [ "-f", "\"best[ext=mp4]\"", "--cookies-from-browser", cookie, "--download-sections", show ("*" <> start <> "-" <> end), "-o", show filepath, show urlString ]
+        [ "-f", "\"best[ext=mp4]\"", "--force-overwrite", "--download-sections", show ("*" <> start <> "-" <> end), "-o", show filepath, "--cookies-from-browser", cookie, show urlString ]
 
 downloadVideo :: WURL -> String -> Milliseconds -> Milliseconds -> Aff (Tuple ExecaProcess ExecaResult)
 downloadVideo youtubeUri filename start end = do

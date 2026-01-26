@@ -5,7 +5,7 @@ import Prelude
 import Node.Path (FilePath, resolve)
 
 outputPath :: Effect FilePath
-outputPath = resolve [] "../output"
+outputPath = resolve [] "../public/output"
 
 mp4 :: String -> Effect FilePath
 mp4 filename = outputPath >>= \ofp -> resolve [ofp] (filename <> ".mp4")

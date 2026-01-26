@@ -26,6 +26,7 @@ import Components.HtmlIds
   , youtubeUrlId
   )
 import Control.Monad.Error.Class (catchError)
+import Data.Newtype (class Newtype)
 import Data.Tuple (Tuple(..), fst, snd)
 import Effect (Effect)
 import Prelude (bind, pure)
@@ -63,7 +64,7 @@ data ResultPreview
   = ResultPreviewDiv HTMLDivElement
   | ResultPreviewIframe HTMLIFrameElement
 
-data HtmlOutputs = HtmlOutputs
+newtype HtmlOutputs = HtmlOutputs
   { resultPreview :: ResultPreview
   , addSubtitleButton :: HTMLButtonElement
   , minsiLog :: HTMLDivElement
@@ -73,6 +74,8 @@ data HtmlOutputs = HtmlOutputs
   , loadingModal :: HTMLDivElement
   , resultVideo :: HTMLVideoElement
   }
+
+derive instance Newtype HtmlOutputs _
 
 data HtmlVisualElements = HtmlVisualElements
   { videoSourceRow :: HTMLDivElement

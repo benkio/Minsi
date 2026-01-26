@@ -30,6 +30,7 @@ to generate this file without the comments in this block.
   , "js-timers"
   , "maybe"
   , "monad-loops"
+  , "newtype"
   , "node-path"
   , "ordered-collections"
   , "partial"

@@ -789,13 +789,13 @@
     })(true);
   };
   var traverse_ = function(dictApplicative) {
-    var applySecond3 = applySecond(dictApplicative.Apply0());
+    var applySecond4 = applySecond(dictApplicative.Apply0());
     var pure16 = pure(dictApplicative);
     return function(dictFoldable) {
       var foldr22 = foldr(dictFoldable);
       return function(f) {
         return foldr22(function($454) {
-          return applySecond3(f($454));
+          return applySecond4(f($454));
         })(pure16(unit));
       };
     };
@@ -2346,6 +2346,7 @@
   var fromElement6 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLSpanElement");
 
   // output/Web.HTML.HTMLVideoElement/index.js
+  var toHTMLMediaElement = unsafeCoerce2;
   var fromElement7 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLVideoElement");
 
   // output/Components.HtmlComponents/index.js
@@ -2379,16 +2380,6 @@
       return new HtmlVisualElements2(value0);
     };
     return HtmlVisualElements2;
-  }();
-  var HtmlOutputs = /* @__PURE__ */ function() {
-    function HtmlOutputs2(value0) {
-      this.value0 = value0;
-    }
-    ;
-    HtmlOutputs2.create = function(value0) {
-      return new HtmlOutputs2(value0);
-    };
-    return HtmlOutputs2;
   }();
   var HtmlInputs = /* @__PURE__ */ function() {
     function HtmlInputs2(value0) {
@@ -2483,7 +2474,7 @@
       var cutEndValue = loadSpan(cutEndValueId)(doc)();
       var loadingModal = loadDiv(loadingModalId)(doc)();
       var resultVideo = loadVideo(resultVideoId)(doc)();
-      return new HtmlOutputs({
+      return {
         resultPreview,
         addSubtitleButton,
         minsiLog,
@@ -2492,7 +2483,7 @@
         cutEndValue,
         loadingModal,
         resultVideo
-      });
+      };
     };
   };
   var loadComponents = function(doc) {
@@ -2543,6 +2534,20 @@
   // output/Web.HTML.HTMLLIElement/index.js
   var toElement4 = unsafeCoerce2;
   var fromElement8 = /* @__PURE__ */ unsafeReadProtoTagged("HTMLLIElement");
+
+  // output/Web.HTML.HTMLMediaElement/foreign.js
+  function setSrc5(src9) {
+    return function(media4) {
+      return function() {
+        media4.src = src9;
+      };
+    };
+  }
+  function load(media4) {
+    return function() {
+      return media4.load();
+    };
+  }
 
   // output/Web.HTML.HTMLUListElement/index.js
   var toElement5 = unsafeCoerce2;
@@ -5751,6 +5756,12 @@
     };
   }
 
+  // output/Constants/index.js
+  var outputPath = "/output/";
+  var mp4 = function(filename) {
+    return outputPath + (filename + ".mp4");
+  };
+
   // output/Data.HTTP.Method/index.js
   var OPTIONS = /* @__PURE__ */ function() {
     function OPTIONS2() {
@@ -6694,7 +6705,7 @@
         return writeImpl3("Bottom");
       }
       ;
-      throw new Error("Failed pattern match at Model.State.State (line 42, column 1 - line 44, column 40): " + [v.constructor.name]);
+      throw new Error("Failed pattern match at Model.State.State (line 43, column 1 - line 45, column 40): " + [v.constructor.name]);
     }
   };
   var writeForeignFont = {
@@ -6707,7 +6718,7 @@
         return writeImpl3("Arial Black");
       }
       ;
-      throw new Error("Failed pattern match at Model.State.State (line 53, column 1 - line 55, column 49): " + [v.constructor.name]);
+      throw new Error("Failed pattern match at Model.State.State (line 54, column 1 - line 56, column 49): " + [v.constructor.name]);
     }
   };
   var writeForeignColor = {
@@ -6732,7 +6743,7 @@
         return writeImpl3("#FFFF00");
       }
       ;
-      throw new Error("Failed pattern match at Model.State.State (line 46, column 1 - line 51, column 41): " + [v.constructor.name]);
+      throw new Error("Failed pattern match at Model.State.State (line 47, column 1 - line 52, column 41): " + [v.constructor.name]);
     }
   };
   var writeDurationRange = /* @__PURE__ */ writeForeignRecord2(/* @__PURE__ */ writeForeignFieldsCons({
@@ -6933,11 +6944,21 @@
   }
 
   // output/Handlers.ApplyButtonHandler/index.js
-  var discard3 = /* @__PURE__ */ discard(discardUnit);
   var pure10 = /* @__PURE__ */ pure(applicativeEffect);
-  var discard23 = /* @__PURE__ */ discard3(bindAff);
+  var unwrap4 = /* @__PURE__ */ unwrap();
+  var applySecond3 = /* @__PURE__ */ applySecond(applyAff);
   var $$void7 = /* @__PURE__ */ $$void(functorAff);
-  var liftEffect8 = /* @__PURE__ */ liftEffect(monadEffectAff);
+  var setVideoSrc = function(filepath) {
+    return function(video) {
+      var videoMediaElement = toHTMLMediaElement(video);
+      return function __do4() {
+        setSrc5("")(videoMediaElement)();
+        load(videoMediaElement)();
+        setSrc5(filepath)(videoMediaElement)();
+        return load(videoMediaElement)();
+      };
+    };
+  };
   var scrollToVideoSource = function __do2() {
     var w = windowImpl();
     var loc = location(w)();
@@ -6968,16 +6989,19 @@
         return throwMinsiError(InvalidInputs.create($16));
       })(pure10)(toEither(stateV))();
       showLoadingModal(loadingModalId)();
-      runAff_(genericErrorsHandlerEither)(discard23($$void7(callCompute(state3)))(function() {
-        return liftEffect8(function __do5() {
-          log("got response from the server")();
-          hideLoadingModal(loadingModalId)();
+      return runAff_(function(result) {
+        return function __do5() {
+          genericErrorsHandlerEither(result)();
+          log("return from server, show elements and set src")();
           showHiddenElements(components.htmlVisualElements)();
+          var videoMediaElement = unwrap4(components.htmlOutputs).resultVideo;
+          var videoFilePath = mp4(unwrap4(state3).filename);
+          setVideoSrc(videoFilePath)(videoMediaElement)();
+          log("hide modal, and scroll")();
+          hideLoadingModal(loadingModalId)();
           return scrollToVideoSource();
-        });
-      }))();
-      log("Apply Button Done")();
-      return unit;
+        };
+      })(applySecond3($$void7(callCompute(state3)))(delay(500)))();
     });
   };
   var setApplyButtonHandler = function(applyButton) {
@@ -6994,18 +7018,18 @@
       setCutRangeHandlers(new CRET({
         cutStart: v.htmlInputs.value0.cutStart,
         cutEnd: v.htmlInputs.value0.cutEnd,
-        cutEndValue: v.htmlOutputs.value0.cutEndValue,
-        cutStartValue: v.htmlOutputs.value0.cutStartValue
+        cutEndValue: v.htmlOutputs.cutEndValue,
+        cutStartValue: v.htmlOutputs.cutStartValue
       }))();
       setVideoHandlers(new VET({
         cutStart: v.htmlInputs.value0.cutStart,
         cutEnd: v.htmlInputs.value0.cutEnd,
-        playbackPosition: v.htmlOutputs.value0.playbackPosition,
+        playbackPosition: v.htmlOutputs.playbackPosition,
         setCutStartButton: v.htmlInputs.value0.setCutStartButton,
         setCutEndButton: v.htmlInputs.value0.setCutEndButton,
         youtubeUrl: v.htmlInputs.value0.youtubeUrl,
-        cutStartValue: v.htmlOutputs.value0.cutStartValue,
-        cutEndValue: v.htmlOutputs.value0.cutEndValue
+        cutStartValue: v.htmlOutputs.cutStartValue,
+        cutEndValue: v.htmlOutputs.cutEndValue
       }))();
       return setApplyButtonHandler(v.htmlInputs.value0.applyButton)();
     };
@@ -7042,14 +7066,14 @@
   // output/Main.CheckDependencies/index.js
   var $$null5 = /* @__PURE__ */ $$null(foldableArray);
   var pure15 = /* @__PURE__ */ pure(applicativeAff);
-  var liftEffect9 = /* @__PURE__ */ liftEffect(monadEffectAff);
+  var liftEffect8 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var checkDependecies = /* @__PURE__ */ bind(bindAff)(callCheckDependencies)(function(v) {
     var $6 = $$null5(v.missedDependencies);
     if ($6) {
       return pure15(unit);
     }
     ;
-    return liftEffect9(throwMinsiError(new MissingDependenciesError(v.missedDependencies)));
+    return liftEffect8(throwMinsiError(new MissingDependenciesError(v.missedDependencies)));
   });
 
   // output/Main/index.js
