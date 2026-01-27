@@ -45,8 +45,14 @@ videoSourceId = "videoSource"
 minsiLogId :: String
 minsiLogId = "minsiLog"
 
-playbackPositionId :: String
-playbackPositionId = "playbackPosition"
+playbackPositionYoutubeId :: String
+playbackPositionYoutubeId = "playbackPosition"
+
+playbackPositionResultVideoId :: String
+playbackPositionResultVideoId = "playbackPositionResultVideo"
+
+subtitleTableId :: String
+subtitleTableId = "subtitleTable"
 
 setCutStartButton :: String
 setCutStartButton = "setCutStartButton"

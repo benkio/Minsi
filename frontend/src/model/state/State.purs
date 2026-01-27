@@ -31,7 +31,7 @@ newtype Subtitle = Subtitle
   { videoPosition :: DurationRange
   , value :: String
   , font :: Font
-  , size :: Int
+  , fontSize :: Int
   , color :: Color
   , screenPosition :: Position
   }

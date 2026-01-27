@@ -12,12 +12,14 @@ import Components.HtmlIds
   , loadingModalId
   , minsiLogId
   , outputFilenameId
-  , playbackPositionId
+  , playbackPositionYoutubeId
+  , playbackPositionResultVideoId
   , resultPreviewId
   , resultVideoId
   , reverseLoopGifId
   , setCutEndButton
   , setCutStartButton
+  , subtitleTableId
   , subtitlesRowId
   , titleId
   , videoRowId
@@ -45,6 +47,8 @@ import Web.HTML.HTMLVideoElement (HTMLVideoElement)
 import Web.HTML.HTMLVideoElement as HV
 import Web.HTML.HTMLIFrameElement (HTMLIFrameElement)
 import Web.HTML.HTMLIFrameElement as IF
+import Web.HTML.HTMLTableElement (HTMLTableElement)
+import Web.HTML.HTMLTableElement as HT
 
 data HtmlInputs = HtmlInputs
   { cutStart :: HTMLInputElement
@@ -68,11 +72,13 @@ newtype HtmlOutputs = HtmlOutputs
   { resultPreview :: ResultPreview
   , addSubtitleButton :: HTMLButtonElement
   , minsiLog :: HTMLDivElement
-  , playbackPosition :: HTMLSpanElement
+  , playbackPositionYoutube :: HTMLSpanElement
+  , playbackPositionResultVideo :: HTMLSpanElement
   , cutStartValue :: HTMLSpanElement
   , cutEndValue :: HTMLSpanElement
   , loadingModal :: HTMLDivElement
   , resultVideo :: HTMLVideoElement
+  , subtitleTable :: HTMLTableElement
   }
 
 derive instance Newtype HtmlOutputs _
@@ -133,21 +139,25 @@ loadHtmlOutputs doc = do
   resultPreview <- loadResultPreview doc
   addSubtitleButton <- loadButton addSubtitleId doc
   minsiLog <- loadDiv minsiLogId doc
-  playbackPosition <- loadSpan playbackPositionId doc
+  playbackPositionYoutube <- loadSpan playbackPositionYoutubeId doc
+  playbackPositionResultVideo <- loadSpan playbackPositionResultVideoId doc
   cutStartValue <- loadSpan cutStartValueId doc
   cutEndValue <- loadSpan cutEndValueId doc
   loadingModal <- loadDiv loadingModalId doc
   resultVideo <- loadVideo resultVideoId doc
+  subtitleTable <- loadTable subtitleTableId doc
   pure
     ( HtmlOutputs
         { resultPreview: resultPreview
         , addSubtitleButton: addSubtitleButton
         , minsiLog: minsiLog
-        , playbackPosition: playbackPosition
+        , playbackPositionYoutube: playbackPositionYoutube
+        , playbackPositionResultVideo: playbackPositionResultVideo
         , cutStartValue: cutStartValue
         , cutEndValue: cutEndValue
         , loadingModal: loadingModal
         , resultVideo: resultVideo
+        , subtitleTable: subtitleTable
         }
     )
 
@@ -186,6 +196,9 @@ loadVideoSource = loadHtmlElement videoSourceId HS.fromElement
 
 loadSpan :: String -> NonElementParentNode -> Effect HTMLSpanElement
 loadSpan id = loadHtmlElement id HSP.fromElement
+
+loadTable :: String -> NonElementParentNode -> Effect HTMLTableElement
+loadTable id = loadHtmlElement id HT.fromElement
 
 loadVideo :: String -> NonElementParentNode -> Effect HTMLVideoElement
 loadVideo id = loadHtmlElement id HV.fromElement

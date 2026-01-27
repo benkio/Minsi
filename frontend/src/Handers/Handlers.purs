@@ -22,11 +22,13 @@ setupEventHandlers
       , videoSource
       }
   , htmlOutputs: HtmlOutputs
-      { playbackPosition
+      { playbackPositionYoutube
+      , playbackPositionResultVideo
       , cutEndValue
       , cutStartValue
       , addSubtitleButton
       , resultVideo
+      , subtitleTable
       }
   } = do
   setCutRangeHandlers
@@ -41,7 +43,7 @@ setupEventHandlers
     ( VET
         { cutStart: cutStart
         , cutEnd: cutEnd
-        , playbackPosition: playbackPosition
+        , playbackPosition: playbackPositionYoutube
         , setCutStartButton: setCutStartButton
         , setCutEndButton: setCutEndButton
         , youtubeUrl: youtubeUrl

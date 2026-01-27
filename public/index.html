@@ -135,7 +135,9 @@
                 </button>
 
                 <p class="mb-0 text-center flex-grow-1">
-                  <span id="playbackPosition" class="fs-3 fw-bold">0</span>
+                  <span id="playbackPositionYoutube" class="fs-3 fw-bold"
+                    >0</span
+                  >
                 </p>
 
                 <button id="setCutEndButton" class="btn btn-primary">
@@ -189,13 +191,20 @@
           ></video>
         </div>
       </div>
-
+      <div class="row mt-4 d-none">
+        <div class="col-12">
+          <p class="mb-0 text-center flex-grow-1">
+            <span id="playbackPositionResultVideo" class="fs-3 fw-bold">0</span>
+          </p>
+        </div>
+      </div>
       <!-- Subtitles -->
       <div class="row mt-4 d-none" id="subtitlesRowId">
         <div class="col-12 col-xl-10 mx-auto">
           <div class="table-responsive">
             <table
               class="table table-bordered table-sm bg-white shadow-sm align-middle"
+              id="subtitleTable"
             >
               <thead class="table-light text-center">
                 <tr>
@@ -203,6 +212,7 @@
                   <th style="width: 70px">End</th>
                   <th>Value</th>
                   <th style="width: 140px">Font</th>
+                  <th style="width: 100px">Font Size</th>
                   <th style="width: 120px">Color</th>
                   <th style="width: 100px">Position</th>
                   <th style="width: 80px" class="text-center">
@@ -235,6 +245,14 @@
                       <option selected>Impact</option>
                       <option>Arial Black</option>
                     </select>
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      class="form-control form-control-sm"
+                      min="12"
+                      value="48"
+                    />
                   </td>
                   <td>
                     <select class="form-select form-select-sm">
