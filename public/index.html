@@ -191,7 +191,7 @@
           ></video>
         </div>
       </div>
-      <div class="row mt-4 d-none">
+      <div class="row mt-4 d-none" id="playbackPositionResultRowId">
         <div class="col-12">
           <p class="mb-0 text-center flex-grow-1">
             <span id="playbackPositionResultVideo" class="fs-3 fw-bold">0</span>
@@ -229,10 +229,18 @@
               <tbody>
                 <tr>
                   <td>
-                    <input type="number" class="form-control form-control-sm" />
+                    <input
+                      type="number"
+                      value="0"
+                      class="form-control form-control-sm"
+                    />
                   </td>
                   <td>
-                    <input type="number" class="form-control form-control-sm" />
+                    <input
+                      type="number"
+                      value="100"
+                      class="form-control form-control-sm"
+                    />
                   </td>
                   <td>
                     <textarea
@@ -251,7 +259,8 @@
                       type="number"
                       class="form-control form-control-sm"
                       min="12"
-                      value="48"
+                      value="36"
+                      max="48"
                     />
                   </td>
                   <td>

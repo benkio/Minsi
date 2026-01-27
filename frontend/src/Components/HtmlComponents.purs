@@ -1,8 +1,8 @@
 module Components.HtmlComponents where
 
 import Components.HTMLComponentsLoader (loadHtmlElement)
-import Components.HtmlIds
-  ( addSubtitleId
+import Components.HtmlIds(
+  addSubtitleId
   , applyId
   , artistId
   , cutEndId
@@ -12,8 +12,9 @@ import Components.HtmlIds
   , loadingModalId
   , minsiLogId
   , outputFilenameId
-  , playbackPositionYoutubeId
+  , playbackPositionResultRowId
   , playbackPositionResultVideoId
+  , playbackPositionYoutubeId
   , resultPreviewId
   , resultVideoId
   , reverseLoopGifId
@@ -87,6 +88,7 @@ data HtmlVisualElements = HtmlVisualElements
   { videoSourceRow :: HTMLDivElement
   , videoRow :: HTMLDivElement
   , subtitlesRow :: HTMLDivElement
+  , playbackPositionResultRow :: HTMLDivElement
   }
 
 type HtmlComponents =
@@ -166,11 +168,13 @@ loadHtmlVisualElements doc = do
   videoSourceRow <- loadDiv videoSourceRowId doc
   videoRow <- loadDiv videoRowId doc
   subtitlesRow <- loadDiv subtitlesRowId doc
+  playbackPositionResultRow <- loadDiv playbackPositionResultRowId doc
   pure
     ( HtmlVisualElements
         { videoSourceRow: videoSourceRow
         , videoRow: videoRow
         , subtitlesRow: subtitlesRow
+        , playbackPositionResultRow: playbackPositionResultRow
         }
     )
 

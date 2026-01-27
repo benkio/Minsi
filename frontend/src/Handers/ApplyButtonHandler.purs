@@ -89,10 +89,11 @@ setVideoSrc filepath video = do
   videoMediaElement = toHTMLMediaElement video
 
 showHiddenElements :: HtmlVisualElements -> Effect Unit
-showHiddenElements (HtmlVisualElements { videoSourceRow, videoRow, subtitlesRow }) = do
+showHiddenElements (HtmlVisualElements { videoSourceRow, videoRow, subtitlesRow, playbackPositionResultRow }) = do
   removeClass "d-none" videoSourceRow
   removeClass "d-none" videoRow
   removeClass "d-none" subtitlesRow
+  removeClass "d-none" playbackPositionResultRow
 
 removeClass :: String -> HTMLDivElement.HTMLDivElement -> Effect Unit
 removeClass className div = do

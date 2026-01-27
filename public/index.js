@@ -2244,6 +2244,7 @@
   var resultPreviewId = "youtubeResultPreview";
   var playbackPositionYoutubeId = "playbackPositionYoutube";
   var playbackPositionResultVideoId = "playbackPositionResultVideo";
+  var playbackPositionResultRowId = "playbackPositionResultRowId";
   var outputFilenameId = "outputFilename";
   var minsiLogId = "minsiLog";
   var loadingModalId = "loadingModal";
@@ -2454,10 +2455,12 @@
       var videoSourceRow = loadDiv(videoSourceRowId)(doc)();
       var videoRow = loadDiv(videoRowId)(doc)();
       var subtitlesRow = loadDiv(subtitlesRowId)(doc)();
+      var playbackPositionResultRow = loadDiv(playbackPositionResultRowId)(doc)();
       return new HtmlVisualElements({
         videoSourceRow,
         videoRow,
-        subtitlesRow
+        subtitlesRow,
+        playbackPositionResultRow
       });
     };
   };
@@ -7424,15 +7427,16 @@
     return function __do6() {
       removeClass("d-none")(v.value0.videoSourceRow)();
       removeClass("d-none")(v.value0.videoRow)();
-      return removeClass("d-none")(v.value0.subtitlesRow)();
+      removeClass("d-none")(v.value0.subtitlesRow)();
+      return removeClass("d-none")(v.value0.playbackPositionResultRow)();
     };
   };
   var getCurrentState = function __do3() {
     var doc = getDocument();
     var components = loadComponents(doc)();
     var stateV = fromHtmlInputs(components.htmlInputs)();
-    var state3 = either(function($27) {
-      return throwMinsiError(InvalidInputs.create($27));
+    var state3 = either(function($28) {
+      return throwMinsiError(InvalidInputs.create($28));
     })(pure16)(toEither(stateV))();
     return new Tuple(state3, components);
   };

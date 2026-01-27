@@ -74,3 +74,6 @@ videoRowId = "videoRowId"
 
 subtitlesRowId :: String
 subtitlesRowId = "subtitlesRowId"
+
+playbackPositionResultRowId :: String
+playbackPositionResultRowId = "playbackPositionResultRowId"
