@@ -62,6 +62,7 @@ data HtmlInputs = HtmlInputs
   , videoSource :: HTMLSelectElement
   , setCutEndButton :: HTMLButtonElement
   , setCutStartButton :: HTMLButtonElement
+  , subtitleTable :: HTMLTableElement
   }
 
 data ResultPreview
@@ -78,7 +79,6 @@ newtype HtmlOutputs = HtmlOutputs
   , cutEndValue :: HTMLSpanElement
   , loadingModal :: HTMLDivElement
   , resultVideo :: HTMLVideoElement
-  , subtitleTable :: HTMLTableElement
   }
 
 derive instance Newtype HtmlOutputs _
@@ -118,6 +118,7 @@ loadHtmlInputs doc = do
   videoSource <- loadVideoSource doc
   setCutStartButton <- loadButton setCutStartButton doc
   setCutEndButton <- loadButton setCutEndButton doc
+  subtitleTable <- loadTable subtitleTableId doc
   pure
     ( HtmlInputs
         { cutStart: fst rangeTuple
@@ -131,6 +132,7 @@ loadHtmlInputs doc = do
         , videoSource: videoSource
         , setCutStartButton: setCutStartButton
         , setCutEndButton: setCutEndButton
+        , subtitleTable: subtitleTable
         }
     )
 
@@ -145,7 +147,6 @@ loadHtmlOutputs doc = do
   cutEndValue <- loadSpan cutEndValueId doc
   loadingModal <- loadDiv loadingModalId doc
   resultVideo <- loadVideo resultVideoId doc
-  subtitleTable <- loadTable subtitleTableId doc
   pure
     ( HtmlOutputs
         { resultPreview: resultPreview
@@ -157,7 +158,6 @@ loadHtmlOutputs doc = do
         , cutEndValue: cutEndValue
         , loadingModal: loadingModal
         , resultVideo: resultVideo
-        , subtitleTable: subtitleTable
         }
     )
 

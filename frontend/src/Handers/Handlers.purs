@@ -20,6 +20,7 @@ setupEventHandlers
       , setCutEndButton
       , applyButton
       , videoSource
+      , subtitleTable
       }
   , htmlOutputs: HtmlOutputs
       { playbackPositionYoutube
@@ -28,7 +29,6 @@ setupEventHandlers
       , cutStartValue
       , addSubtitleButton
       , resultVideo
-      , subtitleTable
       }
   } = do
   setCutRangeHandlers

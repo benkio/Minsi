@@ -57,7 +57,7 @@ spec = do
             { videoPosition: DurationRange { start: Milliseconds 10.0, end: Milliseconds 20.0 }
             , value: "Test subtitle"
             , font: Impact
-            , size: 24
+                , fontSize: 24
             , color: White
             , screenPosition: Top
             }
