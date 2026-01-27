@@ -163,7 +163,7 @@
     return dict.pure;
   };
   var when = function(dictApplicative) {
-    var pure18 = pure(dictApplicative);
+    var pure19 = pure(dictApplicative);
     return function(v) {
       return function(v1) {
         if (v) {
@@ -171,7 +171,7 @@
         }
         ;
         if (!v) {
-          return pure18(unit);
+          return pure19(unit);
         }
         ;
         throw new Error("Failed pattern match at Control.Applicative (line 63, column 1 - line 63, column 63): " + [v.constructor.name, v1.constructor.name]);
@@ -180,10 +180,10 @@
   };
   var liftA1 = function(dictApplicative) {
     var apply5 = apply(dictApplicative.Apply0());
-    var pure18 = pure(dictApplicative);
+    var pure19 = pure(dictApplicative);
     return function(f) {
       return function(a) {
-        return apply5(pure18(f))(a);
+        return apply5(pure19(f))(a);
       };
     };
   };
@@ -264,9 +264,9 @@
     return function(value12) {
       return function(rec) {
         var copy = {};
-        for (var key in rec) {
-          if ({}.hasOwnProperty.call(rec, key)) {
-            copy[key] = rec[key];
+        for (var key2 in rec) {
+          if ({}.hasOwnProperty.call(rec, key2)) {
+            copy[key2] = rec[key2];
           }
         }
         copy[label4] = value12;
@@ -277,9 +277,9 @@
   var unsafeDelete = function(label4) {
     return function(rec) {
       var copy = {};
-      for (var key in rec) {
-        if (key !== label4 && {}.hasOwnProperty.call(rec, key)) {
-          copy[key] = rec[key];
+      for (var key2 in rec) {
+        if (key2 !== label4 && {}.hasOwnProperty.call(rec, key2)) {
+          copy[key2] = rec[key2];
         }
       }
       return copy;
@@ -798,13 +798,13 @@
   };
   var traverse_ = function(dictApplicative) {
     var applySecond4 = applySecond(dictApplicative.Apply0());
-    var pure18 = pure(dictApplicative);
+    var pure19 = pure(dictApplicative);
     return function(dictFoldable) {
       var foldr22 = foldr(dictFoldable);
       return function(f) {
         return foldr22(function($454) {
           return applySecond4(f($454));
-        })(pure18(unit));
+        })(pure19(unit));
       };
     };
   };
@@ -1004,13 +1004,13 @@
     }
     return function(apply5) {
       return function(map17) {
-        return function(pure18) {
+        return function(pure19) {
           return function(f) {
             return function(array) {
               function go2(bot, top2) {
                 switch (top2 - bot) {
                   case 0:
-                    return pure18([]);
+                    return pure19([]);
                   case 1:
                     return map17(array1)(f(array[bot]));
                   case 2:
@@ -1037,12 +1037,12 @@
   };
   var traversableMaybe = {
     traverse: function(dictApplicative) {
-      var pure18 = pure(dictApplicative);
+      var pure19 = pure(dictApplicative);
       var map17 = map(dictApplicative.Apply0().Functor0());
       return function(v) {
         return function(v1) {
           if (v1 instanceof Nothing) {
-            return pure18(Nothing.value);
+            return pure19(Nothing.value);
           }
           ;
           if (v1 instanceof Just) {
@@ -1054,11 +1054,11 @@
       };
     },
     sequence: function(dictApplicative) {
-      var pure18 = pure(dictApplicative);
+      var pure19 = pure(dictApplicative);
       var map17 = map(dictApplicative.Apply0().Functor0());
       return function(v) {
         if (v instanceof Nothing) {
-          return pure18(Nothing.value);
+          return pure19(Nothing.value);
         }
         ;
         if (v instanceof Just) {
@@ -1988,12 +1988,12 @@
   // output/Control.Monad/index.js
   var ap = function(dictMonad) {
     var bind11 = bind(dictMonad.Bind1());
-    var pure18 = pure(dictMonad.Applicative0());
+    var pure19 = pure(dictMonad.Applicative0());
     return function(f) {
       return function(a) {
         return bind11(f)(function(f$prime) {
           return bind11(a)(function(a$prime) {
-            return pure18(f$prime(a$prime));
+            return pure19(f$prime(a$prime));
           });
         });
       };
@@ -2058,7 +2058,7 @@
     })(map4(Right.create)(action2));
   };
 
-  // output/Main.MinsiErrors/index.js
+  // output/Main.MinsiError/index.js
   var map5 = /* @__PURE__ */ map(functorArray);
   var toUnfoldable2 = /* @__PURE__ */ toUnfoldable(unfoldableArray);
   var show2 = /* @__PURE__ */ show(showInt);
@@ -2168,7 +2168,7 @@
         return "Compute failed: " + v.value0;
       }
       ;
-      throw new Error("Failed pattern match at Main.MinsiErrors (line 20, column 10 - line 32, column 51): " + [v.constructor.name]);
+      throw new Error("Failed pattern match at Main.MinsiError (line 20, column 10 - line 34, column 51): " + [v.constructor.name]);
     }
   };
   var throwMinsiError = /* @__PURE__ */ function() {
@@ -2212,7 +2212,7 @@
   var loadHtmlElement = function(id2) {
     return function(f) {
       return function(doc) {
-        return function __do4() {
+        return function __do5() {
           var maybeComponent = getElementById(id2)(doc)();
           var maybeComponentElement = bind1(maybeComponent)(f);
           if (maybeComponentElement instanceof Nothing) {
@@ -2276,10 +2276,10 @@
     var catchError1 = catchError(dictMonadError);
     var Monad0 = dictMonadError.MonadThrow0().Monad0();
     var map17 = map(Monad0.Bind1().Apply0().Functor0());
-    var pure18 = pure(Monad0.Applicative0());
+    var pure19 = pure(Monad0.Applicative0());
     return function(a) {
       return catchError1(map17(Right.create)(a))(function($52) {
-        return pure18(Left.create($52));
+        return pure19(Left.create($52));
       });
     };
   };
@@ -2427,7 +2427,7 @@
     return loadHtmlElement(id2)(fromElement2);
   };
   var loadHtmlVisualElements = function(doc) {
-    return function __do4() {
+    return function __do5() {
       var videoSourceRow = loadDiv(videoSourceRowId)(doc)();
       var videoRow = loadDiv(videoRowId)(doc)();
       var subtitlesRow = loadDiv(subtitlesRowId)(doc)();
@@ -2439,18 +2439,18 @@
     };
   };
   var loadResultPreview = function(doc) {
-    return catchError2(function __do4() {
+    return catchError2(function __do5() {
       var div2 = loadDiv(resultPreviewId)(doc)();
       return new ResultPreviewDiv(div2);
     })(function(v) {
-      return function __do4() {
+      return function __do5() {
         var iframe = loadHtmlElement(resultPreviewId)(fromElement3)(doc)();
         return new ResultPreviewIframe(iframe);
       };
     });
   };
   var loadCutRange = function(doc) {
-    return function __do4() {
+    return function __do5() {
       var cutStart = loadHtmlElement(cutStartId)(fromElement4)(doc)();
       var cutEnd = loadHtmlElement(cutEndId)(fromElement4)(doc)();
       return new Tuple(cutStart, cutEnd);
@@ -2460,7 +2460,7 @@
     return loadHtmlElement(id2)(fromElement);
   };
   var loadHtmlInputs = function(doc) {
-    return function __do4() {
+    return function __do5() {
       var rangeTuple = loadCutRange(doc)();
       var youtubeUrl = loadInput(youtubeUrlId)(doc)();
       var filename = loadInput(outputFilenameId)(doc)();
@@ -2487,7 +2487,7 @@
     };
   };
   var loadHtmlOutputs = function(doc) {
-    return function __do4() {
+    return function __do5() {
       var resultPreview = loadResultPreview(doc)();
       var addSubtitleButton = loadButton(addSubtitleId)(doc)();
       var minsiLog = loadDiv(minsiLogId)(doc)();
@@ -2509,7 +2509,7 @@
     };
   };
   var loadComponents = function(doc) {
-    return function __do4() {
+    return function __do5() {
       var inputs = loadHtmlInputs(doc)();
       var outputs = loadHtmlOutputs(doc)();
       var visualElements = loadHtmlVisualElements(doc)();
@@ -2528,6 +2528,7 @@
 
   // output/Web.HTML.HTMLDocument/index.js
   var toNonElementParentNode = unsafeCoerce2;
+  var toEventTarget = unsafeCoerce2;
   var toDocument = unsafeCoerce2;
 
   // output/Effect.Uncurried/foreign.js
@@ -2610,7 +2611,7 @@
 
   // output/Components.Window/index.js
   var raiseErrorAlert = function(msg) {
-    return function __do4() {
+    return function __do5() {
       var w = windowImpl();
       return alert("\u{1F63E}!!! ERROR !!! \u{1F63E}\n" + msg)(w)();
     };
@@ -3717,12 +3718,12 @@
   };
   var bindExceptT = function(dictMonad) {
     var bind11 = bind(dictMonad.Bind1());
-    var pure18 = pure(dictMonad.Applicative0());
+    var pure19 = pure(dictMonad.Applicative0());
     return {
       bind: function(v) {
         return function(k) {
           return bind11(v)(either(function($193) {
-            return pure18(Left.create($193));
+            return pure19(Left.create($193));
           })(function(a) {
             var v1 = k(a);
             return v1;
@@ -3915,7 +3916,7 @@
     return _makeFiber(ffiUtil, aff);
   };
   var launchAff = function(aff) {
-    return function __do4() {
+    return function __do5() {
       var fiber = makeFiber(aff)();
       fiber.run();
       return fiber;
@@ -4139,7 +4140,7 @@
 
   // output/Web.DOM.Element/index.js
   var toNode3 = unsafeCoerce2;
-  var toEventTarget = unsafeCoerce2;
+  var toEventTarget2 = unsafeCoerce2;
   var fromEventTarget = /* @__PURE__ */ unsafeReadProtoTagged("Element");
 
   // output/Web.DOM.Node/foreign.js
@@ -4191,7 +4192,7 @@
   var applySecond2 = /* @__PURE__ */ applySecond(applyEffect);
   var createErrorList = function(errorMessage) {
     var errorLines = split("<br>")(errorMessage);
-    return function __do4() {
+    return function __do5() {
       var w = windowImpl();
       var htmlDoc = document2(w)();
       var doc = toDocument(htmlDoc);
@@ -4206,11 +4207,11 @@
           return v.value0;
         }
         ;
-        throw new Error("Failed pattern match at Handers.ErrorHandlers (line 60, column 16 - line 62, column 21): " + [v.constructor.name]);
+        throw new Error("Failed pattern match at Handers.ErrorHandlers (line 64, column 16 - line 66, column 21): " + [v.constructor.name]);
       }();
       var ulNode = toNode3(toElement5(ulElement));
       traverse2(function(line) {
-        return function __do5() {
+        return function __do6() {
           var liElementRaw = createElement("li")(doc)();
           var liElement = function() {
             var v = fromElement8(liElementRaw);
@@ -4222,7 +4223,7 @@
               return v.value0;
             }
             ;
-            throw new Error("Failed pattern match at Handers.ErrorHandlers (line 67, column 22 - line 69, column 27): " + [v.constructor.name]);
+            throw new Error("Failed pattern match at Handers.ErrorHandlers (line 71, column 22 - line 73, column 27): " + [v.constructor.name]);
           }();
           var liNode = toNode3(toElement4(liElement));
           setTextContent(line)(liNode)();
@@ -4233,7 +4234,7 @@
     };
   };
   var writeToMinsiLog = function(errorMessage) {
-    return function __do4() {
+    return function __do5() {
       var doc = getDocument();
       var minsiLog = loadDiv(minsiLogId)(doc)();
       var errorList = createErrorList(errorMessage)();
@@ -4259,7 +4260,7 @@
       return applySecond2(log(errorMessage))(catchError3(writeToMinsiLog(errorMessage))($$const(raiseErrorAlert(errorMessage))));
     }
     ;
-    throw new Error("Failed pattern match at Handers.ErrorHandlers (line 36, column 1 - line 36, column 70): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at Handers.ErrorHandlers (line 38, column 1 - line 38, column 70): " + [v.constructor.name]);
   };
 
   // output/Data.Validation.Semigroup/index.js
@@ -4353,7 +4354,7 @@
   // output/Control.Monad.Loops/index.js
   var whileM_ = function(dictMonad) {
     var bind11 = bind(dictMonad.Bind1());
-    var pure18 = pure(dictMonad.Applicative0());
+    var pure19 = pure(dictMonad.Applicative0());
     return function(p) {
       return function(f) {
         return bind11(p)(function(v) {
@@ -4363,7 +4364,7 @@
             });
           }
           ;
-          return pure18(unit);
+          return pure19(unit);
         });
       };
     };
@@ -4500,7 +4501,7 @@
   }();
   var updateCutValue = function(cutInput) {
     return function(cutValueSpan) {
-      return function __do4() {
+      return function __do5() {
         var inputValue = value2(cutInput)();
         return setTextContent(inputValue)(toNode2(cutValueSpan))();
       };
@@ -4508,7 +4509,7 @@
   };
   var updateCutStartValue = function(cutStart) {
     return function(cutStartValue) {
-      return function __do4() {
+      return function __do5() {
         var inputValue = value2(cutStart)();
         return setTextContent(inputValue)(toNode2(cutStartValue))();
       };
@@ -4516,7 +4517,7 @@
   };
   var updateCutEndValue = function(cutEnd) {
     return function(cutEndValue) {
-      return function __do4() {
+      return function __do5() {
         var inputValue = value2(cutEnd)();
         return setTextContent(inputValue)(toNode2(cutEndValue))();
       };
@@ -4525,7 +4526,7 @@
   var cutStartEventListener = function(cutStart) {
     return function(cutStartValue) {
       return function(v) {
-        return function __do4() {
+        return function __do5() {
           var inputValue = value2(cutStart)();
           return setTextContent(inputValue)(toNode2(cutStartValue))();
         };
@@ -4535,7 +4536,7 @@
   var cutEndEventListener = function(cutEnd) {
     return function(cutEndValue) {
       return function(v) {
-        return function __do4() {
+        return function __do5() {
           var inputValue = value2(cutEnd)();
           return setTextContent(inputValue)(toNode2(cutEndValue))();
         };
@@ -4543,9 +4544,9 @@
     };
   };
   var setCutRangeHandlers = function(v) {
-    var cutStartEventTarget = toEventTarget(toElement3(v.value0.cutStart));
-    var cutEndEventTarget = toEventTarget(toElement3(v.value0.cutEnd));
-    return function __do4() {
+    var cutStartEventTarget = toEventTarget2(toElement3(v.value0.cutStart));
+    var cutEndEventTarget = toEventTarget2(toElement3(v.value0.cutEnd));
+    return function __do5() {
       var cutStartEvL = eventListener(cutStartEventListener(v.value0.cutStart)(v.value0.cutStartValue))();
       var cutEndEvL = eventListener(cutEndEventListener(v.value0.cutEnd)(v.value0.cutEndValue))();
       addEventListener(input)(cutStartEvL)(false)(cutStartEventTarget)();
@@ -4569,7 +4570,7 @@
   var setCutInputButtonEvL = function(cutInput) {
     return function(cutValueSpan) {
       return function(v) {
-        return function __do4() {
+        return function __do5() {
           var currentTime2 = getPlayerCurrentTime();
           setValue2(show4(currentTime2))(cutInput)();
           return updateCutValue(cutInput)(cutValueSpan)();
@@ -4698,7 +4699,7 @@
     return Iterator2;
   }();
   var next = function(v) {
-    return function __do4() {
+    return function __do5() {
       var i = read2(v.value1)();
       modify(function(v1) {
         return v1 + 1 | 0;
@@ -4711,10 +4712,10 @@
   };
   var iterate = function(iter) {
     return function(f) {
-      return function __do4() {
+      return function __do5() {
         var $$break = newSTRef(false)();
         while (map9(not3)(read2($$break))()) {
-          (function __do5() {
+          (function __do6() {
             var mx = next(iter)();
             if (mx instanceof Just) {
               return f(mx.value0)();
@@ -4890,7 +4891,7 @@
     return num + ("." + dec);
   };
   var updatePlaybackPosition = function(playbackPosition) {
-    return function __do4() {
+    return function __do5() {
       var playerReady = isPlayerReady();
       var currentTime2 = getPlayerCurrentTime();
       return when2(playerReady)(setTextContent(formatToThreeDecimals(currentTime2))(toNode2(playbackPosition)))();
@@ -5089,7 +5090,7 @@
   };
   var compactableArray = {
     compact: function(xs) {
-      return function __do4() {
+      return function __do5() {
         var result = newSTArray();
         var iter = iterator(function(v) {
           return index2(xs)(v);
@@ -5111,7 +5112,7 @@
       }();
     },
     separate: function(xs) {
-      return function __do4() {
+      return function __do5() {
         var ls = newSTArray();
         var rs = newSTArray();
         var iter = iterator(function(v) {
@@ -5395,11 +5396,11 @@
     };
   };
   var readArray = function(dictMonad) {
-    var pure18 = pure(applicativeExceptT(dictMonad));
+    var pure19 = pure(applicativeExceptT(dictMonad));
     var fail1 = fail(dictMonad);
     return function(value12) {
       if (isArray(value12)) {
-        return pure18(unsafeFromForeign(value12));
+        return pure19(unsafeFromForeign(value12));
       }
       ;
       if (otherwise) {
@@ -5410,12 +5411,12 @@
     };
   };
   var unsafeReadTagged = function(dictMonad) {
-    var pure18 = pure(applicativeExceptT(dictMonad));
+    var pure19 = pure(applicativeExceptT(dictMonad));
     var fail1 = fail(dictMonad);
     return function(tag) {
       return function(value12) {
         if (tagOf(value12) === tag) {
-          return pure18(unsafeFromForeign(value12));
+          return pure19(unsafeFromForeign(value12));
         }
         ;
         if (otherwise) {
@@ -5438,17 +5439,17 @@
   };
 
   // output/Foreign.Index/foreign.js
-  function unsafeReadPropImpl(f, s, key, value12) {
-    return value12 == null ? f : s(value12[key]);
+  function unsafeReadPropImpl(f, s, key2, value12) {
+    return value12 == null ? f : s(value12[key2]);
   }
 
   // output/Foreign.Index/index.js
   var unsafeReadProp = function(dictMonad) {
     var fail3 = fail(dictMonad);
-    var pure18 = pure(applicativeExceptT(dictMonad));
+    var pure19 = pure(applicativeExceptT(dictMonad));
     return function(k) {
       return function(value12) {
-        return unsafeReadPropImpl(fail3(new TypeMismatch("object", typeOf(value12))), pure18, k, value12);
+        return unsafeReadPropImpl(fail3(new TypeMismatch("object", typeOf(value12))), pure19, k, value12);
       };
     };
   };
@@ -5515,9 +5516,9 @@
   // output/Record.Builder/foreign.js
   function copyRecord(rec) {
     var copy = {};
-    for (var key in rec) {
-      if ({}.hasOwnProperty.call(rec, key)) {
-        copy[key] = rec[key];
+    for (var key2 in rec) {
+      if ({}.hasOwnProperty.call(rec, key2)) {
+        copy[key2] = rec[key2];
       }
     }
     return copy;
@@ -5778,7 +5779,7 @@
       return function(cutStartValue) {
         return function(cutEndValue) {
           return function(ev) {
-            return genericErrorsHandler(function __do4() {
+            return genericErrorsHandler(function __do5() {
               var rawValue = getInputValue(ev)();
               var youtubeUrlV = maybe(invalid(singleton3(youtubeUrlId)("Empty YoutubeUrl Input")))(function(v) {
                 return youtubeUrlValidation(youtubeUrlId)(v);
@@ -5806,10 +5807,10 @@
     };
   };
   var setVideoHandlers = function(v) {
-    var ytUrlEventTarget = toEventTarget(toElement3(v.value0.youtubeUrl));
-    var setCutStartButtonTarget = toEventTarget(toElement(v.value0.setCutStartButton));
-    var setCutEndButtonTarget = toEventTarget(toElement(v.value0.setCutEndButton));
-    return function __do4() {
+    var ytUrlEventTarget = toEventTarget2(toElement3(v.value0.youtubeUrl));
+    var setCutStartButtonTarget = toEventTarget2(toElement(v.value0.setCutStartButton));
+    var setCutEndButtonTarget = toEventTarget2(toElement(v.value0.setCutEndButton));
+    return function __do5() {
       var ytEvL = eventListener(youtubeUrlEventListener(v.value0.cutStart)(v.value0.cutEnd)(v.value0.cutStartValue)(v.value0.cutEndValue))();
       addEventListener(input)(ytEvL)(false)(ytUrlEventTarget)();
       addEventListener(change)(ytEvL)(false)(ytUrlEventTarget)();
@@ -6041,14 +6042,14 @@
   };
 
   // output/Yoga.JSON/foreign.js
-  function reviver(key, value12) {
-    if (key === "big") {
+  function reviver(key2, value12) {
+    if (key2 === "big") {
       return BigInt(value12);
     }
     return value12;
   }
   var _parseJSON2 = (payload) => JSON.parse(payload, reviver);
-  function replacer(key, value12) {
+  function replacer(key2, value12) {
     if (typeof value12 === "bigint") {
       return value12.toString();
     }
@@ -6336,7 +6337,7 @@
             return pure13(v.value0);
           }
           ;
-          throw new Error("Failed pattern match at Endpoints.ResponseParser (line 29, column 5 - line 40, column 21): " + [v.constructor.name]);
+          throw new Error("Failed pattern match at Endpoints.ResponseParser (line 33, column 5 - line 49, column 21): " + [v.constructor.name]);
         });
       };
     };
@@ -6683,7 +6684,7 @@
   var toAbortableAff = function(abortController) {
     return function(p) {
       return makeAff(function(cb) {
-        return function __do4() {
+        return function __do5() {
           $$void6(thenOrCatch4(function(a) {
             return map15(resolve4)(cb(new Right(a)));
           })(function(e) {
@@ -7068,7 +7069,7 @@
   var apply4 = /* @__PURE__ */ apply(/* @__PURE__ */ applyV(/* @__PURE__ */ semigroupMap()(ordString)(semigroupString)));
   var map16 = /* @__PURE__ */ map(functorV);
   var youtubeUrlFromHTMLInput = function(youtubeUrlComponent) {
-    return function __do4() {
+    return function __do5() {
       var urlString = value2(youtubeUrlComponent)();
       return youtubeUrlValidation(youtubeUrlId)(urlString);
     };
@@ -7080,7 +7081,7 @@
   };
   var cutVideoFromHtmlRange = function(cutStart) {
     return function(cutEnd) {
-      return function __do4() {
+      return function __do5() {
         var start2 = valueAsNumber(cutStart)();
         var end = valueAsNumber(cutEnd)();
         return cutVideoValidation(cutStartId)(start2 * 1e3)(end * 1e3);
@@ -7088,7 +7089,7 @@
     };
   };
   var fromHtmlInputs = function(v) {
-    return function __do4() {
+    return function __do5() {
       var cutVideoV = cutVideoFromHtmlRange(v.value0.cutStart)(v.value0.cutEnd)();
       var youtubeUrlV = youtubeUrlFromHTMLInput(v.value0.youtubeUrl)();
       var filenameV = nonEmptyFromHtmlInput(v.value0.filename)(outputFilenameId)();
@@ -7152,7 +7153,7 @@
           return liftEffect8(throwMinsiError(new ComputeFailed("Video download failed")));
         }
         ;
-        throw new Error("Failed pattern match at Handlers.ApplyButtonHandler (line 72, column 7 - line 75, column 87): " + [response.status.constructor.name]);
+        throw new Error("Failed pattern match at Handlers.ApplyButtonHandler (line 74, column 5 - line 77, column 85): " + [response.status.constructor.name]);
       });
     };
     return tailRecM3(pollStatus)(unit);
@@ -7160,7 +7161,7 @@
   var setVideoSrc = function(filepath) {
     return function(video) {
       var videoMediaElement = toHTMLMediaElement(video);
-      return function __do4() {
+      return function __do5() {
         var timestamp = now();
         var cacheBustedPath = filepath + ("?t=" + show15(timestamp));
         pause(videoMediaElement)();
@@ -7177,21 +7178,21 @@
   var removeClass = function(className2) {
     return function(div2) {
       var element = toElement2(div2);
-      return function __do4() {
+      return function __do5() {
         var classList2 = classList(element)();
         return remove(classList2)(className2)();
       };
     };
   };
   var showHiddenElements = function(v) {
-    return function __do4() {
+    return function __do5() {
       removeClass("d-none")(v.value0.videoSourceRow)();
       removeClass("d-none")(v.value0.videoRow)();
       return removeClass("d-none")(v.value0.subtitlesRow)();
     };
   };
   var applyButtonEventListener = function(v) {
-    return genericErrorsHandler(function __do4() {
+    return genericErrorsHandler(function __do5() {
       var doc = getDocument();
       var components = loadComponents(doc)();
       var stateV = fromHtmlInputs(components.htmlInputs)();
@@ -7202,7 +7203,7 @@
       var filepath = mp4(filename);
       showLoadingModal(loadingModalId)();
       return runAff_(function(result) {
-        return function __do5() {
+        return function __do6() {
           genericErrorsHandlerEither(result)();
           log("return from server, show elements and set src")();
           showHiddenElements(components.htmlVisualElements)();
@@ -7216,16 +7217,52 @@
     });
   };
   var setApplyButtonHandler = function(applyButton) {
-    var applyButtonEventTarget = toEventTarget(toElement(applyButton));
-    return function __do4() {
+    var applyButtonEventTarget = toEventTarget2(toElement(applyButton));
+    return function __do5() {
       var applyButtonEvL = eventListener(applyButtonEventListener)();
       return addEventListener(click2)(applyButtonEvL)(false)(applyButtonEventTarget)();
     };
   };
 
+  // output/Web.UIEvent.KeyboardEvent/foreign.js
+  function key(e) {
+    return e.key;
+  }
+  function ctrlKey(e) {
+    return e.ctrlKey;
+  }
+  function metaKey(e) {
+    return e.metaKey;
+  }
+
+  // output/Web.UIEvent.KeyboardEvent/index.js
+  var fromEvent = /* @__PURE__ */ unsafeReadProtoTagged("KeyboardEvent");
+
+  // output/Web.UIEvent.KeyboardEvent.EventTypes/index.js
+  var keydown = "keydown";
+
+  // output/Handlers.KeyboardHandler/index.js
+  var when3 = /* @__PURE__ */ when(applicativeEffect);
+  var pure16 = /* @__PURE__ */ pure(applicativeEffect);
+  var keyboardEventListener = function(ev) {
+    var handleKeyboardEvent = function(keyboardEvent) {
+      var keyValue = key(keyboardEvent);
+      var isMeta = metaKey(keyboardEvent);
+      var isCtrl = ctrlKey(keyboardEvent);
+      return when3(keyValue === "Enter" && (isCtrl || isMeta))(applyButtonEventListener(ev));
+    };
+    return maybe(pure16(unit))(handleKeyboardEvent)(fromEvent(ev));
+  };
+  var setKeyboardHandlers = function __do3() {
+    var w = windowImpl();
+    var doc = document2(w)();
+    var keyboardEvL = eventListener(keyboardEventListener)();
+    return addEventListener(keydown)(keyboardEvL)(false)(toEventTarget(doc))();
+  };
+
   // output/Handlers.Handlers/index.js
   var setupEventHandlers = function(v) {
-    return function __do4() {
+    return function __do5() {
       setCutRangeHandlers(new CRET({
         cutStart: v.htmlInputs.value0.cutStart,
         cutEnd: v.htmlInputs.value0.cutEnd,
@@ -7242,12 +7279,13 @@
         cutStartValue: v.htmlOutputs.cutStartValue,
         cutEndValue: v.htmlOutputs.cutEndValue
       }))();
-      return setApplyButtonHandler(v.htmlInputs.value0.applyButton)();
+      setApplyButtonHandler(v.htmlInputs.value0.applyButton)();
+      return setKeyboardHandlers();
     };
   };
 
   // output/Endpoints.CheckDependencies/index.js
-  var pure16 = /* @__PURE__ */ pure(applicativeAff);
+  var pure17 = /* @__PURE__ */ pure(applicativeAff);
   var decodeJsonResponse3 = /* @__PURE__ */ decodeJsonResponse(/* @__PURE__ */ readForeignRecord()(/* @__PURE__ */ readForeignFieldsCons({
     reflectSymbol: function() {
       return "missedDependencies";
@@ -7265,7 +7303,7 @@
       method: POST.value
     }))(function(response) {
       if (response.ok) {
-        return pure16({
+        return pure17({
           missedDependencies: []
         });
       }
@@ -7276,19 +7314,19 @@
 
   // output/Main.CheckDependencies/index.js
   var $$null5 = /* @__PURE__ */ $$null(foldableArray);
-  var pure17 = /* @__PURE__ */ pure(applicativeAff);
+  var pure18 = /* @__PURE__ */ pure(applicativeAff);
   var liftEffect9 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var checkDependecies = /* @__PURE__ */ bind(bindAff)(callCheckDependencies)(function(v) {
     var $6 = $$null5(v.missedDependencies);
     if ($6) {
-      return pure17(unit);
+      return pure18(unit);
     }
     ;
     return liftEffect9(throwMinsiError(new MissingDependenciesError(v.missedDependencies)));
   });
 
   // output/Main/index.js
-  var program = function __do3() {
+  var program = function __do4() {
     runAff_(genericErrorsHandlerEither)(checkDependecies)();
     var doc = getDocument();
     var htmlComponents = loadComponents(doc)();

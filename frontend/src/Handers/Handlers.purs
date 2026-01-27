@@ -2,6 +2,7 @@ module Handlers.Handlers where
 
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CutRangeHandler (CutRangeTargets(..), setCutRangeHandlers)
+import Handlers.KeyboardHandler (setKeyboardHandlers)
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlOutputs(..))
 import Effect (Effect)
 import Handers.YoutubeVideo.YoutubeVideoHandler (setVideoHandlers, VideoEventTargets(..))
@@ -44,4 +45,5 @@ setupEventHandlers
         }
     )
   setApplyButtonHandler applyButton
+  setKeyboardHandlers
 
