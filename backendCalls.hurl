@@ -1,15 +1,15 @@
 # Backend API Calls
 # Server runs on http://localhost:8080
 
-# Check Dependencies Endpoint
 # Verifies that required software and fonts are available
+# @name checkDependencies
 POST http://localhost:8080/checkDependencies
 Content-Type: application/json
 
 ###
 
-# Check Dependencies Endpoint
 # Verifies that required software and fonts are available
+# @name status
 POST http://localhost:8080/status
 Content-Type: application/json
 
@@ -17,8 +17,8 @@ Content-Type: application/json
 
 ###
 
-# Cut Video Endpoint
-# # Processes video cutting request
+# Processes video cutting request
+# @name compute
 POST http://localhost:8080/compute
 Content-Type: application/json
 
@@ -40,7 +40,7 @@ Content-Type: application/json
       },
       "value": "Test subtitle",
       "font": "Impact",
-      "size": 24,
+      "fontSize": 24,
       "color": "#ffffff",
       "screenPosition": "Top"
     },
@@ -51,7 +51,7 @@ Content-Type: application/json
       },
       "value": "Another subtitle",
       "font": "Arial Black",
-      "size": 32,
+      "fontSize": 32,
       "color": "#FFFF00",
       "screenPosition": "Bottom"
     }

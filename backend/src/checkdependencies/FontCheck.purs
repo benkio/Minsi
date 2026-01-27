@@ -1,9 +1,18 @@
 module CheckDependencies.FontCheck where
 
+import Data.Time.Duration (Milliseconds(..))
+
+import Node.ChildProcess.Types (stringSignal)
+import Node.ChildProcess (execSync)
+import Node.Encoding (Encoding(..))
+import Node.Buffer (toString)
+import Node.Library.Execa.Which (isWindows)
+import Effect.Console (log)
 import Node.Library.Execa (execaCommandSync)
 import Control.Monad.Error.Class (catchError)
 import Control.Monad.Loops (anyM)
 import Data.Array (catMaybes, partition)
+import Data.Maybe (Maybe(..))
 import Data.Either (hush)
 import Data.Foldable (foldM)
 import Data.Functor ((<#>))
@@ -18,13 +27,10 @@ import Data.Tuple (Tuple(..), fst, snd)
 import Effect (Effect)
 import Effect.Console (error)
 import Effect.Exception (catchException, message, try)
-import Node.Buffer (toString)
-import Node.ChildProcess.Types (Exit(..))
-import Node.Encoding (Encoding(..))
 import Node.FS.Stats (isDirectory)
 import Node.FS.Sync (readdir, stat, exists)
 import Node.Path (FilePath, basename, normalize)
-import Prelude (bind, map, pure, ($), (*>), (<$>), (<<<), (<>), (>>=), (>>>))
+import Prelude
 
 fontDependencies :: Array String
 fontDependencies =
@@ -69,8 +75,9 @@ searchFont font = do
 
 fcListSearch :: String -> Effect Boolean
 fcListSearch font = catchException (\e -> error (message e) *> pure false) $ do
-  execaResult <- execaCommandSync "fc-list" (\x -> x)
-  pure $ any (includes font) <<< lines $ execaResult.stdout
+  log ("Execute Command: fc-list")
+  stringResult <- execSync "fc-list" >>= toString UTF8
+  pure $ any (includes font) <<< lines $ stringResult
 
 searchFontInDirs :: String -> Effect Boolean
 searchFontInDirs font = do

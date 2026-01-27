@@ -29,7 +29,7 @@ import Effect.Timer (setInterval)
 data VideoEventTargets = VET
   { cutStart :: HI.HTMLInputElement
   , cutEnd :: HI.HTMLInputElement
-  , playbackPosition :: HSP.HTMLSpanElement
+  , playbackPositionYoutube :: HSP.HTMLSpanElement
   , setCutEndButton :: HB.HTMLButtonElement
   , setCutStartButton :: HB.HTMLButtonElement
   , youtubeUrl :: HI.HTMLInputElement
@@ -42,7 +42,7 @@ setVideoHandlers
   ( VET
       { cutStart
       , setCutStartButton
-      , playbackPosition
+      , playbackPositionYoutube
       , cutEnd
       , setCutEndButton
       , youtubeUrl: youtubeUrl
@@ -53,7 +53,7 @@ setVideoHandlers
   ytEvL <- eventListener (youtubeUrlEventListener cutStart cutEnd cutStartValue cutEndValue)
   addEventListener E.input ytEvL false ytUrlEventTarget
   addEventListener E.change ytEvL false ytUrlEventTarget
-  _ <- setInterval 1000 (updatePlaybackPosition playbackPosition)
+  _ <- setInterval 1000 (updatePlaybackPosition playbackPositionYoutube)
   setCutStartButtonEvLV <- eventListener (setCutInputButtonEvL cutStart cutStartValue)
   setCutEndButtonEvLV <- eventListener (setCutInputButtonEvL cutEnd cutEndValue)
   addEventListener E.click setCutStartButtonEvLV false setCutStartButtonTarget

@@ -1,6 +1,5 @@
 module CheckDependencies.SoftwareCheck where
 
-import Node.Library.Execa (execaCommandSync)
 import Data.Either (isRight)
 import Effect.Console (log)
 import Data.Foldable (foldM)

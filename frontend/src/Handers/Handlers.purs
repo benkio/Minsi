@@ -43,7 +43,7 @@ setupEventHandlers
     ( VET
         { cutStart: cutStart
         , cutEnd: cutEnd
-        , playbackPosition: playbackPositionYoutube
+        , playbackPositionYoutube: playbackPositionYoutube
         , setCutStartButton: setCutStartButton
         , setCutEndButton: setCutEndButton
         , youtubeUrl: youtubeUrl

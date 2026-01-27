@@ -1,12 +1,13 @@
 module Model.State.StateFromHtml where
 
-import Data.Array (catMaybes, fromFoldable, head)
-import Data.Int (round)
+import Main.MinsiError (MinsiError(..), throwMinsiError)
+import Data.Array (catMaybes, head)
+import Data.Int (fromString)
 import Data.Map (Map)
-import Data.Maybe (Maybe(..), maybe)
+import Data.Maybe (Maybe(..), maybe, fromMaybe)
 import Data.Traversable (traverse)
 import Data.Time.Duration (Milliseconds(..))
-import Web.DOM.Element (fromNode, toParentNode, toNode)
+import Web.DOM.Element (toParentNode)
 import Web.DOM.ParentNode (QuerySelector(..), querySelector)
 import Web.HTML.HTMLInputElement (HTMLInputElement, value, valueAsNumber, checked)
 import Web.HTML.HTMLInputElement as HI
@@ -16,8 +17,9 @@ import Web.HTML.HTMLTableRowElement as HTR
 import Web.HTML.HTMLTableSectionElement as HTS
 import Web.HTML.HTMLTextAreaElement as HTA
 import Web.HTML.HTMLTableCellElement as HTC
+import Web.DOM.HTMLCollection as HC
 import Effect (Effect)
-import Components.HtmlComponents (HtmlInputs(..), HtmlOutputs(..))
+import Components.HtmlComponents (HtmlInputs(..))
 import Model.State.State (State(..), DurationRange(..), WURL(..), Subtitle(..), Font(..), Color(..), Position(..))
 import Data.URL (URL)
 import Prelude
@@ -81,28 +83,25 @@ nonEmptyFromHtmlInput i id =
 
 loadSubtitlesFromTable :: HT.HTMLTableElement -> Effect (Array Subtitle)
 loadSubtitlesFromTable table = do
-  tbodyMaybe <- HT.tBodies table >>= \bodies -> pure $ head (fromFoldable bodies)
-  case tbodyMaybe of
-    Nothing -> pure []
-    Just tbody -> do
-      rows <- HTS.rows tbody
-      rowArray <- fromFoldable rows
-      subtitles <- catMaybes <$> traverse loadSubtitleFromRow rowArray
-      pure subtitles
+  tbody <- HT.tBodies table >>= (\b -> map (\x -> head x >>= HTS.fromElement) (HC.toArray b)) >>= maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableStartCell")) pure
+  rows <- HTS.rows tbody
+  rowArray <- HC.toArray rows
+  subtitles <- catMaybes <$> traverse (\x -> loadSubtitleFromRow =<< maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableRow")) pure (HTR.fromElement x)) rowArray
+  pure subtitles
 
 loadSubtitleFromRow :: HTR.HTMLTableRowElement -> Effect (Maybe Subtitle)
 loadSubtitleFromRow row = do
   cells <- HTR.cells row
-  let cellArray = fromFoldable cells
+  cellArray <- HC.toArray cells
   case cellArray of
     [startCell, endCell, valueCell, fontCell, fontSizeCell, colorCell, positionCell, _] -> do
-      startValue <- getInputValueFromCell startCell >>= \v -> pure $ maybe 0.0 identity v
-      endValue <- getInputValueFromCell endCell >>= \v -> pure $ maybe 0.0 identity v
-      valueText <- getTextAreaValueFromCell valueCell
-      fontValue <- getSelectValueFromCell fontCell
-      fontSizeValue <- getInputValueFromCell fontSizeCell >>= \v -> pure $ maybe 48 (round <<< identity) v
-      colorValue <- getSelectValueFromCell colorCell
-      positionValue <- getSelectValueFromCell positionCell
+      startValue <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableStartCell")) pure (HTC.fromElement startCell) >>= getInputValueFromCell >>= \v -> pure $ maybe 0.0 identity v
+      endValue <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableEndCell")) pure (HTC.fromElement endCell) >>= getInputValueFromCell >>= \v -> pure $ maybe 0.0 identity v
+      valueText <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTablevalueCell")) pure (HTC.fromElement valueCell) >>= getTextAreaValueFromCell
+      fontValue <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTablefontCell")) pure (HTC.fromElement fontCell) >>= getSelectValueFromCell
+      fontSizeValue <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTablefontSizeCell")) pure (HTC.fromElement fontSizeCell) >>= getSelectValueFromCell <#> \mv -> fromMaybe 48 (fromString mv)
+      colorValue <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTablecolorCell")) pure (HTC.fromElement colorCell) >>= getSelectValueFromCell
+      positionValue <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTablepositionCell")) pure (HTC.fromElement positionCell) >>= getSelectValueFromCell
       pure $ Just $ Subtitle
         { videoPosition: DurationRange
             { start: Milliseconds (startValue * 1000.0)

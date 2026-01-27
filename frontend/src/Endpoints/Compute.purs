@@ -3,7 +3,7 @@ module Endpoints.Compute where
 import Effect.Class (liftEffect)
 
 import Model.State.State (State)
-import Endpoints.ResponseParser (decodeJsonResponse, validateResponse)
+import Endpoints.ResponseParser (validateResponse)
 import Main.Config (backendUrl)
 import Effect.Aff (Aff)
 import Yoga.JSON (writeJSON)

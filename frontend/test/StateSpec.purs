@@ -57,7 +57,7 @@ spec = do
             { videoPosition: DurationRange { start: Milliseconds 10.0, end: Milliseconds 20.0 }
             , value: "Test subtitle"
             , font: Impact
-                , fontSize: 24
+            , fontSize: 24
             , color: White
             , screenPosition: Top
             }
@@ -162,9 +162,9 @@ spec = do
       subtitlePosition `shouldEqual` "Top"
 
       -- Check subtitle size
-      subtitleSize <- case lookup "size" subtitleObj of
+      subtitleSize <- case lookup "fontSize" subtitleObj of
         Just s -> liftEffect $ readForeignInt s
-        Nothing -> liftEffect $ throwException $ error "size field missing in subtitle"
+        Nothing -> liftEffect $ throwException $ error "fontSize field missing in subtitle"
       subtitleSize `shouldEqual` 24
 
       pure unit

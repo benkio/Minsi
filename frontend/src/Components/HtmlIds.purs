@@ -46,7 +46,7 @@ minsiLogId :: String
 minsiLogId = "minsiLog"
 
 playbackPositionYoutubeId :: String
-playbackPositionYoutubeId = "playbackPosition"
+playbackPositionYoutubeId = "playbackPositionYoutube"
 
 playbackPositionResultVideoId :: String
 playbackPositionResultVideoId = "playbackPositionResultVideo"
