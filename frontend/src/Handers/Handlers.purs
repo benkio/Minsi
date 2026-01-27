@@ -1,5 +1,6 @@
 module Handlers.Handlers where
 
+import Handlers.AddSubtitleButtonHandler (setAddSubtitleButtonHandler)
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CutRangeHandler (CutRangeTargets(..), setCutRangeHandlers)
 import Handlers.KeyboardHandler (setKeyboardHandlers)
@@ -22,6 +23,7 @@ setupEventHandlers
       { playbackPosition
       , cutEndValue
       , cutStartValue
+      , addSubtitleButton
       }
   } = do
   setCutRangeHandlers
@@ -46,4 +48,5 @@ setupEventHandlers
     )
   setApplyButtonHandler applyButton
   setKeyboardHandlers
+  setAddSubtitleButtonHandler addSubtitleButton
 
