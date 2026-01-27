@@ -4,6 +4,7 @@ import Handlers.AddSubtitleButtonHandler (setAddSubtitleButtonHandler)
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CutRangeHandler (CutRangeTargets(..), setCutRangeHandlers)
 import Handlers.KeyboardHandler (setKeyboardHandlers)
+import Handlers.VideoSourceHandler (setVideoSourceHandler)
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlOutputs(..))
 import Effect (Effect)
 import Handers.YoutubeVideo.YoutubeVideoHandler (setVideoHandlers, VideoEventTargets(..))
@@ -18,12 +19,14 @@ setupEventHandlers
       , setCutStartButton
       , setCutEndButton
       , applyButton
+      , videoSource
       }
   , htmlOutputs: HtmlOutputs
       { playbackPosition
       , cutEndValue
       , cutStartValue
       , addSubtitleButton
+      , resultVideo
       }
   } = do
   setCutRangeHandlers
@@ -49,4 +52,5 @@ setupEventHandlers
   setApplyButtonHandler applyButton
   setKeyboardHandlers
   setAddSubtitleButtonHandler addSubtitleButton
+  setVideoSourceHandler videoSource resultVideo
 

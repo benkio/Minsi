@@ -2,7 +2,9 @@ module Handlers.ApplyButtonHandler where
 
 import Prelude
 
-import Components.HtmlComponents (HtmlVisualElements(..), loadComponents)
+import Data.Tuple (Tuple(..), fst, snd)
+import Model.State.State (State)
+import Components.HtmlComponents (HtmlComponents, HtmlVisualElements(..), loadComponents)
 import Components.HtmlIds (loadingModalId, videoSourceId)
 import Components.Modal (hideLoadingModal, showLoadingModal)
 import Components.Window (getDocument)
@@ -36,6 +38,7 @@ import Web.HTML.HTMLVideoElement (HTMLVideoElement, toHTMLMediaElement)
 import Web.HTML.Location (setHash)
 import Web.HTML.Window (location)
 import Effect.Now (now)
+import Data.DateTime.Instant (unInstant)
 
 setApplyButtonHandler :: HB.HTMLButtonElement -> Effect Unit
 setApplyButtonHandler applyButton = do
@@ -46,10 +49,9 @@ setApplyButtonHandler applyButton = do
 
 applyButtonEventListener :: Event -> Effect Unit
 applyButtonEventListener _ = genericErrorsHandler $ do
-  doc <- getDocument
-  components <- loadComponents doc
-  stateV <- fromHtmlInputs components.htmlInputs
-  state <- (either (throwMinsiError <<< InvalidInputs) pure <<< toEither) stateV
+  stateComponents <- getCurrentState
+  let state = fst stateComponents
+  let components = snd stateComponents
   let filename = (unwrap state).filename
   let filepath = mp4 filename
   showLoadingModal loadingModalId
@@ -78,8 +80,8 @@ waitForStatus filename = tailRecM pollStatus unit
 
 setVideoSrc :: String -> HTMLVideoElement -> Effect Unit
 setVideoSrc filepath video = do
-  timestamp <- now
-  let cacheBustedPath = filepath <> "?t=" <> show timestamp
+  (Milliseconds m) <- unInstant <$> now
+  let cacheBustedPath = filepath <> "?t=" <> show m
   pause videoMediaElement
   setSrc cacheBustedPath videoMediaElement
   load videoMediaElement
@@ -103,3 +105,11 @@ scrollToVideoSource = do
   w <- window
   loc <- location w
   setHash ("#" <> videoSourceId) loc
+
+getCurrentState :: Effect (Tuple State HtmlComponents)
+getCurrentState = do
+  doc <- getDocument
+  components <- loadComponents doc
+  stateV <- fromHtmlInputs components.htmlInputs
+  state <- (either (throwMinsiError <<< InvalidInputs) pure <<< toEither) stateV
+  pure $ Tuple state components
