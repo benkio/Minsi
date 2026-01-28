@@ -1,7 +1,7 @@
 module Model.State.StateFromHtml where
 
 import Main.MinsiError (MinsiError(..), throwMinsiError)
-import Data.Array (catMaybes, head)
+import Data.Array (catMaybes)
 import Data.Int (fromString)
 import Data.Map (Map)
 import Data.Maybe (Maybe(..), maybe, fromMaybe)
@@ -14,7 +14,7 @@ import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.HTMLTableElement as HT
 import Web.HTML.HTMLTableRowElement as HTR
-import Web.HTML.HTMLTableSectionElement as HTS
+import Components.HTMLTableElement (getRows)
 import Web.HTML.HTMLTextAreaElement as HTA
 import Web.HTML.HTMLTableCellElement as HTC
 import Web.DOM.HTMLCollection as HC
@@ -83,10 +83,8 @@ nonEmptyFromHtmlInput i id =
 
 loadSubtitlesFromTable :: HT.HTMLTableElement -> Effect (Array Subtitle)
 loadSubtitlesFromTable table = do
-  tbody <- HT.tBodies table >>= (\b -> map (\x -> head x >>= HTS.fromElement) (HC.toArray b)) >>= maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableBody")) pure
-  rows <- HTS.rows tbody
-  rowArray <- HC.toArray rows
-  subtitles <- catMaybes <$> traverse (\x -> loadSubtitleFromRow =<< maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableRow")) pure (HTR.fromElement x)) rowArray
+  rows <- getRows table
+  subtitles <- catMaybes <$> traverse loadSubtitleFromRow rows
   pure subtitles
 
 loadSubtitleFromRow :: HTR.HTMLTableRowElement -> Effect (Maybe Subtitle)

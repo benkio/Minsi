@@ -1,0 +1,75 @@
+module Components.HTMLTableElement where
+
+import Prelude
+
+import Data.Array (catMaybes, drop, head, last)
+import Data.Maybe (Maybe(..), maybe)
+import Effect (Effect)
+import Main.MinsiError (MinsiError(..), throwMinsiError)
+import Web.DOM.Element (toParentNode)
+import Web.DOM.HTMLCollection as HC
+import Web.DOM.ParentNode (QuerySelector(..), querySelector)
+import Web.HTML.HTMLInputElement (HTMLInputElement)
+import Web.HTML.HTMLInputElement as HI
+import Web.HTML.HTMLTableElement as HT
+import Web.HTML.HTMLTableRowElement as HTR
+import Web.HTML.HTMLTableSectionElement as HTS
+import Web.HTML.HTMLTableCellElement as HTC
+
+-- | Get the tbody element from a table
+getTBody :: HT.HTMLTableElement -> Effect HTS.HTMLTableSectionElement
+getTBody table = do
+  tBodies <- HT.tBodies table
+  tBodyArray <- HC.toArray tBodies
+  maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableBody")) pure
+    $ (head tBodyArray >>= HTS.fromElement)
+
+-- | Get an array of all rows from a table's tbody
+getRows :: HT.HTMLTableElement -> Effect (Array HTR.HTMLTableRowElement)
+getRows table = do
+  tbody <- getTBody table
+  rows <- HTS.rows tbody
+  rowArray <- HC.toArray rows
+  pure $ catMaybes $ map HTR.fromElement rowArray
+
+-- | Get the first row from a table
+getFirstRow :: HT.HTMLTableElement -> Effect HTR.HTMLTableRowElement
+getFirstRow table = do
+  rows <- getRows table
+  maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableFirstRow")) pure
+    $ head rows
+
+-- | Get the last row from a table
+getLastRow :: HT.HTMLTableElement -> Effect HTR.HTMLTableRowElement
+getLastRow table = do
+  rows <- getRows table
+  maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableLastRow")) pure
+    $ last rows
+
+-- | Get the start input element from a table row (first cell)
+getStartInput :: HTR.HTMLTableRowElement -> Effect HTMLInputElement
+getStartInput row = do
+  cells <- HTR.cells row
+  cellArray <- HC.toArray cells
+  startCell <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableStartCell")) pure
+    $ (head cellArray >>= HTC.fromElement)
+  let element = HTC.toElement startCell
+  let parentNode = toParentNode element
+  elementMaybe <- querySelector (QuerySelector "input") parentNode
+  input <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableStartInput")) pure
+    $ (elementMaybe >>= HI.fromElement)
+  pure input
+
+-- | Get the end input element from a table row (second cell)
+getEndInput :: HTR.HTMLTableRowElement -> Effect HTMLInputElement
+getEndInput row = do
+  cells <- HTR.cells row
+  cellArray <- HC.toArray cells
+  endCell <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableEndCell")) pure
+    $ (head (drop 1 cellArray) >>= HTC.fromElement)
+  let element = HTC.toElement endCell
+  let parentNode = toParentNode element
+  elementMaybe <- querySelector (QuerySelector "input") parentNode
+  input <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableEndInput")) pure
+    $ (elementMaybe >>= HI.fromElement)
+  pure input
