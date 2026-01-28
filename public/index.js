@@ -7475,10 +7475,12 @@
   var tailRecM3 = /* @__PURE__ */ tailRecM(monadRecAff);
   var map20 = /* @__PURE__ */ map(functorEffect);
   var show11 = /* @__PURE__ */ show(showNumber);
+  var $$void7 = /* @__PURE__ */ $$void(functorEffect);
+  var traverse5 = /* @__PURE__ */ traverse(traversableArray)(applicativeEffect);
   var pure18 = /* @__PURE__ */ pure(applicativeEffect);
   var unwrap4 = /* @__PURE__ */ unwrap();
   var applySecond3 = /* @__PURE__ */ applySecond(applyAff);
-  var $$void7 = /* @__PURE__ */ $$void(functorAff);
+  var void1 = /* @__PURE__ */ $$void(functorAff);
   var waitForStatus = function(filename) {
     var pollStatus = function(v) {
       return bind11(callStatus(filename))(function(response) {
@@ -7494,7 +7496,7 @@
           return liftEffect8(throwMinsiError(new ComputeFailed("Video download failed")));
         }
         ;
-        throw new Error("Failed pattern match at Handlers.ApplyButtonHandler (line 77, column 5 - line 80, column 85): " + [response.status.constructor.name]);
+        throw new Error("Failed pattern match at Handlers.ApplyButtonHandler (line 82, column 5 - line 85, column 85): " + [response.status.constructor.name]);
       });
     };
     return tailRecM3(pollStatus)(unit);
@@ -7509,6 +7511,25 @@
         setSrc5(cacheBustedPath)(videoMediaElement)();
         return load(videoMediaElement)();
       };
+    };
+  };
+  var setSubtitleTableMaxValues = function(v) {
+    return function(subtitleTable) {
+      return genericErrorsHandler(function() {
+        var durationSeconds = v.cutVideo.end - v.cutVideo.start;
+        return function __do6() {
+          var rows4 = getRows(subtitleTable)();
+          $$void7(traverse5(function(row) {
+            return function __do7() {
+              var startInput = getStartInput(row)();
+              var endInput = getEndInput(row)();
+              setMax(show11(durationSeconds))(startInput)();
+              return setMax(show11(durationSeconds))(endInput)();
+            };
+          })(rows4))();
+          return log("Set max values for all subtitle inputs to " + (show11(durationSeconds) + " seconds"))();
+        };
+      }());
     };
   };
   var scrollToVideoSource = function __do2() {
@@ -7537,8 +7558,8 @@
     var doc = getDocument();
     var components = loadComponents(doc)();
     var stateV = fromHtmlInputs(components.htmlInputs)();
-    var state3 = either(function($28) {
-      return throwMinsiError(InvalidInputs.create($28));
+    var state3 = either(function($41) {
+      return throwMinsiError(InvalidInputs.create($41));
     })(pure18)(toEither(stateV))();
     return new Tuple(state3, components);
   };
@@ -7559,9 +7580,10 @@
           hideLoadingModal(loadingModalId)();
           scrollToVideoSource();
           var videoMediaElement = unwrap4(components.htmlOutputs).resultVideo;
-          return setVideoSrc(filepath)(videoMediaElement)();
+          setVideoSrc(filepath)(videoMediaElement)();
+          return setSubtitleTableMaxValues(state3)(components.htmlInputs.value0.subtitleTable)();
         };
-      })(applySecond3($$void7(callCompute(state3)))(waitForStatus(filename)))();
+      })(applySecond3(void1(callCompute(state3)))(waitForStatus(filename)))();
     });
   };
   var setApplyButtonHandler = function(applyButton) {

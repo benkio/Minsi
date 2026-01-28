@@ -3,8 +3,8 @@ module Handlers.ApplyButtonHandler where
 import Prelude
 
 import Data.Tuple (Tuple(..), fst, snd)
-import Model.State.State (State)
-import Components.HtmlComponents (HtmlComponents, HtmlVisualElements(..), loadComponents)
+import Model.State.State (State(..),DurationRange(..))
+import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlVisualElements(..), loadComponents)
 import Components.HtmlIds (loadingModalId, videoSourceId)
 import Components.Modal (hideLoadingModal, showLoadingModal)
 import Components.Window (getDocument)
@@ -33,8 +33,12 @@ import Web.HTML (window)
 import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLDivElement as HTMLDivElement
+import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLMediaElement (load, pause, setSrc)
 import Web.HTML.HTMLVideoElement (HTMLVideoElement, toHTMLMediaElement)
+import Web.HTML.HTMLTableElement as HT
+import Components.HTMLTableElement (getRows, getStartInput, getEndInput)
+import Data.Traversable (traverse)
 import Web.HTML.Location (setHash)
 import Web.HTML.Window (location)
 import Effect.Now (now)
@@ -65,7 +69,8 @@ applyButtonEventListener _ = genericErrorsHandler $ do
         scrollToVideoSource
         let videoMediaElement = (unwrap components.htmlOutputs).resultVideo
         setVideoSrc filepath videoMediaElement
-        --TODO: set max value of the subtitle table start/end as the duration of the cut.
+        let HtmlInputs { subtitleTable } = components.htmlInputs
+        setSubtitleTableMaxValues state subtitleTable
     )
     (void (callCompute state) *> waitForStatus filename)
 
@@ -115,3 +120,17 @@ getCurrentState = do
   stateV <- fromHtmlInputs components.htmlInputs
   state <- (either (throwMinsiError <<< InvalidInputs) pure <<< toEither) stateV
   pure $ Tuple state components
+
+setSubtitleTableMaxValues :: State -> HT.HTMLTableElement -> Effect Unit
+setSubtitleTableMaxValues (State { cutVideo: DurationRange { start: Milliseconds startMs, end: Milliseconds endMs } }) subtitleTable = genericErrorsHandler $ do
+  let durationSeconds = (endMs - startMs)
+  rows <- getRows subtitleTable
+  void $ traverse
+    ( \row -> do
+        startInput <- getStartInput row
+        endInput <- getEndInput row
+        HI.setMax (show durationSeconds) startInput
+        HI.setMax (show durationSeconds) endInput
+    )
+    rows
+  log $ "Set max values for all subtitle inputs to " <> show durationSeconds <> " seconds"
