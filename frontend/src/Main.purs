@@ -26,9 +26,6 @@ program = do
 -- TODOs --------------------------------
 {-
 
-- Apply button handler:
-  - Change the text of the modal: replace the spinner with an emoji, show it for a sec and then move to the next phase.
-
 --- Add subtitle logic Frontend ---
 - Add the button handler for adding more subtitles
 - (maybe) Add a button to send the subtitles, probably a clone of the ApplyButton or really similar

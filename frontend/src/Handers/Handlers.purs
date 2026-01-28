@@ -58,6 +58,6 @@ setupEventHandlers
                                 })
   setApplyButtonHandler applyButton
   setKeyboardHandlers
-  setAddSubtitleButtonHandler addSubtitleButton
+  setAddSubtitleButtonHandler addSubtitleButton subtitleTable
   setVideoSourceHandler videoSource resultVideo
   --TODO: Add handler for the table button to clone the top row and put the end value as the start value of the next row, while the end value would be startvalue + 1000

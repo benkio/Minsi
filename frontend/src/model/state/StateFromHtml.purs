@@ -83,7 +83,7 @@ nonEmptyFromHtmlInput i id =
 
 loadSubtitlesFromTable :: HT.HTMLTableElement -> Effect (Array Subtitle)
 loadSubtitlesFromTable table = do
-  tbody <- HT.tBodies table >>= (\b -> map (\x -> head x >>= HTS.fromElement) (HC.toArray b)) >>= maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableStartCell")) pure
+  tbody <- HT.tBodies table >>= (\b -> map (\x -> head x >>= HTS.fromElement) (HC.toArray b)) >>= maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableBody")) pure
   rows <- HTS.rows tbody
   rowArray <- HC.toArray rows
   subtitles <- catMaybes <$> traverse (\x -> loadSubtitleFromRow =<< maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableRow")) pure (HTR.fromElement x)) rowArray
