@@ -65,6 +65,7 @@ applyButtonEventListener _ = genericErrorsHandler $ do
         scrollToVideoSource
         let videoMediaElement = (unwrap components.htmlOutputs).resultVideo
         setVideoSrc filepath videoMediaElement
+        --TODO: set max value of the subtitle table start/end as the duration of the cut.
     )
     (void (callCompute state) *> waitForStatus filename)
 
