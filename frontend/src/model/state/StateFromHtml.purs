@@ -145,10 +145,12 @@ getSelectValueFromCell cell = do
     Nothing -> pure ""
     Just select -> HS.value select
 
+--TODO: move it to an appropriate place and test
 parseFont :: String -> Font
 parseFont "Arial Black" = ArialBlack
 parseFont _ = Impact
 
+--TODO: move it to an appropriate place and test
 parseColor :: String -> Color
 parseColor "Black" = Black
 parseColor "Light Green" = LightGreen
@@ -156,6 +158,7 @@ parseColor "Light Orange" = LightOrange
 parseColor "Yellow" = Yellow
 parseColor _ = White
 
+--TODO: move it to an appropriate place and test
 parsePosition :: String -> Position
 parsePosition "Top" = Top
 parsePosition _ = Bottom

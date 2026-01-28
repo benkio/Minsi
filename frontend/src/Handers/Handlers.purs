@@ -4,6 +4,7 @@ import Handlers.AddSubtitleButtonHandler (setAddSubtitleButtonHandler)
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CutRangeHandler (CutRangeTargets(..), setCutRangeHandlers)
 import Handlers.KeyboardHandler (setKeyboardHandlers)
+import Handlers.ResultVideo.Handler (ResultVideoEventTargets(..), setResultVideoHandlers)
 import Handlers.VideoSourceHandler (setVideoSourceHandler)
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlOutputs(..))
 import Effect (Effect)
@@ -51,8 +52,11 @@ setupEventHandlers
         , cutEndValue: cutEndValue
         }
     )
+  setResultVideoHandlers ( RVET {
+                             playbackPositionResultVideo: playbackPositionResultVideo,
+                             resultVideo: resultVideo
+                                })
   setApplyButtonHandler applyButton
   setKeyboardHandlers
   setAddSubtitleButtonHandler addSubtitleButton
   setVideoSourceHandler videoSource resultVideo
-

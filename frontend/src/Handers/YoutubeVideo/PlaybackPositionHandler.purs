@@ -15,6 +15,7 @@ updatePlaybackPosition playbackPosition = do
   currentTime <- getPlayerCurrentTime
   when playerReady $ setTextContent (formatToThreeDecimals currentTime) (HSP.toNode playbackPosition)
 
+--TODO: move it to an appropriate place and test
 formatToThreeDecimals :: Number -> String
 formatToThreeDecimals v =
   let

@@ -8,7 +8,7 @@ import Model.State.State (DurationRange(..))
 
 cutVideoValidation :: String -> Number -> Number -> V (Map String String) DurationRange
 cutVideoValidation id start end =
-  if start > end then
-    invalid (singleton id ("start > end: " <> show start <> " " <> show end))
+  if start >= end - 100.0 then -- 100 milliseconds are not percevable
+    invalid (singleton id ("start >= end - 100: " <> show start <> " " <> show end))
   else
     pure $ DurationRange { start: Milliseconds start, end: Milliseconds end }

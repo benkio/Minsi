@@ -97,3 +97,5 @@ instance ReadForeign WURL where
 
 instance Decode State where
   decode = readImpl
+
+--TODO: Add state validation: Duration range

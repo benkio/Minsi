@@ -2601,6 +2601,11 @@
       return media4.load();
     };
   }
+  function currentTime(media4) {
+    return function() {
+      return media4.currentTime;
+    };
+  }
   function pause(media4) {
     return function() {
       media4.pause();
@@ -7119,9 +7124,9 @@
   var cutVideoValidation = function(id2) {
     return function(start2) {
       return function(end) {
-        var $8 = start2 > end;
-        if ($8) {
-          return invalid(singleton3(id2)("start > end: " + (show9(start2) + (" " + show9(end)))));
+        var $9 = start2 >= end - 100;
+        if ($9) {
+          return invalid(singleton3(id2)("start >= end - 100: " + (show9(start2) + (" " + show9(end)))));
         }
         ;
         return pure10({
@@ -7506,6 +7511,32 @@
     return addEventListener(keydown)(keyboardEvL)(false)(toEventTarget(doc))();
   };
 
+  // output/Handlers.ResultVideo.Handler/index.js
+  var RVET = /* @__PURE__ */ function() {
+    function RVET2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    RVET2.create = function(value0) {
+      return new RVET2(value0);
+    };
+    return RVET2;
+  }();
+  var updatePlaybackPosition2 = function(playbackPositionResultVideo) {
+    return function(resultVideo) {
+      return genericErrorsHandler(function __do6() {
+        var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
+        return setTextContent(formatToThreeDecimals(currentTimeValue))(toNode2(playbackPositionResultVideo))();
+      });
+    };
+  };
+  var setResultVideoHandlers = function(v) {
+    return function __do6() {
+      setInterval2(1e3)(updatePlaybackPosition2(v.value0.playbackPositionResultVideo)(v.value0.resultVideo))();
+      return unit;
+    };
+  };
+
   // output/Handlers.VideoSourceHandler/index.js
   var unwrap5 = /* @__PURE__ */ unwrap();
   var videoSourceEventListener = function(filename) {
@@ -7561,6 +7592,10 @@
         youtubeUrl: v.htmlInputs.value0.youtubeUrl,
         cutStartValue: v.htmlOutputs.cutStartValue,
         cutEndValue: v.htmlOutputs.cutEndValue
+      }))();
+      setResultVideoHandlers(new RVET({
+        playbackPositionResultVideo: v.htmlOutputs.playbackPositionResultVideo,
+        resultVideo: v.htmlOutputs.resultVideo
       }))();
       setApplyButtonHandler(v.htmlInputs.value0.applyButton)();
       setKeyboardHandlers();
