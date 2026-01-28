@@ -5,6 +5,7 @@ import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CutRangeHandler (CutRangeTargets(..), setCutRangeHandlers)
 import Handlers.KeyboardHandler (setKeyboardHandlers)
 import Handlers.ResultVideo.Handler (ResultVideoEventTargets(..), setResultVideoHandlers)
+import Handlers.SubtitleTimeButtonsHandler (SubtitleTimeButtonsTargets(..), setSubtitleTimeButtonsHandlers)
 import Handlers.VideoSourceHandler (setVideoSourceHandler)
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlOutputs(..))
 import Effect (Effect)
@@ -29,6 +30,8 @@ setupEventHandlers
       , cutEndValue
       , cutStartValue
       , addSubtitleButton
+      , setSubtitleStartButton
+      , setSubtitleEndButton
       , resultVideo
       }
   } = do
@@ -59,5 +62,10 @@ setupEventHandlers
   setApplyButtonHandler applyButton
   setKeyboardHandlers
   setAddSubtitleButtonHandler addSubtitleButton subtitleTable
+  setSubtitleTimeButtonsHandlers (STBT {
+    setSubtitleStartButton: setSubtitleStartButton
+    , setSubtitleEndButton: setSubtitleEndButton
+    , subtitleTable: subtitleTable
+    , resultVideo: resultVideo
+  })
   setVideoSourceHandler videoSource resultVideo
-  --TODO: Add handler for the table button to clone the top row and put the end value as the start value of the next row, while the end value would be startvalue + 1000

@@ -20,6 +20,8 @@ import Components.HtmlIds(
   , reverseLoopGifId
   , setCutEndButton
   , setCutStartButton
+  , setSubtitleEndButtonId
+  , setSubtitleStartButtonId
   , subtitleTableId
   , subtitlesRowId
   , titleId
@@ -73,6 +75,8 @@ data ResultPreview
 newtype HtmlOutputs = HtmlOutputs
   { resultPreview :: ResultPreview
   , addSubtitleButton :: HTMLButtonElement
+  , setSubtitleStartButton :: HTMLButtonElement
+  , setSubtitleEndButton :: HTMLButtonElement
   , minsiLog :: HTMLDivElement
   , playbackPositionYoutube :: HTMLSpanElement
   , playbackPositionResultVideo :: HTMLSpanElement
@@ -142,6 +146,8 @@ loadHtmlOutputs :: NonElementParentNode -> Effect HtmlOutputs
 loadHtmlOutputs doc = do
   resultPreview <- loadResultPreview doc
   addSubtitleButton <- loadButton addSubtitleId doc
+  setSubtitleStartButton <- loadButton setSubtitleStartButtonId doc
+  setSubtitleEndButton <- loadButton setSubtitleEndButtonId doc
   minsiLog <- loadDiv minsiLogId doc
   playbackPositionYoutube <- loadSpan playbackPositionYoutubeId doc
   playbackPositionResultVideo <- loadSpan playbackPositionResultVideoId doc
@@ -153,6 +159,8 @@ loadHtmlOutputs doc = do
     ( HtmlOutputs
         { resultPreview: resultPreview
         , addSubtitleButton: addSubtitleButton
+        , setSubtitleStartButton: setSubtitleStartButton
+        , setSubtitleEndButton: setSubtitleEndButton
         , minsiLog: minsiLog
         , playbackPositionYoutube: playbackPositionYoutube
         , playbackPositionResultVideo: playbackPositionResultVideo

@@ -445,11 +445,11 @@
     return Just2;
   }();
   var showMaybe = function(dictShow) {
-    var show15 = show(dictShow);
+    var show16 = show(dictShow);
     return {
       show: function(v) {
         if (v instanceof Just) {
-          return "(Just " + (show15(v.value0) + ")");
+          return "(Just " + (show16(v.value0) + ")");
         }
         ;
         if (v instanceof Nothing) {
@@ -1182,12 +1182,12 @@
     };
   };
   var showNonEmpty = function(dictShow) {
-    var show15 = show(dictShow);
+    var show16 = show(dictShow);
     return function(dictShow1) {
-      var show16 = show(dictShow1);
+      var show17 = show(dictShow1);
       return {
         show: function(v) {
-          return "(NonEmpty " + (show15(v.value0) + (" " + (show16(v.value1) + ")")));
+          return "(NonEmpty " + (show16(v.value0) + (" " + (show17(v.value1) + ")")));
         }
       };
     };
@@ -1395,22 +1395,22 @@
     }
   };
   var showList = function(dictShow) {
-    var show15 = show(dictShow);
+    var show16 = show(dictShow);
     return {
       show: function(v) {
         if (v instanceof Nil) {
           return "Nil";
         }
         ;
-        return "(" + (intercalate2(" : ")(map3(show15)(v)) + " : Nil)");
+        return "(" + (intercalate2(" : ")(map3(show16)(v)) + " : Nil)");
       }
     };
   };
   var showNonEmptyList = function(dictShow) {
-    var show15 = show(showNonEmpty(dictShow)(showList(dictShow)));
+    var show16 = show(showNonEmpty(dictShow)(showList(dictShow)));
     return {
       show: function(v) {
-        return "(NonEmptyList " + (show15(v) + ")");
+        return "(NonEmptyList " + (show16(v) + ")");
       }
     };
   };
@@ -2237,6 +2237,8 @@
   var titleId = "title";
   var subtitlesRowId = "subtitlesRowId";
   var subtitleTableId = "subtitleTable";
+  var setSubtitleStartButtonId = "setSubtitleStartButton";
+  var setSubtitleEndButtonId = "setSubtitleEndButton";
   var setCutStartButton = "setCutStartButton";
   var setCutEndButton = "setCutEndButton";
   var reverseLoopGifId = "reverseLoopGif";
@@ -2518,6 +2520,8 @@
     return function __do6() {
       var resultPreview = loadResultPreview(doc)();
       var addSubtitleButton = loadButton(addSubtitleId)(doc)();
+      var setSubtitleStartButton = loadButton(setSubtitleStartButtonId)(doc)();
+      var setSubtitleEndButton = loadButton(setSubtitleEndButtonId)(doc)();
       var minsiLog = loadDiv(minsiLogId)(doc)();
       var playbackPositionYoutube = loadSpan(playbackPositionYoutubeId)(doc)();
       var playbackPositionResultVideo = loadSpan(playbackPositionResultVideoId)(doc)();
@@ -2528,6 +2532,8 @@
       return {
         resultPreview,
         addSubtitleButton,
+        setSubtitleStartButton,
+        setSubtitleEndButton,
         minsiLog,
         playbackPositionYoutube,
         playbackPositionResultVideo,
@@ -7628,6 +7634,56 @@
     };
   };
 
+  // output/Handlers.SubtitleTimeButtonsHandler/index.js
+  var show15 = /* @__PURE__ */ show(showNumber);
+  var STBT = /* @__PURE__ */ function() {
+    function STBT2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    STBT2.create = function(value0) {
+      return new STBT2(value0);
+    };
+    return STBT2;
+  }();
+  var setSubtitleStartButtonEventListener = function(subtitleTable) {
+    return function(resultVideo) {
+      return function(v) {
+        return genericErrorsHandler(function __do6() {
+          log("Set subtitle start button clicked")();
+          var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
+          var firstRow = getFirstRow(subtitleTable)();
+          var startInput = getStartInput(firstRow)();
+          setValue2(show15(currentTimeValue * 1e3))(startInput)();
+          return log("Subtitle start time set successfully")();
+        });
+      };
+    };
+  };
+  var setSubtitleEndButtonEventListener = function(subtitleTable) {
+    return function(resultVideo) {
+      return function(v) {
+        return genericErrorsHandler(function __do6() {
+          log("Set subtitle end button clicked")();
+          var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
+          var firstRow = getFirstRow(subtitleTable)();
+          var endInput = getEndInput(firstRow)();
+          setValue2(show15(currentTimeValue * 1e3))(endInput)();
+          return log("Subtitle end time set successfully")();
+        });
+      };
+    };
+  };
+  var setSubtitleTimeButtonsHandlers = function(v) {
+    return function __do6() {
+      var startButtonEvL = eventListener(setSubtitleStartButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo))();
+      var endButtonEvL = eventListener(setSubtitleEndButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo))();
+      addEventListener(click2)(startButtonEvL)(false)(toEventTarget2(toElement(v.value0.setSubtitleStartButton)))();
+      addEventListener(click2)(endButtonEvL)(false)(toEventTarget2(toElement(v.value0.setSubtitleEndButton)))();
+      return log("Subtitle time buttons handlers set up successfully")();
+    };
+  };
+
   // output/Handlers.VideoSourceHandler/index.js
   var unwrap5 = /* @__PURE__ */ unwrap();
   var videoSourceEventListener = function(filename) {
@@ -7691,6 +7747,12 @@
       setApplyButtonHandler(v.htmlInputs.value0.applyButton)();
       setKeyboardHandlers();
       setAddSubtitleButtonHandler(v.htmlOutputs.addSubtitleButton)(v.htmlInputs.value0.subtitleTable)();
+      setSubtitleTimeButtonsHandlers(new STBT({
+        setSubtitleStartButton: v.htmlOutputs.setSubtitleStartButton,
+        setSubtitleEndButton: v.htmlOutputs.setSubtitleEndButton,
+        subtitleTable: v.htmlInputs.value0.subtitleTable,
+        resultVideo: v.htmlOutputs.resultVideo
+      }))();
       return setVideoSourceHandler(v.htmlInputs.value0.videoSource)(v.htmlOutputs.resultVideo)();
     };
   };

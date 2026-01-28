@@ -77,3 +77,9 @@ subtitlesRowId = "subtitlesRowId"
 
 playbackPositionResultRowId :: String
 playbackPositionResultRowId = "playbackPositionResultRowId"
+
+setSubtitleStartButtonId :: String
+setSubtitleStartButtonId = "setSubtitleStartButton"
+
+setSubtitleEndButtonId :: String
+setSubtitleEndButtonId = "setSubtitleEndButton"
