@@ -5,36 +5,59 @@ import Prelude
 import Command.Ffmpeg (extractMp3)
 import Command.Id3v2 (addId3Tags)
 import Command.Ytdlp (downloadVideo)
-import Data.Foldable (sum)
 import Control.Monad.Error.Class (catchError)
 import Control.Monad.Except (runExcept)
+import Data.Array (fromFoldable)
+import Data.Bifunctor (lmap)
 import Data.Either (Either(Left, Right))
+import Data.Foldable (sum)
+import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
-import InMemoryDB (Store, insert)
-import Model.ProcessStatus (ProcessStatus(..))
+import InMemoryDB (Store, insert, lookup)
+import Model.ProcessStatus (ProcessStatus(..), isFinished)
 import Model.State (State(..), DurationRange(..))
 import Node.ChildProcess.Types (Exit(..))
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody)
 import Node.Express.Response (sendJson, setStatus, end)
 
+data ComputeResponse =
+  ParseFailed (Array String)
+  | PendingComputation
+  | Success State
+
 computeController :: Store -> Handler
 computeController store = do
-  stateParsingResult <- getBody
-  case runExcept stateParsingResult of
-    Left errors -> do
-      liftEffect $ log ("Failed to parse state: " <> show errors)
-      setStatus 400 *> sendJson { error: "Bad Request: Failed to parse state" } *> end
-    Right state -> liftEffect (compute state store) *> setStatus 200 *> end
+  bodyResult <- getBody
+  let stateParsingResult = lmap (fromFoldable <<< map show) (runExcept bodyResult)
+  response <- liftEffect $ computeResponse store stateParsingResult
+  case response of
+    ParseFailed errors ->
+      liftEffect (log ("Failed to parse state: " <> show errors))
+        *> setStatus 400
+        *> sendJson { error: "Bad Request: Failed to parse state" }
+        *> end
+    PendingComputation ->
+      liftEffect (log "Pending Computation")
+        *> setStatus 500
+        *> sendJson { error: "Pending Computation" }
+        *> end
+    Success state ->
+      liftEffect (compute state store) *> setStatus 200 *> end
+
+computeResponse :: Store -> Either (Array String) State -> Effect ComputeResponse
+computeResponse _ (Left errors) = pure (ParseFailed errors)
+computeResponse store (Right state@(State { filename })) = do
+  m <- lookup filename store
+  case m of
+    Just p | not (isFinished p) -> pure PendingComputation
+    _ -> pure (Success state)
 
 compute :: State -> Store -> Effect Unit
 compute (State { youtubeUrl, filename, cutVideo: (DurationRange { start: start, end: end }), artist, title }) store = do
-  --TODO: check if a previous execution exists for the filename
-  -- yes and pending -> return an error
-  -- yes and finished or no -> delete the files if any and continue
   insert filename Pending store
   log "Starting video download in background..."
   launchAff_ $ catchError
