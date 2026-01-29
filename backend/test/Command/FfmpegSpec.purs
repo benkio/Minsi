@@ -2,7 +2,7 @@ module Test.Command.FfmpegSpec where
 
 import Prelude
 
-import Command.Ffmpeg (millisToString, millisecondsToSecondsString, secondsToString)
+import Command.Ffmpeg.Mp3 (millisToString, millisecondsToSecondsString, secondsToString)
 import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Milliseconds(..))
 import Test.Spec (Spec, describe, it)

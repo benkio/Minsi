@@ -2,7 +2,7 @@ module Model.State where
 
 import Prelude
 import Data.Maybe (Maybe(..))
-import Data.Time.Duration (Milliseconds)
+import Data.Time.Duration (Milliseconds(..))
 import Node.Path (FilePath)
 import Foreign.Generic.Class (class Decode)
 import Data.URL (URL, fromString)
@@ -97,3 +97,12 @@ instance ReadForeign WURL where
 
 instance Decode State where
   decode = readImpl
+
+derive instance eqFont :: Eq Font
+derive instance eqColor :: Eq Color
+derive instance eqPosition :: Eq Position
+derive newtype instance eqDurationRange :: Eq DurationRange
+derive newtype instance eqSubtitle :: Eq Subtitle
+instance Ord Subtitle where
+  compare (Subtitle {videoPosition: (DurationRange { start: Milliseconds str1 })}) (Subtitle {videoPosition: (DurationRange { start: Milliseconds str2 })}) =
+    compare str1 str2

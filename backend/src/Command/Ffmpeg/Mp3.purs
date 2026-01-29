@@ -1,4 +1,4 @@
-module Command.Ffmpeg where
+module Command.Ffmpeg.Mp3 where
 
 import Prelude
 
@@ -17,6 +17,7 @@ import Node.Library.Execa (ExecaResult)
 import Node.Path (FilePath)
 import Text.Printf (formatInt)
 
+--TODO: move it to a better place
 secondsToString :: Int -> String
 secondsToString seconds =
   intercalate ":" $ map (formatInt "02") [ dd, hh, ss ]
@@ -25,6 +26,7 @@ secondsToString seconds =
   hh = (seconds `mod` 3600) / 60
   ss = (seconds `mod` 3600) `mod` 60
 
+--TODO: move it to a better place
 millisToString :: Milliseconds -> Char -> String
 millisToString (Milliseconds ms) millisSeparator =
   secondsToString seconds <> singleton millisSeparator <> (formatInt "03" leftMillis)
@@ -32,6 +34,7 @@ millisToString (Milliseconds ms) millisSeparator =
   seconds = (floor ms) / 1000
   leftMillis = (floor ms) `mod` 1000
 
+--TODO: move it to a better place
 millisecondsToSecondsString :: Milliseconds -> Maybe Char -> String
 millisecondsToSecondsString ms Nothing = millisToString ms ','
 millisecondsToSecondsString ms (Just c) = millisToString ms c
@@ -47,6 +50,3 @@ extractMp3 filename = do
 extractMp3CommandArgs :: FilePath -> FilePath -> Array String
 extractMp3CommandArgs filepathMp3 filepathMp4 =
   [ "-hide_banner", "-loglevel", "warning", "-i", filepathMp4, "-vn", "-acodec", "libmp3lame", "-y", filepathMp3 ]
-
-makePlainGif :: Effect Unit
-makePlainGif = pure unit
