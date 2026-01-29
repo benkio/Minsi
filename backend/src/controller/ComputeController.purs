@@ -2,7 +2,7 @@ module Controller.ComputeController where
 
 import Prelude
 
-import Command.Ffmpeg (extractMp3)
+import Command.Ffmpeg.Mp3 (extractMp3)
 import Command.Id3v2 (addId3Tags)
 import Command.Ytdlp (downloadVideo)
 import Data.Foldable (sum)
@@ -42,11 +42,13 @@ compute (State { youtubeUrl, filename, cutVideo: (DurationRange { start: start, 
         cutResult <- downloadVideo youtubeUrl filename start end
         mp3result <- extractMp3 filename
         id3result <- addId3Tags filename artist title
+        -- gifresult <- makeGif
         let
           totalExitCode = (sum <<< map exitToInt)
             [ cutResult.exit
             , mp3result.exit
-            , id3result.exit -- , gifResult.exit
+            , id3result.exit
+           -- , gifResult.exit
             ]
           processResult = if totalExitCode == 0 then Succeed else Failed
         liftEffect $ insert filename processResult store
