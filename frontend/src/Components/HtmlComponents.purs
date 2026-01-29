@@ -10,6 +10,7 @@ import Components.HtmlIds(
   , cutStartId
   , cutStartValueId
   , loadingModalId
+  , minsiErrorModalId
   , minsiLogId
   , outputFilenameId
   , playbackPositionResultRowId
@@ -83,6 +84,7 @@ newtype HtmlOutputs = HtmlOutputs
   , cutStartValue :: HTMLSpanElement
   , cutEndValue :: HTMLSpanElement
   , loadingModal :: HTMLDivElement
+  , minsiErrorModal :: HTMLDivElement
   , resultVideo :: HTMLVideoElement
   }
 
@@ -154,6 +156,7 @@ loadHtmlOutputs doc = do
   cutStartValue <- loadSpan cutStartValueId doc
   cutEndValue <- loadSpan cutEndValueId doc
   loadingModal <- loadDiv loadingModalId doc
+  minsiErrorModal <- loadDiv minsiErrorModalId doc
   resultVideo <- loadVideo resultVideoId doc
   pure
     ( HtmlOutputs
@@ -167,6 +170,7 @@ loadHtmlOutputs doc = do
         , cutStartValue: cutStartValue
         , cutEndValue: cutEndValue
         , loadingModal: loadingModal
+        , minsiErrorModal: minsiErrorModal
         , resultVideo: resultVideo
         }
     )

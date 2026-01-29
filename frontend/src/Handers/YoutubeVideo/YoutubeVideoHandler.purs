@@ -4,7 +4,7 @@ import Data.Foldable (foldl)
 import Data.Maybe (Maybe, maybe)
 import Data.Traversable (traverse)
 import Data.Validation.Semigroup (invalid)
-import Data.Map (singleton)
+import Model.ValidationErrors (fromSingleton)
 import Effect (Effect)
 import Effect.Console (log)
 import Handers.ErrorHandlers (genericErrorsHandler)
@@ -67,7 +67,7 @@ setVideoHandlers
 youtubeUrlEventListener :: HI.HTMLInputElement -> HI.HTMLInputElement -> HSP.HTMLSpanElement -> HSP.HTMLSpanElement -> Event -> Effect Unit
 youtubeUrlEventListener cutStart cutEnd cutStartValue cutEndValue ev = genericErrorsHandler $ do
   rawValue <- getInputValue ev
-  let youtubeUrlV = maybe (invalid (singleton youtubeUrlId "Empty YoutubeUrl Input")) (\v -> youtubeUrlValidation youtubeUrlId v) rawValue
+  let youtubeUrlV = maybe (invalid (fromSingleton youtubeUrlId "Empty YoutubeUrl Input")) (\v -> youtubeUrlValidation youtubeUrlId v) rawValue
   youtubeUrl <- foldl (\_ v -> pure v) (throwMinsiError (InvalidInput youtubeUrlId (show rawValue))) youtubeUrlV
   videoId <- (maybe (throwMinsiError (InvalidInput youtubeUrlId (show rawValue))) pure <<< extractYoutubeVideoId) youtubeUrl
   let startTime = extractYoutubeVideoStartTime youtubeUrl

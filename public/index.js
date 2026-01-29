@@ -133,12 +133,27 @@
       return map110($$const(x));
     };
   };
+  var functorFn = {
+    map: /* @__PURE__ */ compose(semigroupoidFn)
+  };
   var functorArray = {
     map: arrayMap
   };
 
   // output/Control.Apply/index.js
   var identity2 = /* @__PURE__ */ identity(categoryFn);
+  var applyFn = {
+    apply: function(f) {
+      return function(g) {
+        return function(x) {
+          return f(x)(g(x));
+        };
+      };
+    },
+    Functor0: function() {
+      return functorFn;
+    }
+  };
   var applyArray = {
     apply: arrayApply,
     Functor0: function() {
@@ -179,11 +194,11 @@
     };
   };
   var liftA1 = function(dictApplicative) {
-    var apply5 = apply(dictApplicative.Apply0());
+    var apply6 = apply(dictApplicative.Apply0());
     var pure110 = pure(dictApplicative);
     return function(f) {
       return function(a) {
-        return apply5(pure110(f))(a);
+        return apply6(pure110(f))(a);
       };
     };
   };
@@ -1002,7 +1017,7 @@
         return xs.concat(ys);
       };
     }
-    return function(apply5) {
+    return function(apply6) {
       return function(map21) {
         return function(pure23) {
           return function(f) {
@@ -1014,12 +1029,12 @@
                   case 1:
                     return map21(array1)(f(array[bot]));
                   case 2:
-                    return apply5(map21(array2)(f(array[bot])))(f(array[bot + 1]));
+                    return apply6(map21(array2)(f(array[bot])))(f(array[bot + 1]));
                   case 3:
-                    return apply5(apply5(map21(array3)(f(array[bot])))(f(array[bot + 1])))(f(array[bot + 2]));
+                    return apply6(apply6(map21(array3)(f(array[bot])))(f(array[bot + 1])))(f(array[bot + 2]));
                   default:
                     var pivot = bot + Math.floor((top2 - bot) / 4) * 2;
-                    return apply5(map21(concat2)(go2(bot, pivot)))(go2(pivot, top2));
+                    return apply6(map21(concat2)(go2(bot, pivot)))(go2(pivot, top2));
                 }
               }
               return go2(0, array.length);
@@ -1772,15 +1787,8 @@
       };
     };
   };
-  var semigroupMap = function() {
-    return function(dictOrd) {
-      var unionWith1 = unionWith(dictOrd);
-      return function(dictSemigroup) {
-        return {
-          append: unionWith1(append(dictSemigroup))
-        };
-      };
-    };
+  var union = function(dictOrd) {
+    return unionWith(dictOrd)($$const);
   };
   var lookup = function(dictOrd) {
     var compare3 = compare(dictOrd);
@@ -1947,8 +1955,18 @@
   function error(msg) {
     return new Error(msg);
   }
+  function errorWithName(msg) {
+    return function(name15) {
+      const e = new Error(msg);
+      e.name = name15;
+      return e;
+    };
+  }
   function message(e) {
     return e.message;
+  }
+  function name(e) {
+    return e.name || "Error";
   }
   function throwException(e) {
     return function() {
@@ -2062,6 +2080,7 @@
   var map5 = /* @__PURE__ */ map(functorArray);
   var toUnfoldable2 = /* @__PURE__ */ toUnfoldable(unfoldableArray);
   var show2 = /* @__PURE__ */ show(showInt);
+  var apply3 = /* @__PURE__ */ apply(applyFn);
   var HTMLElementNotFound = /* @__PURE__ */ function() {
     function HTMLElementNotFound2(value0) {
       this.value0 = value0;
@@ -2171,12 +2190,75 @@
       throw new Error("Failed pattern match at Main.MinsiError (line 20, column 10 - line 34, column 51): " + [v.constructor.name]);
     }
   };
+  var minsiErrorName = function(v) {
+    if (v instanceof HTMLElementNotFound) {
+      return "HTMLElementNotFound";
+    }
+    ;
+    if (v instanceof MissingDependenciesError) {
+      return "MissingDependenciesError";
+    }
+    ;
+    if (v instanceof InvalidInput) {
+      return "InvalidInput";
+    }
+    ;
+    if (v instanceof InvalidInputs) {
+      return "InvalidInputs";
+    }
+    ;
+    if (v instanceof JSONParsingError) {
+      return "JSONParsingError";
+    }
+    ;
+    if (v instanceof ErrorResponse) {
+      return "ErrorResponse";
+    }
+    ;
+    if (v instanceof ComputeFailed) {
+      return "ComputeFailed";
+    }
+    ;
+    throw new Error("Failed pattern match at Main.MinsiError (line 40, column 1 - line 40, column 39): " + [v.constructor.name]);
+  };
   var throwMinsiError = /* @__PURE__ */ function() {
-    var $21 = show(showMinsiError);
-    return function($22) {
-      return throwException(error($21($22)));
+    var $34 = apply3(apply3($$const(errorWithName))(minsiErrorName))(show(showMinsiError));
+    return function($35) {
+      return throwException($34($35));
     };
   }();
+  var isCriticalError = function(e) {
+    var v = name(e);
+    if (v === "HTMLElementNotFound") {
+      return false;
+    }
+    ;
+    if (v === "MissingDependenciesError") {
+      return true;
+    }
+    ;
+    if (v === "InvalidInput") {
+      return false;
+    }
+    ;
+    if (v === "InvalidInputs") {
+      return false;
+    }
+    ;
+    if (v === "JSONParsingError") {
+      return true;
+    }
+    ;
+    if (v === "ErrorResponse") {
+      return true;
+    }
+    ;
+    if (v === "ComputeFailed") {
+      return true;
+    }
+    ;
+    return false;
+  };
 
   // output/Web.DOM.NonElementParentNode/foreign.js
   function _getElementById(id2) {
@@ -2249,6 +2331,8 @@
   var playbackPositionResultRowId = "playbackPositionResultRowId";
   var outputFilenameId = "outputFilename";
   var minsiLogId = "minsiLog";
+  var minsiErrorModalId = "minsiErrorModal";
+  var minsiErrorModalContentId = "minsiErrorModalContent";
   var loadingModalId = "loadingModal";
   var cutStartValueId = "cutStartValue";
   var cutStartId = "cutStart";
@@ -2528,6 +2612,7 @@
       var cutStartValue = loadSpan(cutStartValueId)(doc)();
       var cutEndValue = loadSpan(cutEndValueId)(doc)();
       var loadingModal = loadDiv(loadingModalId)(doc)();
+      var minsiErrorModal = loadDiv(minsiErrorModalId)(doc)();
       var resultVideo = loadVideo(resultVideoId)(doc)();
       return {
         resultPreview,
@@ -2540,6 +2625,7 @@
         cutStartValue,
         cutEndValue,
         loadingModal,
+        minsiErrorModal,
         resultVideo
       };
     };
@@ -4309,7 +4395,7 @@
           return v.value0;
         }
         ;
-        throw new Error("Failed pattern match at Handers.ErrorHandlers (line 64, column 16 - line 66, column 21): " + [v.constructor.name]);
+        throw new Error("Failed pattern match at Handers.ErrorHandlers (line 83, column 16 - line 85, column 21): " + [v.constructor.name]);
       }();
       var ulNode = toNode5(toElement7(ulElement));
       traverse2(function(line) {
@@ -4325,7 +4411,7 @@
               return v.value0;
             }
             ;
-            throw new Error("Failed pattern match at Handers.ErrorHandlers (line 71, column 22 - line 73, column 27): " + [v.constructor.name]);
+            throw new Error("Failed pattern match at Handers.ErrorHandlers (line 90, column 22 - line 92, column 27): " + [v.constructor.name]);
           }();
           var liNode = toNode5(toElement5(liElement));
           setTextContent(line)(liNode)();
@@ -4333,6 +4419,16 @@
         };
       })(errorLines)();
       return ulElement;
+    };
+  };
+  var showMinsiErrorDialog = function(errorMessage) {
+    return function __do6() {
+      var doc = getDocument();
+      var minsiErrorModalContent = loadDiv(minsiErrorModalContentId)(doc)();
+      var errorList = createErrorList(errorMessage)();
+      var minsiErrorModalContentNode = toNode(minsiErrorModalContent);
+      var errorListNode = toNode5(toElement7(errorList));
+      return appendChild(errorListNode)(minsiErrorModalContentNode)();
     };
   };
   var writeToMinsiLog = function(errorMessage) {
@@ -4349,7 +4445,15 @@
   var genericErrorsHandler = function(p) {
     return catchError3(p)(function(e) {
       var errorMessage = message(e);
-      return applySecond2(log(errorMessage))(catchError3(writeToMinsiLog(errorMessage))($$const(raiseErrorAlert(errorMessage))));
+      var handleError = function() {
+        var $16 = isCriticalError(e);
+        if ($16) {
+          return showMinsiErrorDialog(errorMessage);
+        }
+        ;
+        return writeToMinsiLog(errorMessage);
+      }();
+      return applySecond2(log(errorMessage))(catchError3(handleError)($$const(raiseErrorAlert(errorMessage))));
     });
   };
   var genericErrorsHandlerEither = function(v) {
@@ -4359,10 +4463,18 @@
     ;
     if (v instanceof Left) {
       var errorMessage = message(v.value0);
-      return applySecond2(log(errorMessage))(catchError3(writeToMinsiLog(errorMessage))($$const(raiseErrorAlert(errorMessage))));
+      var handleError = function() {
+        var $19 = isCriticalError(v.value0);
+        if ($19) {
+          return showMinsiErrorDialog(errorMessage);
+        }
+        ;
+        return writeToMinsiLog(errorMessage);
+      }();
+      return applySecond2(log(errorMessage))(catchError3(handleError)($$const(raiseErrorAlert(errorMessage))));
     }
     ;
-    throw new Error("Failed pattern match at Handers.ErrorHandlers (line 38, column 1 - line 38, column 70): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at Handers.ErrorHandlers (line 43, column 1 - line 43, column 70): " + [v.constructor.name]);
   };
 
   // output/Data.Validation.Semigroup/index.js
@@ -5168,7 +5280,7 @@
   // output/Data.Compactable/index.js
   var $$void5 = /* @__PURE__ */ $$void(functorST);
   var pure1 = /* @__PURE__ */ pure(applicativeST);
-  var apply3 = /* @__PURE__ */ apply(applyST);
+  var apply4 = /* @__PURE__ */ apply(applyST);
   var map11 = /* @__PURE__ */ map(functorST);
   var compactableMaybe = {
     compact: /* @__PURE__ */ join(bindMaybe),
@@ -5244,7 +5356,7 @@
             throw new Error("Failed pattern match at Data.Compactable (line 122, column 34 - line 124, column 31): " + [v.constructor.name]);
           }($109));
         })();
-        return apply3(map11(function(v) {
+        return apply4(map11(function(v) {
           return function(v1) {
             return {
               left: v,
@@ -5821,8 +5933,26 @@
     return alt5(maybeVQueryString)(lastPath);
   };
 
+  // output/Model.ValidationErrors/index.js
+  var union3 = /* @__PURE__ */ union(ordString);
+  var semigroupValidationErrors = {
+    append: function(v) {
+      return function(v1) {
+        return union3(v)(v1);
+      };
+    }
+  };
+  var toMap = function(v) {
+    return v;
+  };
+  var fromSingleton = function(k) {
+    return function(v) {
+      return singleton3(k)(v);
+    };
+  };
+
   // output/Validations.RegexValidation/index.js
-  var pure4 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(/* @__PURE__ */ semigroupMap()(ordString)(semigroupString)));
+  var pure4 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
   var matches2 = function(v) {
     return function(v1) {
       return function(v2) {
@@ -5830,7 +5960,7 @@
           return pure4(v2);
         }
         ;
-        return invalid(singleton3(v1)("Invalid Input for regex: " + v2));
+        return invalid(fromSingleton(v1)("Invalid Input for regex: " + v2));
       };
     };
   };
@@ -5838,21 +5968,21 @@
   // output/Validations.YoutubeValidation/index.js
   var lmap2 = /* @__PURE__ */ lmap(bifunctorEither);
   var lmap1 = /* @__PURE__ */ lmap(bifunctorV);
-  var pure5 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(/* @__PURE__ */ semigroupMap()(ordString)(semigroupString)));
+  var pure5 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
   var youtubeRegex = "^(?:https?:\\/\\/)?(?:www\\.)?(?:youtube\\.com\\/watch\\?v=([a-zA-Z0-9_-]+)|youtu\\.be\\/([a-zA-Z\\d_-]+))(?:[?&].*)?$";
   var youtubeRegexValidation = function(id2) {
     return lmap2(function(x) {
-      return singleton3(id2)(x);
+      return fromSingleton(id2)(x);
     })(regex(youtubeRegex)(noFlags));
   };
   var youtubeUrlValidation = function(id2) {
     return function(v) {
       return lmap1(function(v1) {
-        return singleton3(id2)("Invalid Youtube URL");
+        return fromSingleton(id2)("Invalid Youtube URL");
       })(andThen(andThen(youtubeRegexValidation(id2))(function(ytRegex) {
         return matches2(ytRegex)(id2)(v);
       }))(function(urlString) {
-        return maybe(invalid(singleton3(id2)("Error validating youtube Url")))(pure5)(fromString2(urlString));
+        return maybe(invalid(fromSingleton(id2)("Error validating youtube Url")))(pure5)(fromString2(urlString));
       }));
     };
   };
@@ -5894,7 +6024,7 @@
           return function(ev) {
             return genericErrorsHandler(function __do6() {
               var rawValue = getInputValue(ev)();
-              var youtubeUrlV = maybe(invalid(singleton3(youtubeUrlId)("Empty YoutubeUrl Input")))(function(v) {
+              var youtubeUrlV = maybe(invalid(fromSingleton(youtubeUrlId)("Empty YoutubeUrl Input")))(function(v) {
                 return youtubeUrlValidation(youtubeUrlId)(v);
               })(rawValue);
               var youtubeUrl = foldl3(function(v) {
@@ -7234,13 +7364,13 @@
 
   // output/Validations.CutVideoValidation/index.js
   var show10 = /* @__PURE__ */ show(showNumber);
-  var pure15 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(/* @__PURE__ */ semigroupMap()(ordString)(semigroupString)));
+  var pure15 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
   var cutVideoValidation = function(id2) {
     return function(start2) {
       return function(end) {
-        var $9 = start2 >= end - 100;
-        if ($9) {
-          return invalid(singleton3(id2)("start >= end - 100: " + (show10(start2) + (" " + show10(end)))));
+        var $6 = start2 >= end - 100;
+        if ($6) {
+          return invalid(fromSingleton(id2)("start >= end - 100: " + (show10(start2) + (" " + show10(end)))));
         }
         ;
         return pure15({
@@ -7257,13 +7387,13 @@
   var nonEmptyRegex = "[\\S\\s]*\\S[\\S\\s]*";
   var nonEmptyRegexValidation = function(id2) {
     return lmap4(function(x) {
-      return singleton3(id2)(x);
+      return fromSingleton(id2)(x);
     })(regex(nonEmptyRegex)(noFlags));
   };
   var nonEmptyValidation = function(id2) {
     return function(v) {
       return lmap12(function(v1) {
-        return singleton3(id2)("value cannot be empty");
+        return fromSingleton(id2)("value cannot be empty");
       })(andThen(nonEmptyRegexValidation(id2))(function(r) {
         return matches2(r)(id2)(v);
       }));
@@ -7278,7 +7408,7 @@
   var identity10 = /* @__PURE__ */ identity(categoryFn);
   var map18 = /* @__PURE__ */ map(functorEffect);
   var traverse4 = /* @__PURE__ */ traverse(traversableArray)(applicativeEffect);
-  var apply4 = /* @__PURE__ */ apply(/* @__PURE__ */ applyV(/* @__PURE__ */ semigroupMap()(ordString)(semigroupString)));
+  var apply5 = /* @__PURE__ */ apply(/* @__PURE__ */ applyV(semigroupValidationErrors));
   var map19 = /* @__PURE__ */ map(functorV);
   var youtubeUrlFromHTMLInput = function(youtubeUrlComponent) {
     return function __do6() {
@@ -7436,7 +7566,7 @@
       var artistV = nonEmptyFromHtmlInput(v.value0.artist)(artistId)();
       var titleV = nonEmptyFromHtmlInput(v.value0.title)(titleId)();
       var subtitles = loadSubtitlesFromTable(v.value0.subtitleTable)();
-      return apply4(apply4(apply4(apply4(map19(function(v1) {
+      return apply5(apply5(apply5(apply5(map19(function(v1) {
         return function(v2) {
           return function(v3) {
             return function(v4) {
@@ -7496,7 +7626,7 @@
           return liftEffect8(throwMinsiError(new ComputeFailed("Video download failed")));
         }
         ;
-        throw new Error("Failed pattern match at Handlers.ApplyButtonHandler (line 82, column 5 - line 85, column 85): " + [response.status.constructor.name]);
+        throw new Error("Failed pattern match at Handlers.ApplyButtonHandler (line 83, column 5 - line 86, column 85): " + [response.status.constructor.name]);
       });
     };
     return tailRecM3(pollStatus)(unit);
@@ -7559,7 +7689,7 @@
     var components = loadComponents(doc)();
     var stateV = fromHtmlInputs(components.htmlInputs)();
     var state3 = either(function($41) {
-      return throwMinsiError(InvalidInputs.create($41));
+      return throwMinsiError(InvalidInputs.create(toMap($41)));
     })(pure18)(toEither(stateV))();
     return new Tuple(state3, components);
   };

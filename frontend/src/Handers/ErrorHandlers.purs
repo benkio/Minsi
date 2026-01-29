@@ -1,7 +1,7 @@
 module Handers.ErrorHandlers where
 
 import Effect.Console (log)
-import Components.HtmlIds (minsiLogId)
+import Components.HtmlIds (minsiLogId, minsiErrorModalContentId)
 import Prelude
 import Components.HtmlComponents (loadDiv)
 import Components.Window (getDocument, raiseErrorAlert)
@@ -23,7 +23,7 @@ import Data.String (split)
 import Data.String.Pattern (Pattern(..))
 import Data.Traversable (traverse)
 import Data.Maybe (Maybe(..))
-import Main.MinsiError (MinsiError(..), throwMinsiError)
+import Main.MinsiError (MinsiError(..), isCriticalError, throwMinsiError)
 
 genericErrorsHandler :: Effect Unit -> Effect Unit
 genericErrorsHandler p =
@@ -31,8 +31,13 @@ genericErrorsHandler p =
     ( \e ->
         let
           errorMessage = message e
+          handleError =
+            if isCriticalError e then
+              showMinsiErrorDialog errorMessage
+            else
+              writeToMinsiLog errorMessage
         in
-          log errorMessage *> catchError (writeToMinsiLog errorMessage) (const (raiseErrorAlert errorMessage))
+          log errorMessage *> catchError handleError (const (raiseErrorAlert errorMessage))
     )
 
 genericErrorsHandlerEither :: forall a. Either Error a -> Effect Unit
@@ -40,8 +45,13 @@ genericErrorsHandlerEither (Right _) = pure unit
 genericErrorsHandlerEither (Left e) =
   let
     errorMessage = message e
+    handleError =
+      if isCriticalError e then
+        showMinsiErrorDialog errorMessage
+      else
+        writeToMinsiLog errorMessage
   in
-    log errorMessage *> catchError (writeToMinsiLog errorMessage) (const (raiseErrorAlert errorMessage))
+    log errorMessage *> catchError handleError (const (raiseErrorAlert errorMessage))
 
 writeToMinsiLog :: String -> Effect Unit
 writeToMinsiLog errorMessage = do
@@ -53,6 +63,15 @@ writeToMinsiLog errorMessage = do
   appendChild errorListNode minsiLogNode
   void $ setTimeout 5000 do
     removeChild errorListNode minsiLogNode
+
+showMinsiErrorDialog :: String -> Effect Unit
+showMinsiErrorDialog errorMessage = do
+  doc <- getDocument
+  minsiErrorModalContent <- loadDiv minsiErrorModalContentId doc
+  errorList <- createErrorList errorMessage
+  let minsiErrorModalContentNode = toNode minsiErrorModalContent
+  let errorListNode = E.toNode (ULH.toElement errorList)
+  appendChild errorListNode minsiErrorModalContentNode
 
 createErrorList :: String -> Effect ULH.HTMLUListElement
 createErrorList errorMessage = do

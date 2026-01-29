@@ -33,8 +33,8 @@ computeController store = do
 compute :: State -> Store -> Effect Unit
 compute (State { youtubeUrl, filename, cutVideo: (DurationRange { start: start, end: end }), artist, title }) store = do
   --TODO: check if a previous execution exists for the filename
-  -- yes -> kill it
-  -- then -> delete all remaining files
+  -- yes and pending -> return an error
+  -- yes and finished or no -> delete the files if any and continue
   insert filename Pending store
   log "Starting video download in background..."
   launchAff_ $ catchError

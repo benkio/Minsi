@@ -324,6 +324,34 @@
       </div>
     </div>
 
+    <!-- Critical Error Dialog (non-blocking, close via X or click outside) -->
+    <div
+      class="modal fade"
+      id="minsiErrorModal"
+      tabindex="-1"
+      aria-labelledby="minsiErrorModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger">
+          <div class="modal-header border-danger">
+            <h5 class="modal-title text-danger" id="minsiErrorModalLabel">
+              Critical Error
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div id="minsiErrorModalContent" class="font-monospace small"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://www.youtube.com/iframe_api"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="./index.js"></script>

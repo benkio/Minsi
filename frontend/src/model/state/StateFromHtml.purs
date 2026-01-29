@@ -3,7 +3,6 @@ module Model.State.StateFromHtml where
 import Main.MinsiError (MinsiError(..), throwMinsiError)
 import Data.Array (catMaybes)
 import Data.Int (fromString)
-import Data.Map (Map)
 import Data.Maybe (Maybe(..), maybe, fromMaybe)
 import Data.Traversable (traverse)
 import Data.Time.Duration (Milliseconds(..))
@@ -24,12 +23,13 @@ import Model.State.State (State(..), DurationRange(..), WURL(..), Subtitle(..), 
 import Data.URL (URL)
 import Prelude
 import Data.Validation.Semigroup (V)
+import Model.ValidationErrors (ValidationErrors)
 import Validations.YoutubeValidation (youtubeUrlValidation)
 import Validations.NonEmptyValidation (nonEmptyValidation)
 import Validations.CutVideoValidation (cutVideoValidation)
 import Components.HtmlIds (youtubeUrlId, outputFilenameId, artistId, titleId, cutStartId)
 
-fromHtmlInputs :: HtmlInputs -> Effect (V (Map String String) State)
+fromHtmlInputs :: HtmlInputs -> Effect (V ValidationErrors State)
 fromHtmlInputs
   ( HtmlInputs
       { cutStart
@@ -66,18 +66,18 @@ fromHtmlInputs
         , subtitles: subtitles
         }
 
-cutVideoFromHtmlRange :: HTMLInputElement -> HTMLInputElement -> Effect (V (Map String String) DurationRange)
+cutVideoFromHtmlRange :: HTMLInputElement -> HTMLInputElement -> Effect (V ValidationErrors DurationRange)
 cutVideoFromHtmlRange cutStart cutEnd = do
   start <- valueAsNumber cutStart
   end <- valueAsNumber cutEnd
   pure $ cutVideoValidation cutStartId (start * 1000.0) (end * 1000.0)
 
-youtubeUrlFromHTMLInput :: HTMLInputElement -> Effect (V (Map String String) URL)
+youtubeUrlFromHTMLInput :: HTMLInputElement -> Effect (V ValidationErrors URL)
 youtubeUrlFromHTMLInput youtubeUrlComponent = do
   urlString <- value youtubeUrlComponent
   pure $ youtubeUrlValidation youtubeUrlId urlString
 
-nonEmptyFromHtmlInput :: HTMLInputElement -> String -> Effect (V (Map String String) String)
+nonEmptyFromHtmlInput :: HTMLInputElement -> String -> Effect (V ValidationErrors String)
 nonEmptyFromHtmlInput i id =
   value i <#> nonEmptyValidation id
 

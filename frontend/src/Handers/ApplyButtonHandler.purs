@@ -24,6 +24,7 @@ import Handers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
 import Main.MinsiError (MinsiError(..), throwMinsiError)
 import Model.ProcessStatus (ProcessStatus(..))
 import Model.State.StateFromHtml (fromHtmlInputs)
+import Model.ValidationErrors (toMap)
 import Web.DOM.DOMTokenList as DOMTokenList
 import Web.DOM.Element (toEventTarget)
 import Web.DOM.Element as Element
@@ -118,7 +119,7 @@ getCurrentState = do
   doc <- getDocument
   components <- loadComponents doc
   stateV <- fromHtmlInputs components.htmlInputs
-  state <- (either (throwMinsiError <<< InvalidInputs) pure <<< toEither) stateV
+  state <- (either (throwMinsiError <<< InvalidInputs <<< toMap) pure <<< toEither) stateV
   pure $ Tuple state components
 
 setSubtitleTableMaxValues :: State -> HT.HTMLTableElement -> Effect Unit
