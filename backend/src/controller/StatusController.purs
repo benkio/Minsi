@@ -8,7 +8,7 @@ import Data.Maybe (maybe)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
 import InMemoryDB (Store, lookup)
-import Model.ProcessStatus (ProcessStatus(..))
+import Model.ProcessStatus (ProcessStatus)
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody)
 import Node.Express.Response (sendJson, setStatus, end)
@@ -33,5 +33,5 @@ notFound :: Handler
 notFound = setStatus 404 *> sendJson { error: "Not found" } *> end
 
 respondWithStatus :: Store -> String -> ProcessStatus -> Handler
-respondWithStatus store filename status =
+respondWithStatus _ _ status =
   setStatus 200 *> sendJson (buildResponse status) *> end

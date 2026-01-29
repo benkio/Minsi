@@ -3,7 +3,7 @@ module Controller.ErrorHandlers where
 import Prelude
 import Effect.Class (liftEffect)
 import Effect.Console (log)
-import Effect.Exception (Error, message)
+import Effect.Exception (message)
 import Control.Monad.Error.Class (catchError)
 import Node.Express.Handler (Handler)
 import Node.Express.Response (setStatus, sendJson, end)
