@@ -2,8 +2,9 @@ module Model.State where
 
 import Prelude
 import Data.Maybe (Maybe(..))
-import Data.Time.Duration (Milliseconds)
+import Data.Time.Duration (Milliseconds(..))
 import Node.Path (FilePath)
+import Data.Foldable (traverse_)
 import Foreign.Generic.Class (class Decode)
 import Data.URL (URL, fromString)
 import Yoga.JSON
@@ -11,6 +12,7 @@ import Yoga.JSON
   , readImpl
   )
 import Foreign (fail, ForeignError(TypeMismatch))
+import Data.Either (Either(..))
 
 -------------------------------------------------------------------------------
 --                    Copy Pasted between Frontend↔Backend                   --
@@ -98,4 +100,14 @@ instance ReadForeign WURL where
 instance Decode State where
   decode = readImpl
 
---TODO: Add state validation: Duration range
+--TODO: test it
+validateState :: State -> Either (Array String) State
+validateState state@(State ({cutVideo: durationRange, subtitles})) = do
+  _ <- validateRange durationRange
+  _ <- traverse_ (\(Subtitle {videoPosition}) -> validateRange videoPosition) subtitles
+  pure state
+
+validateRange :: DurationRange -> Either (Array String) Unit
+validateRange (DurationRange {start:(Milliseconds start), end:(Milliseconds end)})
+  | start < end - 100.0 = Right unit
+  | otherwise = Left ["State Validation: range start >= end - 100"]

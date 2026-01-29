@@ -27,7 +27,5 @@ program = do
 {-
 
 --- Add subtitle logic Frontend ---
-- Add the button handler for adding more subtitles
 - (maybe) Add a button to send the subtitles, probably a clone of the ApplyButton or really similar
-- Add buttons in the start/end of each subtitle row that sets the value to the current position of teh video.
 -}

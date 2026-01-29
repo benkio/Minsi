@@ -18,24 +18,24 @@ import Effect.Class (liftEffect)
 import Effect.Console (log)
 import InMemoryDB (Store, insert, lookup)
 import Model.ProcessStatus (ProcessStatus(..), isFinished)
-import Model.State (State(..), DurationRange(..))
+import Model.State (State(..), DurationRange(..), validateState)
 import Node.ChildProcess.Types (Exit(..))
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody)
 import Node.Express.Response (sendJson, setStatus, end)
 
 data ComputeResponse =
-  ParseFailed (Array String)
+  InvalidInput (Array String)
   | PendingComputation
   | Success State
 
 computeController :: Store -> Handler
 computeController store = do
   bodyResult <- getBody
-  let stateParsingResult = lmap (fromFoldable <<< map show) (runExcept bodyResult)
+  let stateParsingResult = validateState =<< lmap (fromFoldable <<< map show) (runExcept bodyResult)
   response <- liftEffect $ computeResponse store stateParsingResult
   case response of
-    ParseFailed errors ->
+    InvalidInput errors ->
       liftEffect (log ("Failed to parse state: " <> show errors))
         *> setStatus 400
         *> sendJson { error: "Bad Request: Failed to parse state" }
@@ -49,7 +49,7 @@ computeController store = do
       liftEffect (compute state store) *> setStatus 200 *> end
 
 computeResponse :: Store -> Either (Array String) State -> Effect ComputeResponse
-computeResponse _ (Left errors) = pure (ParseFailed errors)
+computeResponse _ (Left errors) = pure (InvalidInput errors)
 computeResponse store (Right state@(State { filename })) = do
   m <- lookup filename store
   case m of
