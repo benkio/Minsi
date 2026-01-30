@@ -15,6 +15,7 @@
   , "lists"
   , "maybe"
   , "monad-loops"
+  , "node-buffer"
   , "node-child-process"
   , "node-execa"
   , "node-fs"

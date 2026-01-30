@@ -1,5 +1,6 @@
 module CheckDependencies.SoftwareCheck where
 
+import Command.Command (commandSyncOptions, shell)
 import Data.Either (isRight)
 import Node.Library.Execa (execaSync)
 import Node.Library.Execa.Which (whichSync, defaultWhichOptions)
