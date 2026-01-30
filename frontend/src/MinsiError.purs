@@ -35,7 +35,7 @@ instance Show MinsiError where
 
 throwMinsiError :: forall a. MinsiError -> Effect a
 throwMinsiError =
-  throwException <<< (const errorWithName <*> minsiErrorName <*> show)
+  throwException <<< (const errorWithName <*> show <*> minsiErrorName)
 
 minsiErrorName :: MinsiError -> String
 minsiErrorName (HTMLElementNotFound       _) = "HTMLElementNotFound"

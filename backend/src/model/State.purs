@@ -1,6 +1,7 @@
 module Model.State where
 
 import Prelude
+import Data.Array (null)
 import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Milliseconds(..))
 import Node.Path (FilePath)
@@ -102,10 +103,17 @@ instance Decode State where
 
 --TODO: test it
 validateState :: State -> Either (Array String) State
-validateState state@(State ({cutVideo: durationRange, subtitles})) = do
+validateState state@(State ({cutVideo: durationRange, subtitles, reverseLoop})) = do
   _ <- validateRange durationRange
-  _ <- traverse_ (\(Subtitle {videoPosition}) -> validateRange videoPosition) subtitles
+  _ <- validateSubtitles subtitles reverseLoop
   pure state
+
+validateSubtitles :: Array Subtitle -> Boolean -> Either (Array String) Unit
+validateSubtitles subtitles reverseLoop = do
+  _ <- traverse_ (\(Subtitle {videoPosition}) -> validateRange videoPosition) subtitles
+  if reverseLoop && (not <<< null) subtitles
+    then Left ["ReverseLoop and subtitles not supported"]
+    else Right unit
 
 validateRange :: DurationRange -> Either (Array String) Unit
 validateRange (DurationRange {start:(Milliseconds start), end:(Milliseconds end)})

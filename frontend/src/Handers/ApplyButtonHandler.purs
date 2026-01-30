@@ -6,7 +6,7 @@ import Data.Tuple (Tuple(..), fst, snd)
 import Model.State.State (State(..),DurationRange(..))
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlVisualElements(..), loadComponents)
 import Components.HtmlIds (loadingModalId, videoSourceId)
-import Components.Modal (hideLoadingModal, showLoadingModal)
+import Components.Modal (hideModal, showModal)
 import Components.Window (getDocument)
 import Constants (mp4)
 import Control.Monad.Rec.Class (Step(..), tailRecM)
@@ -15,7 +15,7 @@ import Data.Newtype (unwrap)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Validation.Semigroup (toEither)
 import Effect (Effect)
-import Effect.Aff (Aff, delay, runAff_)
+import Effect.Aff (Aff, delay, runAff_, finally)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
 import Endpoints.Compute (callCompute)
@@ -58,22 +58,26 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   let state = fst stateComponents
   let components = snd stateComponents
   let filename = (unwrap state).filename
-  let filepath = mp4 filename
-  showLoadingModal loadingModalId
+  showModal loadingModalId
   runAff_
-    ( \result -> do
-        genericErrorsHandlerEither result
-        log "return from server, show elements and set src"
-        showHiddenElements components.htmlVisualElements
-        log "hide modal, and scroll"
-        hideLoadingModal loadingModalId
-        scrollToVideoSource
-        let videoMediaElement = (unwrap components.htmlOutputs).resultVideo
-        setVideoSrc filepath videoMediaElement
-        let HtmlInputs { subtitleTable } = components.htmlInputs
-        setSubtitleTableMaxValues state subtitleTable
-    )
-    (void (callCompute state) *> waitForStatus filename)
+    ( \result -> genericErrorsHandlerEither result) $
+    finally (liftEffect (finallyHandlers components state)) (void (callCompute state) *> waitForStatus filename)
+
+finallyHandlers :: HtmlComponents -> State -> Effect Unit
+finallyHandlers components state = do
+  let reverseLoop = (unwrap state).reverseLoop
+  let filename = (unwrap state).filename
+  let filepath = mp4 filename
+  log "return from server, show elements and set src"
+  showHiddenElements components.htmlVisualElements reverseLoop
+  log "hide modal, and scroll"
+  hideModal loadingModalId
+  scrollToVideoSource
+  let videoMediaElement = (unwrap components.htmlOutputs).resultVideo
+  setVideoSrc filepath videoMediaElement
+  let HtmlInputs { subtitleTable } = components.htmlInputs
+  setSubtitleTableMaxValues state subtitleTable
+
 
 waitForStatus :: String -> Aff Unit
 waitForStatus filename = tailRecM pollStatus unit
@@ -95,18 +99,26 @@ setVideoSrc filepath video = do
   where
   videoMediaElement = toHTMLMediaElement video
 
-showHiddenElements :: HtmlVisualElements -> Effect Unit
-showHiddenElements (HtmlVisualElements { videoSourceRow, videoRow, subtitlesRow, playbackPositionResultRow }) = do
+showHiddenElements :: HtmlVisualElements -> Boolean -> Effect Unit
+showHiddenElements (HtmlVisualElements { videoSourceRow, videoRow, subtitlesRow, playbackPositionResultRow }) reverseLoop = do
   removeClass "d-none" videoSourceRow
   removeClass "d-none" videoRow
-  removeClass "d-none" subtitlesRow
+  if reverseLoop then addClass "d-none" subtitlesRow else removeClass "d-none" subtitlesRow
   removeClass "d-none" playbackPositionResultRow
 
 removeClass :: String -> HTMLDivElement.HTMLDivElement -> Effect Unit
 removeClass className div = do
   let element = HTMLDivElement.toElement div
   classList <- Element.classList element
-  DOMTokenList.remove classList className
+  containsClassName <- DOMTokenList.contains classList className
+  when containsClassName $ DOMTokenList.remove classList className
+
+addClass :: String -> HTMLDivElement.HTMLDivElement -> Effect Unit
+addClass className div = do
+  let element = HTMLDivElement.toElement div
+  classList <- Element.classList element
+  containsClassName <- DOMTokenList.contains classList className
+  unless containsClassName $ DOMTokenList.remove classList className
 
 scrollToVideoSource :: Effect Unit
 scrollToVideoSource = do

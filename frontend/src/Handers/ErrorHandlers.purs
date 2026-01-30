@@ -1,7 +1,8 @@
 module Handers.ErrorHandlers where
 
 import Effect.Console (log)
-import Components.HtmlIds (minsiLogId, minsiErrorModalContentId)
+import Components.HtmlIds (minsiLogId, minsiErrorModalContentId, minsiErrorModalId)
+import Components.Modal (showModal)
 import Prelude
 import Components.HtmlComponents (loadDiv)
 import Components.Window (getDocument, raiseErrorAlert)
@@ -72,6 +73,7 @@ showMinsiErrorDialog errorMessage = do
   let minsiErrorModalContentNode = toNode minsiErrorModalContent
   let errorListNode = E.toNode (ULH.toElement errorList)
   appendChild errorListNode minsiErrorModalContentNode
+  showModal minsiErrorModalId
 
 createErrorList :: String -> Effect ULH.HTMLUListElement
 createErrorList errorMessage = do

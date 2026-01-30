@@ -177,6 +177,22 @@
   var pure = function(dict) {
     return dict.pure;
   };
+  var unless = function(dictApplicative) {
+    var pure110 = pure(dictApplicative);
+    return function(v) {
+      return function(v1) {
+        if (!v) {
+          return v1;
+        }
+        ;
+        if (v) {
+          return pure110(unit);
+        }
+        ;
+        throw new Error("Failed pattern match at Control.Applicative (line 68, column 1 - line 68, column 65): " + [v.constructor.name, v1.constructor.name]);
+      };
+    };
+  };
   var when = function(dictApplicative) {
     var pure110 = pure(dictApplicative);
     return function(v) {
@@ -2222,7 +2238,7 @@
     throw new Error("Failed pattern match at Main.MinsiError (line 40, column 1 - line 40, column 39): " + [v.constructor.name]);
   };
   var throwMinsiError = /* @__PURE__ */ function() {
-    var $34 = apply3(apply3($$const(errorWithName))(minsiErrorName))(show(showMinsiError));
+    var $34 = apply3(apply3($$const(errorWithName))(show(showMinsiError)))(minsiErrorName);
     return function($35) {
       return throwException($34($35));
     };
@@ -3653,6 +3669,13 @@
     };
   }
   var makeAff = Aff.Async;
+  function generalBracket(acquire) {
+    return function(options2) {
+      return function(k) {
+        return Aff.Bracket(acquire, options2, k);
+      };
+    };
+  }
   function _makeFiber(util, aff) {
     return function() {
       return Aff.Fiber(util, null, aff);
@@ -4083,6 +4106,15 @@
   var delay = function(v) {
     return _delay(Right.create, v);
   };
+  var bracket = function(acquire) {
+    return function(completed) {
+      return generalBracket(acquire)({
+        killed: $$const(completed),
+        failed: $$const(completed),
+        completed: $$const(completed)
+      });
+    };
+  };
   var applyParAff = {
     apply: _parAffApply,
     Functor0: function() {
@@ -4121,6 +4153,11 @@
   var pure22 = /* @__PURE__ */ pure(applicativeAff);
   var bind12 = /* @__PURE__ */ bind(bindAff);
   var bindFlipped2 = /* @__PURE__ */ bindFlipped(bindAff);
+  var $$finally = function(fin) {
+    return function(a) {
+      return bracket(pure22(unit))($$const(fin))($$const(a));
+    };
+  };
   var parallelAff = {
     parallel: unsafeCoerce2,
     sequential: _sequential,
@@ -4220,6 +4257,26 @@
       console.log(s);
     };
   };
+
+  // output/Components.Modal/foreign.js
+  function showModal(id2) {
+    return function() {
+      const el = document.getElementById(id2);
+      if (el) {
+        const modal = bootstrap.Modal.getOrCreateInstance(el);
+        modal.show();
+      }
+    };
+  }
+  function hideModal(id2) {
+    return function() {
+      const el = document.getElementById(id2);
+      if (el) {
+        const modal = bootstrap.Modal.getOrCreateInstance(el);
+        modal.hide();
+      }
+    };
+  }
 
   // output/Effect.Timer/foreign.js
   function setTimeoutImpl(ms) {
@@ -4395,7 +4452,7 @@
           return v.value0;
         }
         ;
-        throw new Error("Failed pattern match at Handers.ErrorHandlers (line 83, column 16 - line 85, column 21): " + [v.constructor.name]);
+        throw new Error("Failed pattern match at Handers.ErrorHandlers (line 85, column 16 - line 87, column 21): " + [v.constructor.name]);
       }();
       var ulNode = toNode5(toElement7(ulElement));
       traverse2(function(line) {
@@ -4411,7 +4468,7 @@
               return v.value0;
             }
             ;
-            throw new Error("Failed pattern match at Handers.ErrorHandlers (line 90, column 22 - line 92, column 27): " + [v.constructor.name]);
+            throw new Error("Failed pattern match at Handers.ErrorHandlers (line 92, column 22 - line 94, column 27): " + [v.constructor.name]);
           }();
           var liNode = toNode5(toElement5(liElement));
           setTextContent(line)(liNode)();
@@ -4428,7 +4485,8 @@
       var errorList = createErrorList(errorMessage)();
       var minsiErrorModalContentNode = toNode(minsiErrorModalContent);
       var errorListNode = toNode5(toElement7(errorList));
-      return appendChild(errorListNode)(minsiErrorModalContentNode)();
+      appendChild(errorListNode)(minsiErrorModalContentNode)();
+      return showModal(minsiErrorModalId)();
     };
   };
   var writeToMinsiLog = function(errorMessage) {
@@ -4474,7 +4532,7 @@
       return applySecond2(log(errorMessage))(catchError3(handleError)($$const(raiseErrorAlert(errorMessage))));
     }
     ;
-    throw new Error("Failed pattern match at Handers.ErrorHandlers (line 43, column 1 - line 43, column 70): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at Handers.ErrorHandlers (line 44, column 1 - line 44, column 70): " + [v.constructor.name]);
   };
 
   // output/Data.Validation.Semigroup/index.js
@@ -6159,22 +6217,6 @@
     };
   };
 
-  // output/Components.Modal/foreign.js
-  function showLoadingModal(id2) {
-    return function() {
-      const el = document.getElementById(id2);
-      const modal = bootstrap.Modal.getOrCreateInstance(el);
-      modal.show();
-    };
-  }
-  function hideLoadingModal(id2) {
-    return function() {
-      const el = document.getElementById(id2);
-      const modal = bootstrap.Modal.getOrCreateInstance(el);
-      modal.hide();
-    };
-  }
-
   // output/Constants/index.js
   var outputPath = "/output/";
   var mp4 = function(filename) {
@@ -7596,6 +7638,13 @@
       };
     };
   }
+  function contains4(list) {
+    return function(token) {
+      return function() {
+        return list.contains(token);
+      };
+    };
+  }
 
   // output/Handlers.ApplyButtonHandler/index.js
   var bind11 = /* @__PURE__ */ bind(bindAff);
@@ -7607,7 +7656,9 @@
   var show11 = /* @__PURE__ */ show(showNumber);
   var $$void7 = /* @__PURE__ */ $$void(functorEffect);
   var traverse5 = /* @__PURE__ */ traverse(traversableArray)(applicativeEffect);
+  var when3 = /* @__PURE__ */ when(applicativeEffect);
   var pure18 = /* @__PURE__ */ pure(applicativeEffect);
+  var unless2 = /* @__PURE__ */ unless(applicativeEffect);
   var unwrap4 = /* @__PURE__ */ unwrap();
   var applySecond3 = /* @__PURE__ */ applySecond(applyAff);
   var void1 = /* @__PURE__ */ $$void(functorAff);
@@ -7626,7 +7677,7 @@
           return liftEffect8(throwMinsiError(new ComputeFailed("Video download failed")));
         }
         ;
-        throw new Error("Failed pattern match at Handlers.ApplyButtonHandler (line 83, column 5 - line 86, column 85): " + [response.status.constructor.name]);
+        throw new Error("Failed pattern match at Handlers.ApplyButtonHandler (line 87, column 5 - line 90, column 85): " + [response.status.constructor.name]);
       });
     };
     return tailRecM3(pollStatus)(unit);
@@ -7672,26 +7723,62 @@
       var element = toElement2(div2);
       return function __do6() {
         var classList2 = classList(element)();
-        return remove(classList2)(className2)();
+        var containsClassName = contains4(classList2)(className2)();
+        return when3(containsClassName)(remove(classList2)(className2))();
       };
-    };
-  };
-  var showHiddenElements = function(v) {
-    return function __do6() {
-      removeClass("d-none")(v.value0.videoSourceRow)();
-      removeClass("d-none")(v.value0.videoRow)();
-      removeClass("d-none")(v.value0.subtitlesRow)();
-      return removeClass("d-none")(v.value0.playbackPositionResultRow)();
     };
   };
   var getCurrentState = function __do3() {
     var doc = getDocument();
     var components = loadComponents(doc)();
     var stateV = fromHtmlInputs(components.htmlInputs)();
-    var state3 = either(function($41) {
-      return throwMinsiError(InvalidInputs.create(toMap($41)));
+    var state3 = either(function($45) {
+      return throwMinsiError(InvalidInputs.create(toMap($45)));
     })(pure18)(toEither(stateV))();
     return new Tuple(state3, components);
+  };
+  var addClass = function(className2) {
+    return function(div2) {
+      var element = toElement2(div2);
+      return function __do6() {
+        var classList2 = classList(element)();
+        var containsClassName = contains4(classList2)(className2)();
+        return unless2(containsClassName)(remove(classList2)(className2))();
+      };
+    };
+  };
+  var showHiddenElements = function(v) {
+    return function(reverseLoop) {
+      return function __do6() {
+        removeClass("d-none")(v.value0.videoSourceRow)();
+        removeClass("d-none")(v.value0.videoRow)();
+        (function() {
+          if (reverseLoop) {
+            return addClass("d-none")(v.value0.subtitlesRow)();
+          }
+          ;
+          return removeClass("d-none")(v.value0.subtitlesRow)();
+        })();
+        return removeClass("d-none")(v.value0.playbackPositionResultRow)();
+      };
+    };
+  };
+  var finallyHandlers = function(components) {
+    return function(state3) {
+      var reverseLoop = unwrap4(state3).reverseLoop;
+      var filename = unwrap4(state3).filename;
+      var filepath = mp4(filename);
+      return function __do6() {
+        log("return from server, show elements and set src")();
+        showHiddenElements(components.htmlVisualElements)(reverseLoop)();
+        log("hide modal, and scroll")();
+        hideModal(loadingModalId)();
+        scrollToVideoSource();
+        var videoMediaElement = unwrap4(components.htmlOutputs).resultVideo;
+        setVideoSrc(filepath)(videoMediaElement)();
+        return setSubtitleTableMaxValues(state3)(components.htmlInputs.value0.subtitleTable)();
+      };
+    };
   };
   var applyButtonEventListener = function(v) {
     return genericErrorsHandler(function __do6() {
@@ -7699,21 +7786,10 @@
       var state3 = fst(stateComponents);
       var components = snd(stateComponents);
       var filename = unwrap4(state3).filename;
-      var filepath = mp4(filename);
-      showLoadingModal(loadingModalId)();
+      showModal(loadingModalId)();
       return runAff_(function(result) {
-        return function __do7() {
-          genericErrorsHandlerEither(result)();
-          log("return from server, show elements and set src")();
-          showHiddenElements(components.htmlVisualElements)();
-          log("hide modal, and scroll")();
-          hideLoadingModal(loadingModalId)();
-          scrollToVideoSource();
-          var videoMediaElement = unwrap4(components.htmlOutputs).resultVideo;
-          setVideoSrc(filepath)(videoMediaElement)();
-          return setSubtitleTableMaxValues(state3)(components.htmlInputs.value0.subtitleTable)();
-        };
-      })(applySecond3(void1(callCompute(state3)))(waitForStatus(filename)))();
+        return genericErrorsHandlerEither(result);
+      })($$finally(liftEffect8(finallyHandlers(components)(state3)))(applySecond3(void1(callCompute(state3)))(waitForStatus(filename))))();
     });
   };
   var setApplyButtonHandler = function(applyButton) {
@@ -7742,14 +7818,14 @@
   var keydown = "keydown";
 
   // output/Handlers.KeyboardHandler/index.js
-  var when3 = /* @__PURE__ */ when(applicativeEffect);
+  var when4 = /* @__PURE__ */ when(applicativeEffect);
   var pure19 = /* @__PURE__ */ pure(applicativeEffect);
   var keyboardEventListener = function(ev) {
     var handleKeyboardEvent = function(keyboardEvent) {
       var keyValue = key(keyboardEvent);
       var isMeta = metaKey(keyboardEvent);
       var isCtrl = ctrlKey(keyboardEvent);
-      return when3(keyValue === "Enter" && (isCtrl || isMeta))(applyButtonEventListener(ev));
+      return when4(keyValue === "Enter" && (isCtrl || isMeta))(applyButtonEventListener(ev));
     };
     return maybe(pure19(unit))(handleKeyboardEvent)(fromEvent(ev));
   };

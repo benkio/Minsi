@@ -3,5 +3,5 @@ module Components.Modal where
 import Effect (Effect)
 import Prelude
 
-foreign import showLoadingModal :: String -> Effect Unit
-foreign import hideLoadingModal :: String -> Effect Unit
+foreign import showModal :: String -> Effect Unit
+foreign import hideModal :: String -> Effect Unit
