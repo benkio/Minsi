@@ -1,7 +1,9 @@
 module CheckDependencies.SoftwareCheck where
 
 import Command.Command (commandSyncOptions, shell)
+import Data.Either (isRight)
 import Node.Library.Execa (execaSync)
+import Node.Library.Execa.Which (whichSync, defaultWhichOptions)
 import Data.Foldable (any, foldM)
 import Data.Traversable (traverse)
 import Effect.Console (log)
@@ -32,7 +34,12 @@ checkSoftwareDependency :: String -> Effect Boolean
 checkSoftwareDependency command = do
   commandOptionsF <- commandSyncOptions
   sh <- shell
-  any identity <$> traverse (tryCommand sh commandOptionsF) commands
+  whichOk <-
+    catchException
+      (\_ -> pure false)
+      (isRight <$> (whichSync command defaultWhichOptions))
+  shellOk <- any identity <$> traverse (tryCommand sh commandOptionsF) commands
+  pure (whichOk || shellOk)
   where
     commands =
       [ "which " <> command
