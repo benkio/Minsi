@@ -46,12 +46,12 @@ downloadVideo youtubeUri filename start end = do
   filepath <- liftEffect $ mp4 filename
   tryCookies ytdlpSupportedBrowserCookies youtubeUri filepath
   where
-  startStr = millisecondsToSecondsString start (Just '.')
-  endStr = millisecondsToSecondsString end (Just '.')
+    startStr = millisecondsToSecondsString start (Just '.')
+    endStr = millisecondsToSecondsString end (Just '.')
 
-  tryCookies :: Array String -> WURL -> String -> Aff ExecaResult
-  tryCookies cookies url filepath =
-    case uncons cookies of
-      Just { head: c, tail: cs } ->
-        catchError (getYtdlpOutputUrl c url filepath startStr endStr >>= _.getResult) (\_ -> tryCookies cs url filepath)
-      Nothing -> liftEffect $ throwMinsiError (YtdlpError "All yt-dlp cookie attempts failed")
+    tryCookies :: Array String -> WURL -> String -> Aff ExecaResult
+    tryCookies cookies url filepath =
+      case uncons cookies of
+        Just { head: c, tail: cs } ->
+          catchError (getYtdlpOutputUrl c url filepath startStr endStr >>= _.getResult) (\_ -> tryCookies cs url filepath)
+        Nothing -> liftEffect $ throwMinsiError (YtdlpError "All yt-dlp cookie attempts failed")
