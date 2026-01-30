@@ -1,56 +1,58 @@
 # Minsi
 
-Opinionated YouTube Clip Video GIF Audio Extractor
+**Opinionated YouTube Clip Video, GIF & Audio Extractor**
 
-A web application for downloading YouTube videos and creating customized clips with subtitles, GIFs, and audio extracts.
+A web application to download YouTube videos and produce customized clips: **video** (MP4), **MP3** audio, and **GIF** (with optional subtitles), with best-possible quality.
 
-## Project Structure
+## Project structure
 
-- **[Frontend](./frontend/README.md)** - PureScript frontend application
-- **[Backend](./backend/README.md)** - PureScript Express server
+- **[Frontend](./frontend/README.md)** — PureScript UI (Bootstrap, YouTube embed)
+- **[Backend](./backend/README.md)** — PureScript Express server (yt-dlp, ffmpeg, id3v2)
 
-## Dependencies
+## System dependencies
 
-The following system dependencies are required for video processing:
+Required for video/audio processing (must be on your `PATH`):
 
-- `ffmpeg` - Video/audio processing and conversion
-- `yt-dlp` - YouTube video downloading
-- `id3v2` - MP3 metadata tagging
-- `fc-list` - Font listing utility
-- [Impact font](https://www.dafontfree.io/download/impact/) - Subtitle font
-- [Arial Black font](https://online-fonts.com/fonts/arial-black) - Subtitle font
+| Tool     | Purpose                    |
+|----------|----------------------------|
+| **ffmpeg** | Video/audio conversion     |
+| **yt-dlp** | YouTube download           |
+| **id3v2**  | MP3 metadata (artist/title)|
+| **fc-list** | Font listing (subtitles)   |
 
-## Usage
+You also need **Impact** and **Arial Black** fonts installed if you use subtitles.
 
-1. **Start the backend server:**
+## Quick start
+
+1. **Backend** (from project root):
    ```bash
    cd backend
+   npm install
    spago build
    spago run
    ```
+   Server runs at **http://localhost:8080**.
 
-2. **Build the frontend:**
+2. **Frontend** (in another terminal):
    ```bash
    cd frontend
+   spago install
    spago build
    spago bundle-app -t ../public/index.js
    ```
 
-3. **Open the application:**
-   - Navigate to `http://localhost:8080` in your browser
-   - The server will serve the frontend from the `public/` folder
-   - The files will be stored in the `/output` folder
+3. **Use the app**
+   - Open **http://localhost:8080** in your browser.
+   - See **[Instructions](http://localhost:8080/instructions.html)** for how to get video, MP3, and GIF from a YouTube URL.
+
+Output files are written to **`public/output/`** (e.g. `filename.mp4`, `filename.mp3`, `filenameGif.mp4`).
 
 ## Motivation
 
-I needed a tool to download and create, from a YouTube Clip/video, the:
-- GIF with specific subtitles
-- MP3 audio extract
-- Video clip
+I needed a single tool to turn a YouTube clip into:
 
-With the best possible quality. Therefore, I created [this
-script](https://gist.github.com/benkio/103960b7b5a5781c222df1c4e31544a2)
-that does exactly that.
+- A **GIF** (with optional subtitles)
+- An **MP3** audio extract
+- A **video** clip
 
-The only problem is its usability.
-Here, I want to extend that giving a UI, so it's more user friendly.
+[This script](https://gist.github.com/benkio/103960b7b5a5781c222df1c4e31544a2) did the job; Minsi adds a **web UI** so it’s easier to use.

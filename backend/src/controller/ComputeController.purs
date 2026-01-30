@@ -6,20 +6,21 @@ import Command.Ffmpeg (extractMp3)
 import Command.Id3v2 (addId3Tags)
 import Command.Ytdlp (downloadVideo)
 import Control.Monad.Error.Class (catchError)
-import Control.Monad.Except (runExcept)
+import Control.Monad.Except (ExceptT(..), runExcept, runExceptT)
 import Data.Array (fromFoldable)
 import Data.Bifunctor (lmap)
-import Data.Either (Either(Left, Right))
-import Data.Foldable (sum)
+import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
-import Effect.Aff (launchAff_)
+import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
+import Effect.Exception (message)
 import InMemoryDB (Store, insert, lookup)
 import Model.ProcessStatus (ProcessStatus(..), isFinished)
 import Model.State (State(..), DurationRange(..), validateState)
 import Node.ChildProcess.Types (Exit(..))
+import Node.Library.Execa (ExecaResult)
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody)
 import Node.Express.Response (sendJson, setStatus, end)
@@ -57,26 +58,33 @@ computeResponse store (Right state@(State { filename })) = do
     _ -> pure (Success state)
 
 compute :: State -> Store -> Effect Unit
-compute (State { youtubeUrl, filename, cutVideo: (DurationRange { start: start, end: end }), artist, title }) store = do
+compute state@(State { filename }) store = do
   insert filename Pending store
   log "Starting video download in background..."
-  launchAff_ $ catchError
-    ( do
-        cutResult <- downloadVideo youtubeUrl filename start end
-        mp3result <- extractMp3 filename
-        id3result <- addId3Tags filename artist title
-        let
-          totalExitCode = (sum <<< map exitToInt)
-            [ cutResult.exit
-            , mp3result.exit
-            , id3result.exit -- , gifResult.exit
-            ]
-          processResult = if totalExitCode == 0 then Succeed else Failed
-        liftEffect $ insert filename processResult store
-    )
-    (\_ -> liftEffect $ insert filename Failed store)
+  launchAff_ $ do
+    result <- runComputePipeline state
+    processResult <- case result of
+      Right _ -> pure Succeed
+      Left _ -> pure Failed
+    liftEffect $ insert filename processResult store
   log "Video download launched, returning HTTP response"
 
-exitToInt :: Exit -> Int
-exitToInt (Normally 0) = 0
-exitToInt _ = 1
+runComputePipeline :: State -> Aff (Either String Unit)
+runComputePipeline (State { youtubeUrl, filename, cutVideo: DurationRange { start, end }, artist, title }) =
+  runExceptT do
+    void $ exceptTStep "Video download" $ downloadVideo youtubeUrl filename start end
+    void $ exceptTStep "MP3 extraction" $ extractMp3 filename
+    void $ exceptTStep "ID3 tags" $ addId3Tags filename artist title
+    pure unit
+
+exceptTStep :: String -> Aff ExecaResult -> ExceptT String Aff Unit
+exceptTStep label aff =
+  ExceptT $
+    ( aff >>= \r ->
+        pure $ if isSuccessExit r.exit then Right unit else Left (label <> " failed")
+    )
+      `catchError` (\e -> pure $ Left (label <> ": " <> message e))
+
+isSuccessExit :: Exit -> Boolean
+isSuccessExit (Normally 0) = true
+isSuccessExit _ = false

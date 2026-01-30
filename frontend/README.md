@@ -1,22 +1,22 @@
 # Minsi Frontend
 
-PureScript frontend application for the Minsi YouTube clip extractor.
+PureScript frontend for the Minsi YouTube clip extractor. It provides the web UI (Bootstrap, YouTube embed) and talks to the backend API.
 
 ## Dependencies
 
-- `purescript` - PureScript compiler
-- `spago` - PureScript package manager
+- **PureScript** + **Spago** — build and package management
+
+The backend must be running (see [root README](../README.md)) so the app can call its API and load/serve assets.
 
 ## Setup
 
-1. Install PureScript and Spago if you haven't already:
+1. Install PureScript and Spago (if needed):
    ```bash
    npm install -g purescript spago
    ```
 
-2. Install project dependencies:
+2. From the **frontend** directory:
    ```bash
-   cd frontend
    spago install
    ```
 
@@ -24,26 +24,27 @@ PureScript frontend application for the Minsi YouTube clip extractor.
 
 ### Development
 
-1. **Compile the frontend:**
+1. **Build:**
    ```bash
    spago build
    ```
 
-2. **Bundle for browser:**
+2. **Bundle for the browser:**
    ```bash
    spago bundle-app -t ../public/index.js
    ```
+   This writes the app bundle to **`public/index.js`**, which the backend serves.
 
-3. **Run tests:**
+3. **Tests:**
    ```bash
    spago test
    ```
 
-4. **Format**
+4. **Format:**
    ```bash
    npx purs-tidy format-in-place "src/**/*.purs" && npx purs-tidy format-in-place "test/**/*.purs"
    ```
 
 ### Production
 
-After bundling, the `index.js` file will be placed in the `public/` folder at the root of the project. The backend server will serve this file along with the HTML.
+After bundling, open **http://localhost:8080** (with the backend running). The backend serves `index.html`, `index.js`, and other files from `public/`.

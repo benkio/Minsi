@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Minsi — How to use</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container-fluid px-3 px-lg-4 py-3">
+      <!-- Header (same as index.html) -->
+      <div class="row text-center mb-4">
+        <div class="col">
+          <h1 class="mb-1">Minsi</h1>
+          <p class="text-muted mb-0">
+            Opinionated YouTube Clip Video Gif Audio Extractor
+          </p>
+          <p class="mt-2 mb-0">
+            <a href="./index.html" class="btn btn-outline-primary btn-sm"
+              >← Back to app</a
+            >
+          </p>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12 col-lg-8 mx-auto">
+          <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light fw-bold">How to get Video, MP3 & GIF</div>
+            <div class="card-body">
+              <p class="lead mb-4">
+                Use the main app (<a href="./index.html">index.html</a>) to pick a
+                YouTube clip, set the time range and metadata, then run the
+                pipeline. You get a <strong>video</strong> (MP4), an
+                <strong>MP3</strong>, and optionally a <strong>GIF</strong>.
+              </p>
+
+              <h5 class="mt-4 mb-2">1. Paste the YouTube URL</h5>
+              <p class="text-muted small mb-3">
+                In the main area, paste a YouTube watch URL (e.g.
+                <code>https://www.youtube.com/watch?v=…</code>). The preview
+                loads so you can scrub and set the exact clip.
+              </p>
+
+              <h5 class="mt-4 mb-2">2. Set output and metadata (left panel)</h5>
+              <ul class="small mb-3">
+                <li><strong>Output Filename</strong> — base name for all files (e.g. <code>myclip</code> → <code>myclip.mp4</code>, <code>myclip.mp3</code>, <code>myclipGif.mp4</code>).</li>
+                <li><strong>Artist</strong> and <strong>Title</strong> — used for the MP3’s ID3 tags.</li>
+                <li><strong>Reverse / Loop GIF</strong> — optional, for the GIF output.</li>
+              </ul>
+
+              <h5 class="mt-4 mb-2">3. Set the clip range</h5>
+              <p class="text-muted small mb-3">
+                Use the <strong>Start Time</strong> and <strong>End Time</strong>
+                sliders, or play the YouTube preview and click
+                <strong>Set Start Position</strong> / <strong>Set End Position</strong>
+                to snap the range to the current playback time. The numbers show
+                seconds.
+              </p>
+
+              <h5 class="mt-4 mb-2">4. Apply (run the pipeline)</h5>
+              <p class="text-muted small mb-3">
+                Click <strong>Apply</strong>. The backend will:
+              </p>
+              <ol class="small mb-3">
+                <li><strong>Download</strong> the clip as MP4 (via yt-dlp).</li>
+                <li><strong>Extract MP3</strong> from that clip (ffmpeg) and write ID3 artist/title (id3v2).</li>
+                <li>Optionally produce a <strong>GIF</strong> (and subtitles if you use the subtitles table).</li>
+              </ol>
+              <p class="text-muted small mb-3">
+                A loading modal appears while the job runs. When it finishes,
+                the UI shows the result and you can switch between
+                <strong>Video</strong> and <strong>Gif</strong> in the source
+                selector to preview.
+              </p>
+
+              <h5 class="mt-4 mb-2">5. Where are the files?</h5>
+              <p class="text-muted small mb-3">
+                Outputs are written to the server’s <strong>output</strong>
+                folder (by default <code>public/output/</code>). You get:
+              </p>
+              <ul class="small mb-0">
+                <li><code>&lt;filename&gt;.mp4</code> — video clip</li>
+                <li><code>&lt;filename&gt;.mp3</code> — audio with ID3 tags</li>
+                <li><code>&lt;filename&gt;Gif.mp4</code> — GIF (or looped clip)</li>
+              </ul>
+
+              <hr class="my-4" />
+              <p class="text-muted small mb-0">
+                If the app reports missing dependencies (e.g. yt-dlp, ffmpeg),
+                install them on the machine where the <strong>backend</strong>
+                runs and ensure they are on the system <code>PATH</code>. See
+                the project README for the full list.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

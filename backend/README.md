@@ -1,31 +1,25 @@
 # Minsi Backend
 
-PureScript Express server for Minsi web app
+PureScript Express server for the Minsi web app. It serves the frontend (from `public/`), runs the API used by the UI, and executes video/audio pipelines (yt-dlp, ffmpeg, id3v2).
 
 ## Dependencies
 
-- `purescript` - PureScript compiler
-- `spago` - PureScript package manager
-- `express` - Node.js Express framework (npm package)
-- `purescript-express` - PureScript bindings for Express
+- **PureScript** + **Spago** — build and package management
+- **Node.js** — runtime (Express)
+- **npm**: `express` (and any transitive deps)
+
+System tools used at runtime (must be on `PATH`): **ffmpeg**, **yt-dlp**, **id3v2**, **fc-list**.
 
 ## Setup
 
-1. Install PureScript and Spago if you haven't already:
-
+1. Install PureScript and Spago (if needed):
    ```bash
    npm install -g purescript spago
    ```
 
-2. Install npm dependencies:
-
+2. From the **backend** directory:
    ```bash
-   cd backend
    npm install
-   ```
-
-3. Install PureScript dependencies:
-   ```bash
    spago install
    ```
 
@@ -33,38 +27,30 @@ PureScript Express server for Minsi web app
 
 ### Development
 
-1. **Compile the backend:**
-
+1. **Build:**
    ```bash
    spago build
    ```
 
-2. **Format**
+2. **Run the server:**
+   ```bash
+   spago run
+   ```
+   Listens on **http://localhost:8080**.
 
+3. **Format:**
    ```bash
    npx purs-tidy format-in-place "src/**/*.purs" && npx purs-tidy format-in-place "test/**/*.purs"
    ```
 
-3. **Run the server:**
+### Behaviour
 
-   ```bash
-   spago run
-   ```
+- Serves static files from **`../public/`** (relative to the backend directory).
+- Root (`/`) serves **`index.html`**; other assets (e.g. `index.js`, `instructions.html`) are served by path.
+- Exposes API routes used by the frontend (e.g. dependency check, compute, status).
+- Writes output files (MP4, MP3, GIF) under **`public/output/`**.
 
-4. **Access the application:**
-   - The server will start on `http://localhost:8080`
-   - It serves all static files from the `../public/` folder
-   - The root route (`/`) serves `index.html`
-   - Other files (like `index.js`) are served at their respective paths
+### Configuration
 
-### Production
-
-The server uses Express static middleware to serve all files from the `public/` directory. Make sure the frontend is bundled and placed in the `public/` folder before starting the server. Then exposes routes for the Minsi Web App
-
-## Configuration
-
-The server is configured to:
-
-- Listen on port `8080`
-- Serve static files from `../public/` (relative to the backend directory)
-- Use Express static middleware for file serving
+- **Port:** 8080 (set in `Main.purs`).
+- **Static root:** `../public/` (ensure the frontend is built and output is in `public/` before running).
