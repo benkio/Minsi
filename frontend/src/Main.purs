@@ -27,5 +27,6 @@ program = do
 {-
 
 --- Add subtitle logic Frontend ---
-- (maybe) Add a button to send the subtitles, probably a clone of the ApplyButton or really similar
+- The plus button of subtitles should add a fresh new row if there's no row to clone!
+- Add a button to remove the row.
 -}

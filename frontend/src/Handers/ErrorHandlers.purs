@@ -14,6 +14,7 @@ import Data.Either (Either(..))
 import Web.HTML.HTMLDivElement (toNode)
 import Web.DOM.Node (appendChild, removeChild, setTextContent)
 import Web.DOM.Document (createElement)
+import Web.DOM.ElementName (ElementName(..))
 import Web.DOM.Element (toNode) as E
 import Web.HTML.HTMLUListElement as ULH
 import Web.HTML.HTMLLIElement as LIH
@@ -81,14 +82,14 @@ createErrorList errorMessage = do
   w <- window
   htmlDoc <- document w
   doc <- pure $ toDocument htmlDoc
-  ulElementRaw <- createElement "ul" doc
+  ulElementRaw <- createElement (ElementName "ul") doc
   ulElement <- case ULH.fromElement ulElementRaw of
     Nothing -> throwMinsiError (HTMLElementNotFound "ul")
     Just u -> pure u
   let ulNode = E.toNode (ULH.toElement ulElement)
   _ <- traverse
     ( \line -> do
-        liElementRaw <- createElement "li" doc
+        liElementRaw <- createElement (ElementName "li") doc
         liElement <- case LIH.fromElement liElementRaw of
           Nothing -> throwMinsiError (HTMLElementNotFound "li")
           Just l -> pure l

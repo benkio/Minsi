@@ -4,6 +4,7 @@ import Handlers.AddSubtitleButtonHandler (setAddSubtitleButtonHandler)
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CutRangeHandler (CutRangeTargets(..), setCutRangeHandlers)
 import Handlers.KeyboardHandler (setKeyboardHandlers)
+import Handlers.RemoveSubtitleButtonHandler (setRemoveSubtitleButtonHandler)
 import Handlers.ResultVideo.Handler (ResultVideoEventTargets(..), setResultVideoHandlers)
 import Handlers.SubtitleTimeButtonsHandler (SubtitleTimeButtonsTargets(..), setSubtitleTimeButtonsHandlers)
 import Handlers.VideoSourceHandler (setVideoSourceHandler)
@@ -23,15 +24,15 @@ setupEventHandlers
       , applyButton
       , videoSource
       , subtitleTable
+      , addSubtitleButton
+      , setSubtitleStartButton
+      , setSubtitleEndButton
       }
   , htmlOutputs: HtmlOutputs
       { playbackPositionYoutube
       , playbackPositionResultVideo
       , cutEndValue
       , cutStartValue
-      , addSubtitleButton
-      , setSubtitleStartButton
-      , setSubtitleEndButton
       , resultVideo
       }
   } = do
@@ -58,10 +59,11 @@ setupEventHandlers
   setResultVideoHandlers ( RVET {
                              playbackPositionResultVideo: playbackPositionResultVideo,
                              resultVideo: resultVideo
-                                })
+                             })
   setApplyButtonHandler applyButton
   setKeyboardHandlers
   setAddSubtitleButtonHandler addSubtitleButton subtitleTable
+  setRemoveSubtitleButtonHandler subtitleTable
   setSubtitleTimeButtonsHandlers (STBT {
     setSubtitleStartButton: setSubtitleStartButton
     , setSubtitleEndButton: setSubtitleEndButton
