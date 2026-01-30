@@ -2,7 +2,7 @@ module Controller.ComputeController where
 
 import Prelude
 
-import Command.Ffmpeg (extractMp3)
+import Command.Ffmpeg.Mp3 (extractMp3)
 import Command.Id3v2 (addId3Tags)
 import Command.Ytdlp (downloadVideo)
 import Control.Monad.Error.Class (catchError)

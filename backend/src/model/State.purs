@@ -101,6 +101,15 @@ instance ReadForeign WURL where
 instance Decode State where
   decode = readImpl
 
+derive instance eqFont :: Eq Font
+derive instance eqColor :: Eq Color
+derive instance eqPosition :: Eq Position
+derive newtype instance eqDurationRange :: Eq DurationRange
+derive newtype instance eqSubtitle :: Eq Subtitle
+instance Ord Subtitle where
+  compare (Subtitle {videoPosition: (DurationRange { start: Milliseconds str1 })}) (Subtitle {videoPosition: (DurationRange { start: Milliseconds str2 })}) =
+    compare str1 str2
+
 --TODO: test it
 validateState :: State -> Either (Array String) State
 validateState state@(State ({cutVideo: durationRange, subtitles, reverseLoop})) = do
