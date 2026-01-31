@@ -1,10 +1,11 @@
 module Test.Arbitrary where
 
+import Data.Array.NonEmpty as NEA
 import Data.Time.Duration (Milliseconds(..))
 import Model.State (DurationRange(..))
 import Prelude
 import Test.QuickCheck.Arbitrary (class Arbitrary, arbitrary)
-import Test.QuickCheck.Gen (choose, suchThat)
+import Test.QuickCheck.Gen (choose, suchThat, arrayOf1)
 
 data Range = Range Number Number
 
@@ -33,10 +34,25 @@ newtype InvalidDurationRange = InvalidDurationRange DurationRange
 instance Arbitrary InvalidDurationRange where
   arbitrary = do
     start <- arbitrary
-    -- arbitrary for Number is [0,1], so this predicate is always satisfied
     gap <- suchThat arbitrary (\g -> g >= 0.0 && g <= 100.0)
     pure $ InvalidDurationRange $ DurationRange
       { start: Milliseconds start
       , end: Milliseconds (start + gap)
       }
+
+-- | Non-empty array of valid DurationRanges (for validateSubtitles tests)
+newtype NonEmptyValidDurationRanges = NonEmptyValidDurationRanges (Array DurationRange)
+
+instance Arbitrary NonEmptyValidDurationRanges where
+  arbitrary = do
+    nea <- arrayOf1 arbitrary
+    pure $ NonEmptyValidDurationRanges (map (\(ValidDurationRange r) -> r) (NEA.toArray nea))
+
+-- | Non-empty array of invalid DurationRanges (for validateSubtitles tests)
+newtype NonEmptyInvalidDurationRanges = NonEmptyInvalidDurationRanges (Array DurationRange)
+
+instance Arbitrary NonEmptyInvalidDurationRanges where
+  arbitrary = do
+    nea <- arrayOf1 arbitrary
+    pure $ NonEmptyInvalidDurationRanges (map (\(InvalidDurationRange r) -> r) (NEA.toArray nea))
 
