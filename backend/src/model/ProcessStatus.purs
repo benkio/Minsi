@@ -14,7 +14,6 @@ instance Show ProcessStatus where
   show Succeed = "Succeed"
   show Failed = "Failed"
 
---TODO: test this
 isFinished :: ProcessStatus -> Boolean
 isFinished Pending = false
 isFinished _ = true

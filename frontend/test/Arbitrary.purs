@@ -6,9 +6,8 @@ import Test.QuickCheck.Gen (Gen, suchThat, chooseInt, arrayOf, elements)
 import Data.Char (fromCharCode)
 import Data.String.CodeUnits (fromCharArray)
 import Data.Maybe (maybe)
-import Data.Array.NonEmpty.Internal (NonEmptyArray(..))
+import Data.Array.NonEmpty (cons')
 import Data.Int (toNumber)
-
 data Range = Range Number Number
 
 instance Arbitrary Range where
@@ -33,7 +32,7 @@ instance Arbitrary NonEmptyASCIIString where
 
 instance Arbitrary EmptyASCIIString where
   arbitrary =
-    arrayOf (elements (NonEmptyArray [ ' ', '\t', '\n', '\r' ])) <#>
+    arrayOf (elements (cons' ' ' [ '\t', '\n', '\r' ])) <#>
       fromCharArray >>> EmptyASCIIString
 
 asciiChar :: Gen Char
@@ -53,3 +52,4 @@ instance Arbitrary DecimalNumber where
     frac <- chooseInt 0 9999
     let n = toNumber whole + (toNumber frac / 10000.0)
     pure (DecimalNumber n)
+
