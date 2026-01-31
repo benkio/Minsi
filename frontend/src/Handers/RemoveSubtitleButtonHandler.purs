@@ -2,52 +2,69 @@ module Handlers.RemoveSubtitleButtonHandler where
 
 import Prelude
 import Components.HTMLTableElement (getRows)
+import Control.Monad.Loops (iterateUntilM)
+import Control.Monad.Trans.Class (lift)
+import Control.Monad.Maybe.Trans (MaybeT(..), runMaybeT)
 import Data.Foldable (traverse_)
+import Data.Maybe (Maybe(..), fromMaybe)
 import Effect (Effect)
 import Effect.Console (log)
 import Handers.ErrorHandlers (genericErrorsHandler)
-import Web.DOM.Element (toEventTarget)
+import Web.DOM.DOMTokenList (contains)
+import Web.DOM.Element (classList, fromNode, tagName, toEventTarget, toNode)
+import Web.DOM.ElementName (ElementName(..))
+import Web.DOM.Internal.Types (Node)
+import Web.DOM.Node (parentNode, removeChild)
+import Web.Event.Event (target)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
 import Web.HTML.Event.EventTypes as E
+import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLTableElement as HT
 import Web.HTML.HTMLTableRowElement as HR
 
 setRemoveSubtitleButtonHandler :: HT.HTMLTableElement -> Effect Unit
 setRemoveSubtitleButtonHandler subtitleTable = do
   log "Setting up remove subtitle button handlers"
+  evl <- eventListener removeSubtitleButtonEventListener
   rows <- getRows subtitleTable
-  traverse_ (\r ->
-               removeEventListener r >>= \evl ->
-               addEventListener E.click evl false (tableRowEventTarget r)) rows
+  traverse_ (\r -> addEventListener E.click evl false (tableRowEventTarget r)) rows
   log "Remove subtitle button handler set up successfully"
   where
-    tableRowEventTarget r = toEventTarget (HR.toElement r)
-    removeEventListener r = eventListener (removeSubtitleButtonEventListener r)
+  tableRowEventTarget r = toEventTarget (HR.toElement r)
 
-removeSubtitleButtonEventListener :: HR.HTMLTableRowElement -> Event -> Effect Unit
-removeSubtitleButtonEventListener _subtitleTableRow _ev = genericErrorsHandler $ do
-  pure unit
-  --TODO: implement
-  -- log "Remove subtitle button clicked"
-  -- tbody <- getTBody subtitleTable
-  -- firstRow <- getFirstRow subtitleTable
-  -- clonedRowNode <- deepClone (HTR.toNode firstRow)
-  -- clonedRow <- maybe (throwMinsiError (HTMLElementNotFound "ClonedRow")) pure (fromNode clonedRowNode >>= HTR.fromElement)
+removeSubtitleButtonEventListener :: Event -> Effect Unit
+removeSubtitleButtonEventListener ev =
+  genericErrorsHandler
+    $ runMaybeT (removeSubtitleButtonEventListenerTrans ev)
+    *> pure unit
 
-  -- -- Get start value from the first row
-  -- firstRowEndInput <- getEndInput firstRow
-  -- endValue <- valueAsNumber firstRowEndInput
+removeSubtitleButtonEventListenerTrans :: Event -> MaybeT Effect Unit
+removeSubtitleButtonEventListenerTrans ev = do
+  lift $ log "Remove subtitle button clicked"
+  buttonTarget <- MaybeT $ pure $ target ev >>= HB.fromEventTarget
+  hasRemoveClass <- lift $ classList (HB.toElement buttonTarget) >>= flip contains "removeSubtitleButton"
+  when (not hasRemoveClass) (MaybeT $ pure Nothing)
+  let buttonNode = toNode (HB.toElement buttonTarget)
+  tableRow <- findTrAncestor buttonNode
+  removeRowFromDom tableRow
 
-  -- -- Set cloned row end time = start time of first row
-  -- clonedRowStartInput <- getStartInput clonedRow
-  -- setValue (show endValue) clonedRowStartInput
+isTrElement :: Node -> Boolean
+isTrElement node =
+  fromMaybe false
+    $ (_ == ElementName "TR") <<< tagName
+    <$> fromNode node
 
-  -- -- Set cloned row start time = start time - 1000 (1 second before)
-  -- let newEndValue = endValue + 1000.0
-  -- clonedRowEndInput <- getEndInput clonedRow
-  -- setValue (show newEndValue) clonedRowEndInput
+getParentNode :: Node -> MaybeT Effect Node
+getParentNode node = MaybeT $ parentNode node
 
-  -- -- Insert the cloned row before the first row
-  -- insertBefore clonedRowNode (HTR.toNode firstRow) (HTS.toNode tbody)
-  -- log "Subtitle row cloned successfully"
+findTrAncestor :: Node -> MaybeT Effect HR.HTMLTableRowElement
+findTrAncestor node = do
+  trNode <- iterateUntilM isTrElement getParentNode node
+  MaybeT $ pure $ fromNode trNode >>= HR.fromElement
+
+removeRowFromDom :: HR.HTMLTableRowElement -> MaybeT Effect Unit
+removeRowFromDom tableRow = do
+  let rowNode = HR.toNode tableRow
+  parentNode' <- MaybeT $ parentNode rowNode
+  lift $ removeChild rowNode parentNode'
