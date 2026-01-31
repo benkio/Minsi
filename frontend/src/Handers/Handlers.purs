@@ -24,6 +24,7 @@ setupEventHandlers
       , applyButton
       , videoSource
       , subtitleTable
+      , subtitleRow
       , addSubtitleButton
       , setSubtitleStartButton
       , setSubtitleEndButton
@@ -62,7 +63,7 @@ setupEventHandlers
                              })
   setApplyButtonHandler applyButton
   setKeyboardHandlers
-  setAddSubtitleButtonHandler addSubtitleButton subtitleTable
+  setAddSubtitleButtonHandler addSubtitleButton subtitleTable subtitleRow
   setRemoveSubtitleButtonHandler subtitleTable
   setSubtitleTimeButtonsHandlers (STBT {
     setSubtitleStartButton: setSubtitleStartButton

@@ -30,6 +30,7 @@ import Components.HtmlIds(
   , videoSourceId
   , videoSourceRowId
   , youtubeUrlId
+  , subtitleRow
   )
 import Control.Monad.Error.Class (catchError)
 import Data.Newtype (class Newtype)
@@ -53,6 +54,8 @@ import Web.HTML.HTMLIFrameElement (HTMLIFrameElement)
 import Web.HTML.HTMLIFrameElement as IF
 import Web.HTML.HTMLTableElement (HTMLTableElement)
 import Web.HTML.HTMLTableElement as HT
+import Web.HTML.HTMLTemplateElement (HTMLTemplateElement)
+import Web.HTML.HTMLTemplateElement as HTP
 
 data HtmlInputs = HtmlInputs
   { cutStart :: HTMLInputElement
@@ -70,6 +73,7 @@ data HtmlInputs = HtmlInputs
   , addSubtitleButton :: HTMLButtonElement
   , setSubtitleStartButton :: HTMLButtonElement
   , setSubtitleEndButton :: HTMLButtonElement
+  , subtitleRow :: HTMLTemplateElement
   }
 
 data ResultPreview
@@ -130,6 +134,7 @@ loadHtmlInputs doc = do
   addSubtitleButton <- loadButton addSubtitleId doc
   setSubtitleStartButton <- loadButton setSubtitleStartButtonId doc
   setSubtitleEndButton <- loadButton setSubtitleEndButtonId doc
+  subtitleRow <- loadTemplate subtitleRow doc
   pure
     ( HtmlInputs
         { cutStart: fst rangeTuple
@@ -147,6 +152,7 @@ loadHtmlInputs doc = do
         , addSubtitleButton: addSubtitleButton
         , setSubtitleStartButton: setSubtitleStartButton
         , setSubtitleEndButton: setSubtitleEndButton
+        , subtitleRow: subtitleRow
         }
     )
 
@@ -218,6 +224,9 @@ loadTable id = loadHtmlElement id HT.fromElement
 
 loadVideo :: String -> NonElementParentNode -> Effect HTMLVideoElement
 loadVideo id = loadHtmlElement id HV.fromElement
+
+loadTemplate :: String -> NonElementParentNode -> Effect HTMLTemplateElement
+loadTemplate id = loadHtmlElement id HTP.fromElement
 
 loadResultPreview :: NonElementParentNode -> Effect ResultPreview
 loadResultPreview doc = do

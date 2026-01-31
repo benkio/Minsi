@@ -1,53 +1,68 @@
 module Handlers.AddSubtitleButtonHandler where
+
 import Prelude
 
-import Web.DOM.Node(deepClone, insertBefore)
+import Components.HTMLTableElement (getEndInput, getFirstRow, getStartInput, getTBody)
+import Data.Either (Either(..))
+import Data.Maybe (maybe)
 import Effect (Effect)
 import Effect.Console (log)
-import Web.DOM.Element (toEventTarget, fromNode)
+import Effect.Exception (try)
+import Handers.ErrorHandlers (genericErrorsHandler)
+import Handlers.ApplyButtonHandler (getRow)
+import Handlers.RemoveSubtitleButtonHandler (addRemoveSubtitleListenerToRow)
+import Web.HTML.HTMLTemplateElement as HTP
+import Main.MinsiError (MinsiError(..), throwMinsiError)
+import Web.DOM.Element (fromNode, toEventTarget)
+import Web.DOM.Node (appendChild, deepClone, insertBefore)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
 import Web.HTML.HTMLButtonElement as HB
+import Web.HTML.HTMLInputElement (setValue, valueAsNumber)
 import Web.HTML.HTMLTableElement as HT
-import Main.MinsiError (MinsiError(..), throwMinsiError)
-import Data.Maybe (maybe)
-import Web.HTML.Event.EventTypes as E
-import Web.HTML.HTMLTableSectionElement as HTS
 import Web.HTML.HTMLTableRowElement as HTR
-import Web.HTML.HTMLInputElement (valueAsNumber, setValue)
-import Handers.ErrorHandlers (genericErrorsHandler)
-import Components.HTMLTableElement (getFirstRow, getTBody, getStartInput, getEndInput)
+import Web.HTML.HTMLTableSectionElement as HTS
+import Web.HTML.Event.EventTypes as E
 
-setAddSubtitleButtonHandler :: HB.HTMLButtonElement -> HT.HTMLTableElement -> Effect Unit
-setAddSubtitleButtonHandler addSubtitleButton subtitleTable = do
+setAddSubtitleButtonHandler :: HB.HTMLButtonElement -> HT.HTMLTableElement -> HTP.HTMLTemplateElement -> Effect Unit
+setAddSubtitleButtonHandler addSubtitleButton subtitleTable subtitleRowTemplate = do
   log "Setting up add subtitle button handler"
-  addSubtitleButtonEvL <- eventListener (addSubtitleButtonEventListener subtitleTable)
+  addSubtitleButtonEvL <- eventListener (addSubtitleButtonEventListener subtitleTable subtitleRowTemplate)
   addEventListener E.click addSubtitleButtonEvL false addSubtitleButtonEventTarget
   log "Add subtitle button handler set up successfully"
   where
   addSubtitleButtonEventTarget = toEventTarget (HB.toElement addSubtitleButton)
 
-addSubtitleButtonEventListener :: HT.HTMLTableElement -> Event -> Effect Unit
-addSubtitleButtonEventListener subtitleTable _ = genericErrorsHandler $ do
+addSubtitleButtonEventListener :: HT.HTMLTableElement -> HTP.HTMLTemplateElement -> Event -> Effect Unit
+addSubtitleButtonEventListener subtitleTable subtitleRowTemplate _ = genericErrorsHandler $ do
   log "Add subtitle button clicked"
+  eitherFirstRow <- try $ getFirstRow subtitleTable
+  case eitherFirstRow of
+    Left _ -> addNewRow subtitleTable subtitleRowTemplate
+    Right firstRow -> cloneFirstRow firstRow subtitleTable
+
+addNewRow :: HT.HTMLTableElement -> HTP.HTMLTemplateElement -> Effect Unit
+addNewRow subtitleTable subtitleRowTemplate = do
+  subtitleRow <- getRow subtitleRowTemplate
   tbody <- getTBody subtitleTable
-  firstRow <- getFirstRow subtitleTable
+  clonedRowNode <- deepClone (HTR.toNode subtitleRow)
+  clonedRow <- maybe (throwMinsiError (HTMLElementNotFound "subtitleRow")) pure (fromNode clonedRowNode >>= HTR.fromElement)
+  appendChild clonedRowNode (HTS.toNode tbody)
+  addRemoveSubtitleListenerToRow clonedRow
+  log "Subtitle row added successfully"
+
+cloneFirstRow :: HTR.HTMLTableRowElement -> HT.HTMLTableElement -> Effect Unit
+cloneFirstRow firstRow subtitleTable = do
+  tbody <- getTBody subtitleTable
   clonedRowNode <- deepClone (HTR.toNode firstRow)
   clonedRow <- maybe (throwMinsiError (HTMLElementNotFound "ClonedRow")) pure (fromNode clonedRowNode >>= HTR.fromElement)
-
-  -- Get start value from the first row
   firstRowEndInput <- getEndInput firstRow
   endValue <- valueAsNumber firstRowEndInput
-
-  -- Set cloned row end time = start time of first row
   clonedRowStartInput <- getStartInput clonedRow
   setValue (show endValue) clonedRowStartInput
-
-  -- Set cloned row start time = start time - 1000 (1 second before)
-  let newEndValue = endValue + 1000.0
+  let newEndValue = endValue + 1.0
   clonedRowEndInput <- getEndInput clonedRow
   setValue (show newEndValue) clonedRowEndInput
-
-  -- Insert the cloned row before the first row
   insertBefore clonedRowNode (HTR.toNode firstRow) (HTS.toNode tbody)
+  addRemoveSubtitleListenerToRow clonedRow
   log "Subtitle row cloned successfully"

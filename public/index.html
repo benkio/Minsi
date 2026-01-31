@@ -21,7 +21,9 @@
             Opinionated YouTube Clip Video Gif Audio Extractor
           </p>
           <p class="mt-2 mb-0">
-            <a href="./instructions.html" class="btn btn-outline-secondary btn-sm"
+            <a
+              href="./instructions.html"
+              class="btn btn-outline-secondary btn-sm"
               >How to use (Video, MP3, GIF)</a
             >
           </p>
@@ -247,71 +249,68 @@
                   </th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <input
-                      type="number"
-                      value="0"
-                      class="form-control form-control-sm"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      value="100"
-                      class="form-control form-control-sm"
-                    />
-                  </td>
-                  <td>
-                    <textarea
-                      class="form-control form-control-sm"
-                      rows="2"
-                    ></textarea>
-                  </td>
-                  <td>
-                    <select class="form-select form-select-sm">
-                      <option selected>Impact</option>
-                      <option>Arial Black</option>
-                    </select>
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      class="form-control form-control-sm"
-                      min="12"
-                      value="36"
-                      max="48"
-                    />
-                  </td>
-                  <td>
-                    <select class="form-select form-select-sm">
-                      <option selected>White</option>
-                      <option>Black</option>
-                      <option>Light Green</option>
-                      <option>Light Orange</option>
-                      <option>Yellow</option>
-                    </select>
-                  </td>
-                  <td>
-                    <select class="form-select form-select-sm">
-                      <option>Top</option>
-                      <option selected>Bottom</option>
-                    </select>
-                  </td>
-                  <td class="text-center">
-                      <button
-                          type="button"
-                          class="btn btn-sm btn-outline-danger removeSubtitleButton"
-                      >➖</button>
-                  </td>
-                </tr>
-              </tbody>
+              <tbody></tbody>
             </table>
           </div>
         </div>
       </div>
     </div>
+
+    <template id="subtitleRow">
+      <tr>
+        <td>
+          <input type="number" value="0" class="form-control form-control-sm" />
+        </td>
+        <td>
+          <input
+            type="number"
+            value="100"
+            class="form-control form-control-sm"
+          />
+        </td>
+        <td>
+          <textarea class="form-control form-control-sm" rows="2"></textarea>
+        </td>
+        <td>
+          <select class="form-select form-select-sm">
+            <option selected>Impact</option>
+            <option>Arial Black</option>
+          </select>
+        </td>
+        <td>
+          <input
+            type="number"
+            class="form-control form-control-sm"
+            min="12"
+            value="36"
+            max="48"
+          />
+        </td>
+        <td>
+          <select class="form-select form-select-sm">
+            <option selected>White</option>
+            <option>Black</option>
+            <option>Light Green</option>
+            <option>Light Orange</option>
+            <option>Yellow</option>
+          </select>
+        </td>
+        <td>
+          <select class="form-select form-select-sm">
+            <option>Top</option>
+            <option selected>Bottom</option>
+          </select>
+        </td>
+        <td class="text-center">
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-danger removeSubtitleButton"
+          >
+            ➖
+          </button>
+        </td>
+      </tr>
+    </template>
 
     <!-- Loading Modal -->
     <div

@@ -2,6 +2,7 @@ module Handlers.ApplyButtonHandler where
 
 import Prelude
 
+import Data.Array (cons)
 import Data.Tuple (Tuple(..), fst, snd)
 import Model.State.State (State(..),DurationRange(..))
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlVisualElements(..), loadComponents)
@@ -21,6 +22,7 @@ import Effect.Console (log)
 import Endpoints.Compute (callCompute)
 import Endpoints.Status (callStatus)
 import Handers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
+import Data.Maybe (maybe)
 import Main.MinsiError (MinsiError(..), throwMinsiError)
 import Model.ProcessStatus (ProcessStatus(..))
 import Model.State.StateFromHtml (fromHtmlInputs)
@@ -38,6 +40,10 @@ import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLMediaElement (load, pause, setSrc)
 import Web.HTML.HTMLVideoElement (HTMLVideoElement, toHTMLMediaElement)
 import Web.HTML.HTMLTableElement as HT
+import Web.HTML.HTMLTableRowElement as HR
+import Web.HTML.HTMLTemplateElement as HTP
+import Web.DOM.DocumentFragment as DF
+import Web.DOM.ParentNode (firstElementChild)
 import Components.HTMLTableElement (getRows, getStartInput, getEndInput)
 import Data.Traversable (traverse)
 import Web.HTML.Location (setHash)
@@ -75,8 +81,8 @@ finallyHandlers components state = do
   scrollToVideoSource
   let videoMediaElement = (unwrap components.htmlOutputs).resultVideo
   setVideoSrc filepath videoMediaElement
-  let HtmlInputs { subtitleTable } = components.htmlInputs
-  setSubtitleTableMaxValues state subtitleTable
+  let HtmlInputs { subtitleTable, subtitleRow } = components.htmlInputs
+  setSubtitleTableMaxValues state subtitleTable subtitleRow
 
 
 waitForStatus :: String -> Aff Unit
@@ -134,9 +140,10 @@ getCurrentState = do
   state <- (either (throwMinsiError <<< InvalidInputs <<< toMap) pure <<< toEither) stateV
   pure $ Tuple state components
 
-setSubtitleTableMaxValues :: State -> HT.HTMLTableElement -> Effect Unit
-setSubtitleTableMaxValues (State { cutVideo: DurationRange { start: Milliseconds startMs, end: Milliseconds endMs } }) subtitleTable = genericErrorsHandler $ do
+setSubtitleTableMaxValues :: State -> HT.HTMLTableElement -> HTP.HTMLTemplateElement -> Effect Unit
+setSubtitleTableMaxValues (State { cutVideo: DurationRange { start: Milliseconds startMs, end: Milliseconds endMs } }) subtitleTable subtitleRowTemplate = genericErrorsHandler $ do
   let durationSeconds = (endMs - startMs)
+  subtitleRow <- getRow subtitleRowTemplate
   rows <- getRows subtitleTable
   void $ traverse
     ( \row -> do
@@ -145,5 +152,12 @@ setSubtitleTableMaxValues (State { cutVideo: DurationRange { start: Milliseconds
         HI.setMax (show durationSeconds) startInput
         HI.setMax (show durationSeconds) endInput
     )
-    rows
+    (cons subtitleRow rows)
   log $ "Set max values for all subtitle inputs to " <> show durationSeconds <> " seconds"
+
+getRow :: HTP.HTMLTemplateElement -> Effect HR.HTMLTableRowElement
+getRow subtitleTemplateElement = do
+  fragment <- HTP.content subtitleTemplateElement
+  firstEl <- firstElementChild (DF.toParentNode fragment)
+  maybe (throwMinsiError (HTMLElementNotFound "subtitleRowTemplate")) pure
+    (firstEl >>= HR.fromElement)g

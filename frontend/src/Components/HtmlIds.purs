@@ -89,3 +89,6 @@ setSubtitleStartButtonId = "setSubtitleStartButton"
 
 setSubtitleEndButtonId :: String
 setSubtitleEndButtonId = "setSubtitleEndButton"
+
+subtitleRow :: String
+subtitleRow = "subtitleRow"

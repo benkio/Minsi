@@ -33,6 +33,11 @@ setRemoveSubtitleButtonHandler subtitleTable = do
   where
   tableRowEventTarget r = toEventTarget (HR.toElement r)
 
+addRemoveSubtitleListenerToRow :: HR.HTMLTableRowElement -> Effect Unit
+addRemoveSubtitleListenerToRow row = do
+  evl <- eventListener removeSubtitleButtonEventListener
+  addEventListener E.click evl false (toEventTarget (HR.toElement row))
+
 removeSubtitleButtonEventListener :: Event -> Effect Unit
 removeSubtitleButtonEventListener ev =
   genericErrorsHandler
