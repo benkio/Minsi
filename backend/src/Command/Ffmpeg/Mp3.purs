@@ -17,28 +17,6 @@ import Node.Library.Execa (ExecaResult)
 import Node.Path (FilePath)
 import Text.Printf (formatInt)
 
---TODO: move it to a better place
-secondsToString :: Int -> String
-secondsToString seconds =
-  intercalate ":" $ map (formatInt "02") [ dd, hh, ss ]
-  where
-  dd = seconds / 3600
-  hh = (seconds `mod` 3600) / 60
-  ss = (seconds `mod` 3600) `mod` 60
-
---TODO: move it to a better place
-millisToString :: Milliseconds -> Char -> String
-millisToString (Milliseconds ms) millisSeparator =
-  secondsToString seconds <> singleton millisSeparator <> (formatInt "03" leftMillis)
-  where
-  seconds = (floor ms) / 1000
-  leftMillis = (floor ms) `mod` 1000
-
---TODO: move it to a better place
-millisecondsToSecondsString :: Milliseconds -> Maybe Char -> String
-millisecondsToSecondsString ms Nothing = millisToString ms ','
-millisecondsToSecondsString ms (Just c) = millisToString ms c
-
 extractMp3 :: FilePath -> Aff ExecaResult
 extractMp3 filename = do
   filepathMp3 <- liftEffect $ mp3 filename

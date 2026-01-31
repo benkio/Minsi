@@ -1,5 +1,7 @@
 module Model.State.State where
 
+import Prelude
+
 import Data.Newtype (class Newtype)
 import Data.Time.Duration (Milliseconds)
 import Data.URL (URL, toString)
@@ -39,6 +41,25 @@ newtype Subtitle = Subtitle
 data Font = Impact | ArialBlack
 data Color = White | Black | LightGreen | LightOrange | Yellow
 data Position = Top | Bottom
+
+derive instance Eq Font
+derive instance Eq Color
+derive instance Eq Position
+
+instance Show Font where
+  show Impact = "Impact"
+  show ArialBlack = "ArialBlack"
+
+instance Show Color where
+  show White = "White"
+  show Black = "Black"
+  show LightGreen = "LightGreen"
+  show LightOrange = "LightOrange"
+  show Yellow = "Yellow"
+
+instance Show Position where
+  show Top = "Top"
+  show Bottom = "Bottom"
 
 instance WriteForeign Position where
   writeImpl Top = writeImpl "Top"

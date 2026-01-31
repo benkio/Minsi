@@ -5,7 +5,7 @@ import Prelude
 import Effect (Effect)
 import Effect.Timer (setInterval)
 import Handers.ErrorHandlers (genericErrorsHandler)
-import Handers.YoutubeVideo.PlaybackPositionHandler (formatToThreeDecimals)
+import Conversion.Time (formatToThreeDecimals)
 import Web.DOM.Node (setTextContent)
 import Web.HTML.HTMLMediaElement (currentTime)
 import Web.HTML.HTMLSpanElement as HSP

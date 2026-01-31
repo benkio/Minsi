@@ -1,10 +1,10 @@
-module Test.Handers.YoutubeVideo.PlaybackPositionHandlerSpec where
+module Test.Conversion.TimeSpec where
 
+import Conversion.Time (formatToThreeDecimals)
 import Data.Either (Either(..))
 import Data.String.Regex (regex, test)
 import Data.String.Regex.Flags (noFlags)
 import Effect.Class (liftEffect)
-import Handers.YoutubeVideo.PlaybackPositionHandler (formatToThreeDecimals)
 import Prelude
 import Test.Arbitrary (DecimalNumber(..))
 import Test.QuickCheck (quickCheck)
@@ -20,4 +20,3 @@ spec = do
         Right r ->
           quickCheck \(DecimalNumber n) ->
             test r (formatToThreeDecimals n)
-

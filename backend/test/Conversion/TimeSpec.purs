@@ -1,8 +1,8 @@
-module Test.Command.FfmpegSpec where
+module Test.Conversion.TimeSpec where
 
 import Prelude
 
-import Command.Ffmpeg.Mp3 (millisToString, millisecondsToSecondsString, secondsToString)
+import Conversion.Time (millisToString, millisecondsToSecondsString, secondsToString)
 import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Milliseconds(..))
 import Test.Spec (Spec, describe, it)

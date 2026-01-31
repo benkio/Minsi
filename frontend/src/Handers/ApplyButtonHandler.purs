@@ -160,4 +160,4 @@ getRow subtitleTemplateElement = do
   fragment <- HTP.content subtitleTemplateElement
   firstEl <- firstElementChild (DF.toParentNode fragment)
   maybe (throwMinsiError (HTMLElementNotFound "subtitleRowTemplate")) pure
-    (firstEl >>= HR.fromElement)g
+    (firstEl >>= HR.fromElement)
