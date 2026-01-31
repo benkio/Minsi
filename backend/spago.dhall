@@ -24,6 +24,7 @@
   , "ordered-collections"
   , "prelude"
   , "printf"
+  , "quickcheck"
   , "refs"
   , "spec"
   , "spec-discovery"
