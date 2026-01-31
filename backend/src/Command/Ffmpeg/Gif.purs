@@ -1,14 +1,17 @@
 module Command.Ffmpeg.Gif where
 
+import Data.Foldable (intercalate, fold)
+import Constants (srt, txt)
 import Conversion.Time (millisecondsToSecondsString)
-
-import Model.State (DurationRange(..), Subtitle(..), validateRange, validateSubtitles, Font(..), Color(..), Position(..))
+import Node.Path (FilePath)
+import Model.State (DurationRange(..), Subtitle(..), Position(..))
 import Effect (Effect)
-import Node.Library.Execa (ExecaResult)
 import Prelude
 import Data.Array (mapWithIndex)
-import Data.Foldable (fold)
 import Data.Maybe (Maybe(..))
+import Node.Buffer (fromString)
+import Node.FS.Sync (writeFile, rm)
+import Node.Encoding (Encoding(..))
 
 --TODO: implement
 -- makeGif :: Effect ExecaResult
@@ -18,9 +21,25 @@ import Data.Maybe (Maybe(..))
 makePlainGif :: Effect Unit
 makePlainGif = pure unit
 
---TODO: implement
-makeSrtFile :: Effect Unit
-makeSrtFile = pure unit
+writeSrtFile :: FilePath -> String -> Effect Unit
+writeSrtFile filename srtContent = do 
+  f <- srt filename
+  bufferContent <- fromString srtContent UTF8
+  writeFile f bufferContent
+
+deleteSrtFile :: FilePath -> Effect Unit
+deleteSrtFile fp = srt fp >>= rm
+
+writeMergeTxt :: FilePath -> Array FilePath -> Effect Unit
+writeMergeTxt filename files = do
+  f <- txt filename
+  bufferContent <- fromString content UTF8
+  writeFile f bufferContent
+  where
+    content = intercalate "\n" $ files <#> (\f -> "file '"<>f<>"'")
+
+deleteTxtFile :: FilePath -> Effect Unit
+deleteTxtFile fp = txt fp >>= rm
 
 --TODO: implement
 burnSrtIntoGif :: Effect Unit

@@ -1,7 +1,8 @@
 module Controller.ComputeController where
 
-import Prelude
-
+import Node.FS.Sync (rm)
+import Data.Traversable (traverse_)
+import Constants (files)
 import Command.Ffmpeg.Mp3 (extractMp3)
 import Command.Id3v2 (addId3Tags)
 import Command.Ytdlp (downloadVideo)
@@ -20,10 +21,12 @@ import InMemoryDB (Store, insert, lookup)
 import Model.ProcessStatus (ProcessStatus(..), isFinished)
 import Model.State (State(..), DurationRange(..), validateState)
 import Node.ChildProcess.Types (Exit(..))
-import Node.Library.Execa (ExecaResult)
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody)
 import Node.Express.Response (sendJson, setStatus, end)
+import Node.Library.Execa (ExecaResult)
+import Node.Path (FilePath)
+import Prelude
 
 data ComputeResponse =
   InvalidInput (Array String)
@@ -55,7 +58,7 @@ computeResponse store (Right state@(State { filename })) = do
   m <- lookup filename store
   case m of
     Just p | not (isFinished p) -> pure PendingComputation
-    _ -> pure (Success state)
+    _ -> deleteFiles filename *> pure (Success state)
 
 compute :: State -> Store -> Effect Unit
 compute state@(State { filename }) store = do
@@ -88,3 +91,7 @@ exceptTStep label aff =
 isSuccessExit :: Exit -> Boolean
 isSuccessExit (Normally 0) = true
 isSuccessExit _ = false
+
+deleteFiles :: FilePath -> Effect Unit
+deleteFiles filename =
+  files filename >>= \fs -> traverse_ (\f -> catchError (rm f) (\_ -> pure unit)) fs

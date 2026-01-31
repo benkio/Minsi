@@ -4,18 +4,14 @@ import Prelude
 
 import Command.Command (runCommand)
 import Constants (mp3, mp4)
-import Data.Foldable (intercalate)
-import Data.Int (floor)
-import Data.Maybe (Maybe(..))
-import Data.String.CodeUnits (singleton)
-import Data.Time.Duration (Milliseconds(..))
-import Effect (Effect)
+
+
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
 import MinsiError (MinsiError(..))
 import Node.Library.Execa (ExecaResult)
 import Node.Path (FilePath)
-import Text.Printf (formatInt)
+
 
 extractMp3 :: FilePath -> Aff ExecaResult
 extractMp3 filename = do
