@@ -101,6 +101,21 @@ instance ReadForeign WURL where
 instance Decode State where
   decode = readImpl
 
+instance Show Position where
+  show Top = "Top"
+  show Bottom = "Bottom"
+
+instance Show Color where
+  show White = "#ffffff"
+  show Black = "#000000"
+  show LightGreen = "#ABEBC6"
+  show LightOrange = "#FAD7A0"
+  show Yellow = "#FFFF00"
+
+instance Show Font where
+  show Impact = "Impact"
+  show ArialBlack = "Arial Black"
+
 derive instance eqFont :: Eq Font
 derive instance eqColor :: Eq Color
 derive instance eqPosition :: Eq Position
