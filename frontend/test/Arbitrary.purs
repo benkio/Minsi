@@ -13,8 +13,9 @@ data Range = Range Number Number
 instance Arbitrary Range where
   arbitrary = do
     start <- arbitrary
-    end <- suchThat arbitrary (\x -> x >= start)
-    pure (Range start end)
+    -- cutVideoValidation requires start < end - 100.0 (i.e. end - start > 100 ms)
+    gap <- suchThat arbitrary (\g -> g > 100.0)
+    pure (Range start (start + gap))
 
 newtype NonEmptyASCIIString = NonEmptyASCIIString String
 newtype EmptyASCIIString = EmptyASCIIString String
