@@ -334,6 +334,8 @@
   };
 
   // output/Data.Bounded/foreign.js
+  var topInt = 2147483647;
+  var bottomInt = -2147483648;
   var topChar = String.fromCharCode(65535);
   var bottomChar = String.fromCharCode(0);
   var topNumber = Number.POSITIVE_INFINITY;
@@ -351,6 +353,7 @@
       };
     };
   };
+  var ordIntImpl = unsafeCompareImpl;
   var ordStringImpl = unsafeCompareImpl;
 
   // output/Data.Eq/foreign.js
@@ -359,11 +362,15 @@
       return r1 === r2;
     };
   };
+  var eqIntImpl = refEq;
   var eqStringImpl = refEq;
 
   // output/Data.Eq/index.js
   var eqString = {
     eq: eqStringImpl
+  };
+  var eqInt = {
+    eq: eqIntImpl
   };
   var eq = function(dict) {
     return dict.eq;
@@ -401,8 +408,31 @@
       }
     };
   }();
+  var ordInt = /* @__PURE__ */ function() {
+    return {
+      compare: ordIntImpl(LT.value)(EQ.value)(GT.value),
+      Eq0: function() {
+        return eqInt;
+      }
+    };
+  }();
   var compare = function(dict) {
     return dict.compare;
+  };
+
+  // output/Data.Bounded/index.js
+  var top = function(dict) {
+    return dict.top;
+  };
+  var boundedInt = {
+    top: topInt,
+    bottom: bottomInt,
+    Ord0: function() {
+      return ordInt;
+    }
+  };
+  var bottom = function(dict) {
+    return dict.bottom;
   };
 
   // output/Data.Show/foreign.js
@@ -832,13 +862,13 @@
   };
   var traverse_ = function(dictApplicative) {
     var applySecond5 = applySecond(dictApplicative.Apply0());
-    var pure24 = pure(dictApplicative);
+    var pure25 = pure(dictApplicative);
     return function(dictFoldable) {
       var foldr3 = foldr(dictFoldable);
       return function(f) {
         return foldr3(function($473) {
           return applySecond5(f($473));
-        })(pure24(unit));
+        })(pure25(unit));
       };
     };
   };
@@ -1038,13 +1068,13 @@
     }
     return function(apply6) {
       return function(map24) {
-        return function(pure24) {
+        return function(pure25) {
           return function(f) {
             return function(array) {
-              function go2(bot, top2) {
-                switch (top2 - bot) {
+              function go2(bot, top3) {
+                switch (top3 - bot) {
                   case 0:
-                    return pure24([]);
+                    return pure25([]);
                   case 1:
                     return map24(array1)(f(array[bot]));
                   case 2:
@@ -1052,8 +1082,8 @@
                   case 3:
                     return apply6(apply6(map24(array3)(f(array[bot])))(f(array[bot + 1])))(f(array[bot + 2]));
                   default:
-                    var pivot = bot + Math.floor((top2 - bot) / 4) * 2;
-                    return apply6(map24(concat2)(go2(bot, pivot)))(go2(pivot, top2));
+                    var pivot = bot + Math.floor((top3 - bot) / 4) * 2;
+                    return apply6(map24(concat2)(go2(bot, pivot)))(go2(pivot, top3));
                 }
               }
               return go2(0, array.length);
@@ -1071,12 +1101,12 @@
   };
   var traversableMaybe = {
     traverse: function(dictApplicative) {
-      var pure24 = pure(dictApplicative);
+      var pure25 = pure(dictApplicative);
       var map24 = map(dictApplicative.Apply0().Functor0());
       return function(v) {
         return function(v1) {
           if (v1 instanceof Nothing) {
-            return pure24(Nothing.value);
+            return pure25(Nothing.value);
           }
           ;
           if (v1 instanceof Just) {
@@ -1088,11 +1118,11 @@
       };
     },
     sequence: function(dictApplicative) {
-      var pure24 = pure(dictApplicative);
+      var pure25 = pure(dictApplicative);
       var map24 = map(dictApplicative.Apply0().Functor0());
       return function(v) {
         if (v instanceof Nothing) {
-          return pure24(Nothing.value);
+          return pure25(Nothing.value);
         }
         ;
         if (v instanceof Just) {
@@ -2025,23 +2055,23 @@
   // output/Control.Monad/index.js
   var liftM1 = function(dictMonad) {
     var bind19 = bind(dictMonad.Bind1());
-    var pure24 = pure(dictMonad.Applicative0());
+    var pure25 = pure(dictMonad.Applicative0());
     return function(f) {
       return function(a) {
         return bind19(a)(function(a$prime) {
-          return pure24(f(a$prime));
+          return pure25(f(a$prime));
         });
       };
     };
   };
   var ap = function(dictMonad) {
     var bind19 = bind(dictMonad.Bind1());
-    var pure24 = pure(dictMonad.Applicative0());
+    var pure25 = pure(dictMonad.Applicative0());
     return function(f) {
       return function(a) {
         return bind19(f)(function(f$prime) {
           return bind19(a)(function(a$prime) {
-            return pure24(f$prime(a$prime));
+            return pure25(f$prime(a$prime));
           });
         });
       };
@@ -2396,10 +2426,10 @@
     var catchError1 = catchError(dictMonadError);
     var Monad0 = dictMonadError.MonadThrow0().Monad0();
     var map24 = map(Monad0.Bind1().Apply0().Functor0());
-    var pure24 = pure(Monad0.Applicative0());
+    var pure25 = pure(Monad0.Applicative0());
     return function(a) {
       return catchError1(map24(Right.create)(a))(function($52) {
-        return pure24(Left.create($52));
+        return pure25(Left.create($52));
       });
     };
   };
@@ -3941,12 +3971,12 @@
   };
   var bindExceptT = function(dictMonad) {
     var bind19 = bind(dictMonad.Bind1());
-    var pure24 = pure(dictMonad.Applicative0());
+    var pure25 = pure(dictMonad.Applicative0());
     return {
       bind: function(v) {
         return function(k) {
           return bind19(v)(either(function($193) {
-            return pure24(Left.create($193));
+            return pure25(Left.create($193));
           })(function(a) {
             var v1 = k(a);
             return v1;
@@ -4033,13 +4063,13 @@
   };
   var bindMaybeT = function(dictMonad) {
     var bind19 = bind(dictMonad.Bind1());
-    var pure24 = pure(dictMonad.Applicative0());
+    var pure25 = pure(dictMonad.Applicative0());
     return {
       bind: function(v) {
         return function(f) {
           return bind19(v)(function(v1) {
             if (v1 instanceof Nothing) {
-              return pure24(Nothing.value);
+              return pure25(Nothing.value);
             }
             ;
             if (v1 instanceof Just) {
@@ -4762,7 +4792,7 @@
   // output/Control.Monad.Loops/index.js
   var whileM_ = function(dictMonad) {
     var bind19 = bind(dictMonad.Bind1());
-    var pure24 = pure(dictMonad.Applicative0());
+    var pure25 = pure(dictMonad.Applicative0());
     return function(p) {
       return function(f) {
         return bind19(p)(function(v) {
@@ -4772,26 +4802,98 @@
             });
           }
           ;
-          return pure24(unit);
+          return pure25(unit);
         });
       };
     };
   };
   var iterateUntilM = function(dictMonad) {
-    var pure24 = pure(dictMonad.Applicative0());
+    var pure25 = pure(dictMonad.Applicative0());
     var bind19 = bind(dictMonad.Bind1());
     return function(p) {
       return function(f) {
         return function(v) {
           var $181 = p(v);
           if ($181) {
-            return pure24(v);
+            return pure25(v);
           }
           ;
           return bind19(f(v))(iterateUntilM(dictMonad)(p)(f));
         };
       };
     };
+  };
+
+  // output/Data.Int/foreign.js
+  var fromNumberImpl = function(just) {
+    return function(nothing) {
+      return function(n) {
+        return (n | 0) === n ? just(n) : nothing;
+      };
+    };
+  };
+  var toNumber = function(n) {
+    return n;
+  };
+  var fromStringAsImpl = function(just) {
+    return function(nothing) {
+      return function(radix) {
+        var digits;
+        if (radix < 11) {
+          digits = "[0-" + (radix - 1).toString() + "]";
+        } else if (radix === 11) {
+          digits = "[0-9a]";
+        } else {
+          digits = "[0-9a-" + String.fromCharCode(86 + radix) + "]";
+        }
+        var pattern2 = new RegExp("^[\\+\\-]?" + digits + "+$", "i");
+        return function(s) {
+          if (pattern2.test(s)) {
+            var i = parseInt(s, radix);
+            return (i | 0) === i ? just(i) : nothing;
+          } else {
+            return nothing;
+          }
+        };
+      };
+    };
+  };
+
+  // output/Data.Number/foreign.js
+  var isFiniteImpl = isFinite;
+  var floor = Math.floor;
+
+  // output/Data.Int/index.js
+  var top2 = /* @__PURE__ */ top(boundedInt);
+  var bottom2 = /* @__PURE__ */ bottom(boundedInt);
+  var fromStringAs = /* @__PURE__ */ function() {
+    return fromStringAsImpl(Just.create)(Nothing.value);
+  }();
+  var fromString = /* @__PURE__ */ fromStringAs(10);
+  var fromNumber = /* @__PURE__ */ function() {
+    return fromNumberImpl(Just.create)(Nothing.value);
+  }();
+  var unsafeClamp = function(x) {
+    if (!isFiniteImpl(x)) {
+      return 0;
+    }
+    ;
+    if (x >= toNumber(top2)) {
+      return top2;
+    }
+    ;
+    if (x <= toNumber(bottom2)) {
+      return bottom2;
+    }
+    ;
+    if (otherwise) {
+      return fromMaybe(0)(fromNumber(x));
+    }
+    ;
+    throw new Error("Failed pattern match at Data.Int (line 72, column 1 - line 72, column 29): " + [x.constructor.name]);
+  };
+  var floor2 = function($39) {
+    return unsafeClamp(floor($39));
   };
 
   // output/Handers.YoutubeVideo.Foreign/foreign.js
@@ -4887,145 +4989,6 @@
     return hasGetDuration && hasGetCurrentTime && isReady;
   };
 
-  // output/Web.Event.EventTarget/foreign.js
-  function eventListener(fn) {
-    return function() {
-      return function(event) {
-        return fn(event)();
-      };
-    };
-  }
-  function addEventListener(type) {
-    return function(listener) {
-      return function(useCapture) {
-        return function(target6) {
-          return function() {
-            return target6.addEventListener(type, listener, useCapture);
-          };
-        };
-      };
-    };
-  }
-
-  // output/Web.HTML.Event.EventTypes/index.js
-  var input = "input";
-  var click2 = "click";
-  var change = "change";
-
-  // output/Handlers.CutRangeHandler/index.js
-  var CRET = /* @__PURE__ */ function() {
-    function CRET2(value0) {
-      this.value0 = value0;
-    }
-    ;
-    CRET2.create = function(value0) {
-      return new CRET2(value0);
-    };
-    return CRET2;
-  }();
-  var updateCutValue = function(cutInput) {
-    return function(cutValueSpan) {
-      return function __do6() {
-        var inputValue = value2(cutInput)();
-        return setTextContent(inputValue)(toNode2(cutValueSpan))();
-      };
-    };
-  };
-  var updateCutStartValue = function(cutStart) {
-    return function(cutStartValue) {
-      return function __do6() {
-        var inputValue = value2(cutStart)();
-        return setTextContent(inputValue)(toNode2(cutStartValue))();
-      };
-    };
-  };
-  var updateCutEndValue = function(cutEnd) {
-    return function(cutEndValue) {
-      return function __do6() {
-        var inputValue = value2(cutEnd)();
-        return setTextContent(inputValue)(toNode2(cutEndValue))();
-      };
-    };
-  };
-  var cutStartEventListener = function(cutStart) {
-    return function(cutStartValue) {
-      return function(v) {
-        return function __do6() {
-          var inputValue = value2(cutStart)();
-          return setTextContent(inputValue)(toNode2(cutStartValue))();
-        };
-      };
-    };
-  };
-  var cutEndEventListener = function(cutEnd) {
-    return function(cutEndValue) {
-      return function(v) {
-        return function __do6() {
-          var inputValue = value2(cutEnd)();
-          return setTextContent(inputValue)(toNode2(cutEndValue))();
-        };
-      };
-    };
-  };
-  var setCutRangeHandlers = function(v) {
-    var cutStartEventTarget = toEventTarget2(toElement3(v.value0.cutStart));
-    var cutEndEventTarget = toEventTarget2(toElement3(v.value0.cutEnd));
-    return genericErrorsHandler(function __do6() {
-      var cutStartEvL = eventListener(cutStartEventListener(v.value0.cutStart)(v.value0.cutStartValue))();
-      var cutEndEvL = eventListener(cutEndEventListener(v.value0.cutEnd)(v.value0.cutEndValue))();
-      addEventListener(input)(cutStartEvL)(false)(cutStartEventTarget)();
-      addEventListener(change)(cutStartEvL)(false)(cutStartEventTarget)();
-      addEventListener(input)(cutEndEvL)(false)(cutEndEventTarget)();
-      addEventListener(change)(cutEndEvL)(false)(cutEndEventTarget)();
-      return unit;
-    });
-  };
-
-  // output/Handers.YoutubeVideo.CutButtonsHandlers/index.js
-  var discard2 = /* @__PURE__ */ discard(discardUnit);
-  var show3 = /* @__PURE__ */ show(showNumber);
-  var discard22 = /* @__PURE__ */ discard2(bindAff);
-  var whileM_2 = /* @__PURE__ */ whileM_(monadAff);
-  var liftEffect3 = /* @__PURE__ */ liftEffect(monadEffectAff);
-  var map11 = /* @__PURE__ */ map(functorEffect);
-  var not2 = /* @__PURE__ */ not(heytingAlgebraBoolean);
-  var bind13 = /* @__PURE__ */ bind(bindAff);
-  var show1 = /* @__PURE__ */ show(showInt);
-  var setCutInputButtonEvL = function(cutInput) {
-    return function(cutValueSpan) {
-      return function(v) {
-        return function __do6() {
-          var currentTime2 = getPlayerCurrentTime();
-          setValue2(show3(currentTime2))(cutInput)();
-          return updateCutValue(cutInput)(cutValueSpan)();
-        };
-      };
-    };
-  };
-  var initializeCutInputs = function(cutStart) {
-    return function(cutEnd) {
-      return function(cutStartValue) {
-        return function(cutEndValue) {
-          return function(startTime) {
-            return launchAff_(discard22(whileM_2(liftEffect3(map11(not2)(isPlayerReady)))(delay(500)))(function() {
-              return bind13(liftEffect3(getVideoDuration))(function(duration2) {
-                return discard22(liftEffect3(setMax(show3(duration2))(cutStart)))(function() {
-                  return discard22(liftEffect3(setValue2(show1(startTime))(cutStart)))(function() {
-                    return discard22(liftEffect3(setMax(show3(duration2))(cutEnd)))(function() {
-                      return discard22(liftEffect3(updateCutStartValue(cutStart)(cutStartValue)))(function() {
-                        return liftEffect3(updateCutEndValue(cutEnd)(cutEndValue));
-                      });
-                    });
-                  });
-                });
-              });
-            }));
-          };
-        };
-      };
-    };
-  };
-
   // output/Data.Array/foreign.js
   var replicateFill = function(count, value12) {
     if (count < 1) {
@@ -5106,8 +5069,8 @@
   var push = /* @__PURE__ */ runSTFn2(pushImpl);
 
   // output/Data.Array.ST.Iterator/index.js
-  var map12 = /* @__PURE__ */ map(functorST);
-  var not3 = /* @__PURE__ */ not(heytingAlgebraBoolean);
+  var map11 = /* @__PURE__ */ map(functorST);
+  var not2 = /* @__PURE__ */ not(heytingAlgebraBoolean);
   var $$void4 = /* @__PURE__ */ $$void(functorST);
   var Iterator = /* @__PURE__ */ function() {
     function Iterator2(value0, value1) {
@@ -5132,13 +5095,13 @@
     };
   };
   var iterator = function(f) {
-    return map12(Iterator.create(f))(newSTRef(0));
+    return map11(Iterator.create(f))(newSTRef(0));
   };
   var iterate = function(iter) {
     return function(f) {
       return function __do6() {
         var $$break = newSTRef(false)();
-        while (map12(not3)(read2($$break))()) {
+        while (map11(not2)(read2($$break))()) {
           (function __do7() {
             var mx = next(iter)();
             if (mx instanceof Just) {
@@ -5317,18 +5280,130 @@
   };
 
   // output/Conversion.Time/index.js
-  var show4 = /* @__PURE__ */ show(showNumber);
+  var show3 = /* @__PURE__ */ show(showNumber);
   var identity8 = /* @__PURE__ */ identity(categoryFn);
   var append3 = /* @__PURE__ */ append(semigroupArray);
   var formatToThreeDecimals = function(v) {
     var v1 = span2(function(x) {
       return x !== ".";
-    })(toCharArray(show4(v)));
+    })(toCharArray(show3(v)));
     var num = fromCharArray(v1.init);
     var decChars = maybe([])(identity8)(tail(v1.rest));
     var dec3 = take(3)(append3(decChars)(replicate(3)("0")));
     var dec = fromCharArray(dec3);
     return num + ("." + dec);
+  };
+
+  // output/Web.Event.EventTarget/foreign.js
+  function eventListener(fn) {
+    return function() {
+      return function(event) {
+        return fn(event)();
+      };
+    };
+  }
+  function addEventListener(type) {
+    return function(listener) {
+      return function(useCapture) {
+        return function(target6) {
+          return function() {
+            return target6.addEventListener(type, listener, useCapture);
+          };
+        };
+      };
+    };
+  }
+
+  // output/Web.HTML.Event.EventTypes/index.js
+  var input = "input";
+  var click2 = "click";
+  var change = "change";
+
+  // output/Handlers.CutRangeHandler/index.js
+  var pure4 = /* @__PURE__ */ pure(applicativeEffect);
+  var CRET = /* @__PURE__ */ function() {
+    function CRET2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    CRET2.create = function(value0) {
+      return new CRET2(value0);
+    };
+    return CRET2;
+  }();
+  var updateCutValue = function(num) {
+    return function(cutValueSpan) {
+      return setTextContent(formatToThreeDecimals(num))(toNode2(cutValueSpan));
+    };
+  };
+  var cutEventListener = function(cutElement) {
+    return function(cutElementValue) {
+      return function(v) {
+        return function __do6() {
+          var inputValue = value2(cutElement)();
+          var numValue = maybe(throwMinsiError(new InvalidInput("CutElement", inputValue)))(pure4)(fromString(inputValue))();
+          return setTextContent(formatToThreeDecimals(toNumber(numValue)))(toNode2(cutElementValue))();
+        };
+      };
+    };
+  };
+  var setCutRangeHandlers = function(v) {
+    var cutStartEventTarget = toEventTarget2(toElement3(v.value0.cutStart));
+    var cutEndEventTarget = toEventTarget2(toElement3(v.value0.cutEnd));
+    return genericErrorsHandler(function __do6() {
+      var cutStartEvL = eventListener(cutEventListener(v.value0.cutStart)(v.value0.cutStartValue))();
+      var cutEndEvL = eventListener(cutEventListener(v.value0.cutEnd)(v.value0.cutEndValue))();
+      addEventListener(input)(cutStartEvL)(false)(cutStartEventTarget)();
+      addEventListener(change)(cutStartEvL)(false)(cutStartEventTarget)();
+      addEventListener(input)(cutEndEvL)(false)(cutEndEventTarget)();
+      addEventListener(change)(cutEndEvL)(false)(cutEndEventTarget)();
+      return unit;
+    });
+  };
+
+  // output/Handers.YoutubeVideo.CutButtonsHandlers/index.js
+  var discard2 = /* @__PURE__ */ discard(discardUnit);
+  var show4 = /* @__PURE__ */ show(showNumber);
+  var discard22 = /* @__PURE__ */ discard2(bindAff);
+  var whileM_2 = /* @__PURE__ */ whileM_(monadAff);
+  var liftEffect3 = /* @__PURE__ */ liftEffect(monadEffectAff);
+  var map12 = /* @__PURE__ */ map(functorEffect);
+  var not3 = /* @__PURE__ */ not(heytingAlgebraBoolean);
+  var bind13 = /* @__PURE__ */ bind(bindAff);
+  var show1 = /* @__PURE__ */ show(showInt);
+  var setCutInputButtonEvL = function(cutInput) {
+    return function(cutValueSpan) {
+      return function(v) {
+        return function __do6() {
+          var currentTime2 = getPlayerCurrentTime();
+          setValue2(show4(currentTime2))(cutInput)();
+          return updateCutValue(currentTime2)(cutValueSpan)();
+        };
+      };
+    };
+  };
+  var initializeCutInputs = function(cutStart) {
+    return function(cutEnd) {
+      return function(cutStartValue) {
+        return function(cutEndValue) {
+          return function(startTime) {
+            return launchAff_(discard22(whileM_2(liftEffect3(map12(not3)(isPlayerReady)))(delay(500)))(function() {
+              return bind13(liftEffect3(getVideoDuration))(function(duration2) {
+                return discard22(liftEffect3(setMax(show4(duration2))(cutStart)))(function() {
+                  return discard22(liftEffect3(setValue2(show1(startTime))(cutStart)))(function() {
+                    return discard22(liftEffect3(setMax(show4(duration2))(cutEnd)))(function() {
+                      return discard22(liftEffect3(updateCutValue(toNumber(startTime))(cutStartValue)))(function() {
+                        return liftEffect3(updateCutValue(toNumber(startTime))(cutEndValue));
+                      });
+                    });
+                  });
+                });
+              });
+            }));
+          };
+        };
+      };
+    };
   };
 
   // output/Handers.YoutubeVideo.PlaybackPositionHandler/index.js
@@ -5351,37 +5426,6 @@
     };
   };
   var index3 = /* @__PURE__ */ adaptAny(index2);
-
-  // output/Data.Int/foreign.js
-  var fromStringAsImpl = function(just) {
-    return function(nothing) {
-      return function(radix) {
-        var digits;
-        if (radix < 11) {
-          digits = "[0-" + (radix - 1).toString() + "]";
-        } else if (radix === 11) {
-          digits = "[0-9a]";
-        } else {
-          digits = "[0-9a-" + String.fromCharCode(86 + radix) + "]";
-        }
-        var pattern2 = new RegExp("^[\\+\\-]?" + digits + "+$", "i");
-        return function(s) {
-          if (pattern2.test(s)) {
-            var i = parseInt(s, radix);
-            return (i | 0) === i ? just(i) : nothing;
-          } else {
-            return nothing;
-          }
-        };
-      };
-    };
-  };
-
-  // output/Data.Int/index.js
-  var fromStringAs = /* @__PURE__ */ function() {
-    return fromStringAsImpl(Just.create)(Nothing.value);
-  }();
-  var fromString = /* @__PURE__ */ fromStringAs(10);
 
   // output/Data.String.Regex/foreign.js
   var regexImpl = function(left) {
@@ -5889,10 +5933,10 @@
   // output/Foreign.Index/index.js
   var unsafeReadProp = function(dictMonad) {
     var fail3 = fail(dictMonad);
-    var pure24 = pure(applicativeExceptT(dictMonad));
+    var pure25 = pure(applicativeExceptT(dictMonad));
     return function(k) {
       return function(value12) {
-        return unsafeReadPropImpl(fail3(new TypeMismatch("object", typeOf(value12))), pure24, k, value12);
+        return unsafeReadPropImpl(fail3(new TypeMismatch("object", typeOf(value12))), pure25, k, value12);
       };
     };
   };
@@ -6170,12 +6214,12 @@
   };
 
   // output/Validations.RegexValidation/index.js
-  var pure4 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
+  var pure5 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
   var matches2 = function(v) {
     return function(v1) {
       return function(v2) {
         if (test(v)(v2)) {
-          return pure4(v2);
+          return pure5(v2);
         }
         ;
         return invalid(fromSingleton(v1)("Invalid Input for regex: " + v2));
@@ -6186,7 +6230,7 @@
   // output/Validations.YoutubeValidation/index.js
   var lmap2 = /* @__PURE__ */ lmap(bifunctorEither);
   var lmap1 = /* @__PURE__ */ lmap(bifunctorV);
-  var pure5 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
+  var pure6 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
   var youtubeRegex = "^(?:https?:\\/\\/)?(?:www\\.)?(?:youtube\\.com\\/watch\\?v=([a-zA-Z0-9_-]+)|youtu\\.be\\/([a-zA-Z\\d_-]+))(?:[?&].*)?$";
   var youtubeRegexValidation = function(id2) {
     return lmap2(function(x) {
@@ -6200,7 +6244,7 @@
       })(andThen(andThen(youtubeRegexValidation(id2))(function(ytRegex) {
         return matches2(ytRegex)(id2)(v);
       }))(function(urlString) {
-        return maybe(invalid(fromSingleton(id2)("Error validating youtube Url")))(pure5)(fromString2(urlString));
+        return maybe(invalid(fromSingleton(id2)("Error validating youtube Url")))(pure6)(fromString2(urlString));
       }));
     };
   };
@@ -6219,7 +6263,7 @@
   var traverse3 = /* @__PURE__ */ traverse(traversableMaybe)(applicativeEffect);
   var bind3 = /* @__PURE__ */ bind(bindMaybe);
   var foldl3 = /* @__PURE__ */ foldl(foldableV);
-  var pure6 = /* @__PURE__ */ pure(applicativeEffect);
+  var pure7 = /* @__PURE__ */ pure(applicativeEffect);
   var show6 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(showString));
   var show13 = /* @__PURE__ */ show(showString);
   var VET = /* @__PURE__ */ function() {
@@ -6247,10 +6291,10 @@
               })(rawValue);
               var youtubeUrl = foldl3(function(v) {
                 return function(v1) {
-                  return pure6(v1);
+                  return pure7(v1);
                 };
               })(throwMinsiError(new InvalidInput(youtubeUrlId, show6(rawValue))))(youtubeUrlV)();
-              var videoId = maybe(throwMinsiError(new InvalidInput(youtubeUrlId, show6(rawValue))))(pure6)(extractYoutubeVideoId(youtubeUrl))();
+              var videoId = maybe(throwMinsiError(new InvalidInput(youtubeUrlId, show6(rawValue))))(pure7)(extractYoutubeVideoId(youtubeUrl))();
               var startTime = extractYoutubeVideoStartTime(youtubeUrl);
               log("Youtube Url Handler fired with value: " + show13(videoId))();
               embedVideo({
@@ -6292,25 +6336,25 @@
   }
 
   // output/Components.HTMLTableElement/index.js
-  var pure7 = /* @__PURE__ */ pure(applicativeEffect);
+  var pure8 = /* @__PURE__ */ pure(applicativeEffect);
   var bind14 = /* @__PURE__ */ bind(bindMaybe);
   var map15 = /* @__PURE__ */ map(functorArray);
   var getTBody = function(table) {
     return function __do6() {
       var tBodies2 = tBodies(table)();
       var tBodyArray = toArray2(tBodies2)();
-      return maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableBody")))(pure7)(bind14(head(tBodyArray))(fromElement13))();
+      return maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableBody")))(pure8)(bind14(head(tBodyArray))(fromElement13))();
     };
   };
   var getStartInput = function(row) {
     return function __do6() {
       var cells2 = cells(row)();
       var cellArray = toArray2(cells2)();
-      var startCell = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableStartCell")))(pure7)(bind14(head(cellArray))(fromElement11))();
+      var startCell = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableStartCell")))(pure8)(bind14(head(cellArray))(fromElement11))();
       var element = toElement6(startCell);
       var parentNode2 = toParentNode(element);
       var elementMaybe = querySelector("input")(parentNode2)();
-      var input2 = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableStartInput")))(pure7)(bind14(elementMaybe)(fromElement4))();
+      var input2 = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableStartInput")))(pure8)(bind14(elementMaybe)(fromElement4))();
       return input2;
     };
   };
@@ -6325,18 +6369,18 @@
   var getFirstRow = function(table) {
     return function __do6() {
       var rows4 = getRows(table)();
-      return maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableFirstRow")))(pure7)(head(rows4))();
+      return maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableFirstRow")))(pure8)(head(rows4))();
     };
   };
   var getEndInput = function(row) {
     return function __do6() {
       var cells2 = cells(row)();
       var cellArray = toArray2(cells2)();
-      var endCell = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableEndCell")))(pure7)(bind14(head(drop(1)(cellArray)))(fromElement11))();
+      var endCell = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableEndCell")))(pure8)(bind14(head(drop(1)(cellArray)))(fromElement11))();
       var element = toElement6(endCell);
       var parentNode2 = toParentNode(element);
       var elementMaybe = querySelector("input")(parentNode2)();
-      var input2 = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableEndInput")))(pure7)(bind14(elementMaybe)(fromElement4))();
+      var input2 = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableEndInput")))(pure8)(bind14(elementMaybe)(fromElement4))();
       return input2;
     };
   };
@@ -6563,7 +6607,7 @@
   var identity9 = /* @__PURE__ */ identity(categoryBuilder);
   var readString3 = /* @__PURE__ */ readString(monadIdentity);
   var bindExceptT2 = /* @__PURE__ */ bindExceptT(monadIdentity);
-  var pure8 = /* @__PURE__ */ pure(applicativeNonEmptyList);
+  var pure9 = /* @__PURE__ */ pure(applicativeNonEmptyList);
   var except2 = /* @__PURE__ */ except(applicativeIdentity);
   var applicativeExceptT2 = /* @__PURE__ */ applicativeExceptT(monadIdentity);
   var pure12 = /* @__PURE__ */ pure(applicativeExceptT2);
@@ -6679,7 +6723,7 @@
     return function(dictFoldable) {
       var foldl5 = foldl(dictFoldable);
       return function(dictApplicative) {
-        var pure24 = pure(dictApplicative);
+        var pure25 = pure(dictApplicative);
         var fn = function(acc) {
           return function(elem3) {
             var v = runExcept(elem3);
@@ -6692,7 +6736,7 @@
             }
             ;
             if (acc instanceof Right && v instanceof Right) {
-              return new Right(append22(acc.value0)(pure24(v.value0)));
+              return new Right(append22(acc.value0)(pure25(v.value0)));
             }
             ;
             if (acc instanceof Right && v instanceof Left) {
@@ -6733,7 +6777,7 @@
   };
   var parseJSON = /* @__PURE__ */ function() {
     var $560 = lmap3(function($563) {
-      return pure8(ForeignError.create(message($563)));
+      return pure9(ForeignError.create(message($563)));
     });
     var $561 = runEffectFn1(_parseJSON2);
     return function($562) {
@@ -6807,7 +6851,7 @@
   };
 
   // output/Endpoints.ResponseParser/index.js
-  var pure9 = /* @__PURE__ */ pure(applicativeEffect);
+  var pure10 = /* @__PURE__ */ pure(applicativeEffect);
   var bind4 = /* @__PURE__ */ bind(bindAff);
   var liftEffect4 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var show7 = /* @__PURE__ */ show(showInt);
@@ -6815,7 +6859,7 @@
   var pure13 = /* @__PURE__ */ pure(applicativeAff);
   var validateResponse = function(response) {
     if (response.ok) {
-      return pure9(response);
+      return pure10(response);
     }
     ;
     return throwMinsiError(new ErrorResponse(response.status));
@@ -7443,7 +7487,7 @@
   // output/Model.ProcessStatus/index.js
   var bind8 = /* @__PURE__ */ bind(/* @__PURE__ */ bindExceptT(monadIdentity));
   var readImpl3 = /* @__PURE__ */ readImpl2(readForeignString);
-  var pure10 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeExceptT(monadIdentity));
+  var pure11 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeExceptT(monadIdentity));
   var fail2 = /* @__PURE__ */ fail(monadIdentity);
   var Pending = /* @__PURE__ */ function() {
     function Pending2() {
@@ -7470,15 +7514,15 @@
     readImpl: function(f) {
       return bind8(readImpl3(f))(function(s) {
         if (s === "Pending") {
-          return pure10(Pending.value);
+          return pure11(Pending.value);
         }
         ;
         if (s === "Succeed") {
-          return pure10(Succeed.value);
+          return pure11(Succeed.value);
         }
         ;
         if (s === "Failed") {
-          return pure10(Failed.value);
+          return pure11(Failed.value);
         }
         ;
         return fail2(new TypeMismatch("ProcessStatus", "Invalid ProcessStatus: " + s));
@@ -7565,7 +7609,7 @@
 
   // output/Validations.CutVideoValidation/index.js
   var show9 = /* @__PURE__ */ show(showNumber);
-  var pure11 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
+  var pure15 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
   var cutVideoValidation = function(id2) {
     return function(start2) {
       return function(end) {
@@ -7574,7 +7618,7 @@
           return invalid(fromSingleton(id2)("start >= end - 100: " + (show9(start2) + (" " + show9(end)))));
         }
         ;
-        return pure11({
+        return pure15({
           start: start2,
           end
         });
@@ -7603,7 +7647,7 @@
 
   // output/Model.State.StateFromHtml/index.js
   var bind10 = /* @__PURE__ */ bind(bindEffect);
-  var pure15 = /* @__PURE__ */ pure(applicativeEffect);
+  var pure16 = /* @__PURE__ */ pure(applicativeEffect);
   var mapFlipped2 = /* @__PURE__ */ mapFlipped(functorEffect);
   var bind15 = /* @__PURE__ */ bind(bindMaybe);
   var identity10 = /* @__PURE__ */ identity(categoryFn);
@@ -7636,7 +7680,7 @@
         return value11(textareaMaybe.value0)();
       }
       ;
-      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 134, column 3 - line 136, column 40): " + [textareaMaybe.constructor.name]);
+      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 136, column 3 - line 138, column 40): " + [textareaMaybe.constructor.name]);
     };
   };
   var getSelectValueFromCell = function(cell) {
@@ -7653,7 +7697,7 @@
         return value3(selectMaybe.value0)();
       }
       ;
-      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 144, column 3 - line 146, column 35): " + [selectMaybe.constructor.name]);
+      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 146, column 3 - line 148, column 35): " + [selectMaybe.constructor.name]);
     };
   };
   var getInputValueFromCell = function(cell) {
@@ -7670,7 +7714,7 @@
         return mapFlipped2(valueAsNumber(inputMaybe.value0))(Just.create)();
       }
       ;
-      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 124, column 3 - line 126, column 47): " + [inputMaybe.constructor.name]);
+      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 126, column 3 - line 128, column 47): " + [inputMaybe.constructor.name]);
     };
   };
   var loadSubtitleFromRow = function(row) {
@@ -7679,24 +7723,25 @@
       var cellArray = toArray2(cells2)();
       if (cellArray.length === 8) {
         var startValue = function __do7() {
-          var v = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableStartCell")))(pure15)(fromElement11(cellArray[0])))(getInputValueFromCell)();
+          var v = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableStartCell")))(pure16)(fromElement11(cellArray[0])))(getInputValueFromCell)();
           return maybe(0)(identity10)(v);
         }();
         var endValue = function __do7() {
-          var v = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableEndCell")))(pure15)(fromElement11(cellArray[1])))(getInputValueFromCell)();
+          var v = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableEndCell")))(pure16)(fromElement11(cellArray[1])))(getInputValueFromCell)();
           return maybe(0)(identity10)(v);
         }();
-        var valueText = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTablevalueCell")))(pure15)(fromElement11(cellArray[2])))(getTextAreaValueFromCell)();
-        var fontValue = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTablefontCell")))(pure15)(fromElement11(cellArray[3])))(getSelectValueFromCell)();
-        var fontSizeValue = mapFlipped2(bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTablefontSizeCell")))(pure15)(fromElement11(cellArray[4])))(getSelectValueFromCell))(function(mv) {
-          return fromMaybe(48)(fromString(mv));
-        })();
-        var colorValue = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTablecolorCell")))(pure15)(fromElement11(cellArray[5])))(getSelectValueFromCell)();
-        var positionValue = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTablepositionCell")))(pure15)(fromElement11(cellArray[6])))(getSelectValueFromCell)();
+        var valueText = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTablevalueCell")))(pure16)(fromElement11(cellArray[2])))(getTextAreaValueFromCell)();
+        var fontValue = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTablefontCell")))(pure16)(fromElement11(cellArray[3])))(getSelectValueFromCell)();
+        var fontSizeValue = function __do7() {
+          var v = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTablefontSizeCell")))(pure16)(fromElement11(cellArray[4])))(getInputValueFromCell)();
+          return maybe(48)(floor2)(v);
+        }();
+        var colorValue = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTablecolorCell")))(pure16)(fromElement11(cellArray[5])))(getSelectValueFromCell)();
+        var positionValue = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTablepositionCell")))(pure16)(fromElement11(cellArray[6])))(getSelectValueFromCell)();
         return new Just({
           videoPosition: {
-            start: startValue * 1e3,
-            end: endValue * 1e3
+            start: startValue,
+            end: endValue
           },
           value: valueText,
           font: parseFont(fontValue),
@@ -7778,13 +7823,13 @@
   // output/Handlers.ApplyButtonHandler/index.js
   var bind11 = /* @__PURE__ */ bind(bindAff);
   var voidLeft2 = /* @__PURE__ */ voidLeft(functorAff);
-  var pure16 = /* @__PURE__ */ pure(applicativeAff);
+  var pure17 = /* @__PURE__ */ pure(applicativeAff);
   var liftEffect8 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var tailRecM3 = /* @__PURE__ */ tailRecM(monadRecAff);
   var map21 = /* @__PURE__ */ map(functorEffect);
   var show10 = /* @__PURE__ */ show(showNumber);
   var when3 = /* @__PURE__ */ when(applicativeEffect);
-  var pure17 = /* @__PURE__ */ pure(applicativeEffect);
+  var pure18 = /* @__PURE__ */ pure(applicativeEffect);
   var bind22 = /* @__PURE__ */ bind(bindMaybe);
   var $$void7 = /* @__PURE__ */ $$void(functorEffect);
   var traverse5 = /* @__PURE__ */ traverse(traversableArray)(applicativeEffect);
@@ -7800,7 +7845,7 @@
         }
         ;
         if (response.status instanceof Succeed) {
-          return pure16(new Done(unit));
+          return pure17(new Done(unit));
         }
         ;
         if (response.status instanceof Failed) {
@@ -7843,7 +7888,7 @@
     return function __do6() {
       var fragment = content(subtitleTemplateElement)();
       var firstEl = firstElementChild(toParentNode2(fragment))();
-      return maybe(throwMinsiError(new HTMLElementNotFound("subtitleRowTemplate")))(pure17)(bind22(firstEl)(fromElement12))();
+      return maybe(throwMinsiError(new HTMLElementNotFound("subtitleRowTemplate")))(pure18)(bind22(firstEl)(fromElement12))();
     };
   };
   var setSubtitleTableMaxValues = function(v) {
@@ -7861,7 +7906,7 @@
               return setMax(show10(durationSeconds))(endInput)();
             };
           })(cons(subtitleRow2)(rows4)))();
-          return log("Set max values for all subtitle inputs to " + (show10(durationSeconds) + " seconds"))();
+          return log("Set max values for all subtitle inputs to " + (show10(durationSeconds) + " millis"))();
         };
       };
     };
@@ -7872,7 +7917,7 @@
     var stateV = fromHtmlInputs(components.htmlInputs)();
     var state3 = either(function($48) {
       return throwMinsiError(InvalidInputs.create(toMap($48)));
-    })(pure17)(toEither(stateV))();
+    })(pure18)(toEither(stateV))();
     return new Tuple(state3, components);
   };
   var addClass = function(className2) {
@@ -7948,7 +7993,7 @@
   var map23 = /* @__PURE__ */ map(functorMaybe);
   var eq2 = /* @__PURE__ */ eq(eqElementName);
   var iterateUntilM2 = /* @__PURE__ */ iterateUntilM(/* @__PURE__ */ monadMaybeT(monadEffect));
-  var pure18 = /* @__PURE__ */ pure(applicativeEffect);
+  var pure19 = /* @__PURE__ */ pure(applicativeEffect);
   var bind17 = /* @__PURE__ */ bind(bindMaybe);
   var discard3 = /* @__PURE__ */ discard(discardUnit);
   var discard1 = /* @__PURE__ */ discard3(bindMaybeT2);
@@ -7974,14 +8019,14 @@
   };
   var findTrAncestor = function(node) {
     return bind16(iterateUntilM2(isTrElement)(getParentNode)(node))(function(trNode) {
-      return pure18(bind17(fromNode(trNode))(fromElement12));
+      return pure19(bind17(fromNode(trNode))(fromElement12));
     });
   };
   var removeSubtitleButtonEventListenerTrans = function(ev) {
     return discard1(lift3(log("Remove subtitle button clicked")))(function() {
-      return bind16(pure18(bind17(target5(ev))(fromEventTarget)))(function(buttonTarget) {
+      return bind16(pure19(bind17(target5(ev))(fromEventTarget)))(function(buttonTarget) {
         return bind16(lift3(bind23(classList(toElement(buttonTarget)))(flip(contains4)("removeSubtitleButton"))))(function(hasRemoveClass) {
-          return discard1(when4(!hasRemoveClass)(pure18(Nothing.value)))(function() {
+          return discard1(when4(!hasRemoveClass)(pure19(Nothing.value)))(function() {
             var buttonNode = toNode5(toElement(buttonTarget));
             return bind16(findTrAncestor(buttonNode))(function(tableRow) {
               return removeRowFromDom(tableRow);
@@ -7992,7 +8037,7 @@
     });
   };
   var removeSubtitleButtonEventListener = function(ev) {
-    return applySecond4(runMaybeT(removeSubtitleButtonEventListenerTrans(ev)))(pure18(unit));
+    return applySecond4(runMaybeT(removeSubtitleButtonEventListenerTrans(ev)))(pure19(unit));
   };
   var setRemoveSubtitleButtonHandler = function(subtitleTable) {
     var tableRowEventTarget = function(r) {
@@ -8016,7 +8061,7 @@
   };
 
   // output/Handlers.AddSubtitleButtonHandler/index.js
-  var pure19 = /* @__PURE__ */ pure(applicativeEffect);
+  var pure20 = /* @__PURE__ */ pure(applicativeEffect);
   var bind18 = /* @__PURE__ */ bind(bindMaybe);
   var show11 = /* @__PURE__ */ show(showNumber);
   var cloneFirstRow = function(firstRow) {
@@ -8024,7 +8069,7 @@
       return function __do6() {
         var tbody = getTBody(subtitleTable)();
         var clonedRowNode = deepClone(toNode3(firstRow))();
-        var clonedRow = maybe(throwMinsiError(new HTMLElementNotFound("ClonedRow")))(pure19)(bind18(fromNode(clonedRowNode))(fromElement12))();
+        var clonedRow = maybe(throwMinsiError(new HTMLElementNotFound("ClonedRow")))(pure20)(bind18(fromNode(clonedRowNode))(fromElement12))();
         var firstRowEndInput = getEndInput(firstRow)();
         var endValue = valueAsNumber(firstRowEndInput)();
         var clonedRowStartInput = getStartInput(clonedRow)();
@@ -8044,7 +8089,7 @@
         var subtitleRow2 = getRow(subtitleRowTemplate)();
         var tbody = getTBody(subtitleTable)();
         var clonedRowNode = deepClone(toNode3(subtitleRow2))();
-        var clonedRow = maybe(throwMinsiError(new HTMLElementNotFound("subtitleRow")))(pure19)(bind18(fromNode(clonedRowNode))(fromElement12))();
+        var clonedRow = maybe(throwMinsiError(new HTMLElementNotFound("subtitleRow")))(pure20)(bind18(fromNode(clonedRowNode))(fromElement12))();
         appendChild(clonedRowNode)(toNode4(tbody))();
         addRemoveSubtitleListenerToRow(clonedRow)();
         return log("Subtitle row added successfully")();
@@ -8103,7 +8148,7 @@
 
   // output/Handlers.KeyboardHandler/index.js
   var when5 = /* @__PURE__ */ when(applicativeEffect);
-  var pure20 = /* @__PURE__ */ pure(applicativeEffect);
+  var pure21 = /* @__PURE__ */ pure(applicativeEffect);
   var keyboardEventListener = function(ev) {
     var handleKeyboardEvent = function(keyboardEvent) {
       var keyValue = key(keyboardEvent);
@@ -8111,7 +8156,7 @@
       var isCtrl = ctrlKey(keyboardEvent);
       return when5(keyValue === "Enter" && (isCtrl || isMeta))(applyButtonEventListener(ev));
     };
-    return maybe(pure20(unit))(handleKeyboardEvent)(fromEvent(ev));
+    return maybe(pure21(unit))(handleKeyboardEvent)(fromEvent(ev));
   };
   var setKeyboardHandlers = /* @__PURE__ */ genericErrorsHandler(function __do4() {
     var w = windowImpl();
@@ -8266,7 +8311,7 @@
   };
 
   // output/Endpoints.CheckDependencies/index.js
-  var pure21 = /* @__PURE__ */ pure(applicativeAff);
+  var pure23 = /* @__PURE__ */ pure(applicativeAff);
   var decodeJsonResponse3 = /* @__PURE__ */ decodeJsonResponse(/* @__PURE__ */ readForeignRecord()(/* @__PURE__ */ readForeignFieldsCons({
     reflectSymbol: function() {
       return "missedDependencies";
@@ -8284,7 +8329,7 @@
       method: POST.value
     }))(function(response) {
       if (response.ok) {
-        return pure21({
+        return pure23({
           missedDependencies: []
         });
       }
@@ -8295,12 +8340,12 @@
 
   // output/Main.CheckDependencies/index.js
   var $$null5 = /* @__PURE__ */ $$null(foldableArray);
-  var pure23 = /* @__PURE__ */ pure(applicativeAff);
+  var pure24 = /* @__PURE__ */ pure(applicativeAff);
   var liftEffect9 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var checkDependecies = /* @__PURE__ */ bind(bindAff)(callCheckDependencies)(function(v) {
     var $6 = $$null5(v.missedDependencies);
     if ($6) {
-      return pure23(unit);
+      return pure24(unit);
     }
     ;
     return liftEffect9(throwMinsiError(new MissingDependenciesError(v.missedDependencies)));

@@ -1,5 +1,7 @@
 module Model.State.StateFromHtml where
 
+import Data.Int (floor)
+
 import Parse.Font (parseFont, parseColor, parsePosition)
 
 import Main.MinsiError (MinsiError(..), throwMinsiError)
@@ -99,13 +101,13 @@ loadSubtitleFromRow row = do
       endValue <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableEndCell")) pure (HTC.fromElement endCell) >>= getInputValueFromCell >>= \v -> pure $ maybe 0.0 identity v
       valueText <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTablevalueCell")) pure (HTC.fromElement valueCell) >>= getTextAreaValueFromCell
       fontValue <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTablefontCell")) pure (HTC.fromElement fontCell) >>= getSelectValueFromCell
-      fontSizeValue <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTablefontSizeCell")) pure (HTC.fromElement fontSizeCell) >>= getSelectValueFromCell <#> \mv -> fromMaybe 48 (fromString mv)
+      fontSizeValue <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTablefontSizeCell")) pure (HTC.fromElement fontSizeCell) >>= getInputValueFromCell >>= \v -> pure $ maybe 48 floor v
       colorValue <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTablecolorCell")) pure (HTC.fromElement colorCell) >>= getSelectValueFromCell
       positionValue <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTablepositionCell")) pure (HTC.fromElement positionCell) >>= getSelectValueFromCell
       pure $ Just $ Subtitle
         { videoPosition: DurationRange
-            { start: Milliseconds (startValue * 1000.0)
-            , end: Milliseconds (endValue * 1000.0)
+            { start: Milliseconds (startValue)
+            , end: Milliseconds (endValue)
             }
         , value: valueText
         , font: parseFont fontValue

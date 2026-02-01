@@ -98,7 +98,6 @@ mergeVideos filename filepathGif filepathReversed = do
   liftEffect $ writeMergeTxt filename [filepathGif, filepathReversed]
   let args = addFfmpegMergeVideosArgs filepathTxt filepathReversedFull
   process <- runCommand args FfmpegGifError "ffmpeg"
-  liftEffect $ deleteTxtFile filename
   process.getResult
 
 addFfmpegMergeVideosArgs :: FilePath -> FilePath -> Array String

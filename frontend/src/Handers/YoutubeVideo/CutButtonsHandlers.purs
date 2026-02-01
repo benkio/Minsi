@@ -1,5 +1,6 @@
 module Handers.YoutubeVideo.CutButtonsHandlers where
 
+import Data.Int (toNumber)
 import Control.Monad.Loops (whileM_)
 import Data.Time.Duration (Milliseconds(..))
 import Effect (Effect)
@@ -9,14 +10,14 @@ import Web.Event.Internal.Types (Event)
 import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLSpanElement as HSP
 import Handers.YoutubeVideo.Foreign (getPlayerCurrentTime, getVideoDuration, isPlayerReady)
-import Handlers.CutRangeHandler (updateCutStartValue, updateCutEndValue, updateCutValue)
+import Handlers.CutRangeHandler (updateCutValue)
 import Prelude
 
 setCutInputButtonEvL :: HI.HTMLInputElement -> HSP.HTMLSpanElement -> Event -> Effect Unit
 setCutInputButtonEvL cutInput cutValueSpan _ = do
   currentTime <- getPlayerCurrentTime
   HI.setValue (show currentTime) cutInput
-  updateCutValue cutInput cutValueSpan
+  updateCutValue currentTime cutValueSpan
 
 initializeCutInputs :: HI.HTMLInputElement -> HI.HTMLInputElement -> HSP.HTMLSpanElement -> HSP.HTMLSpanElement -> Int -> Effect Unit
 initializeCutInputs cutStart cutEnd cutStartValue cutEndValue startTime = launchAff_ $ do
@@ -25,5 +26,5 @@ initializeCutInputs cutStart cutEnd cutStartValue cutEndValue startTime = launch
   liftEffect $ HI.setMax (show duration) cutStart
   liftEffect $ HI.setValue (show startTime) cutStart
   liftEffect $ HI.setMax (show duration) cutEnd
-  liftEffect $ updateCutStartValue cutStart cutStartValue
-  liftEffect $ updateCutEndValue cutEnd cutEndValue
+  liftEffect $ updateCutValue (toNumber startTime) cutStartValue
+  liftEffect $ updateCutValue (toNumber startTime) cutEndValue

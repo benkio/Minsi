@@ -153,7 +153,7 @@ setSubtitleTableMaxValues (State { cutVideo: DurationRange { start: Milliseconds
         HI.setMax (show durationSeconds) endInput
     )
     (cons subtitleRow rows)
-  log $ "Set max values for all subtitle inputs to " <> show durationSeconds <> " seconds"
+  log $ "Set max values for all subtitle inputs to " <> show durationSeconds <> " millis"
 
 getRow :: HTP.HTMLTemplateElement -> Effect HR.HTMLTableRowElement
 getRow subtitleTemplateElement = do

@@ -1,5 +1,9 @@
 module Handlers.CutRangeHandler where
 
+import Main.MinsiError (MinsiError(..), throwMinsiError)
+import Data.Maybe (maybe)
+import Conversion.Time (formatToThreeDecimals)
+import Data.Int (fromString, toNumber)
 import Handers.ErrorHandlers (genericErrorsHandler)
 import Web.HTML.HTMLSpanElement as HS
 import Web.DOM.Element (toEventTarget)
@@ -21,8 +25,8 @@ data CutRangeTargets = CRET
 
 setCutRangeHandlers :: CutRangeTargets -> Effect Unit
 setCutRangeHandlers (CRET { cutStart, cutEnd, cutStartValue, cutEndValue }) = genericErrorsHandler $ do
-  cutStartEvL <- eventListener (cutStartEventListener cutStart cutStartValue)
-  cutEndEvL <- eventListener (cutEndEventListener cutEnd cutEndValue)
+  cutStartEvL <- eventListener (cutEventListener cutStart cutStartValue)
+  cutEndEvL <- eventListener (cutEventListener cutEnd cutEndValue)
   addEventListener E.input cutStartEvL false cutStartEventTarget
   addEventListener E.change cutStartEvL false cutStartEventTarget
   addEventListener E.input cutEndEvL false cutEndEventTarget
@@ -32,30 +36,14 @@ setCutRangeHandlers (CRET { cutStart, cutEnd, cutStartValue, cutEndValue }) = ge
   cutStartEventTarget = toEventTarget (HI.toElement cutStart)
   cutEndEventTarget = toEventTarget (HI.toElement cutEnd)
 
-cutStartEventListener :: HI.HTMLInputElement -> HS.HTMLSpanElement -> Event -> Effect Unit
-cutStartEventListener cutStart cutStartValue _ = do
-  inputValue <- value cutStart
-  setTextContent inputValue (HS.toNode cutStartValue)
 
-cutEndEventListener :: HI.HTMLInputElement -> HS.HTMLSpanElement -> Event -> Effect Unit
-cutEndEventListener cutEnd cutEndValue _ = do
-  inputValue <- value cutEnd
-  setTextContent inputValue (HS.toNode cutEndValue)
+cutEventListener :: HI.HTMLInputElement -> HS.HTMLSpanElement -> Event -> Effect Unit
+cutEventListener cutElement cutElementValue _ = do
+  inputValue <- value cutElement
+  numValue <- maybe (throwMinsiError (InvalidInput "CutElement" inputValue)) pure (fromString inputValue)
+  setTextContent (formatToThreeDecimals (toNumber numValue)) (HS.toNode cutElementValue)
 
--- Helper functions to update display values programmatically
-updateCutStartValue :: HI.HTMLInputElement -> HS.HTMLSpanElement -> Effect Unit
-updateCutStartValue cutStart cutStartValue = do
-  inputValue <- value cutStart
-  setTextContent inputValue (HS.toNode cutStartValue)
 
-updateCutEndValue :: HI.HTMLInputElement -> HS.HTMLSpanElement -> Effect Unit
-updateCutEndValue cutEnd cutEndValue = do
-  inputValue <- value cutEnd
-  setTextContent inputValue (HS.toNode cutEndValue)
-
--- Generic function to update any cut value display
-updateCutValue :: HI.HTMLInputElement -> HS.HTMLSpanElement -> Effect Unit
-updateCutValue cutInput cutValueSpan = do
-  inputValue <- value cutInput
-  setTextContent inputValue (HS.toNode cutValueSpan)
+updateCutValue :: Number -> HS.HTMLSpanElement -> Effect Unit
+updateCutValue num cutValueSpan = setTextContent (formatToThreeDecimals num) (HS.toNode cutValueSpan)
 
