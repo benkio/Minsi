@@ -5,8 +5,12 @@ import Prelude
 import Node.Path (FilePath, resolve)
 import Data.Traversable (traverse)
 
+-- Single source of truth for the public/static root (change to "./public" for dist bundle)
+publicDir :: FilePath
+publicDir = "../public"
+
 outputPath :: Effect FilePath
-outputPath = resolve [] "../public/output"
+outputPath = resolve [] (publicDir <> "/output")
 
 mp4 :: String -> Effect FilePath
 mp4 filename = outputPath >>= \ofp -> resolve [ ofp ] (filename <> ".mp4")
