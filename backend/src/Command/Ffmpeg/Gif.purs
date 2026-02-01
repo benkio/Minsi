@@ -51,7 +51,7 @@ makeSubtitleGif filename subtitles = do
 
   let args = addFfmpegSubtitleGifArgs filepathMp4 filepathGif filepathSrt
   process <- runCommand args FfmpegGifError "ffmpeg"
-  -- liftEffect $ deleteSrtFile filename
+  liftEffect $ deleteSrtFile filename
   process.getResult
 
 addFfmpegSubtitleGifArgs :: FilePath -> FilePath -> FilePath -> Array String
