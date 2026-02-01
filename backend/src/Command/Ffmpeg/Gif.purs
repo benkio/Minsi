@@ -10,7 +10,7 @@ import Data.Foldable (intercalate, fold, traverse_)
 import Data.Maybe (Maybe(..))
 import Data.String.Common (toUpper)
 import Effect (Effect)
-import Effect.Aff (Aff)
+import Effect.Aff (Aff, finally)
 import Effect.Class (liftEffect)
 import Model.State (DurationRange(..), Subtitle(..), Position(..), State(..))
 import Node.Buffer (fromString)
@@ -22,8 +22,8 @@ import Prelude
 
 makeGif :: State -> Aff (Array ExecaResult)
 makeGif (State {filename, subtitles, reverseLoop})
-  | reverseLoop && null subtitles               = makeReverseGif filename
-  | not reverseLoop && (not <<< null) subtitles = singleton <$> makeSubtitleGif filename subtitles
+  | reverseLoop && null subtitles               = finally (reverseGifCleanup filename) (makeReverseGif filename)
+  | not reverseLoop && (not <<< null) subtitles = finally (subtitleGifCleanup filename) (singleton <$> makeSubtitleGif filename subtitles)
   | not reverseLoop && null subtitles           = singleton <$> makePlainGif filename
   | otherwise = liftEffect $ throwMinsiError (FfmpegGifError "Unsupported gif operation")
 
@@ -51,7 +51,6 @@ makeSubtitleGif filename subtitles = do
 
   let args = addFfmpegSubtitleGifArgs filepathMp4 filepathGif filepathSrt
   process <- runCommand args FfmpegGifError "ffmpeg"
-  liftEffect $ deleteSrtFile filename
   process.getResult
 
 addFfmpegSubtitleGifArgs :: FilePath -> FilePath -> FilePath -> Array String
@@ -65,17 +64,11 @@ addFfmpegSubtitleGifArgs mp4 gif srt =
 makeReverseGif :: FilePath -> Aff (Array ExecaResult)
 makeReverseGif filename = do
   filepathGif <- liftEffect $ gif filename
-  filepathTxt <- liftEffect $ txt filename
   filepathReversed <- liftEffect $ reversed filename
-  filepathReversedFull <- liftEffect $ reversedFull filename
 
   plainGif <- makePlainGif filename
   reversedGif <- makeReverseSingleGif filename
   merge <- mergeVideos filename filepathGif filepathReversed
-
-  -- TODO: ⚠️ Risky. If they fail I don't get a proper result
-  liftEffect $ traverse_ rm [filepathGif, filepathReversed, filepathTxt]
-  liftEffect $ rename filepathReversedFull filepathGif
 
   pure [plainGif, reversedGif, merge]
 
@@ -104,6 +97,21 @@ addFfmpegMergeVideosArgs :: FilePath -> FilePath -> Array String
 addFfmpegMergeVideosArgs filepathTxt filepathReversedFull =
   [ "-hide_banner", "-loglevel", "warning", "-f", "concat", "-safe", "0", "-i", show filepathTxt, "-c", "copy", show filepathReversedFull]
 
+reverseGifCleanup :: String -> Aff Unit
+reverseGifCleanup filename = liftEffect $ do
+  filepathGif <- liftEffect $ gif filename
+  filepathTxt <- liftEffect $ txt filename
+  filepathReversed <- liftEffect $ reversed filename
+  filepathReversedFull <- liftEffect $ reversedFull filename
+  let filesToDelete = [filepathGif, filepathReversed, filepathTxt]
+  log $ "Execute Command, delete multiple files:" <> show filesToDelete
+  traverse_ rm filesToDelete
+  log $ "Execute Command, rename:" <> show filepathReversedFull <> " into " <> filepathGif
+  rename filepathReversedFull filepathGif
+
+subtitleGifCleanup :: String -> Aff Unit
+subtitleGifCleanup filename = liftEffect $
+  log "Execute Command, delete srt" *> deleteSrtFile filename
 
 -- Extra Files -------------------------------------------------
 
@@ -125,9 +133,6 @@ writeMergeTxt filename files = do
   writeFile f bufferContent
   where
     txtContent = intercalate "\n" $ files <#> (\f -> "file '"<>f<>"'")
-
-deleteTxtFile :: FilePath -> Effect Unit
-deleteTxtFile fp = log ("Execute Command: deleteTxt " <> show fp) *> txt fp >>= rm
 
 -- SRT String Creation -------------------------------------
 

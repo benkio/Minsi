@@ -7,8 +7,9 @@ set -e
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT"
 
-echo "==> Creating dist/"
+echo "==> Cleaning dist/ (keeping .gitignore)"
 mkdir -p dist
+find dist -mindepth 1 ! -name .gitignore -exec rm -rf {} + 2>/dev/null || true
 
 echo "==> Building frontend"
 cd frontend

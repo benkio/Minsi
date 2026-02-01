@@ -69,7 +69,7 @@ compute state@(State { filename }) store = do
     result <- runComputePipeline state
     processResult <- case result of
       Right _ -> pure Succeed
-      Left _ -> pure Failed
+      Left e -> liftEffect (log ("error during compute: " <> e)) *> pure Failed
     liftEffect $ insert filename processResult store
   log "Video download launched, returning HTTP response"
 
@@ -89,7 +89,10 @@ exceptTMultiple label affs = do
 
 execaResultToEither :: String -> ExecaResult -> Either String Unit
 execaResultToEither label r =
-  if isSuccessExit r.exit then Right unit else Left (label <> " failed")
+  if isSuccessExit r.exit then Right unit else Left (label <> " failed. Command: "<> command <> " - stderr: " <> error)
+  where
+    error = r.stderr
+    command = r.escapedCommand
 
 checkExecaResult :: String -> ExecaResult -> ExceptT String Aff Unit
 checkExecaResult label r = ExceptT $ pure $ execaResultToEither label r
