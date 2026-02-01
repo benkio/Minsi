@@ -57,8 +57,10 @@
                 Use the <strong>Start Time</strong> and <strong>End Time</strong>
                 sliders, or play the YouTube preview and click
                 <strong>Set Start Position</strong> / <strong>Set End Position</strong>
-                to snap the range to the current playback time. The numbers show
-                seconds.
+                to snap the range to the current playback time. Values are in
+                <strong>milliseconds</strong> (ms). You can edit the number next to
+                each slider or move the slider; both stay in sync. The range must
+                be at least 100 ms (end &gt; start + 100).
               </p>
 
               <h5 class="mt-4 mb-2">4. Apply (run the pipeline)</h5>
@@ -68,16 +70,48 @@
               <ol class="small mb-3">
                 <li><strong>Download</strong> the clip as MP4 (via yt-dlp).</li>
                 <li><strong>Extract MP3</strong> from that clip (ffmpeg) and write ID3 artist/title (id3v2).</li>
-                <li>Optionally produce a <strong>GIF</strong> (and subtitles if you use the subtitles table).</li>
+                <li>Optionally produce a <strong>GIF</strong> (with or without subtitles; see below).</li>
               </ol>
               <p class="text-muted small mb-3">
                 A loading modal appears while the job runs. When it finishes,
-                the UI shows the result and you can switch between
-                <strong>Video</strong> and <strong>Gif</strong> in the source
-                selector to preview.
+                the UI shows the result video, a <strong>Video / Gif</strong> source
+                selector, and (if you didn’t use Reverse Loop) the <strong>subtitles</strong>
+                table so you can add or edit captions for the next run.
               </p>
 
-              <h5 class="mt-4 mb-2">5. Where are the files?</h5>
+              <h5 class="mt-4 mb-2">5. After Apply: result video and source selector</h5>
+              <p class="text-muted small mb-3">
+                Once the pipeline completes, the result area shows:
+              </p>
+              <ul class="small mb-3">
+                <li><strong>Video / Gif</strong> — A dropdown to switch between the MP4 clip and the generated GIF. Use it to preview both outputs.</li>
+                <li><strong>Subtitles table</strong> — Visible only when <strong>Reverse / Loop GIF</strong> is <em>un</em>checked. Use it to define captions that will be burned into the GIF on the next Apply (see below).</li>
+              </ul>
+
+              <h5 class="mt-4 mb-2">6. Subtitles (for GIF)</h5>
+              <p class="text-muted small mb-3">
+                You can burn one or more <strong>subtitles</strong> into the GIF. The
+                subtitles table appears under the result video after a successful
+                run, as long as <strong>Reverse / Loop GIF</strong> is off (reverse loop
+                and subtitles cannot be used together).
+              </p>
+              <ul class="small mb-2">
+                <li><strong>Start / End</strong> — Time range for the subtitle, in <strong>milliseconds</strong> (ms), within the clip. Use the <strong>Start</strong> and <strong>End</strong> buttons to set the first row’s times from the result video’s current playback position.</li>
+                <li><strong>Value</strong> — The caption text.</li>
+                <li><strong>Font</strong> — Impact or Arial Black.</li>
+                <li><strong>Size</strong> — Font size (12–48).</li>
+                <li><strong>Color</strong> — White, Black, Light Green, Light Orange, Yellow.</li>
+                <li><strong>Position</strong> — Top or Bottom.</li>
+                <li><strong>➕ / ➖</strong> — Add a new subtitle row (clone times from the previous row) or remove a row.</li>
+              </ul>
+              <p class="text-muted small mb-3">
+                Subtitle times must fall within the clip duration. After editing,
+                click <strong>Apply</strong> again to regenerate the GIF with the
+                new subtitles. The table is pre-filled with one row; add more as
+                needed.
+              </p>
+
+              <h5 class="mt-4 mb-2">7. Where are the files?</h5>
               <p class="text-muted small mb-3">
                 Outputs are written to the server’s <strong>output</strong>
                 folder (by default <code>public/output/</code>). You get:
@@ -89,6 +123,9 @@
               </ul>
 
               <hr class="my-4" />
+              <p class="text-muted small mb-2">
+                <strong>Validation:</strong> The app checks that the YouTube URL is non-empty, the clip range is valid (end &gt; start + 100 ms), and subtitle times (if any) fall within the clip. Errors appear in the <strong>Minsi Log</strong> (left panel) or in a modal for critical failures.
+              </p>
               <p class="text-muted small mb-0">
                 If the app reports missing dependencies (e.g. yt-dlp, ffmpeg),
                 install them on the machine where the <strong>backend</strong>
