@@ -31,6 +31,8 @@ import Components.HtmlIds(
   , videoSourceRowId
   , youtubeUrlId
   , subtitleRow
+  , keyboardShortcutsModalId
+  , keyboardShortcutsButtonId
   )
 import Control.Monad.Error.Class (catchError)
 import Data.Newtype (class Newtype)
@@ -90,6 +92,7 @@ newtype HtmlOutputs = HtmlOutputs
   , loadingModal :: HTMLDivElement
   , minsiErrorModal :: HTMLDivElement
   , resultVideo :: HTMLVideoElement
+  , keyboardShortcutsButton :: HTMLButtonElement
   }
 
 derive instance Newtype HtmlOutputs _
@@ -167,6 +170,7 @@ loadHtmlOutputs doc = do
   loadingModal <- loadDiv loadingModalId doc
   minsiErrorModal <- loadDiv minsiErrorModalId doc
   resultVideo <- loadVideo resultVideoId doc
+  keyboardShortcutsButton <- loadButton keyboardShortcutsButtonId doc
   pure
     ( HtmlOutputs
         { resultPreview: resultPreview
@@ -178,6 +182,7 @@ loadHtmlOutputs doc = do
         , loadingModal: loadingModal
         , minsiErrorModal: minsiErrorModal
         , resultVideo: resultVideo
+        , keyboardShortcutsButton: keyboardShortcutsButton
         }
     )
 

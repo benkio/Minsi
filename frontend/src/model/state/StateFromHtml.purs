@@ -1,18 +1,17 @@
 module Model.State.StateFromHtml where
 
+import Conversion.String (capitalize)
 import Data.Int (floor)
-
 import Parse.Font (parseFont, parseColor, parsePosition)
-
 import Main.MinsiError (MinsiError(..), throwMinsiError)
 import Data.Array (catMaybes)
-import Data.Int (fromString)
 import Data.Maybe (Maybe(..), maybe, fromMaybe)
 import Data.Traversable (traverse)
 import Data.Time.Duration (Milliseconds(..))
 import Web.DOM.Element (toParentNode)
 import Web.DOM.ParentNode (QuerySelector(..), querySelector)
 import Web.HTML.HTMLInputElement (HTMLInputElement, value, valueAsNumber, checked)
+import Data.String.Common (trim, toUpper)
 import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.HTMLTableElement as HT
@@ -23,7 +22,7 @@ import Web.HTML.HTMLTableCellElement as HTC
 import Web.DOM.HTMLCollection as HC
 import Effect (Effect)
 import Components.HtmlComponents (HtmlInputs(..))
-import Model.State.State (State(..), DurationRange(..), WURL(..), Subtitle(..), Font(..), Color(..), Position(..))
+import Model.State.State (State(..), DurationRange(..), WURL(..), Subtitle(..))
 import Data.URL (URL)
 import Prelude
 import Data.Validation.Semigroup (V)
@@ -65,8 +64,8 @@ fromHtmlInputs
         , youtubeUrl: WURL youtubeUrl
         , filename: filename
         , reverseLoop: reverseLoopValue
-        , artist: artist
-        , title: title
+        , artist: capitalize artist
+        , title: capitalize title
         , subtitles: subtitles
         }
 
@@ -109,7 +108,7 @@ loadSubtitleFromRow row = do
             { start: Milliseconds (startValue)
             , end: Milliseconds (endValue)
             }
-        , value: valueText
+        , value: (toUpper <<< trim) valueText
         , font: parseFont fontValue
         , fontSize: fontSizeValue
         , color: parseColor colorValue

@@ -8,7 +8,7 @@ import Conversion.Time (millisecondsToSecondsString)
 import Data.Array (mapWithIndex, null, singleton)
 import Data.Foldable (intercalate, fold, traverse_)
 import Data.Maybe (Maybe(..))
-import Data.String.Common (toUpper)
+import Data.String.Common (toUpper, trim)
 import Effect (Effect)
 import Effect.Aff (Aff, finally)
 import Effect.Class (liftEffect)
@@ -45,7 +45,6 @@ makeSubtitleGif filename subtitles = do
   filepathGif <- liftEffect $ gif filename
   filepathSrt <- liftEffect $ srt filename
 
-  liftEffect $ log $ show subtitles
   let subtitleContent = makeSrtsString subtitles
   liftEffect $ writeSrtFile filename subtitleContent
 
@@ -149,4 +148,4 @@ makeSrtString index (Subtitle { videoPosition : (DurationRange {start:start, end
     startStr = millisecondsToSecondsString start Nothing
     endStr = millisecondsToSecondsString end Nothing
     positionStr = if screenPosition == Top then "{\\an8}" else ""
-    fontStr = "<font face=\"" <> show font <> "\" size=\"" <> show fontSize <> "px\" color=\"" <> show color <> "\">" <> toUpper value <> "</font>"
+    fontStr = "<font face=\"" <> show font <> "\" size=\"" <> show fontSize <> "px\" color=\"" <> show color <> "\">" <> value <> "</font>"

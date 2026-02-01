@@ -36,6 +36,14 @@
               class="btn btn-outline-secondary btn-sm"
               >How to use (Video, MP3, GIF)</a
             >
+            <button
+              type="button"
+              id="keyboardShortcutsButton"
+              class="btn btn-outline-secondary btn-sm ms-1"
+              title="Keyboard shortcuts"
+            >
+              ⌨️ Shortcuts
+            </button>
           </p>
         </div>
       </div>
@@ -340,6 +348,48 @@
               <span class="visually-hidden">Loading...</span>
             </div>
             <div>Cutting the Video, please wait…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div
+      class="modal fade"
+      id="keyboardShortcutsModal"
+      tabindex="-1"
+      aria-labelledby="keyboardShortcutsModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="keyboardShortcutsModalLabel">
+              Keyboard shortcuts
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <table class="table table-sm table-borderless mb-0">
+              <tbody>
+                <tr><th scope="row">Ctrl/⌘ + Enter</th><td>Apply (cut video / MP3 / GIF)</td></tr>
+                <tr><th scope="row">Ctrl/⌘ + S</th><td>Sync start time to number</td></tr>
+                <tr><th scope="row">Ctrl/⌘ + E</th><td>Sync end time to number</td></tr>
+                <tr><th scope="row">Alt + S</th><td>Set subtitle start from result video</td></tr>
+                <tr><th scope="row">Alt + E</th><td>Set subtitle end from result video</td></tr>
+                <tr><th scope="row">Alt + +</th><td>Add subtitle row</td></tr>
+                <tr><th scope="row">Alt + −</th><td>Remove first subtitle row</td></tr>
+                <tr><th scope="row">Ctrl + Space</th><td>Toggle result video play/pause</td></tr>
+                <tr><th scope="row">←</th><td>Skip result video backward (0.5 s)</td></tr>
+                <tr><th scope="row">→</th><td>Skip result video forward (0.5 s)</td></tr>
+                <tr><th scope="row">Ctrl + ?</th><td>Show this shortcuts modal</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

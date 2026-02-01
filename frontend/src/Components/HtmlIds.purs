@@ -92,3 +92,9 @@ setSubtitleEndButtonId = "setSubtitleEndButton"
 
 subtitleRow :: String
 subtitleRow = "subtitleRow"
+
+keyboardShortcutsModalId :: String
+keyboardShortcutsModalId = "keyboardShortcutsModal"
+
+keyboardShortcutsButtonId :: String
+keyboardShortcutsButtonId = "keyboardShortcutsButton"

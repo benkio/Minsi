@@ -3,12 +3,13 @@ module Handlers.Handlers where
 import Handlers.AddSubtitleButtonHandler (setAddSubtitleButtonHandler)
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CutRangeHandler (CutRangeTargets(..), setCutRangeHandlers)
-import Handlers.KeyboardHandler (setKeyboardHandlers)
+import Handlers.KeyboardHandler (KeyboardHandlerTargets(..), setKeyboardHandlers)
 import Handlers.RemoveSubtitleButtonHandler (setRemoveSubtitleButtonHandler)
 import Handlers.ResultVideo.Handler (ResultVideoEventTargets(..), setResultVideoHandlers)
 import Handlers.SubtitleTimeButtonsHandler (SubtitleTimeButtonsTargets(..), setSubtitleTimeButtonsHandlers)
 import Handlers.VideoSourceHandler (setVideoSourceHandler)
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlOutputs(..))
+import Components.HtmlIds (keyboardShortcutsModalId)
 import Effect (Effect)
 import Handers.YoutubeVideo.YoutubeVideoHandler (setVideoHandlers, VideoEventTargets(..))
 import Prelude
@@ -35,6 +36,7 @@ setupEventHandlers
       , cutEndValue
       , cutStartValue
       , resultVideo
+      , keyboardShortcutsButton
       }
   } = do
   setCutRangeHandlers
@@ -62,7 +64,17 @@ setupEventHandlers
                              resultVideo: resultVideo
                              })
   setApplyButtonHandler applyButton
-  setKeyboardHandlers
+  setKeyboardHandlers (KHT {
+    cutStart,
+    cutEnd,
+    cutStartValue,
+    cutEndValue,
+    subtitleTable,
+    subtitleRow,
+    resultVideo,
+    keyboardShortcutsModalId,
+    keyboardShortcutsButton
+  })
   setAddSubtitleButtonHandler addSubtitleButton subtitleTable subtitleRow
   setRemoveSubtitleButtonHandler subtitleTable
   setSubtitleTimeButtonsHandlers (STBT {

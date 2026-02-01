@@ -2,6 +2,7 @@ module Handlers.RemoveSubtitleButtonHandler where
 
 import Prelude
 import Components.HTMLTableElement (getRows)
+import Data.Array (head)
 import Control.Monad.Loops (iterateUntilM)
 import Control.Monad.Trans.Class (lift)
 import Control.Monad.Maybe.Trans (MaybeT(..), runMaybeT)
@@ -72,3 +73,12 @@ removeRowFromDom tableRow = do
   let rowNode = HR.toNode tableRow
   parentNode' <- MaybeT $ parentNode rowNode
   lift $ removeChild rowNode parentNode'
+
+-- | Remove the first (top) row of the subtitle table. Reuses removeRowFromDom.
+-- | No-op if the table has no rows.
+removeFirstSubtitleRow :: HT.HTMLTableElement -> Effect Unit
+removeFirstSubtitleRow subtitleTable = do
+  rows <- getRows subtitleTable
+  case head rows of
+    Just row -> runMaybeT (removeRowFromDom row) *> pure unit
+    Nothing -> pure unit

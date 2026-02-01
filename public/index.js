@@ -354,6 +354,7 @@
     };
   };
   var ordIntImpl = unsafeCompareImpl;
+  var ordNumberImpl = unsafeCompareImpl;
   var ordStringImpl = unsafeCompareImpl;
 
   // output/Data.Eq/foreign.js
@@ -363,11 +364,15 @@
     };
   };
   var eqIntImpl = refEq;
+  var eqNumberImpl = refEq;
   var eqStringImpl = refEq;
 
   // output/Data.Eq/index.js
   var eqString = {
     eq: eqStringImpl
+  };
+  var eqNumber = {
+    eq: eqNumberImpl
   };
   var eqInt = {
     eq: eqIntImpl
@@ -408,6 +413,14 @@
       }
     };
   }();
+  var ordNumber = /* @__PURE__ */ function() {
+    return {
+      compare: ordNumberImpl(LT.value)(EQ.value)(GT.value),
+      Eq0: function() {
+        return eqNumber;
+      }
+    };
+  }();
   var ordInt = /* @__PURE__ */ function() {
     return {
       compare: ordIntImpl(LT.value)(EQ.value)(GT.value),
@@ -418,6 +431,48 @@
   }();
   var compare = function(dict) {
     return dict.compare;
+  };
+  var max = function(dictOrd) {
+    var compare3 = compare(dictOrd);
+    return function(x) {
+      return function(y) {
+        var v = compare3(x)(y);
+        if (v instanceof LT) {
+          return y;
+        }
+        ;
+        if (v instanceof EQ) {
+          return x;
+        }
+        ;
+        if (v instanceof GT) {
+          return x;
+        }
+        ;
+        throw new Error("Failed pattern match at Data.Ord (line 181, column 3 - line 184, column 12): " + [v.constructor.name]);
+      };
+    };
+  };
+  var min = function(dictOrd) {
+    var compare3 = compare(dictOrd);
+    return function(x) {
+      return function(y) {
+        var v = compare3(x)(y);
+        if (v instanceof LT) {
+          return x;
+        }
+        ;
+        if (v instanceof EQ) {
+          return x;
+        }
+        ;
+        if (v instanceof GT) {
+          return y;
+        }
+        ;
+        throw new Error("Failed pattern match at Data.Ord (line 172, column 3 - line 175, column 12): " + [v.constructor.name]);
+      };
+    };
   };
 
   // output/Data.Bounded/index.js
@@ -1989,6 +2044,12 @@
   var toLower = function(s) {
     return s.toLowerCase();
   };
+  var toUpper = function(s) {
+    return s.toUpperCase();
+  };
+  var trim = function(s) {
+    return s.trim();
+  };
   var joinWith = function(s) {
     return function(xs) {
       return xs.join(s);
@@ -2354,7 +2415,7 @@
   var loadHtmlElement = function(id2) {
     return function(f) {
       return function(doc) {
-        return function __do6() {
+        return function __do5() {
           var maybeComponent = getElementById(id2)(doc)();
           var maybeComponentElement = bind1(maybeComponent)(f);
           if (maybeComponentElement instanceof Nothing) {
@@ -2395,6 +2456,8 @@
   var minsiErrorModalId = "minsiErrorModal";
   var minsiErrorModalContentId = "minsiErrorModalContent";
   var loadingModalId = "loadingModal";
+  var keyboardShortcutsModalId = "keyboardShortcutsModal";
+  var keyboardShortcutsButtonId = "keyboardShortcutsButton";
   var cutStartValueId = "cutStartValue";
   var cutStartId = "cutStart";
   var cutEndValueId = "cutEndValue";
@@ -2482,10 +2545,10 @@
       return input2.checked;
     };
   }
-  function setMax(max6) {
+  function setMax(max7) {
     return function(input2) {
       return function() {
-        input2.max = max6;
+        input2.max = max7;
       };
     };
   }
@@ -2612,7 +2675,7 @@
     return loadHtmlElement(id2)(fromElement2);
   };
   var loadHtmlVisualElements = function(doc) {
-    return function __do6() {
+    return function __do5() {
       var videoSourceRow = loadDiv(videoSourceRowId)(doc)();
       var videoRow = loadDiv(videoRowId)(doc)();
       var subtitlesRow = loadDiv(subtitlesRowId)(doc)();
@@ -2626,42 +2689,18 @@
     };
   };
   var loadResultPreview = function(doc) {
-    return catchError2(function __do6() {
+    return catchError2(function __do5() {
       var div2 = loadDiv(resultPreviewId)(doc)();
       return new ResultPreviewDiv(div2);
     })(function(v) {
-      return function __do6() {
+      return function __do5() {
         var iframe = loadHtmlElement(resultPreviewId)(fromElement3)(doc)();
         return new ResultPreviewIframe(iframe);
       };
     });
   };
-  var loadHtmlOutputs = function(doc) {
-    return function __do6() {
-      var resultPreview = loadResultPreview(doc)();
-      var minsiLog = loadDiv(minsiLogId)(doc)();
-      var playbackPositionYoutube = loadSpan(playbackPositionYoutubeId)(doc)();
-      var playbackPositionResultVideo = loadSpan(playbackPositionResultVideoId)(doc)();
-      var cutStartValue = loadHtmlElement(cutStartValueId)(fromElement4)(doc)();
-      var cutEndValue = loadHtmlElement(cutEndValueId)(fromElement4)(doc)();
-      var loadingModal = loadDiv(loadingModalId)(doc)();
-      var minsiErrorModal = loadDiv(minsiErrorModalId)(doc)();
-      var resultVideo = loadVideo(resultVideoId)(doc)();
-      return {
-        resultPreview,
-        minsiLog,
-        playbackPositionYoutube,
-        playbackPositionResultVideo,
-        cutStartValue,
-        cutEndValue,
-        loadingModal,
-        minsiErrorModal,
-        resultVideo
-      };
-    };
-  };
   var loadCutRange = function(doc) {
-    return function __do6() {
+    return function __do5() {
       var cutStart = loadHtmlElement(cutStartId)(fromElement4)(doc)();
       var cutEnd = loadHtmlElement(cutEndId)(fromElement4)(doc)();
       return new Tuple(cutStart, cutEnd);
@@ -2671,7 +2710,7 @@
     return loadHtmlElement(id2)(fromElement);
   };
   var loadHtmlInputs = function(doc) {
-    return function __do6() {
+    return function __do5() {
       var rangeTuple = loadCutRange(doc)();
       var youtubeUrl = loadInput(youtubeUrlId)(doc)();
       var filename = loadInput(outputFilenameId)(doc)();
@@ -2707,8 +2746,34 @@
       });
     };
   };
+  var loadHtmlOutputs = function(doc) {
+    return function __do5() {
+      var resultPreview = loadResultPreview(doc)();
+      var minsiLog = loadDiv(minsiLogId)(doc)();
+      var playbackPositionYoutube = loadSpan(playbackPositionYoutubeId)(doc)();
+      var playbackPositionResultVideo = loadSpan(playbackPositionResultVideoId)(doc)();
+      var cutStartValue = loadHtmlElement(cutStartValueId)(fromElement4)(doc)();
+      var cutEndValue = loadHtmlElement(cutEndValueId)(fromElement4)(doc)();
+      var loadingModal = loadDiv(loadingModalId)(doc)();
+      var minsiErrorModal = loadDiv(minsiErrorModalId)(doc)();
+      var resultVideo = loadVideo(resultVideoId)(doc)();
+      var keyboardShortcutsButton = loadButton(keyboardShortcutsButtonId)(doc)();
+      return {
+        resultPreview,
+        minsiLog,
+        playbackPositionYoutube,
+        playbackPositionResultVideo,
+        cutStartValue,
+        cutEndValue,
+        loadingModal,
+        minsiErrorModal,
+        resultVideo,
+        keyboardShortcutsButton
+      };
+    };
+  };
   var loadComponents = function(doc) {
-    return function __do6() {
+    return function __do5() {
       var inputs = loadHtmlInputs(doc)();
       var outputs = loadHtmlOutputs(doc)();
       var visualElements = loadHtmlVisualElements(doc)();
@@ -2773,6 +2838,28 @@
   function currentTime(media4) {
     return function() {
       return media4.currentTime;
+    };
+  }
+  function setCurrentTime(currentTime2) {
+    return function(media4) {
+      return function() {
+        media4.currentTime = currentTime2;
+      };
+    };
+  }
+  function duration(media4) {
+    return function() {
+      return media4.duration;
+    };
+  }
+  function paused(media4) {
+    return function() {
+      return media4.paused;
+    };
+  }
+  function play(media4) {
+    return function() {
+      media4.play();
     };
   }
   function pause(media4) {
@@ -2852,7 +2939,7 @@
 
   // output/Components.Window/index.js
   var raiseErrorAlert = function(msg) {
-    return function __do6() {
+    return function __do5() {
       var w = windowImpl();
       return alert("\u{1F63E}!!! ERROR !!! \u{1F63E}\n" + msg)(w)();
     };
@@ -4245,7 +4332,7 @@
     return _makeFiber(ffiUtil, aff);
   };
   var launchAff = function(aff) {
-    return function __do6() {
+    return function __do5() {
       var fiber = makeFiber(aff)();
       fiber.run();
       return fiber;
@@ -4602,7 +4689,7 @@
   var applySecond2 = /* @__PURE__ */ applySecond(applyEffect);
   var createErrorList = function(errorMessage) {
     var errorLines = split("<br>")(errorMessage);
-    return function __do6() {
+    return function __do5() {
       var w = windowImpl();
       var htmlDoc = document2(w)();
       var doc = toDocument(htmlDoc);
@@ -4621,7 +4708,7 @@
       }();
       var ulNode = toNode5(toElement8(ulElement));
       traverse2(function(line) {
-        return function __do7() {
+        return function __do6() {
           var liElementRaw = createElement("li")(doc)();
           var liElement = function() {
             var v = fromElement10(liElementRaw);
@@ -4644,7 +4731,7 @@
     };
   };
   var showMinsiErrorDialog = function(errorMessage) {
-    return function __do6() {
+    return function __do5() {
       var doc = getDocument();
       var minsiErrorModalContent = loadDiv(minsiErrorModalContentId)(doc)();
       var errorList = createErrorList(errorMessage)();
@@ -4655,7 +4742,7 @@
     };
   };
   var writeToMinsiLog = function(errorMessage) {
-    return function __do6() {
+    return function __do5() {
       var doc = getDocument();
       var minsiLog = loadDiv(minsiLogId)(doc)();
       var errorList = createErrorList(errorMessage)();
@@ -5034,7 +5121,7 @@
   var rangeToNumberListener = function(rangeInput) {
     return function(numberInput) {
       return function(v) {
-        return function __do6() {
+        return function __do5() {
           var rangeVal = value2(rangeInput)();
           return setValue2(rangeVal)(numberInput)();
         };
@@ -5047,7 +5134,7 @@
         var nan2 = function(x) {
           return x !== x;
         };
-        return function __do6() {
+        return function __do5() {
           var numVal = valueAsNumber(numberInput)();
           return when2(!nan2(numVal) && numVal >= 0)(setValue2(show3(floor2(numVal)))(rangeInput))();
         };
@@ -5055,7 +5142,7 @@
     };
   };
   var setCutRangeHandlers = function(v) {
-    return genericErrorsHandler(function __do6() {
+    return genericErrorsHandler(function __do5() {
       var cutStartEvL = eventListener(rangeToNumberListener(v.value0.cutStart)(v.value0.cutStartValue))();
       var cutEndEvL = eventListener(rangeToNumberListener(v.value0.cutEnd)(v.value0.cutEndValue))();
       var cutStartValueEvL = eventListener(numberToRangeListener(v.value0.cutStart)(v.value0.cutStartValue))();
@@ -5084,7 +5171,7 @@
   var setCutInputButtonEvL = function(cutInput) {
     return function(cutValueInput) {
       return function(v) {
-        return function __do6() {
+        return function __do5() {
           var currentTimeSeconds = getPlayerCurrentTime();
           var currentTimeMs = currentTimeSeconds * 1e3;
           setValue2(show4(floor2(currentTimeMs)))(cutInput)();
@@ -5144,6 +5231,12 @@
   };
   var indexImpl = function(just, nothing, xs, i) {
     return i < 0 || i >= xs.length ? nothing : just(xs[i]);
+  };
+  var _updateAt = function(just, nothing, i, a, l) {
+    if (i < 0 || i >= l.length) return nothing;
+    var l1 = l.slice();
+    l1[i] = a;
+    return just(l1);
   };
   var filterImpl = function(f, xs) {
     return xs.filter(f);
@@ -5216,7 +5309,7 @@
     return Iterator2;
   }();
   var next = function(v) {
-    return function __do6() {
+    return function __do5() {
       var i = read2(v.value1)();
       modify(function(v1) {
         return v1 + 1 | 0;
@@ -5229,10 +5322,10 @@
   };
   var iterate = function(iter) {
     return function(f) {
-      return function __do6() {
+      return function __do5() {
         var $$break = newSTRef(false)();
         while (map12(not3)(read2($$break))()) {
-          (function __do7() {
+          (function __do6() {
             var mx = next(iter)();
             if (mx instanceof Just) {
               return f(mx.value0)();
@@ -5279,9 +5372,25 @@
       };
     };
   };
+  var runFn5 = function(fn) {
+    return function(a) {
+      return function(b) {
+        return function(c) {
+          return function(d) {
+            return function(e) {
+              return fn(a, b, c, d, e);
+            };
+          };
+        };
+      };
+    };
+  };
 
   // output/Data.Array/index.js
   var append2 = /* @__PURE__ */ append(semigroupArray);
+  var updateAt = /* @__PURE__ */ function() {
+    return runFn5(_updateAt)(Just.create)(Nothing.value);
+  }();
   var tail = /* @__PURE__ */ function() {
     return runFn3(unconsImpl)($$const(Nothing.value))(function(v) {
       return function(xs) {
@@ -5313,6 +5422,16 @@
   }();
   var last = function(xs) {
     return index2(xs)(length3(xs) - 1 | 0);
+  };
+  var modifyAt = function(i) {
+    return function(f) {
+      return function(xs) {
+        var go2 = function(x) {
+          return updateAt(i)(f(x))(xs);
+        };
+        return maybe(Nothing.value)(go2)(index2(xs)(i));
+      };
+    };
   };
   var span2 = function(p) {
     return function(arr) {
@@ -5408,6 +5527,15 @@
   var toCharArray = function(s) {
     return s.split("");
   };
+  var singleton5 = function(c) {
+    return c;
+  };
+
+  // output/Data.String.Unsafe/foreign.js
+  var char = function(s) {
+    if (s.length === 1) return s.charAt(0);
+    throw new Error("Data.String.Unsafe.char: Expected string of length 1.");
+  };
 
   // output/Conversion.Time/index.js
   var show5 = /* @__PURE__ */ show(showNumber);
@@ -5427,7 +5555,7 @@
   // output/Handers.YoutubeVideo.PlaybackPositionHandler/index.js
   var when3 = /* @__PURE__ */ when(applicativeEffect);
   var updatePlaybackPosition = function(playbackPosition) {
-    return function __do6() {
+    return function __do5() {
       var playerReady = isPlayerReady();
       var currentTime2 = getPlayerCurrentTime();
       return when3(playerReady)(setTextContent(formatToThreeDecimals(currentTime2))(toNode2(playbackPosition)))();
@@ -5595,7 +5723,7 @@
   };
   var compactableArray = {
     compact: function(xs) {
-      return function __do6() {
+      return function __do5() {
         var result = newSTArray();
         var iter = iterator(function(v) {
           return index2(xs)(v);
@@ -5617,7 +5745,7 @@
       }();
     },
     separate: function(xs) {
-      return function __do6() {
+      return function __do5() {
         var ls = newSTArray();
         var rs = newSTArray();
         var iter = iterator(function(v) {
@@ -6302,7 +6430,7 @@
       return function(cutStartValue) {
         return function(cutEndValue) {
           return function(ev) {
-            return function __do6() {
+            return function __do5() {
               var rawValue = getInputValue(ev)();
               var youtubeUrlV = maybe(invalid(fromSingleton(youtubeUrlId)("Empty YoutubeUrl Input")))(function(v) {
                 return youtubeUrlValidation(youtubeUrlId)(v);
@@ -6333,7 +6461,7 @@
     var ytUrlEventTarget = toEventTarget2(toElement3(v.value0.youtubeUrl));
     var setCutStartButtonTarget = toEventTarget2(toElement(v.value0.setCutStartButton));
     var setCutEndButtonTarget = toEventTarget2(toElement(v.value0.setCutEndButton));
-    return genericErrorsHandler(function __do6() {
+    return genericErrorsHandler(function __do5() {
       var ytEvL = eventListener(youtubeUrlEventListener(v.value0.cutStart)(v.value0.cutEnd)(v.value0.cutStartValue)(v.value0.cutEndValue))();
       addEventListener(input)(ytEvL)(false)(ytUrlEventTarget)();
       addEventListener(change)(ytEvL)(false)(ytUrlEventTarget)();
@@ -6358,14 +6486,14 @@
   var bind14 = /* @__PURE__ */ bind(bindMaybe);
   var map15 = /* @__PURE__ */ map(functorArray);
   var getTBody = function(table) {
-    return function __do6() {
+    return function __do5() {
       var tBodies2 = tBodies(table)();
       var tBodyArray = toArray2(tBodies2)();
       return maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableBody")))(pure7)(bind14(head(tBodyArray))(fromElement13))();
     };
   };
   var getStartInput = function(row) {
-    return function __do6() {
+    return function __do5() {
       var cells2 = cells(row)();
       var cellArray = toArray2(cells2)();
       var startCell = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableStartCell")))(pure7)(bind14(head(cellArray))(fromElement11))();
@@ -6377,7 +6505,7 @@
     };
   };
   var getRows = function(table) {
-    return function __do6() {
+    return function __do5() {
       var tbody = getTBody(table)();
       var rows4 = rows2(tbody)();
       var rowArray = toArray2(rows4)();
@@ -6385,13 +6513,13 @@
     };
   };
   var getFirstRow = function(table) {
-    return function __do6() {
+    return function __do5() {
       var rows4 = getRows(table)();
       return maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableFirstRow")))(pure7)(head(rows4))();
     };
   };
   var getEndInput = function(row) {
-    return function __do6() {
+    return function __do5() {
       var cells2 = cells(row)();
       var cellArray = toArray2(cells2)();
       var endCell = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableEndCell")))(pure7)(bind14(head(drop(1)(cellArray)))(fromElement11))();
@@ -7248,7 +7376,7 @@
   var toAbortableAff = function(abortController) {
     return function(p) {
       return makeAff(function(cb) {
-        return function __do6() {
+        return function __do5() {
           $$void6(thenOrCatch4(function(a) {
             return map19(resolve4)(cb(new Right(a)));
           })(function(e) {
@@ -7590,6 +7718,24 @@
     });
   };
 
+  // output/Conversion.String/index.js
+  var capitalize = /* @__PURE__ */ function() {
+    var $2 = joinWith(" ");
+    var $3 = map(functorArray)(function() {
+      var $6 = fromMaybe([]);
+      var $7 = modifyAt(0)(function($9) {
+        return char(toUpper(singleton5($9)));
+      });
+      return function($8) {
+        return fromCharArray($6($7(toCharArray($8))));
+      };
+    }());
+    var $4 = split(" ");
+    return function($5) {
+      return $2($3($4($5)));
+    };
+  }();
+
   // output/Parse.Font/index.js
   var parsePosition = function(v) {
     if (v === "Top") {
@@ -7674,7 +7820,7 @@
   var apply5 = /* @__PURE__ */ apply(/* @__PURE__ */ applyV(semigroupValidationErrors));
   var map110 = /* @__PURE__ */ map(functorV);
   var youtubeUrlFromHTMLInput = function(youtubeUrlComponent) {
-    return function __do6() {
+    return function __do5() {
       var urlString = value2(youtubeUrlComponent)();
       return youtubeUrlValidation(youtubeUrlId)(urlString);
     };
@@ -7687,7 +7833,7 @@
   var getTextAreaValueFromCell = function(cell) {
     var element = toElement6(cell);
     var parentNode2 = toParentNode(element);
-    return function __do6() {
+    return function __do5() {
       var elementMaybe = querySelector("textarea")(parentNode2)();
       var textareaMaybe = bind15(elementMaybe)(fromElement14);
       if (textareaMaybe instanceof Nothing) {
@@ -7698,13 +7844,13 @@
         return value11(textareaMaybe.value0)();
       }
       ;
-      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 136, column 3 - line 138, column 40): " + [textareaMaybe.constructor.name]);
+      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 135, column 3 - line 137, column 40): " + [textareaMaybe.constructor.name]);
     };
   };
   var getSelectValueFromCell = function(cell) {
     var element = toElement6(cell);
     var parentNode2 = toParentNode(element);
-    return function __do6() {
+    return function __do5() {
       var elementMaybe = querySelector("select")(parentNode2)();
       var selectMaybe = bind15(elementMaybe)(fromElement5);
       if (selectMaybe instanceof Nothing) {
@@ -7715,13 +7861,13 @@
         return value3(selectMaybe.value0)();
       }
       ;
-      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 146, column 3 - line 148, column 35): " + [selectMaybe.constructor.name]);
+      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 145, column 3 - line 147, column 35): " + [selectMaybe.constructor.name]);
     };
   };
   var getInputValueFromCell = function(cell) {
     var element = toElement6(cell);
     var parentNode2 = toParentNode(element);
-    return function __do6() {
+    return function __do5() {
       var elementMaybe = querySelector("input")(parentNode2)();
       var inputMaybe = bind15(elementMaybe)(fromElement4);
       if (inputMaybe instanceof Nothing) {
@@ -7732,25 +7878,25 @@
         return mapFlipped2(valueAsNumber(inputMaybe.value0))(Just.create)();
       }
       ;
-      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 126, column 3 - line 128, column 47): " + [inputMaybe.constructor.name]);
+      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 125, column 3 - line 127, column 47): " + [inputMaybe.constructor.name]);
     };
   };
   var loadSubtitleFromRow = function(row) {
-    return function __do6() {
+    return function __do5() {
       var cells2 = cells(row)();
       var cellArray = toArray2(cells2)();
       if (cellArray.length === 8) {
-        var startValue = function __do7() {
+        var startValue = function __do6() {
           var v = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableStartCell")))(pure15)(fromElement11(cellArray[0])))(getInputValueFromCell)();
           return maybe(0)(identity10)(v);
         }();
-        var endValue = function __do7() {
+        var endValue = function __do6() {
           var v = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableEndCell")))(pure15)(fromElement11(cellArray[1])))(getInputValueFromCell)();
           return maybe(0)(identity10)(v);
         }();
         var valueText = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTablevalueCell")))(pure15)(fromElement11(cellArray[2])))(getTextAreaValueFromCell)();
         var fontValue = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTablefontCell")))(pure15)(fromElement11(cellArray[3])))(getSelectValueFromCell)();
-        var fontSizeValue = function __do7() {
+        var fontSizeValue = function __do6() {
           var v = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTablefontSizeCell")))(pure15)(fromElement11(cellArray[4])))(getInputValueFromCell)();
           return maybe(48)(floor2)(v);
         }();
@@ -7761,7 +7907,7 @@
             start: startValue,
             end: endValue
           },
-          value: valueText,
+          value: toUpper(trim(valueText)),
           font: parseFont(fontValue),
           fontSize: fontSizeValue,
           color: parseColor(colorValue),
@@ -7773,7 +7919,7 @@
     };
   };
   var loadSubtitlesFromTable = function(table) {
-    return function __do6() {
+    return function __do5() {
       var rows4 = getRows(table)();
       var subtitles = map20(catMaybes)(traverse4(loadSubtitleFromRow)(rows4))();
       return subtitles;
@@ -7781,7 +7927,7 @@
   };
   var cutVideoFromHtmlRange = function(cutStart) {
     return function(cutEnd) {
-      return function __do6() {
+      return function __do5() {
         var start2 = valueAsNumber(cutStart)();
         var end = valueAsNumber(cutEnd)();
         return cutVideoValidation(cutStartId)(start2)(end);
@@ -7789,7 +7935,7 @@
     };
   };
   var fromHtmlInputs = function(v) {
-    return function __do6() {
+    return function __do5() {
       var cutVideoV = cutVideoFromHtmlRange(v.value0.cutStart)(v.value0.cutEnd)();
       var youtubeUrlV = youtubeUrlFromHTMLInput(v.value0.youtubeUrl)();
       var filenameV = nonEmptyFromHtmlInput(v.value0.filename)(outputFilenameId)();
@@ -7807,8 +7953,8 @@
                   youtubeUrl: v2,
                   filename: v3,
                   reverseLoop: reverseLoopValue,
-                  artist: v4,
-                  title: v5,
+                  artist: capitalize(v4),
+                  title: capitalize(v5),
                   subtitles
                 };
               };
@@ -7878,7 +8024,7 @@
   var setVideoSrc = function(filepath) {
     return function(video) {
       var videoMediaElement = toHTMLMediaElement(video);
-      return function __do6() {
+      return function __do5() {
         var v = map21(unInstant)(now)();
         var cacheBustedPath = filepath + ("?t=" + show11(v));
         pause(videoMediaElement)();
@@ -7895,7 +8041,7 @@
   var removeClass = function(className2) {
     return function(div2) {
       var element = toElement2(div2);
-      return function __do6() {
+      return function __do5() {
         var classList2 = classList(element)();
         var containsClassName = contains4(classList2)(className2)();
         return when4(containsClassName)(remove(classList2)(className2))();
@@ -7903,7 +8049,7 @@
     };
   };
   var getRow = function(subtitleTemplateElement) {
-    return function __do6() {
+    return function __do5() {
       var fragment = content(subtitleTemplateElement)();
       var firstEl = firstElementChild(toParentNode2(fragment))();
       return maybe(throwMinsiError(new HTMLElementNotFound("subtitleRowTemplate")))(pure17)(bind22(firstEl)(fromElement12))();
@@ -7913,11 +8059,11 @@
     return function(subtitleTable) {
       return function(subtitleRowTemplate) {
         var durationSeconds = v.cutVideo.end - v.cutVideo.start;
-        return function __do6() {
+        return function __do5() {
           var subtitleRow2 = getRow(subtitleRowTemplate)();
           var rows4 = getRows(subtitleTable)();
           $$void7(traverse5(function(row) {
-            return function __do7() {
+            return function __do6() {
               var startInput = getStartInput(row)();
               var endInput = getEndInput(row)();
               setMax(show11(durationSeconds))(startInput)();
@@ -7941,7 +8087,7 @@
   var addClass = function(className2) {
     return function(div2) {
       var element = toElement2(div2);
-      return function __do6() {
+      return function __do5() {
         var classList2 = classList(element)();
         var containsClassName = contains4(classList2)(className2)();
         return unless2(containsClassName)(remove(classList2)(className2))();
@@ -7950,7 +8096,7 @@
   };
   var showHiddenElements = function(v) {
     return function(reverseLoop) {
-      return function __do6() {
+      return function __do5() {
         removeClass("d-none")(v.value0.videoSourceRow)();
         removeClass("d-none")(v.value0.videoRow)();
         (function() {
@@ -7969,7 +8115,7 @@
       var reverseLoop = unwrap4(state3).reverseLoop;
       var filename = unwrap4(state3).filename;
       var filepath = mp4(filename);
-      return function __do6() {
+      return function __do5() {
         log("return from server, show elements and set src")();
         showHiddenElements(components.htmlVisualElements)(reverseLoop)();
         log("hide modal, and scroll")();
@@ -7982,7 +8128,7 @@
     };
   };
   var applyButtonEventListener = function(v) {
-    return function __do6() {
+    return function __do5() {
       var stateComponents = getCurrentState();
       var state3 = fst(stateComponents);
       var components = snd(stateComponents);
@@ -7995,7 +8141,7 @@
   };
   var setApplyButtonHandler = function(applyButton) {
     var applyButtonEventTarget = toEventTarget2(toElement(applyButton));
-    return genericErrorsHandler(function __do6() {
+    return genericErrorsHandler(function __do5() {
       var applyButtonEvL = eventListener(applyButtonEventListener)();
       return addEventListener(click2)(applyButtonEvL)(false)(applyButtonEventTarget)();
     });
@@ -8008,16 +8154,16 @@
   var bindMaybeT2 = /* @__PURE__ */ bindMaybeT(monadEffect);
   var bind16 = /* @__PURE__ */ bind(bindMaybeT2);
   var lift3 = /* @__PURE__ */ lift(monadTransMaybeT)(monadEffect);
+  var bind17 = /* @__PURE__ */ bind(bindEffect);
+  var applySecond4 = /* @__PURE__ */ applySecond(applyEffect);
+  var pure18 = /* @__PURE__ */ pure(applicativeEffect);
   var map23 = /* @__PURE__ */ map(functorMaybe);
   var eq2 = /* @__PURE__ */ eq(eqElementName);
   var iterateUntilM2 = /* @__PURE__ */ iterateUntilM(/* @__PURE__ */ monadMaybeT(monadEffect));
-  var pure18 = /* @__PURE__ */ pure(applicativeEffect);
-  var bind17 = /* @__PURE__ */ bind(bindMaybe);
+  var bind23 = /* @__PURE__ */ bind(bindMaybe);
   var discard3 = /* @__PURE__ */ discard(discardUnit);
   var discard1 = /* @__PURE__ */ discard3(bindMaybeT2);
-  var bind23 = /* @__PURE__ */ bind(bindEffect);
   var when5 = /* @__PURE__ */ when(/* @__PURE__ */ applicativeMaybeT(monadEffect));
-  var applySecond4 = /* @__PURE__ */ applySecond(applyEffect);
   var traverse_2 = /* @__PURE__ */ traverse_(applicativeEffect)(foldableArray);
   var removeRowFromDom = function(tableRow) {
     var rowNode = toNode3(tableRow);
@@ -8025,11 +8171,26 @@
       return lift3(removeChild(rowNode)(parentNode$prime));
     });
   };
+  var removeFirstSubtitleRow = function(subtitleTable) {
+    return function __do5() {
+      var rows4 = getRows(subtitleTable)();
+      var v = head(rows4);
+      if (v instanceof Just) {
+        return applySecond4(runMaybeT(removeRowFromDom(v.value0)))(pure18(unit))();
+      }
+      ;
+      if (v instanceof Nothing) {
+        return unit;
+      }
+      ;
+      throw new Error("Failed pattern match at Handlers.RemoveSubtitleButtonHandler (line 82, column 3 - line 84, column 25): " + [v.constructor.name]);
+    };
+  };
   var isTrElement = function(node) {
-    return fromMaybe(false)(map23(function($22) {
+    return fromMaybe(false)(map23(function($25) {
       return function(v) {
         return eq2(v)("TR");
-      }(tagName($22));
+      }(tagName($25));
     })(fromNode(node)));
   };
   var getParentNode = function(node) {
@@ -8037,13 +8198,13 @@
   };
   var findTrAncestor = function(node) {
     return bind16(iterateUntilM2(isTrElement)(getParentNode)(node))(function(trNode) {
-      return pure18(bind17(fromNode(trNode))(fromElement12));
+      return pure18(bind23(fromNode(trNode))(fromElement12));
     });
   };
   var removeSubtitleButtonEventListenerTrans = function(ev) {
     return discard1(lift3(log("Remove subtitle button clicked")))(function() {
-      return bind16(pure18(bind17(target5(ev))(fromEventTarget)))(function(buttonTarget) {
-        return bind16(lift3(bind23(classList(toElement(buttonTarget)))(flip(contains4)("removeSubtitleButton"))))(function(hasRemoveClass) {
+      return bind16(pure18(bind23(target5(ev))(fromEventTarget)))(function(buttonTarget) {
+        return bind16(lift3(bind17(classList(toElement(buttonTarget)))(flip(contains4)("removeSubtitleButton"))))(function(hasRemoveClass) {
           return discard1(when5(!hasRemoveClass)(pure18(Nothing.value)))(function() {
             var buttonNode = toNode5(toElement(buttonTarget));
             return bind16(findTrAncestor(buttonNode))(function(tableRow) {
@@ -8061,7 +8222,7 @@
     var tableRowEventTarget = function(r) {
       return toEventTarget2(toElement7(r));
     };
-    return genericErrorsHandler(function __do6() {
+    return genericErrorsHandler(function __do5() {
       log("Setting up remove subtitle button handlers")();
       var evl = eventListener(removeSubtitleButtonEventListener)();
       var rows4 = getRows(subtitleTable)();
@@ -8072,7 +8233,7 @@
     });
   };
   var addRemoveSubtitleListenerToRow = function(row) {
-    return function __do6() {
+    return function __do5() {
       var evl = eventListener(removeSubtitleButtonEventListener)();
       return addEventListener(click2)(evl)(false)(toEventTarget2(toElement7(row)))();
     };
@@ -8084,7 +8245,7 @@
   var show14 = /* @__PURE__ */ show(showNumber);
   var cloneFirstRow = function(firstRow) {
     return function(subtitleTable) {
-      return function __do6() {
+      return function __do5() {
         var tbody = getTBody(subtitleTable)();
         var clonedRowNode = deepClone(toNode3(firstRow))();
         var clonedRow = maybe(throwMinsiError(new HTMLElementNotFound("ClonedRow")))(pure19)(bind18(fromNode(clonedRowNode))(fromElement12))();
@@ -8103,7 +8264,7 @@
   };
   var addNewRow = function(subtitleTable) {
     return function(subtitleRowTemplate) {
-      return function __do6() {
+      return function __do5() {
         var subtitleRow2 = getRow(subtitleRowTemplate)();
         var tbody = getTBody(subtitleTable)();
         var clonedRowNode = deepClone(toNode3(subtitleRow2))();
@@ -8117,7 +8278,7 @@
   var addSubtitleButtonEventListener = function(subtitleTable) {
     return function(subtitleRowTemplate) {
       return function(v) {
-        return function __do6() {
+        return function __do5() {
           log("Add subtitle button clicked")();
           var eitherFirstRow = $$try(getFirstRow(subtitleTable))();
           if (eitherFirstRow instanceof Left) {
@@ -8137,7 +8298,7 @@
     return function(subtitleTable) {
       return function(subtitleRowTemplate) {
         var addSubtitleButtonEventTarget = toEventTarget2(toElement(addSubtitleButton));
-        return genericErrorsHandler(function __do6() {
+        return genericErrorsHandler(function __do5() {
           log("Setting up add subtitle button handler")();
           var addSubtitleButtonEvL = eventListener(addSubtitleButtonEventListener(subtitleTable)(subtitleRowTemplate))();
           addEventListener(click2)(addSubtitleButtonEvL)(false)(addSubtitleButtonEventTarget)();
@@ -8145,68 +8306,6 @@
         });
       };
     };
-  };
-
-  // output/Web.UIEvent.KeyboardEvent/foreign.js
-  function key(e) {
-    return e.key;
-  }
-  function ctrlKey(e) {
-    return e.ctrlKey;
-  }
-  function metaKey(e) {
-    return e.metaKey;
-  }
-
-  // output/Web.UIEvent.KeyboardEvent/index.js
-  var fromEvent = /* @__PURE__ */ unsafeReadProtoTagged("KeyboardEvent");
-
-  // output/Web.UIEvent.KeyboardEvent.EventTypes/index.js
-  var keydown = "keydown";
-
-  // output/Handlers.KeyboardHandler/index.js
-  var when6 = /* @__PURE__ */ when(applicativeEffect);
-  var pure20 = /* @__PURE__ */ pure(applicativeEffect);
-  var keyboardEventListener = function(ev) {
-    var handleKeyboardEvent = function(keyboardEvent) {
-      var keyValue = key(keyboardEvent);
-      var isMeta = metaKey(keyboardEvent);
-      var isCtrl = ctrlKey(keyboardEvent);
-      return when6(keyValue === "Enter" && (isCtrl || isMeta))(applyButtonEventListener(ev));
-    };
-    return maybe(pure20(unit))(handleKeyboardEvent)(fromEvent(ev));
-  };
-  var setKeyboardHandlers = /* @__PURE__ */ genericErrorsHandler(function __do4() {
-    var w = windowImpl();
-    var doc = document2(w)();
-    var keyboardEvL = eventListener(keyboardEventListener)();
-    return addEventListener(keydown)(keyboardEvL)(false)(toEventTarget(doc))();
-  });
-
-  // output/Handlers.ResultVideo.Handler/index.js
-  var RVET = /* @__PURE__ */ function() {
-    function RVET2(value0) {
-      this.value0 = value0;
-    }
-    ;
-    RVET2.create = function(value0) {
-      return new RVET2(value0);
-    };
-    return RVET2;
-  }();
-  var updatePlaybackPosition2 = function(playbackPositionResultVideo) {
-    return function(resultVideo) {
-      return function __do6() {
-        var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
-        return setTextContent(formatToThreeDecimals(currentTimeValue))(toNode2(playbackPositionResultVideo))();
-      };
-    };
-  };
-  var setResultVideoHandlers = function(v) {
-    return genericErrorsHandler(function __do6() {
-      setInterval2(1e3)(updatePlaybackPosition2(v.value0.playbackPositionResultVideo)(v.value0.resultVideo))();
-      return unit;
-    });
   };
 
   // output/Handlers.SubtitleTimeButtonsHandler/index.js
@@ -8224,7 +8323,7 @@
   var setSubtitleStartButtonEventListener = function(subtitleTable) {
     return function(resultVideo) {
       return function(v) {
-        return function __do6() {
+        return function __do5() {
           log("Set subtitle start button clicked")();
           var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
           var firstRow = getFirstRow(subtitleTable)();
@@ -8238,7 +8337,7 @@
   var setSubtitleEndButtonEventListener = function(subtitleTable) {
     return function(resultVideo) {
       return function(v) {
-        return function __do6() {
+        return function __do5() {
           log("Set subtitle end button clicked")();
           var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
           var firstRow = getFirstRow(subtitleTable)();
@@ -8250,7 +8349,7 @@
     };
   };
   var setSubtitleTimeButtonsHandlers = function(v) {
-    return genericErrorsHandler(function __do6() {
+    return genericErrorsHandler(function __do5() {
       var startButtonEvL = eventListener(setSubtitleStartButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo))();
       var endButtonEvL = eventListener(setSubtitleEndButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo))();
       addEventListener(click2)(startButtonEvL)(false)(toEventTarget2(toElement(v.value0.setSubtitleStartButton)))();
@@ -8259,12 +8358,146 @@
     });
   };
 
+  // output/Web.UIEvent.KeyboardEvent/foreign.js
+  function key(e) {
+    return e.key;
+  }
+  function ctrlKey(e) {
+    return e.ctrlKey;
+  }
+  function altKey(e) {
+    return e.altKey;
+  }
+  function metaKey(e) {
+    return e.metaKey;
+  }
+
+  // output/Web.UIEvent.KeyboardEvent/index.js
+  var toEvent = unsafeCoerce2;
+  var fromEvent = /* @__PURE__ */ unsafeReadProtoTagged("KeyboardEvent");
+
+  // output/Web.UIEvent.KeyboardEvent.EventTypes/index.js
+  var keydown = "keydown";
+
+  // output/Handlers.KeyboardHandler/index.js
+  var min5 = /* @__PURE__ */ min(ordNumber);
+  var max6 = /* @__PURE__ */ max(ordNumber);
+  var when6 = /* @__PURE__ */ when(applicativeEffect);
+  var pure20 = /* @__PURE__ */ pure(applicativeEffect);
+  var KHT = /* @__PURE__ */ function() {
+    function KHT2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    KHT2.create = function(value0) {
+      return new KHT2(value0);
+    };
+    return KHT2;
+  }();
+  var toggleResultVideoPlayback = function(video) {
+    var media4 = toHTMLMediaElement(video);
+    return function __do5() {
+      var isPaused = paused(media4)();
+      if (isPaused) {
+        return play(media4)();
+      }
+      ;
+      return pause(media4)();
+    };
+  };
+  var skipSeconds = 5;
+  var skipResultVideoForward = function(video) {
+    var media4 = toHTMLMediaElement(video);
+    return function __do5() {
+      var t = currentTime(media4)();
+      var d = duration(media4)();
+      return setCurrentTime(min5(d)(t + skipSeconds))(media4)();
+    };
+  };
+  var skipResultVideoBackward = function(video) {
+    var media4 = toHTMLMediaElement(video);
+    return function __do5() {
+      var t = currentTime(media4)();
+      return setCurrentTime(max6(0)(t - skipSeconds))(media4)();
+    };
+  };
+  var handleKeyboardEvent = function(v) {
+    return function(keyboardEvent) {
+      var keyValue = key(keyboardEvent);
+      var isMeta = metaKey(keyboardEvent);
+      var isCtrl = ctrlKey(keyboardEvent);
+      var isAlt = altKey(keyboardEvent);
+      return function __do5() {
+        when6(keyValue === "Enter" && (isCtrl || isMeta))(applyButtonEventListener(toEvent(keyboardEvent)))();
+        when6(keyValue === " " && isCtrl)(toggleResultVideoPlayback(v.value0.resultVideo))();
+        when6(keyValue === "ArrowLeft" && isCtrl)(skipResultVideoBackward(v.value0.resultVideo))();
+        when6(keyValue === "ArrowRight" && isCtrl)(skipResultVideoForward(v.value0.resultVideo))();
+        when6(keyValue === "?" && isCtrl)(showModal(v.value0.keyboardShortcutsModalId))();
+        when6(keyValue === "s" && (isCtrl || isMeta))(rangeToNumberListener(v.value0.cutStart)(v.value0.cutStartValue)(toEvent(keyboardEvent)))();
+        when6(keyValue === "e" && (isCtrl || isMeta))(rangeToNumberListener(v.value0.cutEnd)(v.value0.cutEndValue)(toEvent(keyboardEvent)))();
+        when6(keyValue === "s" && isAlt)(setSubtitleStartButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo)(toEvent(keyboardEvent)))();
+        when6(keyValue === "e" && isAlt)(setSubtitleEndButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo)(toEvent(keyboardEvent)))();
+        when6(keyValue === "+" && isAlt)(addSubtitleButtonEventListener(v.value0.subtitleTable)(v.value0.subtitleRow)(toEvent(keyboardEvent)))();
+        return when6(keyValue === "-" && isAlt)(removeFirstSubtitleRow(v.value0.subtitleTable))();
+      };
+    };
+  };
+  var keyboardEventListener = function(targets) {
+    return function(ev) {
+      return maybe(pure20(unit))(handleKeyboardEvent(targets))(fromEvent(ev));
+    };
+  };
+  var setKeyboardHandlers = function(targets) {
+    var showShortcutsModal = function(v) {
+      return showModal(v.value0.keyboardShortcutsModalId);
+    };
+    var keyboardShortcutsButton = function(v) {
+      return v.value0.keyboardShortcutsButton;
+    };
+    return genericErrorsHandler(function __do5() {
+      var w = windowImpl();
+      var doc = document2(w)();
+      var keyboardEvL = eventListener(keyboardEventListener(targets))();
+      addEventListener(keydown)(keyboardEvL)(false)(toEventTarget(doc))();
+      var shortcutsClickEvL = eventListener(function(v) {
+        return showShortcutsModal(targets);
+      })();
+      return addEventListener(click2)(shortcutsClickEvL)(false)(toEventTarget2(toElement(keyboardShortcutsButton(targets))))();
+    });
+  };
+
+  // output/Handlers.ResultVideo.Handler/index.js
+  var RVET = /* @__PURE__ */ function() {
+    function RVET2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    RVET2.create = function(value0) {
+      return new RVET2(value0);
+    };
+    return RVET2;
+  }();
+  var updatePlaybackPosition2 = function(playbackPositionResultVideo) {
+    return function(resultVideo) {
+      return function __do5() {
+        var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
+        return setTextContent(formatToThreeDecimals(currentTimeValue))(toNode2(playbackPositionResultVideo))();
+      };
+    };
+  };
+  var setResultVideoHandlers = function(v) {
+    return genericErrorsHandler(function __do5() {
+      setInterval2(1e3)(updatePlaybackPosition2(v.value0.playbackPositionResultVideo)(v.value0.resultVideo))();
+      return unit;
+    });
+  };
+
   // output/Handlers.VideoSourceHandler/index.js
   var unwrap5 = /* @__PURE__ */ unwrap();
   var videoSourceEventListener = function(videoSource) {
     return function(video) {
       return function(v) {
-        return genericErrorsHandler(function __do6() {
+        return genericErrorsHandler(function __do5() {
           var stateTuple = getCurrentState();
           var filename = unwrap5(fst(stateTuple)).filename;
           var selectedValue = value3(videoSource)();
@@ -8284,7 +8517,7 @@
   var setVideoSourceHandler = function(videoSource) {
     return function(video) {
       var videoSourceEventTarget = toEventTarget2(toElement4(videoSource));
-      return genericErrorsHandler(function __do6() {
+      return genericErrorsHandler(function __do5() {
         var videoSourceEvL = eventListener(videoSourceEventListener(videoSource)(video))();
         return addEventListener(change)(videoSourceEvL)(false)(videoSourceEventTarget)();
       });
@@ -8293,7 +8526,7 @@
 
   // output/Handlers.Handlers/index.js
   var setupEventHandlers = function(v) {
-    return function __do6() {
+    return function __do5() {
       setCutRangeHandlers(new CRET({
         cutStart: v.htmlInputs.value0.cutStart,
         cutEnd: v.htmlInputs.value0.cutEnd,
@@ -8315,7 +8548,17 @@
         resultVideo: v.htmlOutputs.resultVideo
       }))();
       setApplyButtonHandler(v.htmlInputs.value0.applyButton)();
-      setKeyboardHandlers();
+      setKeyboardHandlers(new KHT({
+        cutStart: v.htmlInputs.value0.cutStart,
+        cutEnd: v.htmlInputs.value0.cutEnd,
+        cutStartValue: v.htmlOutputs.cutStartValue,
+        cutEndValue: v.htmlOutputs.cutEndValue,
+        subtitleTable: v.htmlInputs.value0.subtitleTable,
+        subtitleRow: v.htmlInputs.value0.subtitleRow,
+        resultVideo: v.htmlOutputs.resultVideo,
+        keyboardShortcutsModalId,
+        keyboardShortcutsButton: v.htmlOutputs.keyboardShortcutsButton
+      }))();
       setAddSubtitleButtonHandler(v.htmlInputs.value0.addSubtitleButton)(v.htmlInputs.value0.subtitleTable)(v.htmlInputs.value0.subtitleRow)();
       setRemoveSubtitleButtonHandler(v.htmlInputs.value0.subtitleTable)();
       setSubtitleTimeButtonsHandlers(new STBT({
@@ -8370,7 +8613,7 @@
   });
 
   // output/Main/index.js
-  var program = function __do5() {
+  var program = function __do4() {
     runAff_(genericErrorsHandlerEither)(checkDependecies)();
     var doc = getDocument();
     var htmlComponents = loadComponents(doc)();
