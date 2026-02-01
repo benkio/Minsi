@@ -121,6 +121,15 @@ derive instance eqColor :: Eq Color
 derive instance eqPosition :: Eq Position
 derive newtype instance eqDurationRange :: Eq DurationRange
 derive newtype instance eqSubtitle :: Eq Subtitle
+
+instance Show DurationRange where
+  show (DurationRange { start: Milliseconds s, end: Milliseconds e }) =
+    "DurationRange { start: " <> show s <> " ms, end: " <> show e <> " ms }"
+
+instance Show Subtitle where
+  show (Subtitle { videoPosition, value, font, fontSize, color, screenPosition }) =
+    "Subtitle { videoPosition: " <> show videoPosition <> ", value: " <> show value <> ", font: " <> show font <> ", fontSize: " <> show fontSize <> ", color: " <> show color <> ", screenPosition: " <> show screenPosition <> " }"
+
 instance Ord Subtitle where
   compare (Subtitle {videoPosition: (DurationRange { start: Milliseconds str1 })}) (Subtitle {videoPosition: (DurationRange { start: Milliseconds str2 })}) =
     compare str1 str2
