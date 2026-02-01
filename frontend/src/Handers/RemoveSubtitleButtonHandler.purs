@@ -24,7 +24,7 @@ import Web.HTML.HTMLTableElement as HT
 import Web.HTML.HTMLTableRowElement as HR
 
 setRemoveSubtitleButtonHandler :: HT.HTMLTableElement -> Effect Unit
-setRemoveSubtitleButtonHandler subtitleTable = do
+setRemoveSubtitleButtonHandler subtitleTable = genericErrorsHandler $ do
   log "Setting up remove subtitle button handlers"
   evl <- eventListener removeSubtitleButtonEventListener
   rows <- getRows subtitleTable
@@ -40,8 +40,7 @@ addRemoveSubtitleListenerToRow row = do
 
 removeSubtitleButtonEventListener :: Event -> Effect Unit
 removeSubtitleButtonEventListener ev =
-  genericErrorsHandler
-    $ runMaybeT (removeSubtitleButtonEventListenerTrans ev)
+    runMaybeT (removeSubtitleButtonEventListenerTrans ev)
     *> pure unit
 
 removeSubtitleButtonEventListenerTrans :: Event -> MaybeT Effect Unit

@@ -24,7 +24,7 @@ data SubtitleTimeButtonsTargets = STBT
   }
 
 setSubtitleTimeButtonsHandlers :: SubtitleTimeButtonsTargets -> Effect Unit
-setSubtitleTimeButtonsHandlers (STBT { setSubtitleStartButton, setSubtitleEndButton, subtitleTable, resultVideo }) = do
+setSubtitleTimeButtonsHandlers (STBT { setSubtitleStartButton, setSubtitleEndButton, subtitleTable, resultVideo }) = genericErrorsHandler $ do
   startButtonEvL <- eventListener (setSubtitleStartButtonEventListener subtitleTable resultVideo)
   endButtonEvL <- eventListener (setSubtitleEndButtonEventListener subtitleTable resultVideo)
   addEventListener E.click startButtonEvL false (toEventTarget (HB.toElement setSubtitleStartButton))
@@ -32,7 +32,7 @@ setSubtitleTimeButtonsHandlers (STBT { setSubtitleStartButton, setSubtitleEndBut
   log "Subtitle time buttons handlers set up successfully"
 
 setSubtitleStartButtonEventListener :: HT.HTMLTableElement -> HTMLVideoElement -> Event -> Effect Unit
-setSubtitleStartButtonEventListener subtitleTable resultVideo _ = genericErrorsHandler $ do
+setSubtitleStartButtonEventListener subtitleTable resultVideo _ = do
   log "Set subtitle start button clicked"
   currentTimeValue <- currentTime (toHTMLMediaElement resultVideo)
   firstRow <- getFirstRow subtitleTable
@@ -41,7 +41,7 @@ setSubtitleStartButtonEventListener subtitleTable resultVideo _ = genericErrorsH
   log "Subtitle start time set successfully"
 
 setSubtitleEndButtonEventListener :: HT.HTMLTableElement -> HTMLVideoElement -> Event -> Effect Unit
-setSubtitleEndButtonEventListener subtitleTable resultVideo _ = genericErrorsHandler $ do
+setSubtitleEndButtonEventListener subtitleTable resultVideo _ = do
   log "Set subtitle end button clicked"
   currentTimeValue <- currentTime (toHTMLMediaElement resultVideo)
   firstRow <- getFirstRow subtitleTable

@@ -25,7 +25,7 @@ import Web.HTML.HTMLTableSectionElement as HTS
 import Web.HTML.Event.EventTypes as E
 
 setAddSubtitleButtonHandler :: HB.HTMLButtonElement -> HT.HTMLTableElement -> HTP.HTMLTemplateElement -> Effect Unit
-setAddSubtitleButtonHandler addSubtitleButton subtitleTable subtitleRowTemplate = do
+setAddSubtitleButtonHandler addSubtitleButton subtitleTable subtitleRowTemplate = genericErrorsHandler $ do
   log "Setting up add subtitle button handler"
   addSubtitleButtonEvL <- eventListener (addSubtitleButtonEventListener subtitleTable subtitleRowTemplate)
   addEventListener E.click addSubtitleButtonEvL false addSubtitleButtonEventTarget
@@ -34,7 +34,7 @@ setAddSubtitleButtonHandler addSubtitleButton subtitleTable subtitleRowTemplate 
   addSubtitleButtonEventTarget = toEventTarget (HB.toElement addSubtitleButton)
 
 addSubtitleButtonEventListener :: HT.HTMLTableElement -> HTP.HTMLTemplateElement -> Event -> Effect Unit
-addSubtitleButtonEventListener subtitleTable subtitleRowTemplate _ = genericErrorsHandler $ do
+addSubtitleButtonEventListener subtitleTable subtitleRowTemplate _ = do
   log "Add subtitle button clicked"
   eitherFirstRow <- try $ getFirstRow subtitleTable
   case eitherFirstRow of

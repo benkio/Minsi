@@ -4970,7 +4970,7 @@
   var setCutRangeHandlers = function(v) {
     var cutStartEventTarget = toEventTarget2(toElement3(v.value0.cutStart));
     var cutEndEventTarget = toEventTarget2(toElement3(v.value0.cutEnd));
-    return function __do6() {
+    return genericErrorsHandler(function __do6() {
       var cutStartEvL = eventListener(cutStartEventListener(v.value0.cutStart)(v.value0.cutStartValue))();
       var cutEndEvL = eventListener(cutEndEventListener(v.value0.cutEnd)(v.value0.cutEndValue))();
       addEventListener(input)(cutStartEvL)(false)(cutStartEventTarget)();
@@ -4978,7 +4978,7 @@
       addEventListener(input)(cutEndEvL)(false)(cutEndEventTarget)();
       addEventListener(change)(cutEndEvL)(false)(cutEndEventTarget)();
       return unit;
-    };
+    });
   };
 
   // output/Handers.YoutubeVideo.CutButtonsHandlers/index.js
@@ -5316,11 +5316,10 @@
     return s.split("");
   };
 
-  // output/Handers.YoutubeVideo.PlaybackPositionHandler/index.js
+  // output/Conversion.Time/index.js
   var show4 = /* @__PURE__ */ show(showNumber);
   var identity8 = /* @__PURE__ */ identity(categoryFn);
   var append3 = /* @__PURE__ */ append(semigroupArray);
-  var when2 = /* @__PURE__ */ when(applicativeEffect);
   var formatToThreeDecimals = function(v) {
     var v1 = span2(function(x) {
       return x !== ".";
@@ -5331,6 +5330,9 @@
     var dec = fromCharArray(dec3);
     return num + ("." + dec);
   };
+
+  // output/Handers.YoutubeVideo.PlaybackPositionHandler/index.js
+  var when2 = /* @__PURE__ */ when(applicativeEffect);
   var updatePlaybackPosition = function(playbackPosition) {
     return function __do6() {
       var playerReady = isPlayerReady();
@@ -6238,7 +6240,7 @@
       return function(cutStartValue) {
         return function(cutEndValue) {
           return function(ev) {
-            return genericErrorsHandler(function __do6() {
+            return function __do6() {
               var rawValue = getInputValue(ev)();
               var youtubeUrlV = maybe(invalid(fromSingleton(youtubeUrlId)("Empty YoutubeUrl Input")))(function(v) {
                 return youtubeUrlValidation(youtubeUrlId)(v);
@@ -6259,7 +6261,7 @@
                 startTime
               })();
               return initializeCutInputs(cutStart)(cutEnd)(cutStartValue)(cutEndValue)(startTime)();
-            });
+            };
           };
         };
       };
@@ -6269,7 +6271,7 @@
     var ytUrlEventTarget = toEventTarget2(toElement3(v.value0.youtubeUrl));
     var setCutStartButtonTarget = toEventTarget2(toElement(v.value0.setCutStartButton));
     var setCutEndButtonTarget = toEventTarget2(toElement(v.value0.setCutEndButton));
-    return function __do6() {
+    return genericErrorsHandler(function __do6() {
       var ytEvL = eventListener(youtubeUrlEventListener(v.value0.cutStart)(v.value0.cutEnd)(v.value0.cutStartValue)(v.value0.cutEndValue))();
       addEventListener(input)(ytEvL)(false)(ytUrlEventTarget)();
       addEventListener(change)(ytEvL)(false)(ytUrlEventTarget)();
@@ -6279,7 +6281,7 @@
       addEventListener(click2)(setCutStartButtonEvLV)(false)(setCutStartButtonTarget)();
       addEventListener(click2)(setCutEndButtonEvLV)(false)(setCutEndButtonTarget)();
       return unit;
-    };
+    });
   };
 
   // output/Web.DOM.HTMLCollection/foreign.js
@@ -7301,7 +7303,7 @@
         return writeImpl3("Bottom");
       }
       ;
-      throw new Error("Failed pattern match at Model.State.State (line 43, column 1 - line 45, column 40): " + [v.constructor.name]);
+      throw new Error("Failed pattern match at Model.State.State (line 64, column 1 - line 66, column 40): " + [v.constructor.name]);
     }
   };
   var writeForeignFont = {
@@ -7314,7 +7316,7 @@
         return writeImpl3("Arial Black");
       }
       ;
-      throw new Error("Failed pattern match at Model.State.State (line 54, column 1 - line 56, column 49): " + [v.constructor.name]);
+      throw new Error("Failed pattern match at Model.State.State (line 75, column 1 - line 77, column 49): " + [v.constructor.name]);
     }
   };
   var writeForeignColor = {
@@ -7339,7 +7341,7 @@
         return writeImpl3("#FFFF00");
       }
       ;
-      throw new Error("Failed pattern match at Model.State.State (line 47, column 1 - line 52, column 41): " + [v.constructor.name]);
+      throw new Error("Failed pattern match at Model.State.State (line 68, column 1 - line 73, column 41): " + [v.constructor.name]);
     }
   };
   var writeDurationRange = /* @__PURE__ */ writeForeignRecord2(/* @__PURE__ */ writeForeignFieldsCons({
@@ -7526,6 +7528,41 @@
     });
   };
 
+  // output/Parse.Font/index.js
+  var parsePosition = function(v) {
+    if (v === "Top") {
+      return Top.value;
+    }
+    ;
+    return Bottom.value;
+  };
+  var parseFont = function(v) {
+    if (v === "Arial Black") {
+      return ArialBlack.value;
+    }
+    ;
+    return Impact.value;
+  };
+  var parseColor = function(v) {
+    if (v === "Black") {
+      return Black.value;
+    }
+    ;
+    if (v === "Light Green") {
+      return LightGreen.value;
+    }
+    ;
+    if (v === "Light Orange") {
+      return LightOrange.value;
+    }
+    ;
+    if (v === "Yellow") {
+      return Yellow.value;
+    }
+    ;
+    return White.value;
+  };
+
   // output/Validations.CutVideoValidation/index.js
   var show9 = /* @__PURE__ */ show(showNumber);
   var pure11 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
@@ -7580,39 +7617,6 @@
       return youtubeUrlValidation(youtubeUrlId)(urlString);
     };
   };
-  var parsePosition = function(v) {
-    if (v === "Top") {
-      return Top.value;
-    }
-    ;
-    return Bottom.value;
-  };
-  var parseFont = function(v) {
-    if (v === "Arial Black") {
-      return ArialBlack.value;
-    }
-    ;
-    return Impact.value;
-  };
-  var parseColor = function(v) {
-    if (v === "Black") {
-      return Black.value;
-    }
-    ;
-    if (v === "Light Green") {
-      return LightGreen.value;
-    }
-    ;
-    if (v === "Light Orange") {
-      return LightOrange.value;
-    }
-    ;
-    if (v === "Yellow") {
-      return Yellow.value;
-    }
-    ;
-    return White.value;
-  };
   var nonEmptyFromHtmlInput = function(i) {
     return function(id2) {
       return mapFlipped2(value2(i))(nonEmptyValidation(id2));
@@ -7632,7 +7636,7 @@
         return value11(textareaMaybe.value0)();
       }
       ;
-      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 132, column 3 - line 134, column 40): " + [textareaMaybe.constructor.name]);
+      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 134, column 3 - line 136, column 40): " + [textareaMaybe.constructor.name]);
     };
   };
   var getSelectValueFromCell = function(cell) {
@@ -7649,7 +7653,7 @@
         return value3(selectMaybe.value0)();
       }
       ;
-      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 142, column 3 - line 144, column 35): " + [selectMaybe.constructor.name]);
+      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 144, column 3 - line 146, column 35): " + [selectMaybe.constructor.name]);
     };
   };
   var getInputValueFromCell = function(cell) {
@@ -7666,7 +7670,7 @@
         return mapFlipped2(valueAsNumber(inputMaybe.value0))(Just.create)();
       }
       ;
-      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 122, column 3 - line 124, column 47): " + [inputMaybe.constructor.name]);
+      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 124, column 3 - line 126, column 47): " + [inputMaybe.constructor.name]);
     };
   };
   var loadSubtitleFromRow = function(row) {
@@ -7845,22 +7849,20 @@
   var setSubtitleTableMaxValues = function(v) {
     return function(subtitleTable) {
       return function(subtitleRowTemplate) {
-        return genericErrorsHandler(function() {
-          var durationSeconds = v.cutVideo.end - v.cutVideo.start;
-          return function __do6() {
-            var subtitleRow2 = getRow(subtitleRowTemplate)();
-            var rows4 = getRows(subtitleTable)();
-            $$void7(traverse5(function(row) {
-              return function __do7() {
-                var startInput = getStartInput(row)();
-                var endInput = getEndInput(row)();
-                setMax(show10(durationSeconds))(startInput)();
-                return setMax(show10(durationSeconds))(endInput)();
-              };
-            })(cons(subtitleRow2)(rows4)))();
-            return log("Set max values for all subtitle inputs to " + (show10(durationSeconds) + " seconds"))();
-          };
-        }());
+        var durationSeconds = v.cutVideo.end - v.cutVideo.start;
+        return function __do6() {
+          var subtitleRow2 = getRow(subtitleRowTemplate)();
+          var rows4 = getRows(subtitleTable)();
+          $$void7(traverse5(function(row) {
+            return function __do7() {
+              var startInput = getStartInput(row)();
+              var endInput = getEndInput(row)();
+              setMax(show10(durationSeconds))(startInput)();
+              return setMax(show10(durationSeconds))(endInput)();
+            };
+          })(cons(subtitleRow2)(rows4)))();
+          return log("Set max values for all subtitle inputs to " + (show10(durationSeconds) + " seconds"))();
+        };
       };
     };
   };
@@ -7917,7 +7919,7 @@
     };
   };
   var applyButtonEventListener = function(v) {
-    return genericErrorsHandler(function __do6() {
+    return function __do6() {
       var stateComponents = getCurrentState();
       var state3 = fst(stateComponents);
       var components = snd(stateComponents);
@@ -7926,14 +7928,14 @@
       return runAff_(function(result) {
         return genericErrorsHandlerEither(result);
       })($$finally(liftEffect8(finallyHandlers(components)(state3)))(applySecond3(void1(callCompute(state3)))(waitForStatus(filename))))();
-    });
+    };
   };
   var setApplyButtonHandler = function(applyButton) {
     var applyButtonEventTarget = toEventTarget2(toElement(applyButton));
-    return function __do6() {
+    return genericErrorsHandler(function __do6() {
       var applyButtonEvL = eventListener(applyButtonEventListener)();
       return addEventListener(click2)(applyButtonEvL)(false)(applyButtonEventTarget)();
-    };
+    });
   };
 
   // output/Web.DOM.ElementName/index.js
@@ -7990,13 +7992,13 @@
     });
   };
   var removeSubtitleButtonEventListener = function(ev) {
-    return genericErrorsHandler(applySecond4(runMaybeT(removeSubtitleButtonEventListenerTrans(ev)))(pure18(unit)));
+    return applySecond4(runMaybeT(removeSubtitleButtonEventListenerTrans(ev)))(pure18(unit));
   };
   var setRemoveSubtitleButtonHandler = function(subtitleTable) {
     var tableRowEventTarget = function(r) {
       return toEventTarget2(toElement7(r));
     };
-    return function __do6() {
+    return genericErrorsHandler(function __do6() {
       log("Setting up remove subtitle button handlers")();
       var evl = eventListener(removeSubtitleButtonEventListener)();
       var rows4 = getRows(subtitleTable)();
@@ -8004,7 +8006,7 @@
         return addEventListener(click2)(evl)(false)(tableRowEventTarget(r));
       })(rows4)();
       return log("Remove subtitle button handler set up successfully")();
-    };
+    });
   };
   var addRemoveSubtitleListenerToRow = function(row) {
     return function __do6() {
@@ -8052,7 +8054,7 @@
   var addSubtitleButtonEventListener = function(subtitleTable) {
     return function(subtitleRowTemplate) {
       return function(v) {
-        return genericErrorsHandler(function __do6() {
+        return function __do6() {
           log("Add subtitle button clicked")();
           var eitherFirstRow = $$try(getFirstRow(subtitleTable))();
           if (eitherFirstRow instanceof Left) {
@@ -8064,7 +8066,7 @@
           }
           ;
           throw new Error("Failed pattern match at Handlers.AddSubtitleButtonHandler (line 40, column 3 - line 42, column 59): " + [eitherFirstRow.constructor.name]);
-        });
+        };
       };
     };
   };
@@ -8072,12 +8074,12 @@
     return function(subtitleTable) {
       return function(subtitleRowTemplate) {
         var addSubtitleButtonEventTarget = toEventTarget2(toElement(addSubtitleButton));
-        return function __do6() {
+        return genericErrorsHandler(function __do6() {
           log("Setting up add subtitle button handler")();
           var addSubtitleButtonEvL = eventListener(addSubtitleButtonEventListener(subtitleTable)(subtitleRowTemplate))();
           addEventListener(click2)(addSubtitleButtonEvL)(false)(addSubtitleButtonEventTarget)();
           return log("Add subtitle button handler set up successfully")();
-        };
+        });
       };
     };
   };
@@ -8111,12 +8113,12 @@
     };
     return maybe(pure20(unit))(handleKeyboardEvent)(fromEvent(ev));
   };
-  var setKeyboardHandlers = function __do4() {
+  var setKeyboardHandlers = /* @__PURE__ */ genericErrorsHandler(function __do4() {
     var w = windowImpl();
     var doc = document2(w)();
     var keyboardEvL = eventListener(keyboardEventListener)();
     return addEventListener(keydown)(keyboardEvL)(false)(toEventTarget(doc))();
-  };
+  });
 
   // output/Handlers.ResultVideo.Handler/index.js
   var RVET = /* @__PURE__ */ function() {
@@ -8131,17 +8133,17 @@
   }();
   var updatePlaybackPosition2 = function(playbackPositionResultVideo) {
     return function(resultVideo) {
-      return genericErrorsHandler(function __do6() {
+      return function __do6() {
         var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
         return setTextContent(formatToThreeDecimals(currentTimeValue))(toNode2(playbackPositionResultVideo))();
-      });
+      };
     };
   };
   var setResultVideoHandlers = function(v) {
-    return function __do6() {
+    return genericErrorsHandler(function __do6() {
       setInterval2(1e3)(updatePlaybackPosition2(v.value0.playbackPositionResultVideo)(v.value0.resultVideo))();
       return unit;
-    };
+    });
   };
 
   // output/Handlers.SubtitleTimeButtonsHandler/index.js
@@ -8159,75 +8161,70 @@
   var setSubtitleStartButtonEventListener = function(subtitleTable) {
     return function(resultVideo) {
       return function(v) {
-        return genericErrorsHandler(function __do6() {
+        return function __do6() {
           log("Set subtitle start button clicked")();
           var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
           var firstRow = getFirstRow(subtitleTable)();
           var startInput = getStartInput(firstRow)();
           setValue2(show15(currentTimeValue * 1e3))(startInput)();
           return log("Subtitle start time set successfully")();
-        });
+        };
       };
     };
   };
   var setSubtitleEndButtonEventListener = function(subtitleTable) {
     return function(resultVideo) {
       return function(v) {
-        return genericErrorsHandler(function __do6() {
+        return function __do6() {
           log("Set subtitle end button clicked")();
           var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
           var firstRow = getFirstRow(subtitleTable)();
           var endInput = getEndInput(firstRow)();
           setValue2(show15(currentTimeValue * 1e3))(endInput)();
           return log("Subtitle end time set successfully")();
-        });
+        };
       };
     };
   };
   var setSubtitleTimeButtonsHandlers = function(v) {
-    return function __do6() {
+    return genericErrorsHandler(function __do6() {
       var startButtonEvL = eventListener(setSubtitleStartButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo))();
       var endButtonEvL = eventListener(setSubtitleEndButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo))();
       addEventListener(click2)(startButtonEvL)(false)(toEventTarget2(toElement(v.value0.setSubtitleStartButton)))();
       addEventListener(click2)(endButtonEvL)(false)(toEventTarget2(toElement(v.value0.setSubtitleEndButton)))();
       return log("Subtitle time buttons handlers set up successfully")();
-    };
+    });
   };
 
   // output/Handlers.VideoSourceHandler/index.js
   var unwrap5 = /* @__PURE__ */ unwrap();
-  var videoSourceEventListener = function(filename) {
-    return function(videoSource) {
-      return function(video) {
-        return function(v) {
-          var filepathMp4 = mp4(filename);
-          var filepathGif = gif(filename);
-          return function __do6() {
-            var selectedValue = value3(videoSource)();
-            if (selectedValue === "video") {
-              return setVideoSrc(filepathMp4)(video)();
-            }
-            ;
-            if (selectedValue === "gif") {
-              return setVideoSrc(filepathGif)(video)();
-            }
-            ;
-            return log("\u26A0\uFE0F Unexpected VideoSource Input: " + selectedValue)();
-          };
-        };
+  var videoSourceEventListener = function(videoSource) {
+    return function(video) {
+      return function(v) {
+        return genericErrorsHandler(function __do6() {
+          var stateTuple = getCurrentState();
+          var filename = unwrap5(fst(stateTuple)).filename;
+          var selectedValue = value3(videoSource)();
+          if (selectedValue === "video") {
+            return setVideoSrc(mp4(filename))(video)();
+          }
+          ;
+          if (selectedValue === "gif") {
+            return setVideoSrc(gif(filename))(video)();
+          }
+          ;
+          return log("\u26A0\uFE0F Unexpected VideoSource Input: " + selectedValue)();
+        });
       };
     };
   };
   var setVideoSourceHandler = function(videoSource) {
     return function(video) {
       var videoSourceEventTarget = toEventTarget2(toElement4(videoSource));
-      return function __do6() {
-        var stateTuple = getCurrentState();
-        var state3 = fst(stateTuple);
-        var filename = unwrap5(state3).filename;
-        var videoSourceEvL = eventListener(videoSourceEventListener(filename)(videoSource)(video))();
+      return genericErrorsHandler(function __do6() {
+        var videoSourceEvL = eventListener(videoSourceEventListener(videoSource)(video))();
         return addEventListener(change)(videoSourceEvL)(false)(videoSourceEventTarget)();
-      };
+      });
     };
   };
 

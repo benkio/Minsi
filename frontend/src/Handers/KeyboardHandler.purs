@@ -1,8 +1,8 @@
 module Handlers.KeyboardHandler where
 
 import Prelude
-
 import Effect (Effect)
+import Handers.ErrorHandlers (genericErrorsHandler)
 import Handlers.ApplyButtonHandler (applyButtonEventListener)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
@@ -14,7 +14,7 @@ import Web.UIEvent.KeyboardEvent.EventTypes as E
 import Web.HTML.Window (document)
 
 setKeyboardHandlers :: Effect Unit
-setKeyboardHandlers = do
+setKeyboardHandlers = genericErrorsHandler $ do
   w <- window
   doc <- document w
   keyboardEvL <- eventListener keyboardEventListener

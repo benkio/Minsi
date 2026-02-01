@@ -17,11 +17,11 @@ data ResultVideoEventTargets = RVET
   }
 
 setResultVideoHandlers :: ResultVideoEventTargets -> Effect Unit
-setResultVideoHandlers (RVET { playbackPositionResultVideo, resultVideo }) = do
+setResultVideoHandlers (RVET { playbackPositionResultVideo, resultVideo }) = genericErrorsHandler $ do
   _ <- setInterval 1000 (updatePlaybackPosition playbackPositionResultVideo resultVideo)
   pure unit
 
 updatePlaybackPosition :: HSP.HTMLSpanElement -> HTMLVideoElement -> Effect Unit
-updatePlaybackPosition playbackPositionResultVideo resultVideo = genericErrorsHandler $ do
+updatePlaybackPosition playbackPositionResultVideo resultVideo = do
   currentTimeValue <- currentTime (toHTMLMediaElement resultVideo)
   setTextContent (formatToThreeDecimals currentTimeValue) (HSP.toNode playbackPositionResultVideo)

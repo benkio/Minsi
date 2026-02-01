@@ -1,17 +1,17 @@
 module Command.Ffmpeg.Gif where
 
+import Effect.Console (log)
 import MinsiError (MinsiError(..), throwMinsiError)
-import Data.Traversable (traverse)
 import Command.Command (runCommand)
 import Constants (mp4, gif, srt, txt, reversed, reversedFull)
 import Conversion.Time (millisecondsToSecondsString)
 import Data.Array (mapWithIndex, null, singleton)
 import Data.Foldable (intercalate, fold, traverse_)
 import Data.Maybe (Maybe(..))
+import Data.String.Common (toUpper)
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
-import MinsiError (MinsiError(..))
 import Model.State (DurationRange(..), Subtitle(..), Position(..), State(..))
 import Node.Buffer (fromString)
 import Node.Encoding (Encoding(..))
@@ -23,7 +23,7 @@ import Prelude
 makeGif :: State -> Aff (Array ExecaResult)
 makeGif (State {filename, subtitles, reverseLoop})
   | reverseLoop && null subtitles               = makeReverseGif filename
-  | not reverseLoop && (not <<< null) subtitles = singleton <$> makeSubtitleGif filename
+  | not reverseLoop && (not <<< null) subtitles = singleton <$> makeSubtitleGif filename subtitles
   | not reverseLoop && null subtitles           = singleton <$> makePlainGif filename
   | otherwise = liftEffect $ throwMinsiError (FfmpegGifError "Unsupported gif operation")
 
@@ -37,20 +37,26 @@ makePlainGif filename = do
 
 addFfmpegPlainGifArgs :: FilePath -> FilePath -> Array String
 addFfmpegPlainGifArgs mp4 gif =
-  [ "-hide_banner", "-loglevel", "warning", "-i", mp4, "-an", gif]
+  [ "-hide_banner", "-loglevel", "warning", "-i", show mp4, "-an", show gif]
 
-makeSubtitleGif :: FilePath -> Aff ExecaResult
-makeSubtitleGif filename = do
+makeSubtitleGif :: FilePath -> Array Subtitle -> Aff ExecaResult
+makeSubtitleGif filename subtitles = do
   filepathMp4 <- liftEffect $ mp4 filename
   filepathGif <- liftEffect $ gif filename
   filepathSrt <- liftEffect $ srt filename
+
+  liftEffect $ log $ show subtitles
+  let subtitleContent = makeSrtsString subtitles
+  liftEffect $ writeSrtFile filename subtitleContent
+
   let args = addFfmpegSubtitleGifArgs filepathMp4 filepathGif filepathSrt
   process <- runCommand args FfmpegGifError "ffmpeg"
+  -- liftEffect $ deleteSrtFile filename
   process.getResult
 
 addFfmpegSubtitleGifArgs :: FilePath -> FilePath -> FilePath -> Array String
 addFfmpegSubtitleGifArgs mp4 gif srt =
-  [ "-hide_banner", "-loglevel", "warning", "-i", mp4, "-an", "-vf", subtitleArg, gif]
+  [ "-hide_banner", "-loglevel", "warning", "-i", show mp4, "-an", "-vf", show subtitleArg, show gif]
   where
     subtitleArg = "subtitles="<>srt
     -- Can't really support multiple font dirs 🤔
@@ -83,7 +89,7 @@ makeReverseSingleGif filename = do
 
 addFfmpegReverseGifArgs :: FilePath -> FilePath -> Array String
 addFfmpegReverseGifArgs filepathGif filepathReversed =
-  [ "-hide_banner", "-loglevel", "warning", "-i", filepathGif, "-vf", "reverse", filepathReversed]
+  [ "-hide_banner", "-loglevel", "warning", "-i", show filepathGif, "-vf", "reverse", show filepathReversed]
 
 mergeVideos :: FilePath -> FilePath -> FilePath -> Aff ExecaResult
 mergeVideos filename filepathGif filepathReversed = do
@@ -92,11 +98,12 @@ mergeVideos filename filepathGif filepathReversed = do
   liftEffect $ writeMergeTxt filename [filepathGif, filepathReversed]
   let args = addFfmpegMergeVideosArgs filepathTxt filepathReversedFull
   process <- runCommand args FfmpegGifError "ffmpeg"
+  liftEffect $ deleteTxtFile filename
   process.getResult
 
 addFfmpegMergeVideosArgs :: FilePath -> FilePath -> Array String
 addFfmpegMergeVideosArgs filepathTxt filepathReversedFull =
-  [ "-hide_banner", "-loglevel", "warning", "-f", "concat", "-safe", "0", "-i", filepathTxt, "-c", "copy", filepathReversedFull]
+  [ "-hide_banner", "-loglevel", "warning", "-f", "concat", "-safe", "0", "-i", show filepathTxt, "-c", "copy", show filepathReversedFull]
 
 
 -- Extra Files -------------------------------------------------
@@ -105,21 +112,23 @@ writeSrtFile :: FilePath -> String -> Effect Unit
 writeSrtFile filename srtContent = do
   f <- srt filename
   bufferContent <- fromString srtContent UTF8
+  log $ "Execute Command: writeFile " <> show f <> " with content " <> srtContent
   writeFile f bufferContent
 
 deleteSrtFile :: FilePath -> Effect Unit
-deleteSrtFile fp = srt fp >>= rm
+deleteSrtFile fp = log ("Execute Command: deleteSrt " <> show fp) *> srt fp >>= rm
 
 writeMergeTxt :: FilePath -> Array FilePath -> Effect Unit
 writeMergeTxt filename files = do
   f <- txt filename
-  bufferContent <- fromString content UTF8
+  bufferContent <- fromString txtContent UTF8
+  log $ "Execute Command: writeFile " <> show f <> " with content " <> txtContent
   writeFile f bufferContent
   where
-    content = intercalate "\n" $ files <#> (\f -> "file '"<>f<>"'")
+    txtContent = intercalate "\n" $ files <#> (\f -> "file '"<>f<>"'")
 
 deleteTxtFile :: FilePath -> Effect Unit
-deleteTxtFile fp = txt fp >>= rm
+deleteTxtFile fp = log ("Execute Command: deleteTxt " <> show fp) *> txt fp >>= rm
 
 -- SRT String Creation -------------------------------------
 
@@ -136,4 +145,4 @@ makeSrtString index (Subtitle { videoPosition : (DurationRange {start:start, end
     startStr = millisecondsToSecondsString start Nothing
     endStr = millisecondsToSecondsString end Nothing
     positionStr = if screenPosition == Top then "{\\an8}" else ""
-    fontStr = "<font face=\"" <> show font <> "\" size=\"" <> show fontSize <> "px\" color=\"" <> show color <> "\">" <> value <> "</font>"
+    fontStr = "<font face=\"" <> show font <> "\" size=\"" <> show fontSize <> "px\" color=\"" <> show color <> "\">" <> toUpper value <> "</font>"

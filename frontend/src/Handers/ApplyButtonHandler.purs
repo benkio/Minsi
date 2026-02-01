@@ -52,14 +52,14 @@ import Effect.Now (now)
 import Data.DateTime.Instant (unInstant)
 
 setApplyButtonHandler :: HB.HTMLButtonElement -> Effect Unit
-setApplyButtonHandler applyButton = do
+setApplyButtonHandler applyButton = genericErrorsHandler $ do
   applyButtonEvL <- eventListener applyButtonEventListener
   addEventListener E.click applyButtonEvL false applyButtonEventTarget
   where
   applyButtonEventTarget = toEventTarget (HB.toElement applyButton)
 
 applyButtonEventListener :: Event -> Effect Unit
-applyButtonEventListener _ = genericErrorsHandler $ do
+applyButtonEventListener _ = do
   stateComponents <- getCurrentState
   let state = fst stateComponents
   let components = snd stateComponents
@@ -141,7 +141,7 @@ getCurrentState = do
   pure $ Tuple state components
 
 setSubtitleTableMaxValues :: State -> HT.HTMLTableElement -> HTP.HTMLTemplateElement -> Effect Unit
-setSubtitleTableMaxValues (State { cutVideo: DurationRange { start: Milliseconds startMs, end: Milliseconds endMs } }) subtitleTable subtitleRowTemplate = genericErrorsHandler $ do
+setSubtitleTableMaxValues (State { cutVideo: DurationRange { start: Milliseconds startMs, end: Milliseconds endMs } }) subtitleTable subtitleRowTemplate = do
   let durationSeconds = (endMs - startMs)
   subtitleRow <- getRow subtitleRowTemplate
   rows <- getRows subtitleTable

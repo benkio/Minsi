@@ -1,6 +1,7 @@
 module Handlers.VideoSourceHandler where
 
 import Prelude
+import Handers.ErrorHandlers (genericErrorsHandler)
 import Handlers.ApplyButtonHandler (getCurrentState, setVideoSrc)
 import Data.Newtype (unwrap)
 import Data.Tuple (fst)
@@ -15,22 +16,18 @@ import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.Event.EventTypes as E
 
 setVideoSourceHandler :: HS.HTMLSelectElement -> HTMLVideoElement -> Effect Unit
-setVideoSourceHandler videoSource video = do
-  stateTuple <- getCurrentState
-  let state = fst stateTuple
-  let filename = (unwrap state).filename
-  videoSourceEvL <- eventListener (videoSourceEventListener filename videoSource video)
+setVideoSourceHandler videoSource video = genericErrorsHandler $ do
+  videoSourceEvL <- eventListener (videoSourceEventListener videoSource video)
   addEventListener E.change videoSourceEvL false videoSourceEventTarget
   where
   videoSourceEventTarget = toEventTarget (HS.toElement videoSource)
 
-videoSourceEventListener :: String -> HS.HTMLSelectElement -> HTMLVideoElement -> Event -> Effect Unit
-videoSourceEventListener filename videoSource video _ = do
+videoSourceEventListener :: HS.HTMLSelectElement -> HTMLVideoElement -> Event -> Effect Unit
+videoSourceEventListener videoSource video _ = genericErrorsHandler $ do
+  stateTuple <- getCurrentState
+  let filename = (unwrap (fst stateTuple)).filename
   selectedValue <- HS.value videoSource
   case selectedValue of
-    "video" -> setVideoSrc filepathMp4 video
-    "gif"   -> setVideoSrc filepathGif video
+    "video" -> setVideoSrc (mp4 filename) video
+    "gif"   -> setVideoSrc (gif filename) video
     v       -> log $ "⚠️ Unexpected VideoSource Input: " <> v
-  where
-    filepathMp4 = mp4 filename
-    filepathGif = gif filename

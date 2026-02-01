@@ -1,5 +1,6 @@
 module Handlers.CutRangeHandler where
 
+import Handers.ErrorHandlers (genericErrorsHandler)
 import Web.HTML.HTMLSpanElement as HS
 import Web.DOM.Element (toEventTarget)
 import Web.DOM.Node (setTextContent)
@@ -19,7 +20,7 @@ data CutRangeTargets = CRET
   }
 
 setCutRangeHandlers :: CutRangeTargets -> Effect Unit
-setCutRangeHandlers (CRET { cutStart, cutEnd, cutStartValue, cutEndValue }) = do
+setCutRangeHandlers (CRET { cutStart, cutEnd, cutStartValue, cutEndValue }) = genericErrorsHandler $ do
   cutStartEvL <- eventListener (cutStartEventListener cutStart cutStartValue)
   cutEndEvL <- eventListener (cutEndEventListener cutEnd cutEndValue)
   addEventListener E.input cutStartEvL false cutStartEventTarget
