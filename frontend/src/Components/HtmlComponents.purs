@@ -85,8 +85,8 @@ newtype HtmlOutputs = HtmlOutputs
   , minsiLog :: HTMLDivElement
   , playbackPositionYoutube :: HTMLSpanElement
   , playbackPositionResultVideo :: HTMLSpanElement
-  , cutStartValue :: HTMLSpanElement
-  , cutEndValue :: HTMLSpanElement
+  , cutStartValue :: HTMLInputElement
+  , cutEndValue :: HTMLInputElement
   , loadingModal :: HTMLDivElement
   , minsiErrorModal :: HTMLDivElement
   , resultVideo :: HTMLVideoElement
@@ -162,8 +162,8 @@ loadHtmlOutputs doc = do
   minsiLog <- loadDiv minsiLogId doc
   playbackPositionYoutube <- loadSpan playbackPositionYoutubeId doc
   playbackPositionResultVideo <- loadSpan playbackPositionResultVideoId doc
-  cutStartValue <- loadSpan cutStartValueId doc
-  cutEndValue <- loadSpan cutEndValueId doc
+  cutStartValue <- loadHtmlElement cutStartValueId HI.fromElement doc
+  cutEndValue <- loadHtmlElement cutEndValueId HI.fromElement doc
   loadingModal <- loadDiv loadingModalId doc
   minsiErrorModal <- loadDiv minsiErrorModalId doc
   resultVideo <- loadVideo resultVideoId doc

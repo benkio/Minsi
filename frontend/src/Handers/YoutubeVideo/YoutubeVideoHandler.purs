@@ -33,8 +33,8 @@ data VideoEventTargets = VET
   , setCutEndButton :: HB.HTMLButtonElement
   , setCutStartButton :: HB.HTMLButtonElement
   , youtubeUrl :: HI.HTMLInputElement
-  , cutStartValue :: HSP.HTMLSpanElement
-  , cutEndValue :: HSP.HTMLSpanElement
+  , cutStartValue :: HI.HTMLInputElement
+  , cutEndValue :: HI.HTMLInputElement
   }
 
 setVideoHandlers :: VideoEventTargets -> Effect Unit
@@ -64,7 +64,7 @@ setVideoHandlers
   setCutStartButtonTarget = toEventTarget (HB.toElement setCutStartButton)
   setCutEndButtonTarget = toEventTarget (HB.toElement setCutEndButton)
 
-youtubeUrlEventListener :: HI.HTMLInputElement -> HI.HTMLInputElement -> HSP.HTMLSpanElement -> HSP.HTMLSpanElement -> Event -> Effect Unit
+youtubeUrlEventListener :: HI.HTMLInputElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
 youtubeUrlEventListener cutStart cutEnd cutStartValue cutEndValue ev = do
   rawValue <- getInputValue ev
   let youtubeUrlV = maybe (invalid (fromSingleton youtubeUrlId "Empty YoutubeUrl Input")) (\v -> youtubeUrlValidation youtubeUrlId v) rawValue

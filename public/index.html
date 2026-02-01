@@ -83,12 +83,18 @@
                       class="form-range"
                       id="cutStart"
                       min="0"
-                      max="10000"
+                      max="10000000"
                       value="0"
                   />
-                <small class="text-muted">
-                  <span id="cutStartValue">0</span>s
-                </small>
+                <input
+                    type="number"
+                    id="cutStartValue"
+                    class="form-control form-control-sm d-inline-block ms-1"
+                    style="width: 7em"
+                    min="0"
+                    value="0"
+                />
+                <small class="text-muted ms-1">ms</small>
               </div>
 
               <div class="mb-4">
@@ -98,11 +104,18 @@
                       class="form-range"
                       id="cutEnd"
                       min="0"
-                      max="10000"
+                      max="10000000"
+                      value="100000"
                   />
-                <small class="text-muted">
-                  <span id="cutEndValue">100</span>s
-                </small>
+                <input
+                    type="number"
+                    id="cutEndValue"
+                    class="form-control form-control-sm d-inline-block ms-1"
+                    style="width: 7em"
+                    min="0"
+                    value="100000"
+                />
+                <small class="text-muted ms-1">ms</small>
               </div>
 
               <div class="d-flex justify-content-center">

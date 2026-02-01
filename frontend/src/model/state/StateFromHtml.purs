@@ -74,7 +74,7 @@ cutVideoFromHtmlRange :: HTMLInputElement -> HTMLInputElement -> Effect (V Valid
 cutVideoFromHtmlRange cutStart cutEnd = do
   start <- valueAsNumber cutStart
   end <- valueAsNumber cutEnd
-  pure $ cutVideoValidation cutStartId (start * 1000.0) (end * 1000.0)
+  pure $ cutVideoValidation cutStartId start end
 
 youtubeUrlFromHTMLInput :: HTMLInputElement -> Effect (V ValidationErrors URL)
 youtubeUrlFromHTMLInput youtubeUrlComponent = do
