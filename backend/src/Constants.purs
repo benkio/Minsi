@@ -23,6 +23,12 @@ srt filename = outputPath >>= \ofp -> resolve [ ofp ] (filename <> ".srt")
 txt :: String -> Effect FilePath
 txt filename = outputPath >>= \ofp -> resolve [ ofp ] (filename <> ".txt")
 
+reversed :: String -> Effect FilePath
+reversed filename = outputPath >>= \ofp -> resolve [ ofp ] (filename <> "_reversed.mp4")
+
+reversedFull :: String -> Effect FilePath
+reversedFull filename = outputPath >>= \ofp -> resolve [ ofp ] (filename <> "_reversed_full.mp4")
+
 files :: String -> Effect (Array FilePath)
 files filename =
   traverse (\f -> f filename) [
@@ -30,5 +36,7 @@ files filename =
   mp3,
   gif,
   srt,
-  txt
+  txt,
+  reversed,
+  reversedFull
   ]

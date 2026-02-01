@@ -1,5 +1,6 @@
 module Controller.ComputeController where
 
+import Command.Ffmpeg.Gif (makeGif)
 import Node.FS.Sync (rm)
 import Data.Traversable (traverse_)
 import Constants (files)
@@ -7,7 +8,7 @@ import Command.Ffmpeg.Mp3 (extractMp3)
 import Command.Id3v2 (addId3Tags)
 import Command.Ytdlp (downloadVideo)
 import Control.Monad.Error.Class (catchError)
-import Control.Monad.Except (ExceptT(..), runExcept, runExceptT)
+import Control.Monad.Except (ExceptT(..), runExcept, runExceptT, lift)
 import Data.Array (fromFoldable)
 import Data.Bifunctor (lmap)
 import Data.Either (Either(..))
@@ -73,19 +74,30 @@ compute state@(State { filename }) store = do
   log "Video download launched, returning HTTP response"
 
 runComputePipeline :: State -> Aff (Either String Unit)
-runComputePipeline (State { youtubeUrl, filename, cutVideo: DurationRange { start, end }, artist, title }) =
+runComputePipeline state@(State { youtubeUrl, filename, cutVideo: DurationRange { start, end }, artist, title }) =
   runExceptT do
     void $ exceptTStep "Video download" $ downloadVideo youtubeUrl filename start end
     void $ exceptTStep "MP3 extraction" $ extractMp3 filename
     void $ exceptTStep "ID3 tags" $ addId3Tags filename artist title
+    void $ exceptTMultiple "Gif Creation" $ makeGif state
     pure unit
+
+exceptTMultiple :: String -> Aff (Array ExecaResult) -> ExceptT String Aff Unit
+exceptTMultiple label affs = do
+  steps <- lift affs
+  traverse_ (checkExecaResult label) steps
+
+execaResultToEither :: String -> ExecaResult -> Either String Unit
+execaResultToEither label r =
+  if isSuccessExit r.exit then Right unit else Left (label <> " failed")
+
+checkExecaResult :: String -> ExecaResult -> ExceptT String Aff Unit
+checkExecaResult label r = ExceptT $ pure $ execaResultToEither label r
 
 exceptTStep :: String -> Aff ExecaResult -> ExceptT String Aff Unit
 exceptTStep label aff =
   ExceptT $
-    ( aff >>= \r ->
-        pure $ if isSuccessExit r.exit then Right unit else Left (label <> " failed")
-    )
+    (aff >>= \r -> pure $ execaResultToEither label r)
       `catchError` (\e -> pure $ Left (label <> ": " <> message e))
 
 isSuccessExit :: Exit -> Boolean
