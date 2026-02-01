@@ -27,6 +27,13 @@ program = do
 {-
 
 --- Add subtitle logic Frontend ---
-- The plus button of subtitles should add a fresh new row if there's no row to clone!
-- Add a button to remove the row.
+- artist as dropdown with bots names
+- new dropdown for filename prefix
+- Enable the usage of local file
+- Add keyboard shortcut:
+  - ctrl+s - cut start
+  - ctrl+e - cut end
+  - alt+s - sub cut start
+  - alt+e - sub cut end
+  - + - add sub
 -}
