@@ -9,6 +9,16 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <style>
+      /* Sticky left column only on large screens (≥992px); single column on tablets/phones */
+      @media (min-width: 992px) {
+        .sticky-left-lg {
+          position: sticky;
+          top: 0;
+          align-self: start;
+        }
+      }
+    </style>
   </head>
 
   <body>
@@ -30,11 +40,11 @@
         </div>
       </div>
 
-      <!-- Main content -->
+      <!-- Main content: two columns, left fixed when scrolling -->
       <div class="row gy-4">
-        <!-- Left controls -->
-        <div class="col-12 col-lg-3">
-          <div class="card shadow-sm mb-3">
+        <!-- Left column: sticky only on large screens; single column on tablets/phones -->
+        <div class="col-12 col-lg-3 sticky-left-lg">
+          <div class="card shadow-sm mb-3 p-2">
             <div class="card-body">
               <div class="mb-3">
                 <label for="outputFilename" class="form-label">
@@ -81,7 +91,7 @@
                 </small>
               </div>
 
-              <div>
+              <div class="mb-4">
                 <label for="cutEnd" class="form-label small"> End Time </label>
                 <input
                   type="range"
@@ -94,6 +104,16 @@
                 <small class="text-muted">
                   <span id="cutEndValue">100</span>s
                 </small>
+              </div>
+
+              <div class="d-flex justify-content-center">
+                <button
+                  id="applyButton"
+                  type="button"
+                  class="btn btn-primary btn-lg px-5"
+                >
+                  Apply
+                </button>
               </div>
             </div>
           </div>
@@ -112,9 +132,10 @@
           </div>
         </div>
 
-        <!-- Right preview -->
+        <!-- Right column: YouTube block + Result video block (similar layout) -->
         <div class="col-12 col-lg-9">
-          <div class="card shadow-sm h-100">
+          <!-- YouTube block (URL + preview + cut buttons) -->
+          <div class="card shadow-sm mb-4">
             <div class="card-body text-center">
               <div class="mb-4">
                 <label for="youtubeUrl" class="form-label"> YouTube URL </label>
@@ -153,104 +174,83 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Apply Button -->
-      <div class="row mt-4">
-        <div class="col-12">
-          <div class="w-100 w-md-75 mx-auto">
-            <div class="d-flex justify-content-center mb-3">
-              <button
-                id="applyButton"
-                type="button"
-                class="btn btn-primary btn-lg px-5"
+          <!-- Result block: video source + result video + playback + subtitles (like youtube block) -->
+          <div class="d-none mt-5" id="videoSourceRowId">
+            <div class="text-center mb-3">
+              <select
+                name="videoSource"
+                id="videoSource"
+                class="form-select w-50 mx-auto text-center"
               >
-                Apply
-              </button>
+                <option value="video">Video</option>
+                <option value="gif">Gif</option>
+              </select>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Video Source -->
-      <div class="row d-none" id="videoSourceRowId">
-        <div class="col-12 text-center">
-          <select
-            name="videoSource"
-            id="videoSource"
-            class="form-select w-50 mx-auto text-center"
-          >
-            <option value="video">Video</option>
-            <option value="gif">Gif</option>
-          </select>
-        </div>
-      </div>
+          <div class="card shadow-sm d-none" id="videoRowId">
+            <div class="card-body p-0">
+              <video
+                id="resultVideo"
+                class="w-100 bg-dark"
+                style="object-fit: contain; height: 60vh"
+                controls
+              ></video>
+            </div>
+            <div class="px-3 pb-3 d-none" id="playbackPositionResultRowId">
+              <p class="mb-0 text-center">
+                <span id="playbackPositionResultVideo" class="fs-3 fw-bold">0</span>
+              </p>
+            </div>
+          </div>
 
-      <!-- Video Row -->
-      <div class="row mt-4 d-none" id="videoRowId">
-        <div class="col-12">
-          <video
-            id="resultVideo"
-            class="w-100 bg-dark"
-            style="object-fit: contain; height: 60vh"
-            controls
-          ></video>
-        </div>
-      </div>
-      <div class="row mt-4 d-none" id="playbackPositionResultRowId">
-        <div class="col-12">
-          <p class="mb-0 text-center flex-grow-1">
-            <span id="playbackPositionResultVideo" class="fs-3 fw-bold">0</span>
-          </p>
-        </div>
-      </div>
-      <!-- Subtitles -->
-      <div class="row mt-4 d-none" id="subtitlesRowId">
-        <div class="col-12 col-xl-10 mx-auto">
-          <div class="table-responsive">
-            <table
-              class="table table-bordered table-sm bg-white shadow-sm align-middle"
-              id="subtitleTable"
-            >
-              <thead class="table-light text-center">
-                <tr>
-                  <th style="width: 6em">
-                    <button
-                      id="setSubtitleStartButton"
-                      type="button"
-                      class="btn btn-sm btn-outline-primary"
-                    >
-                      Start
-                    </button>
-                  </th>
-                  <th style="width: 6em">
-                    <button
-                      id="setSubtitleEndButton"
-                      type="button"
-                      class="btn btn-sm btn-outline-primary"
-                    >
-                      End
-                    </button>
-                  </th>
-                  <th>Value</th>
-                  <th style="width: 7em">Font</th>
-                  <th style="width: 5em">Size</th>
-                  <th style="width: 6em">Color</th>
-                  <th style="width: 7em">Position</th>
-                  <th style="width: 1em" class="text-center">
-                    <button
-                      id="addSubtitleButton"
-                      type="button"
-                      class="btn btn-sm btn-outline-primary"
-                    >
-                      ➕
-                    </button>
-                  </th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
+          <!-- Subtitles table (under result video, same column) -->
+          <div class="mt-4 d-none" id="subtitlesRowId">
+            <div class="table-responsive">
+              <table
+                class="table table-bordered table-sm bg-white shadow-sm align-middle"
+                id="subtitleTable"
+              >
+                <thead class="table-light text-center">
+                  <tr>
+                    <th style="width: 6em">
+                      <button
+                        id="setSubtitleStartButton"
+                        type="button"
+                        class="btn btn-sm btn-outline-primary"
+                      >
+                        Start
+                      </button>
+                    </th>
+                    <th style="width: 6em">
+                      <button
+                        id="setSubtitleEndButton"
+                        type="button"
+                        class="btn btn-sm btn-outline-primary"
+                      >
+                        End
+                      </button>
+                    </th>
+                    <th>Value</th>
+                    <th style="width: 7em">Font</th>
+                    <th style="width: 5em">Size</th>
+                    <th style="width: 6em">Color</th>
+                    <th style="width: 7em">Position</th>
+                    <th style="width: 1em" class="text-center">
+                      <button
+                        id="addSubtitleButton"
+                        type="button"
+                        class="btn btn-sm btn-outline-primary"
+                      >
+                        ➕
+                      </button>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
