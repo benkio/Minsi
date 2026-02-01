@@ -4413,19 +4413,18 @@
   function showModal(id2) {
     return function() {
       const el = document.getElementById(id2);
-      if (el) {
-        const modal = bootstrap.Modal.getOrCreateInstance(el);
-        modal.show();
-      }
+      const modal = bootstrap.Modal.getOrCreateInstance(el);
+      modal.show();
+      setTimeout(() => {
+        modal.hide(id2);
+      }, 1e4);
     };
   }
   function hideModal(id2) {
     return function() {
       const el = document.getElementById(id2);
-      if (el) {
-        const modal = bootstrap.Modal.getOrCreateInstance(el);
-        modal.hide();
-      }
+      const modal = bootstrap.Modal.getOrCreateInstance(el);
+      modal.hide();
     };
   }
 

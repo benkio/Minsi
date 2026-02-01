@@ -36,4 +36,7 @@ program = do
   - alt+s - sub cut start
   - alt+e - sub cut end
   - + - add sub
+  - right-left - for the video
+  - space - play/pause
+- Add the full transcript of the subtitles
 -}
