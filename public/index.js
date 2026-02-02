@@ -8177,21 +8177,6 @@
       return lift3(removeChild(rowNode)(parentNode$prime));
     });
   };
-  var removeFirstSubtitleRow = function(subtitleTable) {
-    return function __do5() {
-      var rows4 = getRows(subtitleTable)();
-      var v = head(rows4);
-      if (v instanceof Just) {
-        return applySecond4(runMaybeT(removeRowFromDom(v.value0)))(pure18(unit))();
-      }
-      ;
-      if (v instanceof Nothing) {
-        return unit;
-      }
-      ;
-      throw new Error("Failed pattern match at Handlers.RemoveSubtitleButtonHandler (line 82, column 3 - line 84, column 25): " + [v.constructor.name]);
-    };
-  };
   var isTrElement = function(node) {
     return fromMaybe(false)(map23(function($25) {
       return function(v) {
@@ -8314,65 +8299,12 @@
     };
   };
 
-  // output/Handlers.SubtitleTimeButtonsHandler/index.js
-  var show15 = /* @__PURE__ */ show(showNumber);
-  var STBT = /* @__PURE__ */ function() {
-    function STBT2(value0) {
-      this.value0 = value0;
-    }
-    ;
-    STBT2.create = function(value0) {
-      return new STBT2(value0);
-    };
-    return STBT2;
-  }();
-  var setSubtitleStartButtonEventListener = function(subtitleTable) {
-    return function(resultVideo) {
-      return function(v) {
-        return function __do5() {
-          log("Set subtitle start button clicked")();
-          var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
-          var firstRow = getFirstRow(subtitleTable)();
-          var startInput = getStartInput(firstRow)();
-          setValue2(show15(currentTimeValue * 1e3))(startInput)();
-          return log("Subtitle start time set successfully")();
-        };
-      };
-    };
-  };
-  var setSubtitleEndButtonEventListener = function(subtitleTable) {
-    return function(resultVideo) {
-      return function(v) {
-        return function __do5() {
-          log("Set subtitle end button clicked")();
-          var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
-          var firstRow = getFirstRow(subtitleTable)();
-          var endInput = getEndInput(firstRow)();
-          setValue2(show15(currentTimeValue * 1e3))(endInput)();
-          return log("Subtitle end time set successfully")();
-        };
-      };
-    };
-  };
-  var setSubtitleTimeButtonsHandlers = function(v) {
-    return genericErrorsHandler(function __do5() {
-      var startButtonEvL = eventListener(setSubtitleStartButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo))();
-      var endButtonEvL = eventListener(setSubtitleEndButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo))();
-      addEventListener(click2)(startButtonEvL)(false)(toEventTarget2(toElement(v.value0.setSubtitleStartButton)))();
-      addEventListener(click2)(endButtonEvL)(false)(toEventTarget2(toElement(v.value0.setSubtitleEndButton)))();
-      return log("Subtitle time buttons handlers set up successfully")();
-    });
-  };
-
   // output/Web.UIEvent.KeyboardEvent/foreign.js
   function key(e) {
     return e.key;
   }
   function ctrlKey(e) {
     return e.ctrlKey;
-  }
-  function altKey(e) {
-    return e.altKey;
   }
   function metaKey(e) {
     return e.metaKey;
@@ -8439,7 +8371,6 @@
       var keyValue = key(keyboardEvent);
       var isMeta = metaKey(keyboardEvent);
       var isCtrl = ctrlKey(keyboardEvent);
-      var isAlt = altKey(keyboardEvent);
       var ev = toEvent(keyboardEvent);
       var stop = preventDefault(ev);
       var whenNotEditable = function(cond) {
@@ -8452,13 +8383,7 @@
         whenNotEditable(keyValue === " ")(toggleResultVideoPlayback(v.value0.resultVideo))();
         whenNotEditable(keyValue === "ArrowLeft")(skipResultVideoBackward(v.value0.resultVideo))();
         whenNotEditable(keyValue === "ArrowRight")(skipResultVideoForward(v.value0.resultVideo))();
-        when6(keyValue === "?" && isCtrl)(applySecond5(showModal(v.value0.keyboardShortcutsModalId))(stop))();
-        when6(keyValue === "s" && (isCtrl || isMeta))(applySecond5(rangeToNumberListener(v.value0.cutStart)(v.value0.cutStartValue)(ev))(stop))();
-        when6(keyValue === "e" && (isCtrl || isMeta))(applySecond5(rangeToNumberListener(v.value0.cutEnd)(v.value0.cutEndValue)(ev))(stop))();
-        when6(keyValue === "s" && isAlt)(applySecond5(setSubtitleStartButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo)(ev))(stop))();
-        when6(keyValue === "e" && isAlt)(applySecond5(setSubtitleEndButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo)(ev))(stop))();
-        when6(keyValue === "a" && isAlt)(applySecond5(addSubtitleButtonEventListener(v.value0.subtitleTable)(v.value0.subtitleRow)(ev))(stop))();
-        return when6(keyValue === "r" && isAlt)(applySecond5(removeFirstSubtitleRow(v.value0.subtitleTable))(stop))();
+        return whenNotEditable(keyValue === "?")(applySecond5(showModal(v.value0.keyboardShortcutsModalId))(stop))();
       };
     };
   };
@@ -8509,6 +8434,56 @@
     return genericErrorsHandler(function __do5() {
       setInterval2(1e3)(updatePlaybackPosition2(v.value0.playbackPositionResultVideo)(v.value0.resultVideo))();
       return unit;
+    });
+  };
+
+  // output/Handlers.SubtitleTimeButtonsHandler/index.js
+  var show15 = /* @__PURE__ */ show(showNumber);
+  var STBT = /* @__PURE__ */ function() {
+    function STBT2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    STBT2.create = function(value0) {
+      return new STBT2(value0);
+    };
+    return STBT2;
+  }();
+  var setSubtitleStartButtonEventListener = function(subtitleTable) {
+    return function(resultVideo) {
+      return function(v) {
+        return function __do5() {
+          log("Set subtitle start button clicked")();
+          var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
+          var firstRow = getFirstRow(subtitleTable)();
+          var startInput = getStartInput(firstRow)();
+          setValue2(show15(currentTimeValue * 1e3))(startInput)();
+          return log("Subtitle start time set successfully")();
+        };
+      };
+    };
+  };
+  var setSubtitleEndButtonEventListener = function(subtitleTable) {
+    return function(resultVideo) {
+      return function(v) {
+        return function __do5() {
+          log("Set subtitle end button clicked")();
+          var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
+          var firstRow = getFirstRow(subtitleTable)();
+          var endInput = getEndInput(firstRow)();
+          setValue2(show15(currentTimeValue * 1e3))(endInput)();
+          return log("Subtitle end time set successfully")();
+        };
+      };
+    };
+  };
+  var setSubtitleTimeButtonsHandlers = function(v) {
+    return genericErrorsHandler(function __do5() {
+      var startButtonEvL = eventListener(setSubtitleStartButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo))();
+      var endButtonEvL = eventListener(setSubtitleEndButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo))();
+      addEventListener(click2)(startButtonEvL)(false)(toEventTarget2(toElement(v.value0.setSubtitleStartButton)))();
+      addEventListener(click2)(endButtonEvL)(false)(toEventTarget2(toElement(v.value0.setSubtitleEndButton)))();
+      return log("Subtitle time buttons handlers set up successfully")();
     });
   };
 
