@@ -1,4 +1,4 @@
-module Handlers.SubtitleTimeButtonsHandler where
+module Handlers.Subtitles.SubtitleTimeButtonsHandler where
 
 import Prelude
 
@@ -13,7 +13,7 @@ import Web.HTML.HTMLVideoElement (HTMLVideoElement, toHTMLMediaElement)
 import Web.HTML.HTMLMediaElement (currentTime)
 import Web.HTML.HTMLInputElement (setValue)
 import Web.HTML.Event.EventTypes as E
-import Handers.ErrorHandlers (genericErrorsHandler)
+import Handlers.ErrorHandlers (genericErrorsHandler)
 import Components.HTMLTableElement (getFirstRow, getStartInput, getEndInput)
 
 data SubtitleTimeButtonsTargets = STBT

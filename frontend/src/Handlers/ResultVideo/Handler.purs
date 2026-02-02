@@ -4,7 +4,7 @@ import Prelude
 
 import Effect (Effect)
 import Effect.Timer (setInterval)
-import Handers.ErrorHandlers (genericErrorsHandler)
+import Handlers.ErrorHandlers (genericErrorsHandler)
 import Conversion.Time (formatToThreeDecimals)
 import Web.DOM.Node (setTextContent)
 import Web.HTML.HTMLMediaElement (currentTime)

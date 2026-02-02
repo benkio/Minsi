@@ -1,4 +1,4 @@
-module Handers.YoutubeVideo.CutButtonsHandlers where
+module Handlers.YoutubeVideo.CutButtonsHandlers where
 
 import Data.Int (floor, toNumber)
 import Control.Monad.Loops (whileM_)
@@ -8,8 +8,8 @@ import Effect.Aff (delay, launchAff_)
 import Effect.Class (liftEffect)
 import Web.Event.Internal.Types (Event)
 import Web.HTML.HTMLInputElement as HI
-import Handers.ErrorHandlers (genericErrorsHandler)
-import Handers.YoutubeVideo.Foreign (getPlayerCurrentTime, getVideoDuration, isPlayerReady)
+import Handlers.ErrorHandlers (genericErrorsHandler)
+import Handlers.YoutubeVideo.Foreign (getPlayerCurrentTime, getVideoDuration, isPlayerReady)
 import Handlers.CutRangeHandler (updateCutValue)
 import Prelude
 

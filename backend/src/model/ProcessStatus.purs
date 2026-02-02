@@ -5,14 +5,14 @@ import Prelude
 data ProcessStatus
   = Pending
   | Succeed
-  | Failed
+  | Failed String
 
 derive instance Eq ProcessStatus
 
 instance Show ProcessStatus where
   show Pending = "Pending"
   show Succeed = "Succeed"
-  show Failed = "Failed"
+  show (Failed e) = "Failed: " <> e
 
 isFinished :: ProcessStatus -> Boolean
 isFinished Pending = false

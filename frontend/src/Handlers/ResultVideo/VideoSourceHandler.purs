@@ -1,7 +1,7 @@
-module Handlers.VideoSourceHandler where
+module Handlers.ResultVideo.VideoSourceHandler where
 
 import Prelude
-import Handers.ErrorHandlers (genericErrorsHandler)
+import Handlers.ErrorHandlers (genericErrorsHandler)
 import Handlers.ApplyButtonHandler (getCurrentState, setVideoSrc)
 import Data.Newtype (unwrap)
 import Data.Tuple (fst)

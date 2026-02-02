@@ -21,7 +21,7 @@ import Effect.Class (liftEffect)
 import Effect.Console (log)
 import Endpoints.Compute (callCompute)
 import Endpoints.Status (callStatus)
-import Handers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
+import Handlers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
 import Data.Maybe (maybe)
 import Main.MinsiError (MinsiError(..), throwMinsiError)
 import Model.ProcessStatus (ProcessStatus(..))
@@ -33,12 +33,13 @@ import Web.DOM.Element as Element
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
 import Web.HTML (window)
+import Web.DOM.AttrName (AttrName(..))
 import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLDivElement as HTMLDivElement
 import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLMediaElement (load, pause, setSrc)
-import Web.HTML.HTMLVideoElement (HTMLVideoElement, toHTMLMediaElement)
+import Web.HTML.HTMLVideoElement (HTMLVideoElement, toHTMLMediaElement, toElement)
 import Web.HTML.HTMLTableElement as HT
 import Web.HTML.HTMLTableRowElement as HR
 import Web.HTML.HTMLTemplateElement as HTP
@@ -93,17 +94,17 @@ waitForStatus filename = tailRecM pollStatus unit
     case response.status of
       Pending -> delay (Milliseconds 500.0) $> Loop unit
       Succeed -> pure $ Done unit
-      Failed -> liftEffect $ throwMinsiError (ComputeFailed "Video download failed")
+      (Failed error) -> liftEffect $ throwMinsiError (ComputeFailed ("Video download failed: " <> error))
 
 setVideoSrc :: String -> HTMLVideoElement -> Effect Unit
 setVideoSrc filepath video = do
   (Milliseconds m) <- unInstant <$> now
   let cacheBustedPath = filepath <> "?t=" <> show m
-  pause videoMediaElement
-  setSrc cacheBustedPath videoMediaElement
-  load videoMediaElement
-  where
-  videoMediaElement = toHTMLMediaElement video
+  let media = toHTMLMediaElement video
+  pause media
+  Element.removeAttribute (AttrName "src") (toElement video)
+  setSrc cacheBustedPath media
+  load media
 
 showHiddenElements :: HtmlVisualElements -> Boolean -> Effect Unit
 showHiddenElements (HtmlVisualElements { videoSourceRow, videoRow, subtitlesRow, playbackPositionResultRow }) reverseLoop = do

@@ -1,4 +1,4 @@
-module Handlers.AddSubtitleButtonHandler where
+module Handlers.Subtitles.AddSubtitleButtonHandler where
 
 import Prelude
 
@@ -8,9 +8,9 @@ import Data.Maybe (maybe)
 import Effect (Effect)
 import Effect.Console (log)
 import Effect.Exception (try)
-import Handers.ErrorHandlers (genericErrorsHandler)
+import Handlers.ErrorHandlers (genericErrorsHandler)
 import Handlers.ApplyButtonHandler (getRow)
-import Handlers.RemoveSubtitleButtonHandler (addRemoveSubtitleListenerToRow)
+import Handlers.Subtitles.RemoveSubtitleButtonHandler (addRemoveSubtitleListenerToRow)
 import Web.HTML.HTMLTemplateElement as HTP
 import Main.MinsiError (MinsiError(..), throwMinsiError)
 import Web.DOM.Element (fromNode, toEventTarget)

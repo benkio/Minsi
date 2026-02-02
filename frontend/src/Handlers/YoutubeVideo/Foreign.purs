@@ -1,4 +1,4 @@
-module Handers.YoutubeVideo.Foreign where
+module Handlers.YoutubeVideo.Foreign where
 
 import Prelude
 import Effect (Effect)

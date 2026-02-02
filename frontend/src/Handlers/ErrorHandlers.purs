@@ -1,4 +1,4 @@
-module Handers.ErrorHandlers where
+module Handlers.ErrorHandlers where
 
 import Effect.Console (log)
 import Components.HtmlIds (minsiLogId, minsiErrorModalContentId, minsiErrorModalId)

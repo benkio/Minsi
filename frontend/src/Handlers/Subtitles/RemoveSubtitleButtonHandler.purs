@@ -1,4 +1,4 @@
-module Handlers.RemoveSubtitleButtonHandler where
+module Handlers.Subtitles.RemoveSubtitleButtonHandler where
 
 import Prelude
 import Components.HTMLTableElement (getRows)
@@ -10,7 +10,7 @@ import Data.Foldable (traverse_)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Effect (Effect)
 import Effect.Console (log)
-import Handers.ErrorHandlers (genericErrorsHandler)
+import Handlers.ErrorHandlers (genericErrorsHandler)
 import Web.DOM.DOMTokenList (contains)
 import Web.DOM.Element (classList, fromNode, tagName, toEventTarget, toNode)
 import Web.DOM.ElementName (ElementName(..))

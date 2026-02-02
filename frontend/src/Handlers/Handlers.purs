@@ -1,17 +1,18 @@
 module Handlers.Handlers where
 
-import Handlers.AddSubtitleButtonHandler (setAddSubtitleButtonHandler)
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CutRangeHandler (CutRangeTargets(..), setCutRangeHandlers)
 import Handlers.KeyboardHandler (KeyboardHandlerTargets(..), setKeyboardHandlers)
-import Handlers.RemoveSubtitleButtonHandler (setRemoveSubtitleButtonHandler)
 import Handlers.ResultVideo.Handler (ResultVideoEventTargets(..), setResultVideoHandlers)
-import Handlers.SubtitleTimeButtonsHandler (SubtitleTimeButtonsTargets(..), setSubtitleTimeButtonsHandlers)
-import Handlers.VideoSourceHandler (setVideoSourceHandler)
+import Handlers.ResultVideo.VideoSourceHandler (setVideoSourceHandler)
+import Handlers.Subtitles.AddSubtitleButtonHandler (setAddSubtitleButtonHandler)
+import Handlers.Subtitles.RemoveSubtitleButtonHandler (setRemoveSubtitleButtonHandler)
+import Handlers.Subtitles.SubtitleTimeButtonsHandler (SubtitleTimeButtonsTargets(..), setSubtitleTimeButtonsHandlers)
+import Handlers.TextInputValidationHandler (TextInputValidationTargets(..), setTextInputValidationHandlers)
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlOutputs(..))
 import Components.HtmlIds (keyboardShortcutsModalId)
 import Effect (Effect)
-import Handers.YoutubeVideo.YoutubeVideoHandler (setVideoHandlers, VideoEventTargets(..))
+import Handlers.YoutubeVideo.YoutubeVideoHandler (setVideoHandlers, VideoEventTargets(..))
 import Prelude
 
 setupEventHandlers :: HtmlComponents -> Effect Unit
@@ -20,6 +21,7 @@ setupEventHandlers
       { cutStart
       , cutEnd
       , youtubeUrl
+      , filename
       , setCutStartButton
       , setCutEndButton
       , applyButton
@@ -29,6 +31,8 @@ setupEventHandlers
       , addSubtitleButton
       , setSubtitleStartButton
       , setSubtitleEndButton
+      , artist
+      , title
       }
   , htmlOutputs: HtmlOutputs
       { playbackPositionYoutube
@@ -84,3 +88,8 @@ setupEventHandlers
     , resultVideo: resultVideo
   })
   setVideoSourceHandler videoSource resultVideo
+  setTextInputValidationHandlers (TIVT {
+    outputFilename: filename,
+    artist,
+    title
+  })

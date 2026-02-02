@@ -42,10 +42,19 @@ spec = do
 
     it "decodes StatusResponse.status = Failed" do
       let
-        json = """{ "status": "Failed" }"""
+        json = """{ "status": "Failed: " }"""
         res = (readJSON json :: Either _ StatusResponse)
       case res of
         Left err -> fail $ "Expected StatusResponse(Failed) to decode, but got error: " <> show err
         Right { status } ->
-          status `shouldEqual` Failed
+          status `shouldEqual` Failed ""
+
+    it "decodes StatusResponse.status = Failed with error message" do
+      let
+        json = """{ "status": "Failed: video processing error" }"""
+        res = (readJSON json :: Either _ StatusResponse)
+      case res of
+        Left err -> fail $ "Expected StatusResponse(Failed with message) to decode, but got error: " <> show err
+        Right { status } ->
+          status `shouldEqual` Failed "video processing error"
 

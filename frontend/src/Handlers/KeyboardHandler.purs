@@ -4,7 +4,7 @@ import Prelude
 import Components.Modal (showModal)
 import Data.Maybe (maybe, isJust)
 import Effect (Effect)
-import Handers.ErrorHandlers (genericErrorsHandler)
+import Handlers.ErrorHandlers (genericErrorsHandler)
 import Handlers.ApplyButtonHandler (applyButtonEventListener)
 import Web.DOM.Element (fromEventTarget, toEventTarget)
 import Web.Event.Event (preventDefault, target)

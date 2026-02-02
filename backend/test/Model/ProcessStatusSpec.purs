@@ -16,4 +16,4 @@ spec = do
       isFinished Succeed `shouldEqual` true
 
     it "returns true for Failed" do
-      isFinished Failed `shouldEqual` true
+      isFinished (Failed "") `shouldEqual` true

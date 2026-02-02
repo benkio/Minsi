@@ -7,7 +7,7 @@ import Components.Window (getDocument)
 import Effect (Effect)
 import Effect.Aff (runAff_)
 import Effect.Console (log)
-import Handers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
+import Handlers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
 import Handlers.Handlers (setupEventHandlers)
 import Main.CheckDependencies (checkDependecies)
 
@@ -30,7 +30,6 @@ program = do
 - minsi log not showing stuff anymore (eg. empty artist)
 - after cutting and reloading the video shows the video even if the videosource is gif.
 ------Improvements------------
-- Minsi background
 - improve error Video Download Failed
 - Docker support
 - When the cut end and cut start aren't changed, skip the yt-dlp step and just create the gifs

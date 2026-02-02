@@ -1,4 +1,4 @@
-module Handers.YoutubeVideo.YoutubeVideoHandler where
+module Handlers.YoutubeVideo.YoutubeVideoHandler where
 
 import Data.Foldable (foldl)
 import Data.Maybe (Maybe, maybe)
@@ -7,7 +7,7 @@ import Data.Validation.Semigroup (invalid)
 import Model.ValidationErrors (fromSingleton)
 import Effect (Effect)
 import Effect.Console (log)
-import Handers.ErrorHandlers (genericErrorsHandler)
+import Handlers.ErrorHandlers (genericErrorsHandler)
 import Main.MinsiError (MinsiError(..), throwMinsiError)
 import Prelude
 import Validations.YoutubeValidation (youtubeUrlValidation)
@@ -20,10 +20,10 @@ import Web.HTML.HTMLSpanElement as HSP
 import Web.Event.Internal.Types (Event)
 import Web.HTML.Event.EventTypes as E
 import Components.HtmlIds (resultPreviewId, youtubeUrlId)
-import Handers.YoutubeVideo.Foreign (embedVideo)
-import Handers.YoutubeVideo.YoutubeUrlExtraction (extractYoutubeVideoId, extractYoutubeVideoStartTime)
-import Handers.YoutubeVideo.CutButtonsHandlers (initializeCutInputs, setCutInputButtonEvL)
-import Handers.YoutubeVideo.PlaybackPositionHandler (updatePlaybackPosition)
+import Handlers.YoutubeVideo.Foreign (embedVideo)
+import Handlers.YoutubeVideo.YoutubeUrlExtraction (extractYoutubeVideoId, extractYoutubeVideoStartTime)
+import Handlers.YoutubeVideo.CutButtonsHandlers (initializeCutInputs, setCutInputButtonEvL)
+import Handlers.YoutubeVideo.PlaybackPositionHandler (updatePlaybackPosition)
 import Effect.Timer (setInterval)
 
 data VideoEventTargets = VET

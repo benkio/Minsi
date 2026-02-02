@@ -3,7 +3,7 @@ module Handlers.CutRangeHandler where
 import Components.HtmlIds (cutEndId, cutStartId)
 import Data.Validation.Semigroup (validation)
 import Effect (Effect)
-import Handers.ErrorHandlers (genericErrorsHandler)
+import Handlers.ErrorHandlers (genericErrorsHandler)
 import Main.MinsiError (MinsiError(..), throwMinsiError)
 import Model.ValidationErrors (toMap)
 import Prelude

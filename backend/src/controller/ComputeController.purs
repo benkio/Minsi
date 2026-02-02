@@ -69,7 +69,7 @@ compute state@(State { filename }) store = do
     result <- runComputePipeline state
     processResult <- case result of
       Right _ -> pure Succeed
-      Left e -> liftEffect (log ("error during compute: " <> e)) *> pure Failed
+      Left e -> liftEffect (log ("error during compute: " <> e)) *> pure (Failed e)
     liftEffect $ insert filename processResult store
   log "Video download launched, returning HTTP response"
 

@@ -7,7 +7,7 @@ import Effect.Class (liftEffect)
 import Partial.Unsafe (unsafePartial)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
-import Handers.YoutubeVideo.YoutubeUrlExtraction
+import Handlers.YoutubeVideo.YoutubeUrlExtraction
   ( extractYoutubeVideoId
   , extractYoutubeVideoStartTime
   , parseUnit

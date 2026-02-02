@@ -109,10 +109,10 @@
     return dict.map;
   };
   var mapFlipped = function(dictFunctor) {
-    var map111 = map(dictFunctor);
+    var map110 = map(dictFunctor);
     return function(fa) {
       return function(f) {
-        return map111(f)(fa);
+        return map110(f)(fa);
       };
     };
   };
@@ -120,17 +120,17 @@
     return map(dictFunctor)($$const(unit));
   };
   var voidLeft = function(dictFunctor) {
-    var map111 = map(dictFunctor);
+    var map110 = map(dictFunctor);
     return function(f) {
       return function(x) {
-        return map111($$const(x))(f);
+        return map110($$const(x))(f);
       };
     };
   };
   var voidRight = function(dictFunctor) {
-    var map111 = map(dictFunctor);
+    var map110 = map(dictFunctor);
     return function(x) {
-      return map111($$const(x));
+      return map110($$const(x));
     };
   };
   var functorFn = {
@@ -564,11 +564,11 @@
     return Just2;
   }();
   var showMaybe = function(dictShow) {
-    var show17 = show(dictShow);
+    var show18 = show(dictShow);
     return {
       show: function(v) {
         if (v instanceof Just) {
-          return "(Just " + (show17(v.value0) + ")");
+          return "(Just " + (show18(v.value0) + ")");
         }
         ;
         if (v instanceof Nothing) {
@@ -918,13 +918,13 @@
   };
   var traverse_ = function(dictApplicative) {
     var applySecond6 = applySecond(dictApplicative.Apply0());
-    var pure24 = pure(dictApplicative);
+    var pure25 = pure(dictApplicative);
     return function(dictFoldable) {
       var foldr3 = foldr(dictFoldable);
       return function(f) {
         return foldr3(function($473) {
           return applySecond6(f($473));
-        })(pure24(unit));
+        })(pure25(unit));
       };
     };
   };
@@ -1100,6 +1100,64 @@
     }
   };
 
+  // output/Data.FoldableWithIndex/index.js
+  var foldr8 = /* @__PURE__ */ foldr(foldableArray);
+  var mapWithIndex2 = /* @__PURE__ */ mapWithIndex(functorWithIndexArray);
+  var foldl8 = /* @__PURE__ */ foldl(foldableArray);
+  var foldrWithIndex = function(dict) {
+    return dict.foldrWithIndex;
+  };
+  var foldMapWithIndexDefaultR = function(dictFoldableWithIndex) {
+    var foldrWithIndex1 = foldrWithIndex(dictFoldableWithIndex);
+    return function(dictMonoid) {
+      var append6 = append(dictMonoid.Semigroup0());
+      var mempty3 = mempty(dictMonoid);
+      return function(f) {
+        return foldrWithIndex1(function(i) {
+          return function(x) {
+            return function(acc) {
+              return append6(f(i)(x))(acc);
+            };
+          };
+        })(mempty3);
+      };
+    };
+  };
+  var foldableWithIndexArray = {
+    foldrWithIndex: function(f) {
+      return function(z) {
+        var $291 = foldr8(function(v) {
+          return function(y) {
+            return f(v.value0)(v.value1)(y);
+          };
+        })(z);
+        var $292 = mapWithIndex2(Tuple.create);
+        return function($293) {
+          return $291($292($293));
+        };
+      };
+    },
+    foldlWithIndex: function(f) {
+      return function(z) {
+        var $294 = foldl8(function(y) {
+          return function(v) {
+            return f(v.value0)(y)(v.value1);
+          };
+        })(z);
+        var $295 = mapWithIndex2(Tuple.create);
+        return function($296) {
+          return $294($295($296));
+        };
+      };
+    },
+    foldMapWithIndex: function(dictMonoid) {
+      return foldMapWithIndexDefaultR(foldableWithIndexArray)(dictMonoid);
+    },
+    Foldable0: function() {
+      return foldableArray;
+    }
+  };
+
   // output/Data.Traversable/foreign.js
   var traverseArrayImpl = /* @__PURE__ */ function() {
     function array1(a) {
@@ -1124,13 +1182,13 @@
     }
     return function(apply6) {
       return function(map24) {
-        return function(pure24) {
+        return function(pure25) {
           return function(f) {
             return function(array) {
               function go2(bot, top3) {
                 switch (top3 - bot) {
                   case 0:
-                    return pure24([]);
+                    return pure25([]);
                   case 1:
                     return map24(array1)(f(array[bot]));
                   case 2:
@@ -1157,12 +1215,12 @@
   };
   var traversableMaybe = {
     traverse: function(dictApplicative) {
-      var pure24 = pure(dictApplicative);
+      var pure25 = pure(dictApplicative);
       var map24 = map(dictApplicative.Apply0().Functor0());
       return function(v) {
         return function(v1) {
           if (v1 instanceof Nothing) {
-            return pure24(Nothing.value);
+            return pure25(Nothing.value);
           }
           ;
           if (v1 instanceof Just) {
@@ -1174,11 +1232,11 @@
       };
     },
     sequence: function(dictApplicative) {
-      var pure24 = pure(dictApplicative);
+      var pure25 = pure(dictApplicative);
       var map24 = map(dictApplicative.Apply0().Functor0());
       return function(v) {
         if (v instanceof Nothing) {
-          return pure24(Nothing.value);
+          return pure25(Nothing.value);
         }
         ;
         if (v instanceof Just) {
@@ -1216,10 +1274,45 @@
       return foldableArray;
     }
   };
+  var sequence = function(dict) {
+    return dict.sequence;
+  };
+
+  // output/Data.TraversableWithIndex/index.js
+  var traverseWithIndexDefault = function(dictTraversableWithIndex) {
+    var sequence2 = sequence(dictTraversableWithIndex.Traversable2());
+    var mapWithIndex5 = mapWithIndex(dictTraversableWithIndex.FunctorWithIndex0());
+    return function(dictApplicative) {
+      var sequence12 = sequence2(dictApplicative);
+      return function(f) {
+        var $174 = mapWithIndex5(f);
+        return function($175) {
+          return sequence12($174($175));
+        };
+      };
+    };
+  };
+  var traverseWithIndex = function(dict) {
+    return dict.traverseWithIndex;
+  };
+  var traversableWithIndexArray = {
+    traverseWithIndex: function(dictApplicative) {
+      return traverseWithIndexDefault(traversableWithIndexArray)(dictApplicative);
+    },
+    FunctorWithIndex0: function() {
+      return functorWithIndexArray;
+    },
+    FoldableWithIndex1: function() {
+      return foldableWithIndexArray;
+    },
+    Traversable2: function() {
+      return traversableArray;
+    }
+  };
 
   // output/Data.Unfoldable/foreign.js
   var unfoldrArrayImpl = function(isNothing2) {
-    return function(fromJust4) {
+    return function(fromJust5) {
       return function(fst2) {
         return function(snd2) {
           return function(f) {
@@ -1229,7 +1322,7 @@
               while (true) {
                 var maybe2 = f(value12);
                 if (isNothing2(maybe2)) return result;
-                var tuple = fromJust4(maybe2);
+                var tuple = fromJust5(maybe2);
                 result.push(fst2(tuple));
                 value12 = snd2(tuple);
               }
@@ -1242,7 +1335,7 @@
 
   // output/Data.Unfoldable1/foreign.js
   var unfoldr1ArrayImpl = function(isNothing2) {
-    return function(fromJust4) {
+    return function(fromJust5) {
       return function(fst2) {
         return function(snd2) {
           return function(f) {
@@ -1254,7 +1347,7 @@
                 result.push(fst2(tuple));
                 var maybe2 = snd2(tuple);
                 if (isNothing2(maybe2)) return result;
-                value12 = fromJust4(maybe2);
+                value12 = fromJust5(maybe2);
               }
             };
           };
@@ -1302,12 +1395,12 @@
     };
   };
   var showNonEmpty = function(dictShow) {
-    var show17 = show(dictShow);
+    var show18 = show(dictShow);
     return function(dictShow1) {
-      var show18 = show(dictShow1);
+      var show19 = show(dictShow1);
       return {
         show: function(v) {
-          return "(NonEmpty " + (show17(v.value0) + (" " + (show18(v.value1) + ")")));
+          return "(NonEmpty " + (show18(v.value0) + (" " + (show19(v.value1) + ")")));
         }
       };
     };
@@ -1515,22 +1608,22 @@
     }
   };
   var showList = function(dictShow) {
-    var show17 = show(dictShow);
+    var show18 = show(dictShow);
     return {
       show: function(v) {
         if (v instanceof Nil) {
           return "Nil";
         }
         ;
-        return "(" + (intercalate2(" : ")(map3(show17)(v)) + " : Nil)");
+        return "(" + (intercalate2(" : ")(map3(show18)(v)) + " : Nil)");
       }
     };
   };
   var showNonEmptyList = function(dictShow) {
-    var show17 = show(showNonEmpty(dictShow)(showList(dictShow)));
+    var show18 = show(showNonEmpty(dictShow)(showList(dictShow)));
     return {
       show: function(v) {
-        return "(NonEmptyList " + (show17(v) + ")");
+        return "(NonEmptyList " + (show18(v) + ")");
       }
     };
   };
@@ -2117,23 +2210,23 @@
   // output/Control.Monad/index.js
   var liftM1 = function(dictMonad) {
     var bind20 = bind(dictMonad.Bind1());
-    var pure24 = pure(dictMonad.Applicative0());
+    var pure25 = pure(dictMonad.Applicative0());
     return function(f) {
       return function(a) {
         return bind20(a)(function(a$prime) {
-          return pure24(f(a$prime));
+          return pure25(f(a$prime));
         });
       };
     };
   };
   var ap = function(dictMonad) {
     var bind20 = bind(dictMonad.Bind1());
-    var pure24 = pure(dictMonad.Applicative0());
+    var pure25 = pure(dictMonad.Applicative0());
     return function(f) {
       return function(a) {
         return bind20(f)(function(f$prime) {
           return bind20(a)(function(a$prime) {
-            return pure24(f$prime(a$prime));
+            return pure25(f$prime(a$prime));
           });
         });
       };
@@ -2490,10 +2583,10 @@
     var catchError1 = catchError(dictMonadError);
     var Monad0 = dictMonadError.MonadThrow0().Monad0();
     var map24 = map(Monad0.Bind1().Apply0().Functor0());
-    var pure24 = pure(Monad0.Applicative0());
+    var pure25 = pure(Monad0.Applicative0());
     return function(a) {
       return catchError1(map24(Right.create)(a))(function($52) {
-        return pure24(Left.create($52));
+        return pure25(Left.create($52));
       });
     };
   };
@@ -4005,7 +4098,7 @@
     return x;
   };
   var withExceptT = function(dictFunctor) {
-    var map111 = map(dictFunctor);
+    var map110 = map(dictFunctor);
     return function(f) {
       return function(v) {
         var mapLeft = function(v1) {
@@ -4021,7 +4114,7 @@
             throw new Error("Failed pattern match at Control.Monad.Except.Trans (line 43, column 3 - line 43, column 32): " + [v1.constructor.name, v2.constructor.name]);
           };
         };
-        return map111(mapLeft(f))(v);
+        return map110(mapLeft(f))(v);
       };
     };
   };
@@ -4034,10 +4127,10 @@
     };
   };
   var functorExceptT = function(dictFunctor) {
-    var map111 = map(dictFunctor);
+    var map110 = map(dictFunctor);
     return {
       map: function(f) {
-        return mapExceptT(map111(map7(f)));
+        return mapExceptT(map110(map7(f)));
       }
     };
   };
@@ -4059,12 +4152,12 @@
   };
   var bindExceptT = function(dictMonad) {
     var bind20 = bind(dictMonad.Bind1());
-    var pure24 = pure(dictMonad.Applicative0());
+    var pure25 = pure(dictMonad.Applicative0());
     return {
       bind: function(v) {
         return function(k) {
           return bind20(v)(either(function($193) {
-            return pure24(Left.create($193));
+            return pure25(Left.create($193));
           })(function(a) {
             var v1 = k(a);
             return v1;
@@ -4130,11 +4223,11 @@
     }
   };
   var functorMaybeT = function(dictFunctor) {
-    var map111 = map(dictFunctor);
+    var map110 = map(dictFunctor);
     return {
       map: function(f) {
         return function(v) {
-          return map111(map8(f))(v);
+          return map110(map8(f))(v);
         };
       }
     };
@@ -4151,13 +4244,13 @@
   };
   var bindMaybeT = function(dictMonad) {
     var bind20 = bind(dictMonad.Bind1());
-    var pure24 = pure(dictMonad.Applicative0());
+    var pure25 = pure(dictMonad.Applicative0());
     return {
       bind: function(v) {
         return function(f) {
           return bind20(v)(function(v1) {
             if (v1 instanceof Nothing) {
-              return pure24(Nothing.value);
+              return pure25(Nothing.value);
             }
             ;
             if (v1 instanceof Just) {
@@ -4682,7 +4775,7 @@
     };
   }();
 
-  // output/Handers.ErrorHandlers/index.js
+  // output/Handlers.ErrorHandlers/index.js
   var pure3 = /* @__PURE__ */ pure(applicativeEffect);
   var traverse2 = /* @__PURE__ */ traverse(traversableArray)(applicativeEffect);
   var $$void3 = /* @__PURE__ */ $$void(functorEffect);
@@ -4705,7 +4798,7 @@
           return v.value0;
         }
         ;
-        throw new Error("Failed pattern match at Handers.ErrorHandlers (line 86, column 16 - line 88, column 21): " + [v.constructor.name]);
+        throw new Error("Failed pattern match at Handlers.ErrorHandlers (line 86, column 16 - line 88, column 21): " + [v.constructor.name]);
       }();
       var ulNode = toNode5(toElement8(ulElement));
       traverse2(function(line) {
@@ -4721,7 +4814,7 @@
               return v.value0;
             }
             ;
-            throw new Error("Failed pattern match at Handers.ErrorHandlers (line 93, column 22 - line 95, column 27): " + [v.constructor.name]);
+            throw new Error("Failed pattern match at Handlers.ErrorHandlers (line 93, column 22 - line 95, column 27): " + [v.constructor.name]);
           }();
           var liNode = toNode5(toElement5(liElement));
           setTextContent(line)(liNode)();
@@ -4785,512 +4878,7 @@
       return applySecond2(log(errorMessage))(catchError3(handleError)($$const(raiseErrorAlert(errorMessage))));
     }
     ;
-    throw new Error("Failed pattern match at Handers.ErrorHandlers (line 45, column 1 - line 45, column 70): " + [v.constructor.name]);
-  };
-
-  // output/Data.Validation.Semigroup/index.js
-  var V = function(x) {
-    return x;
-  };
-  var validation = function(v) {
-    return function(v1) {
-      return function(v2) {
-        if (v2 instanceof Left) {
-          return v(v2.value0);
-        }
-        ;
-        if (v2 instanceof Right) {
-          return v1(v2.value0);
-        }
-        ;
-        throw new Error("Failed pattern match at Data.Validation.Semigroup (line 48, column 1 - line 48, column 84): " + [v.constructor.name, v1.constructor.name, v2.constructor.name]);
-      };
-    };
-  };
-  var toEither = function(v) {
-    return v;
-  };
-  var invalid = function($100) {
-    return V(Left.create($100));
-  };
-  var functorV = functorEither;
-  var foldableV = {
-    foldMap: function(dictMonoid) {
-      return validation($$const(mempty(dictMonoid)));
-    },
-    foldr: function(f) {
-      return function(b) {
-        return validation($$const(b))(flip(f)(b));
-      };
-    },
-    foldl: function(f) {
-      return function(b) {
-        return validation($$const(b))(f(b));
-      };
-    }
-  };
-  var bifunctorV = bifunctorEither;
-  var applyV = function(dictSemigroup) {
-    var append12 = append(dictSemigroup);
-    return {
-      apply: function(v) {
-        return function(v1) {
-          if (v instanceof Left && v1 instanceof Left) {
-            return new Left(append12(v.value0)(v1.value0));
-          }
-          ;
-          if (v instanceof Left) {
-            return new Left(v.value0);
-          }
-          ;
-          if (v1 instanceof Left) {
-            return new Left(v1.value0);
-          }
-          ;
-          if (v instanceof Right && v1 instanceof Right) {
-            return new Right(v.value0(v1.value0));
-          }
-          ;
-          throw new Error("Failed pattern match at Data.Validation.Semigroup (line 89, column 1 - line 93, column 54): " + [v.constructor.name, v1.constructor.name]);
-        };
-      },
-      Functor0: function() {
-        return functorV;
-      }
-    };
-  };
-  var applicativeV = function(dictSemigroup) {
-    var applyV1 = applyV(dictSemigroup);
-    return {
-      pure: function($108) {
-        return V(Right.create($108));
-      },
-      Apply0: function() {
-        return applyV1;
-      }
-    };
-  };
-  var andThen = function(v1) {
-    return function(f) {
-      return validation(invalid)(f)(v1);
-    };
-  };
-
-  // output/Control.Monad.Loops/index.js
-  var whileM_ = function(dictMonad) {
-    var bind20 = bind(dictMonad.Bind1());
-    var pure24 = pure(dictMonad.Applicative0());
-    return function(p) {
-      return function(f) {
-        return bind20(p)(function(v) {
-          if (v) {
-            return bind20(f)(function(v1) {
-              return whileM_(dictMonad)(p)(f);
-            });
-          }
-          ;
-          return pure24(unit);
-        });
-      };
-    };
-  };
-  var iterateUntilM = function(dictMonad) {
-    var pure24 = pure(dictMonad.Applicative0());
-    var bind20 = bind(dictMonad.Bind1());
-    return function(p) {
-      return function(f) {
-        return function(v) {
-          var $181 = p(v);
-          if ($181) {
-            return pure24(v);
-          }
-          ;
-          return bind20(f(v))(iterateUntilM(dictMonad)(p)(f));
-        };
-      };
-    };
-  };
-
-  // output/Data.Int/foreign.js
-  var fromNumberImpl = function(just) {
-    return function(nothing) {
-      return function(n) {
-        return (n | 0) === n ? just(n) : nothing;
-      };
-    };
-  };
-  var toNumber = function(n) {
-    return n;
-  };
-  var fromStringAsImpl = function(just) {
-    return function(nothing) {
-      return function(radix) {
-        var digits;
-        if (radix < 11) {
-          digits = "[0-" + (radix - 1).toString() + "]";
-        } else if (radix === 11) {
-          digits = "[0-9a]";
-        } else {
-          digits = "[0-9a-" + String.fromCharCode(86 + radix) + "]";
-        }
-        var pattern2 = new RegExp("^[\\+\\-]?" + digits + "+$", "i");
-        return function(s) {
-          if (pattern2.test(s)) {
-            var i = parseInt(s, radix);
-            return (i | 0) === i ? just(i) : nothing;
-          } else {
-            return nothing;
-          }
-        };
-      };
-    };
-  };
-
-  // output/Data.Number/foreign.js
-  var isFiniteImpl = isFinite;
-  var floor = Math.floor;
-
-  // output/Data.Int/index.js
-  var top2 = /* @__PURE__ */ top(boundedInt);
-  var bottom2 = /* @__PURE__ */ bottom(boundedInt);
-  var fromStringAs = /* @__PURE__ */ function() {
-    return fromStringAsImpl(Just.create)(Nothing.value);
-  }();
-  var fromString = /* @__PURE__ */ fromStringAs(10);
-  var fromNumber = /* @__PURE__ */ function() {
-    return fromNumberImpl(Just.create)(Nothing.value);
-  }();
-  var unsafeClamp = function(x) {
-    if (!isFiniteImpl(x)) {
-      return 0;
-    }
-    ;
-    if (x >= toNumber(top2)) {
-      return top2;
-    }
-    ;
-    if (x <= toNumber(bottom2)) {
-      return bottom2;
-    }
-    ;
-    if (otherwise) {
-      return fromMaybe(0)(fromNumber(x));
-    }
-    ;
-    throw new Error("Failed pattern match at Data.Int (line 72, column 1 - line 72, column 29): " + [x.constructor.name]);
-  };
-  var floor2 = function($39) {
-    return unsafeClamp(floor($39));
-  };
-
-  // output/Handers.YoutubeVideo.Foreign/foreign.js
-  var player;
-  var embedVideo = function(embedVideoConfig) {
-    return function() {
-      if (typeof player !== "undefined" && player !== null) {
-        try {
-          if (player.getVideoData && typeof player.getVideoData === "function") {
-            const videoData = player.getVideoData();
-            const currentVideoId = videoData && videoData.video_id;
-            if (currentVideoId === embedVideoConfig.videoId) {
-              console.log("Video ID is the same, skipping reload");
-              return;
-            }
-          }
-        } catch (e) {
-          console.log("Could not get current video data, proceeding with load");
-        }
-        try {
-          player.loadVideoById({
-            videoId: embedVideoConfig.videoId,
-            startSeconds: embedVideoConfig.startTime
-            // endSeconds: Number,
-          });
-          console.log("Video loaded using loadVideoById");
-        } catch (error3) {
-          console.error("Error loading video:", error3);
-          throw error3;
-        }
-      } else {
-        try {
-          player = new YT.Player(embedVideoConfig.resultPreviewId, {
-            height: embedVideoConfig.height,
-            width: embedVideoConfig.width,
-            videoId: embedVideoConfig.videoId,
-            playerVars: {
-              playsinline: 1,
-              start: embedVideoConfig.startTime,
-              loop: 1
-            }
-          });
-          console.log("Player created successfully");
-        } catch (error3) {
-          console.error("Error creating YouTube player:", error3);
-          throw error3;
-        }
-      }
-    };
-  };
-  var getPlayerCurrentTime = () => {
-    if (typeof player !== "undefined" && player !== null) {
-      try {
-        if (player.getCurrentTime && typeof player.getCurrentTime === "function") {
-          return player.getCurrentTime();
-        }
-      } catch (e) {
-        console.error("Error calling getCurrentTime:", e);
-      }
-    }
-    return 0;
-  };
-  var getVideoDuration = () => {
-    if (typeof player !== "undefined" && player !== null) {
-      try {
-        if (player.getDuration && typeof player.getDuration === "function") {
-          const duration2 = player.getDuration();
-          if (duration2 && !isNaN(duration2) && duration2 > 0) {
-            return duration2;
-          }
-        }
-      } catch (e) {
-        console.error("Error calling getDuration:", e);
-      }
-    }
-    return 100;
-  };
-  var isPlayerReady = () => {
-    if (typeof player === "undefined" || player === null) {
-      return false;
-    }
-    const hasGetDuration = player.getDuration && typeof player.getDuration === "function";
-    const hasGetCurrentTime = player.getCurrentTime && typeof player.getCurrentTime === "function";
-    let isReady = false;
-    if (hasGetDuration) {
-      try {
-        const duration2 = player.getDuration();
-        isReady = duration2 && !isNaN(duration2) && duration2 > 0;
-      } catch (e) {
-        isReady = false;
-      }
-    }
-    return hasGetDuration && hasGetCurrentTime && isReady;
-  };
-
-  // output/Model.ValidationErrors/index.js
-  var union2 = /* @__PURE__ */ union(ordString);
-  var semigroupValidationErrors = {
-    append: function(v) {
-      return function(v1) {
-        return union2(v)(v1);
-      };
-    }
-  };
-  var toMap = function(v) {
-    return v;
-  };
-  var fromSingleton = function(k) {
-    return function(v) {
-      return singleton3(k)(v);
-    };
-  };
-
-  // output/Validations.CutVideoValidation/index.js
-  var show3 = /* @__PURE__ */ show(showNumber);
-  var pure4 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
-  var cutVideoValidation = function(id2) {
-    return function(start2) {
-      return function(end) {
-        var $6 = start2 >= end - 100;
-        if ($6) {
-          return invalid(fromSingleton(id2)("start >= end - 100: " + (show3(start2) + (" " + show3(end)))));
-        }
-        ;
-        return pure4({
-          start: start2,
-          end
-        });
-      };
-    };
-  };
-
-  // output/Web.Event.EventTarget/foreign.js
-  function eventListener(fn) {
-    return function() {
-      return function(event) {
-        return fn(event)();
-      };
-    };
-  }
-  function addEventListener(type) {
-    return function(listener) {
-      return function(useCapture) {
-        return function(target6) {
-          return function() {
-            return target6.addEventListener(type, listener, useCapture);
-          };
-        };
-      };
-    };
-  }
-
-  // output/Web.HTML.Event.EventTypes/index.js
-  var input = "input";
-  var click2 = "click";
-  var change = "change";
-
-  // output/Handlers.CutRangeHandler/index.js
-  var show4 = /* @__PURE__ */ show(showInt);
-  var show1 = /* @__PURE__ */ show(showNumber);
-  var CRET = /* @__PURE__ */ function() {
-    function CRET2(value0) {
-      this.value0 = value0;
-    }
-    ;
-    CRET2.create = function(value0) {
-      return new CRET2(value0);
-    };
-    return CRET2;
-  }();
-  var updateCutValue = function(numMs) {
-    return function(cutValueInput) {
-      return setValue2(show4(floor2(numMs)))(cutValueInput);
-    };
-  };
-  var rangeToNumberListenerStart = function(cutStart) {
-    return function(v) {
-      return function(cutStartValue) {
-        return function(cutEndValue) {
-          return function(v1) {
-            return genericErrorsHandler(function __do5() {
-              var start2 = valueAsNumber(cutStart)();
-              var end = valueAsNumber(cutEndValue)();
-              return validation(function(errs) {
-                return throwMinsiError(new InvalidInputs(toMap(errs)));
-              })(function(v2) {
-                return setValue2(show1(start2))(cutStartValue);
-              })(cutVideoValidation(cutStartId)(start2)(end))();
-            });
-          };
-        };
-      };
-    };
-  };
-  var rangeToNumberListenerEnd = function(v) {
-    return function(cutEnd) {
-      return function(cutStartValue) {
-        return function(cutEndValue) {
-          return function(v1) {
-            return genericErrorsHandler(function __do5() {
-              var start2 = valueAsNumber(cutStartValue)();
-              var end = valueAsNumber(cutEnd)();
-              return validation(function(errs) {
-                return throwMinsiError(new InvalidInputs(toMap(errs)));
-              })(function(v2) {
-                return setValue2(show1(end))(cutEndValue);
-              })(cutVideoValidation(cutStartId)(start2)(end))();
-            });
-          };
-        };
-      };
-    };
-  };
-  var numberToRangeListenerStart = function(cutStart) {
-    return function(cutStartValue) {
-      return function(cutEndValue) {
-        return function(v) {
-          return genericErrorsHandler(function __do5() {
-            var start2 = valueAsNumber(cutStartValue)();
-            var end = valueAsNumber(cutEndValue)();
-            return validation(function(errs) {
-              return throwMinsiError(new InvalidInputs(toMap(errs)));
-            })(function(v1) {
-              return setValue2(show1(start2))(cutStart);
-            })(cutVideoValidation(cutStartId)(start2)(end))();
-          });
-        };
-      };
-    };
-  };
-  var numberToRangeListenerEnd = function(cutEnd) {
-    return function(cutStartValue) {
-      return function(cutEndValue) {
-        return function(v) {
-          return genericErrorsHandler(function __do5() {
-            var start2 = valueAsNumber(cutStartValue)();
-            var end = valueAsNumber(cutEndValue)();
-            return validation(function(errs) {
-              return throwMinsiError(new InvalidInputs(toMap(errs)));
-            })(function(v1) {
-              return setValue2(show1(end))(cutEnd);
-            })(cutVideoValidation(cutEndId)(start2)(end))();
-          });
-        };
-      };
-    };
-  };
-  var setCutRangeHandlers = function(v) {
-    return genericErrorsHandler(function __do5() {
-      var cutStartEvL = eventListener(rangeToNumberListenerStart(v.value0.cutStart)(v.value0.cutEnd)(v.value0.cutStartValue)(v.value0.cutEndValue))();
-      var cutEndEvL = eventListener(rangeToNumberListenerEnd(v.value0.cutStart)(v.value0.cutEnd)(v.value0.cutStartValue)(v.value0.cutEndValue))();
-      var cutStartValueEvL = eventListener(numberToRangeListenerStart(v.value0.cutStart)(v.value0.cutStartValue)(v.value0.cutEndValue))();
-      var cutEndValueEvL = eventListener(numberToRangeListenerEnd(v.value0.cutEnd)(v.value0.cutStartValue)(v.value0.cutEndValue))();
-      addEventListener(input)(cutStartEvL)(false)(toEventTarget2(toElement3(v.value0.cutStart)))();
-      addEventListener(change)(cutStartEvL)(false)(toEventTarget2(toElement3(v.value0.cutStart)))();
-      addEventListener(input)(cutEndEvL)(false)(toEventTarget2(toElement3(v.value0.cutEnd)))();
-      addEventListener(change)(cutEndEvL)(false)(toEventTarget2(toElement3(v.value0.cutEnd)))();
-      addEventListener(input)(cutStartValueEvL)(false)(toEventTarget2(toElement3(v.value0.cutStartValue)))();
-      addEventListener(change)(cutStartValueEvL)(false)(toEventTarget2(toElement3(v.value0.cutStartValue)))();
-      addEventListener(input)(cutEndValueEvL)(false)(toEventTarget2(toElement3(v.value0.cutEndValue)))();
-      addEventListener(change)(cutEndValueEvL)(false)(toEventTarget2(toElement3(v.value0.cutEndValue)))();
-      return unit;
-    });
-  };
-
-  // output/Handers.YoutubeVideo.CutButtonsHandlers/index.js
-  var discard2 = /* @__PURE__ */ discard(discardUnit);
-  var show5 = /* @__PURE__ */ show(showInt);
-  var discard22 = /* @__PURE__ */ discard2(bindAff);
-  var whileM_2 = /* @__PURE__ */ whileM_(monadAff);
-  var liftEffect3 = /* @__PURE__ */ liftEffect(monadEffectAff);
-  var map11 = /* @__PURE__ */ map(functorEffect);
-  var not2 = /* @__PURE__ */ not(heytingAlgebraBoolean);
-  var bind13 = /* @__PURE__ */ bind(bindAff);
-  var setCutInputButtonEvL = function(cutInput) {
-    return function(cutValueInput) {
-      return function(v) {
-        return genericErrorsHandler(function __do5() {
-          var currentTimeSeconds = getPlayerCurrentTime();
-          var currentTimeMs = currentTimeSeconds * 1e3;
-          setValue2(show5(floor2(currentTimeMs)))(cutInput)();
-          return updateCutValue(currentTimeMs)(cutValueInput)();
-        });
-      };
-    };
-  };
-  var initializeCutInputs = function(cutStart) {
-    return function(cutEnd) {
-      return function(cutStartValue) {
-        return function(cutEndValue) {
-          return function(startTime) {
-            return launchAff_(discard22(whileM_2(liftEffect3(map11(not2)(isPlayerReady)))(delay(500)))(function() {
-              return bind13(liftEffect3(getVideoDuration))(function(durationSeconds) {
-                var durationMs = durationSeconds * 1e3;
-                var startTimeMs = toNumber(startTime) * 1e3;
-                return discard22(liftEffect3(setMax(show5(floor2(durationMs)))(cutStart)))(function() {
-                  return discard22(liftEffect3(setValue2(show5(floor2(startTimeMs)))(cutStart)))(function() {
-                    return discard22(liftEffect3(setMax(show5(floor2(durationMs)))(cutEnd)))(function() {
-                      return discard22(liftEffect3(updateCutValue(startTimeMs)(cutStartValue)))(function() {
-                        return liftEffect3(updateCutValue(startTimeMs)(cutEndValue));
-                      });
-                    });
-                  });
-                });
-              });
-            }));
-          };
-        };
-      };
-    };
+    throw new Error("Failed pattern match at Handlers.ErrorHandlers (line 45, column 1 - line 45, column 70): " + [v.constructor.name]);
   };
 
   // output/Data.Array/foreign.js
@@ -5379,8 +4967,8 @@
   var push = /* @__PURE__ */ runSTFn2(pushImpl);
 
   // output/Data.Array.ST.Iterator/index.js
-  var map12 = /* @__PURE__ */ map(functorST);
-  var not3 = /* @__PURE__ */ not(heytingAlgebraBoolean);
+  var map11 = /* @__PURE__ */ map(functorST);
+  var not2 = /* @__PURE__ */ not(heytingAlgebraBoolean);
   var $$void4 = /* @__PURE__ */ $$void(functorST);
   var Iterator = /* @__PURE__ */ function() {
     function Iterator2(value0, value1) {
@@ -5405,13 +4993,13 @@
     };
   };
   var iterator = function(f) {
-    return map12(Iterator.create(f))(newSTRef(0));
+    return map11(Iterator.create(f))(newSTRef(0));
   };
   var iterate = function(iter) {
     return function(f) {
       return function __do5() {
         var $$break = newSTRef(false)();
-        while (map12(not3)(read2($$break))()) {
+        while (map11(not2)(read2($$break))()) {
           (function __do6() {
             var mx = next(iter)();
             if (mx instanceof Just) {
@@ -5607,974 +5195,33 @@
   };
   var catMaybes = /* @__PURE__ */ mapMaybe(/* @__PURE__ */ identity(categoryFn));
 
-  // output/Data.String.CodeUnits/foreign.js
-  var fromCharArray = function(a) {
-    return a.join("");
-  };
-  var toCharArray = function(s) {
-    return s.split("");
-  };
-  var singleton5 = function(c) {
-    return c;
-  };
-
-  // output/Data.String.Unsafe/foreign.js
-  var char = function(s) {
-    if (s.length === 1) return s.charAt(0);
-    throw new Error("Data.String.Unsafe.char: Expected string of length 1.");
-  };
-
-  // output/Conversion.Time/index.js
-  var show6 = /* @__PURE__ */ show(showNumber);
-  var identity8 = /* @__PURE__ */ identity(categoryFn);
-  var append3 = /* @__PURE__ */ append(semigroupArray);
-  var formatToThreeDecimals = function(v) {
-    var v1 = span2(function(x) {
-      return x !== ".";
-    })(toCharArray(show6(v)));
-    var num = fromCharArray(v1.init);
-    var decChars = maybe([])(identity8)(tail(v1.rest));
-    var dec3 = take(3)(append3(decChars)(replicate(3)("0")));
-    var dec = fromCharArray(dec3);
-    return num + ("." + dec);
-  };
-
-  // output/Handers.YoutubeVideo.PlaybackPositionHandler/index.js
-  var when2 = /* @__PURE__ */ when(applicativeEffect);
-  var updatePlaybackPosition = function(playbackPosition) {
-    return function __do5() {
-      var playerReady = isPlayerReady();
-      var currentTime2 = getPlayerCurrentTime();
-      return when2(playerReady)(setTextContent(formatToThreeDecimals(currentTime2))(toNode2(playbackPosition)))();
-    };
-  };
-
-  // output/Data.Array.NonEmpty/index.js
-  var toArray = function(v) {
-    return v;
-  };
-  var adaptAny = function(f) {
-    return function($128) {
-      return f(toArray($128));
-    };
-  };
-  var index3 = /* @__PURE__ */ adaptAny(index2);
-
-  // output/Data.String.Regex/foreign.js
-  var regexImpl = function(left) {
-    return function(right) {
-      return function(s1) {
-        return function(s2) {
-          try {
-            return right(new RegExp(s1, s2));
-          } catch (e) {
-            return left(e.message);
-          }
-        };
-      };
-    };
-  };
-  var test = function(r) {
-    return function(s) {
-      var lastIndex = r.lastIndex;
-      var result = r.test(s);
-      r.lastIndex = lastIndex;
-      return result;
-    };
-  };
-  var _match = function(just) {
-    return function(nothing) {
-      return function(r) {
-        return function(s) {
-          var m = s.match(r);
-          if (m == null || m.length === 0) {
-            return nothing;
-          } else {
-            for (var i = 0; i < m.length; i++) {
-              m[i] = m[i] == null ? nothing : just(m[i]);
-            }
-            return just(m);
-          }
-        };
-      };
-    };
-  };
-
-  // output/Data.String.Regex.Flags/index.js
-  var noFlags = {
-    global: false,
-    ignoreCase: false,
-    multiline: false,
-    dotAll: false,
-    sticky: false,
-    unicode: false
-  };
-
-  // output/Data.String.Regex/index.js
-  var renderFlags = function(v) {
-    return function() {
-      if (v.global) {
-        return "g";
-      }
-      ;
-      return "";
-    }() + (function() {
-      if (v.ignoreCase) {
-        return "i";
-      }
-      ;
-      return "";
-    }() + (function() {
-      if (v.multiline) {
-        return "m";
-      }
-      ;
-      return "";
-    }() + (function() {
-      if (v.dotAll) {
-        return "s";
-      }
-      ;
-      return "";
-    }() + (function() {
-      if (v.sticky) {
-        return "y";
-      }
-      ;
-      return "";
-    }() + function() {
-      if (v.unicode) {
-        return "u";
-      }
-      ;
-      return "";
-    }()))));
-  };
-  var regex = function(s) {
-    return function(f) {
-      return regexImpl(Left.create)(Right.create)(s)(renderFlags(f));
-    };
-  };
-  var match = /* @__PURE__ */ function() {
-    return _match(Just.create)(Nothing.value);
-  }();
-
-  // output/Data.URL/foreign.js
-  var fromStringImpl2 = (s) => {
-    try {
-      return new URL(s);
-    } catch {
-      return null;
-    }
-  };
-  var hrefImpl = (u) => u.href;
-  var pathnameImpl = (u) => u.pathname;
-  var queryKeysImpl = (u) => Array.from(u.searchParams.keys());
-  var queryLookupImpl = (k) => (u) => u.searchParams.getAll(k);
-
-  // output/Data.Compactable/index.js
-  var $$void5 = /* @__PURE__ */ $$void(functorST);
-  var pure1 = /* @__PURE__ */ pure(applicativeST);
-  var apply4 = /* @__PURE__ */ apply(applyST);
-  var map13 = /* @__PURE__ */ map(functorST);
-  var compactableMaybe = {
-    compact: /* @__PURE__ */ join(bindMaybe),
-    separate: function(v) {
-      if (v instanceof Nothing) {
-        return {
-          left: Nothing.value,
-          right: Nothing.value
-        };
-      }
-      ;
-      if (v instanceof Just) {
-        if (v.value0 instanceof Left) {
-          return {
-            left: new Just(v.value0.value0),
-            right: Nothing.value
-          };
-        }
-        ;
-        if (v.value0 instanceof Right) {
-          return {
-            left: Nothing.value,
-            right: new Just(v.value0.value0)
-          };
-        }
-        ;
-        throw new Error("Failed pattern match at Data.Compactable (line 91, column 23 - line 93, column 48): " + [v.value0.constructor.name]);
-      }
-      ;
-      throw new Error("Failed pattern match at Data.Compactable (line 87, column 1 - line 93, column 48): " + [v.constructor.name]);
-    }
-  };
-  var compactableArray = {
-    compact: function(xs) {
-      return function __do5() {
-        var result = newSTArray();
-        var iter = iterator(function(v) {
-          return index2(xs)(v);
-        })();
-        iterate(iter)(function($108) {
-          return $$void5(function(v) {
-            if (v instanceof Nothing) {
-              return pure1(0);
-            }
-            ;
-            if (v instanceof Just) {
-              return push(v.value0)(result);
-            }
-            ;
-            throw new Error("Failed pattern match at Data.Compactable (line 111, column 34 - line 113, column 35): " + [v.constructor.name]);
-          }($108));
-        })();
-        return unsafeFreeze(result)();
-      }();
-    },
-    separate: function(xs) {
-      return function __do5() {
-        var ls = newSTArray();
-        var rs = newSTArray();
-        var iter = iterator(function(v) {
-          return index2(xs)(v);
-        })();
-        iterate(iter)(function($109) {
-          return $$void5(function(v) {
-            if (v instanceof Left) {
-              return push(v.value0)(ls);
-            }
-            ;
-            if (v instanceof Right) {
-              return push(v.value0)(rs);
-            }
-            ;
-            throw new Error("Failed pattern match at Data.Compactable (line 122, column 34 - line 124, column 31): " + [v.constructor.name]);
-          }($109));
-        })();
-        return apply4(map13(function(v) {
-          return function(v1) {
-            return {
-              left: v,
-              right: v1
-            };
-          };
-        })(unsafeFreeze(ls)))(unsafeFreeze(rs))();
-      }();
-    }
-  };
-
-  // output/Data.Filterable/index.js
-  var append4 = /* @__PURE__ */ append(semigroupArray);
-  var foldl2 = /* @__PURE__ */ foldl(foldableArray);
-  var partitionMap = function(dict) {
-    return dict.partitionMap;
-  };
-  var maybeBool = function(p) {
-    return function(x) {
-      var $66 = p(x);
-      if ($66) {
-        return new Just(x);
-      }
-      ;
-      return Nothing.value;
-    };
-  };
-  var filterableArray = {
-    partitionMap: function(p) {
-      var go2 = function(acc) {
-        return function(x) {
-          var v = p(x);
-          if (v instanceof Left) {
-            return {
-              right: acc.right,
-              left: append4(acc.left)([v.value0])
-            };
-          }
-          ;
-          if (v instanceof Right) {
-            return {
-              left: acc.left,
-              right: append4(acc.right)([v.value0])
-            };
-          }
-          ;
-          throw new Error("Failed pattern match at Data.Filterable (line 149, column 16 - line 151, column 50): " + [v.constructor.name]);
-        };
-      };
-      return foldl2(go2)({
-        left: [],
-        right: []
-      });
-    },
-    partition,
-    filterMap: mapMaybe,
-    filter,
-    Compactable0: function() {
-      return compactableArray;
-    },
-    Functor1: function() {
-      return functorArray;
-    }
-  };
-  var filterMap = function(dict) {
-    return dict.filterMap;
-  };
-  var filterDefault = function(dictFilterable) {
-    var $121 = filterMap(dictFilterable);
-    return function($122) {
-      return $121(maybeBool($122));
-    };
-  };
-  var filter3 = function(dict) {
-    return dict.filter;
-  };
-  var eitherBool = function(p) {
-    return function(x) {
-      var $84 = p(x);
-      if ($84) {
-        return new Right(x);
-      }
-      ;
-      return new Left(x);
-    };
-  };
-  var partitionDefault = function(dictFilterable) {
-    var partitionMap1 = partitionMap(dictFilterable);
-    return function(p) {
-      return function(xs) {
-        var o = partitionMap1(eitherBool(p))(xs);
-        return {
-          no: o.left,
-          yes: o.right
-        };
-      };
-    };
-  };
-  var filterableMaybe = {
-    partitionMap: function(v) {
-      return function(v1) {
-        if (v1 instanceof Nothing) {
-          return {
-            left: Nothing.value,
-            right: Nothing.value
-          };
-        }
-        ;
-        if (v1 instanceof Just) {
-          var v2 = v(v1.value0);
-          if (v2 instanceof Left) {
-            return {
-              left: new Just(v2.value0),
-              right: Nothing.value
-            };
-          }
-          ;
-          if (v2 instanceof Right) {
-            return {
-              left: Nothing.value,
-              right: new Just(v2.value0)
-            };
-          }
-          ;
-          throw new Error("Failed pattern match at Data.Filterable (line 161, column 29 - line 163, column 48): " + [v2.constructor.name]);
-        }
-        ;
-        throw new Error("Failed pattern match at Data.Filterable (line 159, column 1 - line 169, column 29): " + [v.constructor.name, v1.constructor.name]);
-      };
-    },
-    partition: function(p) {
-      return partitionDefault(filterableMaybe)(p);
-    },
-    filterMap: /* @__PURE__ */ bindFlipped(bindMaybe),
-    filter: function(p) {
-      return filterDefault(filterableMaybe)(p);
-    },
-    Compactable0: function() {
-      return compactableMaybe;
-    },
-    Functor1: function() {
-      return functorMaybe;
-    }
-  };
-
-  // output/Data.String.Utils/foreign.js
-  function startsWithImpl(searchString, s) {
-    return s.startsWith(searchString);
-  }
-
-  // output/Data.String.CodePoints/foreign.js
-  var hasArrayFrom = typeof Array.from === "function";
-  var hasStringIterator = typeof Symbol !== "undefined" && Symbol != null && typeof Symbol.iterator !== "undefined" && typeof String.prototype[Symbol.iterator] === "function";
-  var hasFromCodePoint = typeof String.prototype.fromCodePoint === "function";
-  var hasCodePointAt = typeof String.prototype.codePointAt === "function";
-
-  // output/Data.String.Utils/index.js
-  var startsWith = function(searchString) {
-    return function(s) {
-      return startsWithImpl(searchString, s);
-    };
-  };
-
-  // output/Foreign/foreign.js
-  function typeOf(value12) {
-    return typeof value12;
-  }
-  function tagOf(value12) {
-    return Object.prototype.toString.call(value12).slice(8, -1);
-  }
-  var isArray = Array.isArray || function(value12) {
-    return Object.prototype.toString.call(value12) === "[object Array]";
-  };
-
-  // output/Data.List.NonEmpty/index.js
-  var singleton6 = /* @__PURE__ */ function() {
-    var $200 = singleton2(plusList);
-    return function($201) {
-      return NonEmptyList($200($201));
-    };
-  }();
-
-  // output/Foreign/index.js
-  var show7 = /* @__PURE__ */ show(showString);
-  var show12 = /* @__PURE__ */ show(showInt);
-  var ForeignError = /* @__PURE__ */ function() {
-    function ForeignError2(value0) {
-      this.value0 = value0;
-    }
-    ;
-    ForeignError2.create = function(value0) {
-      return new ForeignError2(value0);
-    };
-    return ForeignError2;
-  }();
-  var TypeMismatch = /* @__PURE__ */ function() {
-    function TypeMismatch2(value0, value1) {
-      this.value0 = value0;
-      this.value1 = value1;
-    }
-    ;
-    TypeMismatch2.create = function(value0) {
-      return function(value1) {
-        return new TypeMismatch2(value0, value1);
-      };
-    };
-    return TypeMismatch2;
-  }();
-  var ErrorAtIndex = /* @__PURE__ */ function() {
-    function ErrorAtIndex2(value0, value1) {
-      this.value0 = value0;
-      this.value1 = value1;
-    }
-    ;
-    ErrorAtIndex2.create = function(value0) {
-      return function(value1) {
-        return new ErrorAtIndex2(value0, value1);
-      };
-    };
-    return ErrorAtIndex2;
-  }();
-  var ErrorAtProperty = /* @__PURE__ */ function() {
-    function ErrorAtProperty2(value0, value1) {
-      this.value0 = value0;
-      this.value1 = value1;
-    }
-    ;
-    ErrorAtProperty2.create = function(value0) {
-      return function(value1) {
-        return new ErrorAtProperty2(value0, value1);
-      };
-    };
-    return ErrorAtProperty2;
-  }();
-  var unsafeToForeign = unsafeCoerce2;
-  var unsafeFromForeign = unsafeCoerce2;
-  var showForeignError = {
-    show: function(v) {
-      if (v instanceof ForeignError) {
-        return "(ForeignError " + (show7(v.value0) + ")");
-      }
-      ;
-      if (v instanceof ErrorAtIndex) {
-        return "(ErrorAtIndex " + (show12(v.value0) + (" " + (show(showForeignError)(v.value1) + ")")));
-      }
-      ;
-      if (v instanceof ErrorAtProperty) {
-        return "(ErrorAtProperty " + (show7(v.value0) + (" " + (show(showForeignError)(v.value1) + ")")));
-      }
-      ;
-      if (v instanceof TypeMismatch) {
-        return "(TypeMismatch " + (show7(v.value0) + (" " + (show7(v.value1) + ")")));
-      }
-      ;
-      throw new Error("Failed pattern match at Foreign (line 69, column 1 - line 73, column 89): " + [v.constructor.name]);
-    }
-  };
-  var fail = function(dictMonad) {
-    var $153 = throwError(monadThrowExceptT(dictMonad));
-    return function($154) {
-      return $153(singleton6($154));
-    };
-  };
-  var readArray = function(dictMonad) {
-    var pure110 = pure(applicativeExceptT(dictMonad));
-    var fail1 = fail(dictMonad);
-    return function(value12) {
-      if (isArray(value12)) {
-        return pure110(unsafeFromForeign(value12));
-      }
-      ;
-      if (otherwise) {
-        return fail1(new TypeMismatch("array", tagOf(value12)));
-      }
-      ;
-      throw new Error("Failed pattern match at Foreign (line 164, column 1 - line 164, column 99): " + [value12.constructor.name]);
-    };
-  };
-  var unsafeReadTagged = function(dictMonad) {
-    var pure110 = pure(applicativeExceptT(dictMonad));
-    var fail1 = fail(dictMonad);
-    return function(tag) {
-      return function(value12) {
-        if (tagOf(value12) === tag) {
-          return pure110(unsafeFromForeign(value12));
-        }
-        ;
-        if (otherwise) {
-          return fail1(new TypeMismatch(tag, tagOf(value12)));
-        }
-        ;
-        throw new Error("Failed pattern match at Foreign (line 123, column 1 - line 123, column 104): " + [tag.constructor.name, value12.constructor.name]);
-      };
-    };
-  };
-  var readString = function(dictMonad) {
-    return unsafeReadTagged(dictMonad)("String");
-  };
-
-  // output/Control.Monad.Except/index.js
-  var unwrap2 = /* @__PURE__ */ unwrap();
-  var withExcept = /* @__PURE__ */ withExceptT(functorIdentity);
-  var runExcept = function($3) {
-    return unwrap2(runExceptT($3));
-  };
-
-  // output/Foreign.Index/foreign.js
-  function unsafeReadPropImpl(f, s, key2, value12) {
-    return value12 == null ? f : s(value12[key2]);
-  }
-
-  // output/Foreign.Index/index.js
-  var unsafeReadProp = function(dictMonad) {
-    var fail3 = fail(dictMonad);
-    var pure24 = pure(applicativeExceptT(dictMonad));
-    return function(k) {
-      return function(value12) {
-        return unsafeReadPropImpl(fail3(new TypeMismatch("object", typeOf(value12))), pure24, k, value12);
-      };
-    };
-  };
-  var readProp = function(dictMonad) {
-    return unsafeReadProp(dictMonad);
-  };
-
-  // output/Foreign.Object/foreign.js
-  function toArrayWithKey(f) {
-    return function(m) {
-      var r = [];
-      for (var k in m) {
-        if (hasOwnProperty.call(m, k)) {
-          r.push(f(k)(m[k]));
-        }
-      }
-      return r;
-    };
-  }
-  var keys = Object.keys || toArrayWithKey(function(k) {
-    return function() {
-      return k;
-    };
-  });
-
-  // output/Record/index.js
-  var insert3 = function(dictIsSymbol) {
-    var reflectSymbol2 = reflectSymbol(dictIsSymbol);
-    return function() {
-      return function() {
-        return function(l) {
-          return function(a) {
-            return function(r) {
-              return unsafeSet(reflectSymbol2(l))(a)(r);
-            };
-          };
-        };
-      };
-    };
-  };
-  var get = function(dictIsSymbol) {
-    var reflectSymbol2 = reflectSymbol(dictIsSymbol);
-    return function() {
-      return function(l) {
-        return function(r) {
-          return unsafeGet(reflectSymbol2(l))(r);
-        };
-      };
-    };
-  };
-  var $$delete2 = function(dictIsSymbol) {
-    var reflectSymbol2 = reflectSymbol(dictIsSymbol);
-    return function() {
-      return function() {
-        return function(l) {
-          return function(r) {
-            return unsafeDelete(reflectSymbol2(l))(r);
-          };
-        };
-      };
-    };
-  };
-
-  // output/Record.Builder/foreign.js
-  function copyRecord(rec) {
-    var copy = {};
-    for (var key2 in rec) {
-      if ({}.hasOwnProperty.call(rec, key2)) {
-        copy[key2] = rec[key2];
-      }
-    }
-    return copy;
-  }
-  function unsafeInsert(l) {
-    return function(a) {
-      return function(rec) {
-        rec[l] = a;
-        return rec;
-      };
-    };
-  }
-
-  // output/Record.Builder/index.js
-  var semigroupoidBuilder = semigroupoidFn;
-  var insert4 = function() {
-    return function() {
-      return function(dictIsSymbol) {
-        var reflectSymbol2 = reflectSymbol(dictIsSymbol);
-        return function(l) {
-          return function(a) {
-            return function(r1) {
-              return unsafeInsert(reflectSymbol2(l))(a)(r1);
-            };
-          };
-        };
-      };
-    };
-  };
-  var categoryBuilder = categoryFn;
-  var build = function(v) {
-    return function(r1) {
-      return v(copyRecord(r1));
-    };
-  };
-
-  // output/Data.URL/index.js
-  var filter4 = /* @__PURE__ */ filter3(filterableMaybe);
-  var fromFoldable4 = /* @__PURE__ */ fromFoldable(ordString)(foldableArray);
-  var map14 = /* @__PURE__ */ map(functorArray);
-  var wrap3 = /* @__PURE__ */ wrap();
-  var filter1 = /* @__PURE__ */ filter3(filterableArray);
-  var PathEmpty = /* @__PURE__ */ function() {
-    function PathEmpty2() {
-    }
-    ;
-    PathEmpty2.value = new PathEmpty2();
-    return PathEmpty2;
-  }();
-  var PathAbsolute = /* @__PURE__ */ function() {
-    function PathAbsolute2(value0) {
-      this.value0 = value0;
-    }
-    ;
-    PathAbsolute2.create = function(value0) {
-      return new PathAbsolute2(value0);
-    };
-    return PathAbsolute2;
-  }();
-  var PathRelative = /* @__PURE__ */ function() {
-    function PathRelative2(value0) {
-      this.value0 = value0;
-    }
-    ;
-    PathRelative2.create = function(value0) {
-      return new PathRelative2(value0);
-    };
-    return PathRelative2;
-  }();
-  var toString = hrefImpl;
-  var query = function(u) {
-    var vals = function(k) {
-      return queryLookupImpl(k)(u);
-    };
-    var ks = queryKeysImpl(u);
-    return fromFoldable4(map14(function(k) {
-      return new Tuple(k, vals(k));
-    })(ks));
-  };
-  var pathFromString = function(s) {
-    var segments = function() {
-      var $235 = filter1(function($238) {
-        return !$$null2($238);
-      });
-      var $236 = split(wrap3("/"));
-      return function($237) {
-        return $235($236($237));
-      };
-    }();
-    return maybe(PathEmpty.value)(function() {
-      var $203 = startsWith("/")(s);
-      if ($203) {
-        return PathAbsolute.create;
-      }
-      ;
-      return PathRelative.create;
-    }())(filter4(function($239) {
-      return !$$null3($239);
-    })(new Just(segments(s))));
-  };
-  var path = function($240) {
-    return pathFromString(pathnameImpl($240));
-  };
-  var fromString2 = function($255) {
-    return toMaybe(fromStringImpl2($255));
-  };
-
-  // output/Handers.YoutubeVideo.YoutubeUrlExtraction/index.js
-  var join2 = /* @__PURE__ */ join(bindMaybe);
-  var bind2 = /* @__PURE__ */ bind(bindMaybe);
-  var lookup3 = /* @__PURE__ */ lookup(ordString);
-  var alt5 = /* @__PURE__ */ alt(altMaybe);
-  var pathToArray = function(v) {
-    if (v instanceof PathEmpty) {
-      return [];
-    }
-    ;
-    if (v instanceof PathAbsolute) {
-      return v.value0;
-    }
-    ;
-    if (v instanceof PathRelative) {
-      return v.value0;
-    }
-    ;
-    throw new Error("Failed pattern match at Handers.YoutubeVideo.YoutubeUrlExtraction (line 23, column 1 - line 23, column 36): " + [v.constructor.name]);
-  };
-  var parseUnit = function(str) {
-    return function(unit2) {
-      var v = regex("(\\d+)" + unit2)(noFlags);
-      if (v instanceof Left) {
-        return 0;
-      }
-      ;
-      if (v instanceof Right) {
-        var v1 = join2(bind2(match(v.value0)(str))(flip(index3)(1)));
-        if (v1 instanceof Just) {
-          return fromMaybe(0)(fromString(v1.value0));
-        }
-        ;
-        if (v1 instanceof Nothing) {
-          return 0;
-        }
-        ;
-        throw new Error("Failed pattern match at Handers.YoutubeVideo.YoutubeUrlExtraction (line 39, column 7 - line 41, column 21): " + [v1.constructor.name]);
-      }
-      ;
-      throw new Error("Failed pattern match at Handers.YoutubeVideo.YoutubeUrlExtraction (line 36, column 3 - line 41, column 21): " + [v.constructor.name]);
-    };
-  };
-  var parseYouTubeT = function(raw) {
-    var str = toLower(raw);
-    var v = fromString(str);
-    if (v instanceof Just) {
-      return new Just(v.value0);
-    }
-    ;
-    if (v instanceof Nothing) {
-      var s = parseUnit(str)("s");
-      var m = parseUnit(str)("m");
-      var h = parseUnit(str)("h");
-      var total = ((h * 3600 | 0) + (m * 60 | 0) | 0) + s | 0;
-      var $24 = total > 0;
-      if ($24) {
-        return new Just(total);
-      }
-      ;
-      return Nothing.value;
-    }
-    ;
-    throw new Error("Failed pattern match at Handers.YoutubeVideo.YoutubeUrlExtraction (line 49, column 5 - line 58, column 52): " + [v.constructor.name]);
-  };
-  var extractYoutubeVideoStartTime = function(url3) {
-    return fromMaybe(0)(bind2(lookup3("t")(query(url3)))(function(values) {
-      return bind2(head(values))(function(v) {
-        return parseYouTubeT(v);
-      });
-    }));
-  };
-  var extractYoutubeVideoId = function(url3) {
-    var maybeVQueryString = function(v) {
-      return bind2(lookup3("v")(v))(head);
-    }(query(url3));
-    var lastPath = function($25) {
-      return last(pathToArray($25));
-    }(path(url3));
-    return alt5(maybeVQueryString)(lastPath);
-  };
-
-  // output/Validations.RegexValidation/index.js
-  var pure5 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
-  var matches2 = function(v) {
-    return function(v1) {
-      return function(v2) {
-        if (test(v)(v2)) {
-          return pure5(v2);
-        }
-        ;
-        return invalid(fromSingleton(v1)("Invalid Input for regex: " + v2));
-      };
-    };
-  };
-
-  // output/Validations.YoutubeValidation/index.js
-  var lmap2 = /* @__PURE__ */ lmap(bifunctorEither);
-  var lmap1 = /* @__PURE__ */ lmap(bifunctorV);
-  var pure6 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
-  var youtubeRegex = "^(?:https?:\\/\\/)?(?:www\\.)?(?:youtube\\.com\\/watch\\?v=([a-zA-Z0-9_-]+)|youtu\\.be\\/([a-zA-Z\\d_-]+))(?:[?&].*)?$";
-  var youtubeRegexValidation = function(id2) {
-    return lmap2(function(x) {
-      return fromSingleton(id2)(x);
-    })(regex(youtubeRegex)(noFlags));
-  };
-  var youtubeUrlValidation = function(id2) {
-    return function(v) {
-      return lmap1(function(v1) {
-        return fromSingleton(id2)("Invalid Youtube URL");
-      })(andThen(andThen(youtubeRegexValidation(id2))(function(ytRegex) {
-        return matches2(ytRegex)(id2)(v);
-      }))(function(urlString) {
-        return maybe(invalid(fromSingleton(id2)("Error validating youtube Url")))(pure6)(fromString2(urlString));
-      }));
-    };
-  };
-
-  // output/Web.Event.Event/foreign.js
-  function _target(e) {
-    return e.target;
-  }
-  function preventDefault(e) {
-    return function() {
-      return e.preventDefault();
-    };
-  }
-
-  // output/Web.Event.Event/index.js
-  var target5 = function($3) {
-    return toMaybe(_target($3));
-  };
-
-  // output/Handers.YoutubeVideo.YoutubeVideoHandler/index.js
-  var traverse3 = /* @__PURE__ */ traverse(traversableMaybe)(applicativeEffect);
-  var bind3 = /* @__PURE__ */ bind(bindMaybe);
-  var foldl3 = /* @__PURE__ */ foldl(foldableV);
-  var pure7 = /* @__PURE__ */ pure(applicativeEffect);
-  var show8 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(showString));
-  var show13 = /* @__PURE__ */ show(showString);
-  var VET = /* @__PURE__ */ function() {
-    function VET2(value0) {
-      this.value0 = value0;
-    }
-    ;
-    VET2.create = function(value0) {
-      return new VET2(value0);
-    };
-    return VET2;
-  }();
-  var getInputValue = function(ev) {
-    return traverse3(value2)(bind3(bind3(target5(ev))(fromEventTarget2))(fromElement4));
-  };
-  var youtubeUrlEventListener = function(cutStart) {
-    return function(cutEnd) {
-      return function(cutStartValue) {
-        return function(cutEndValue) {
-          return function(ev) {
-            return genericErrorsHandler(function __do5() {
-              var rawValue = getInputValue(ev)();
-              var youtubeUrlV = maybe(invalid(fromSingleton(youtubeUrlId)("Empty YoutubeUrl Input")))(function(v) {
-                return youtubeUrlValidation(youtubeUrlId)(v);
-              })(rawValue);
-              var youtubeUrl = foldl3(function(v) {
-                return function(v1) {
-                  return pure7(v1);
-                };
-              })(throwMinsiError(new InvalidInput(youtubeUrlId, show8(rawValue))))(youtubeUrlV)();
-              var videoId = maybe(throwMinsiError(new InvalidInput(youtubeUrlId, show8(rawValue))))(pure7)(extractYoutubeVideoId(youtubeUrl))();
-              var startTime = extractYoutubeVideoStartTime(youtubeUrl);
-              log("Youtube Url Handler fired with value: " + show13(videoId))();
-              embedVideo({
-                resultPreviewId,
-                videoId,
-                width: 1e3,
-                height: 500,
-                startTime
-              })();
-              return initializeCutInputs(cutStart)(cutEnd)(cutStartValue)(cutEndValue)(startTime)();
-            });
-          };
-        };
-      };
-    };
-  };
-  var setVideoHandlers = function(v) {
-    var ytUrlEventTarget = toEventTarget2(toElement3(v.value0.youtubeUrl));
-    var setCutStartButtonTarget = toEventTarget2(toElement(v.value0.setCutStartButton));
-    var setCutEndButtonTarget = toEventTarget2(toElement(v.value0.setCutEndButton));
-    return genericErrorsHandler(function __do5() {
-      var ytEvL = eventListener(youtubeUrlEventListener(v.value0.cutStart)(v.value0.cutEnd)(v.value0.cutStartValue)(v.value0.cutEndValue))();
-      addEventListener(input)(ytEvL)(false)(ytUrlEventTarget)();
-      addEventListener(change)(ytEvL)(false)(ytUrlEventTarget)();
-      setInterval2(1e3)(updatePlaybackPosition(v.value0.playbackPositionYoutube))();
-      var setCutStartButtonEvLV = eventListener(setCutInputButtonEvL(v.value0.cutStart)(v.value0.cutStartValue))();
-      var setCutEndButtonEvLV = eventListener(setCutInputButtonEvL(v.value0.cutEnd)(v.value0.cutEndValue))();
-      addEventListener(click2)(setCutStartButtonEvLV)(false)(setCutStartButtonTarget)();
-      addEventListener(click2)(setCutEndButtonEvLV)(false)(setCutEndButtonTarget)();
-      return unit;
-    });
-  };
-
   // output/Web.DOM.HTMLCollection/foreign.js
-  function toArray2(list) {
+  function toArray(list) {
     return function() {
       return [].slice.call(list);
     };
   }
 
   // output/Components.HTMLTableElement/index.js
-  var pure8 = /* @__PURE__ */ pure(applicativeEffect);
-  var bind14 = /* @__PURE__ */ bind(bindMaybe);
-  var map15 = /* @__PURE__ */ map(functorArray);
+  var pure4 = /* @__PURE__ */ pure(applicativeEffect);
+  var bind13 = /* @__PURE__ */ bind(bindMaybe);
+  var map12 = /* @__PURE__ */ map(functorArray);
   var getTBody = function(table) {
     return function __do5() {
       var tBodies2 = tBodies(table)();
-      var tBodyArray = toArray2(tBodies2)();
-      return maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableBody")))(pure8)(bind14(head(tBodyArray))(fromElement13))();
+      var tBodyArray = toArray(tBodies2)();
+      return maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableBody")))(pure4)(bind13(head(tBodyArray))(fromElement13))();
     };
   };
   var getStartInput = function(row) {
     return function __do5() {
       var cells2 = cells(row)();
-      var cellArray = toArray2(cells2)();
-      var startCell = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableStartCell")))(pure8)(bind14(head(cellArray))(fromElement11))();
+      var cellArray = toArray(cells2)();
+      var startCell = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableStartCell")))(pure4)(bind13(head(cellArray))(fromElement11))();
       var element = toElement6(startCell);
       var parentNode2 = toParentNode(element);
       var elementMaybe = querySelector("input")(parentNode2)();
-      var input2 = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableStartInput")))(pure8)(bind14(elementMaybe)(fromElement4))();
+      var input2 = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableStartInput")))(pure4)(bind13(elementMaybe)(fromElement4))();
       return input2;
     };
   };
@@ -6582,25 +5229,25 @@
     return function __do5() {
       var tbody = getTBody(table)();
       var rows4 = rows2(tbody)();
-      var rowArray = toArray2(rows4)();
-      return catMaybes(map15(fromElement12)(rowArray));
+      var rowArray = toArray(rows4)();
+      return catMaybes(map12(fromElement12)(rowArray));
     };
   };
   var getFirstRow = function(table) {
     return function __do5() {
       var rows4 = getRows(table)();
-      return maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableFirstRow")))(pure8)(head(rows4))();
+      return maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableFirstRow")))(pure4)(head(rows4))();
     };
   };
   var getEndInput = function(row) {
     return function __do5() {
       var cells2 = cells(row)();
-      var cellArray = toArray2(cells2)();
-      var endCell = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableEndCell")))(pure8)(bind14(head(drop(1)(cellArray)))(fromElement11))();
+      var cellArray = toArray(cells2)();
+      var endCell = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableEndCell")))(pure4)(bind13(head(drop(1)(cellArray)))(fromElement11))();
       var element = toElement6(endCell);
       var parentNode2 = toParentNode(element);
       var elementMaybe = querySelector("input")(parentNode2)();
-      var input2 = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableEndInput")))(pure8)(bind14(elementMaybe)(fromElement4))();
+      var input2 = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableEndInput")))(pure4)(bind13(elementMaybe)(fromElement4))();
       return input2;
     };
   };
@@ -6614,9 +5261,169 @@
     return outputPath + (filename + "Gif.mp4");
   };
 
+  // output/Data.Int/foreign.js
+  var fromNumberImpl = function(just) {
+    return function(nothing) {
+      return function(n) {
+        return (n | 0) === n ? just(n) : nothing;
+      };
+    };
+  };
+  var toNumber = function(n) {
+    return n;
+  };
+  var fromStringAsImpl = function(just) {
+    return function(nothing) {
+      return function(radix) {
+        var digits;
+        if (radix < 11) {
+          digits = "[0-" + (radix - 1).toString() + "]";
+        } else if (radix === 11) {
+          digits = "[0-9a]";
+        } else {
+          digits = "[0-9a-" + String.fromCharCode(86 + radix) + "]";
+        }
+        var pattern2 = new RegExp("^[\\+\\-]?" + digits + "+$", "i");
+        return function(s) {
+          if (pattern2.test(s)) {
+            var i = parseInt(s, radix);
+            return (i | 0) === i ? just(i) : nothing;
+          } else {
+            return nothing;
+          }
+        };
+      };
+    };
+  };
+
+  // output/Data.Number/foreign.js
+  var isFiniteImpl = isFinite;
+  var floor = Math.floor;
+
+  // output/Data.Int/index.js
+  var top2 = /* @__PURE__ */ top(boundedInt);
+  var bottom2 = /* @__PURE__ */ bottom(boundedInt);
+  var fromStringAs = /* @__PURE__ */ function() {
+    return fromStringAsImpl(Just.create)(Nothing.value);
+  }();
+  var fromString = /* @__PURE__ */ fromStringAs(10);
+  var fromNumber = /* @__PURE__ */ function() {
+    return fromNumberImpl(Just.create)(Nothing.value);
+  }();
+  var unsafeClamp = function(x) {
+    if (!isFiniteImpl(x)) {
+      return 0;
+    }
+    ;
+    if (x >= toNumber(top2)) {
+      return top2;
+    }
+    ;
+    if (x <= toNumber(bottom2)) {
+      return bottom2;
+    }
+    ;
+    if (otherwise) {
+      return fromMaybe(0)(fromNumber(x));
+    }
+    ;
+    throw new Error("Failed pattern match at Data.Int (line 72, column 1 - line 72, column 29): " + [x.constructor.name]);
+  };
+  var floor2 = function($39) {
+    return unsafeClamp(floor($39));
+  };
+
   // output/Data.DateTime.Instant/index.js
   var unInstant = function(v) {
     return v;
+  };
+
+  // output/Data.Validation.Semigroup/index.js
+  var V = function(x) {
+    return x;
+  };
+  var validation = function(v) {
+    return function(v1) {
+      return function(v2) {
+        if (v2 instanceof Left) {
+          return v(v2.value0);
+        }
+        ;
+        if (v2 instanceof Right) {
+          return v1(v2.value0);
+        }
+        ;
+        throw new Error("Failed pattern match at Data.Validation.Semigroup (line 48, column 1 - line 48, column 84): " + [v.constructor.name, v1.constructor.name, v2.constructor.name]);
+      };
+    };
+  };
+  var toEither = function(v) {
+    return v;
+  };
+  var invalid = function($100) {
+    return V(Left.create($100));
+  };
+  var functorV = functorEither;
+  var foldableV = {
+    foldMap: function(dictMonoid) {
+      return validation($$const(mempty(dictMonoid)));
+    },
+    foldr: function(f) {
+      return function(b) {
+        return validation($$const(b))(flip(f)(b));
+      };
+    },
+    foldl: function(f) {
+      return function(b) {
+        return validation($$const(b))(f(b));
+      };
+    }
+  };
+  var bifunctorV = bifunctorEither;
+  var applyV = function(dictSemigroup) {
+    var append12 = append(dictSemigroup);
+    return {
+      apply: function(v) {
+        return function(v1) {
+          if (v instanceof Left && v1 instanceof Left) {
+            return new Left(append12(v.value0)(v1.value0));
+          }
+          ;
+          if (v instanceof Left) {
+            return new Left(v.value0);
+          }
+          ;
+          if (v1 instanceof Left) {
+            return new Left(v1.value0);
+          }
+          ;
+          if (v instanceof Right && v1 instanceof Right) {
+            return new Right(v.value0(v1.value0));
+          }
+          ;
+          throw new Error("Failed pattern match at Data.Validation.Semigroup (line 89, column 1 - line 93, column 54): " + [v.constructor.name, v1.constructor.name]);
+        };
+      },
+      Functor0: function() {
+        return functorV;
+      }
+    };
+  };
+  var applicativeV = function(dictSemigroup) {
+    var applyV1 = applyV(dictSemigroup);
+    return {
+      pure: function($108) {
+        return V(Right.create($108));
+      },
+      Apply0: function() {
+        return applyV1;
+      }
+    };
+  };
+  var andThen = function(v1) {
+    return function(f) {
+      return validation(invalid)(f)(v1);
+    };
   };
 
   // output/Effect.Now/foreign.js
@@ -6807,6 +5614,159 @@
     }
   };
 
+  // output/Foreign/foreign.js
+  function typeOf(value12) {
+    return typeof value12;
+  }
+  function tagOf(value12) {
+    return Object.prototype.toString.call(value12).slice(8, -1);
+  }
+  var isArray = Array.isArray || function(value12) {
+    return Object.prototype.toString.call(value12) === "[object Array]";
+  };
+
+  // output/Data.List.NonEmpty/index.js
+  var singleton5 = /* @__PURE__ */ function() {
+    var $200 = singleton2(plusList);
+    return function($201) {
+      return NonEmptyList($200($201));
+    };
+  }();
+
+  // output/Data.String.CodeUnits/foreign.js
+  var fromCharArray = function(a) {
+    return a.join("");
+  };
+  var toCharArray = function(s) {
+    return s.split("");
+  };
+  var singleton6 = function(c) {
+    return c;
+  };
+
+  // output/Data.String.Unsafe/foreign.js
+  var char = function(s) {
+    if (s.length === 1) return s.charAt(0);
+    throw new Error("Data.String.Unsafe.char: Expected string of length 1.");
+  };
+
+  // output/Foreign/index.js
+  var show3 = /* @__PURE__ */ show(showString);
+  var show1 = /* @__PURE__ */ show(showInt);
+  var ForeignError = /* @__PURE__ */ function() {
+    function ForeignError2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    ForeignError2.create = function(value0) {
+      return new ForeignError2(value0);
+    };
+    return ForeignError2;
+  }();
+  var TypeMismatch = /* @__PURE__ */ function() {
+    function TypeMismatch2(value0, value1) {
+      this.value0 = value0;
+      this.value1 = value1;
+    }
+    ;
+    TypeMismatch2.create = function(value0) {
+      return function(value1) {
+        return new TypeMismatch2(value0, value1);
+      };
+    };
+    return TypeMismatch2;
+  }();
+  var ErrorAtIndex = /* @__PURE__ */ function() {
+    function ErrorAtIndex2(value0, value1) {
+      this.value0 = value0;
+      this.value1 = value1;
+    }
+    ;
+    ErrorAtIndex2.create = function(value0) {
+      return function(value1) {
+        return new ErrorAtIndex2(value0, value1);
+      };
+    };
+    return ErrorAtIndex2;
+  }();
+  var ErrorAtProperty = /* @__PURE__ */ function() {
+    function ErrorAtProperty2(value0, value1) {
+      this.value0 = value0;
+      this.value1 = value1;
+    }
+    ;
+    ErrorAtProperty2.create = function(value0) {
+      return function(value1) {
+        return new ErrorAtProperty2(value0, value1);
+      };
+    };
+    return ErrorAtProperty2;
+  }();
+  var unsafeToForeign = unsafeCoerce2;
+  var unsafeFromForeign = unsafeCoerce2;
+  var showForeignError = {
+    show: function(v) {
+      if (v instanceof ForeignError) {
+        return "(ForeignError " + (show3(v.value0) + ")");
+      }
+      ;
+      if (v instanceof ErrorAtIndex) {
+        return "(ErrorAtIndex " + (show1(v.value0) + (" " + (show(showForeignError)(v.value1) + ")")));
+      }
+      ;
+      if (v instanceof ErrorAtProperty) {
+        return "(ErrorAtProperty " + (show3(v.value0) + (" " + (show(showForeignError)(v.value1) + ")")));
+      }
+      ;
+      if (v instanceof TypeMismatch) {
+        return "(TypeMismatch " + (show3(v.value0) + (" " + (show3(v.value1) + ")")));
+      }
+      ;
+      throw new Error("Failed pattern match at Foreign (line 69, column 1 - line 73, column 89): " + [v.constructor.name]);
+    }
+  };
+  var fail = function(dictMonad) {
+    var $153 = throwError(monadThrowExceptT(dictMonad));
+    return function($154) {
+      return $153(singleton5($154));
+    };
+  };
+  var readArray = function(dictMonad) {
+    var pure110 = pure(applicativeExceptT(dictMonad));
+    var fail1 = fail(dictMonad);
+    return function(value12) {
+      if (isArray(value12)) {
+        return pure110(unsafeFromForeign(value12));
+      }
+      ;
+      if (otherwise) {
+        return fail1(new TypeMismatch("array", tagOf(value12)));
+      }
+      ;
+      throw new Error("Failed pattern match at Foreign (line 164, column 1 - line 164, column 99): " + [value12.constructor.name]);
+    };
+  };
+  var unsafeReadTagged = function(dictMonad) {
+    var pure110 = pure(applicativeExceptT(dictMonad));
+    var fail1 = fail(dictMonad);
+    return function(tag) {
+      return function(value12) {
+        if (tagOf(value12) === tag) {
+          return pure110(unsafeFromForeign(value12));
+        }
+        ;
+        if (otherwise) {
+          return fail1(new TypeMismatch(tag, tagOf(value12)));
+        }
+        ;
+        throw new Error("Failed pattern match at Foreign (line 123, column 1 - line 123, column 104): " + [tag.constructor.name, value12.constructor.name]);
+      };
+    };
+  };
+  var readString = function(dictMonad) {
+    return unsafeReadTagged(dictMonad)("String");
+  };
+
   // output/Yoga.JSON/foreign.js
   function reviver(key2, value12) {
     if (key2 === "big") {
@@ -6814,38 +5774,173 @@
     }
     return value12;
   }
-  var _parseJSON2 = (payload) => JSON.parse(payload, reviver);
+  var _parseJSON = (payload) => JSON.parse(payload, reviver);
   function replacer(key2, value12) {
     if (typeof value12 === "bigint") {
       return value12.toString();
     }
     return value12;
   }
-  var _unsafeStringify2 = (data) => JSON.stringify(data, replacer);
+  var _unsafeStringify = (data) => JSON.stringify(data, replacer);
+
+  // output/Control.Monad.Except/index.js
+  var unwrap2 = /* @__PURE__ */ unwrap();
+  var withExcept = /* @__PURE__ */ withExceptT(functorIdentity);
+  var runExcept = function($3) {
+    return unwrap2(runExceptT($3));
+  };
+
+  // output/Data.Array.NonEmpty/index.js
+  var toArray2 = function(v) {
+    return v;
+  };
+  var adaptAny = function(f) {
+    return function($128) {
+      return f(toArray2($128));
+    };
+  };
+  var index4 = /* @__PURE__ */ adaptAny(index2);
+
+  // output/Foreign.Index/foreign.js
+  function unsafeReadPropImpl(f, s, key2, value12) {
+    return value12 == null ? f : s(value12[key2]);
+  }
+
+  // output/Foreign.Index/index.js
+  var unsafeReadProp = function(dictMonad) {
+    var fail3 = fail(dictMonad);
+    var pure25 = pure(applicativeExceptT(dictMonad));
+    return function(k) {
+      return function(value12) {
+        return unsafeReadPropImpl(fail3(new TypeMismatch("object", typeOf(value12))), pure25, k, value12);
+      };
+    };
+  };
+  var readProp = function(dictMonad) {
+    return unsafeReadProp(dictMonad);
+  };
+
+  // output/Foreign.Object/foreign.js
+  function toArrayWithKey(f) {
+    return function(m) {
+      var r = [];
+      for (var k in m) {
+        if (hasOwnProperty.call(m, k)) {
+          r.push(f(k)(m[k]));
+        }
+      }
+      return r;
+    };
+  }
+  var keys2 = Object.keys || toArrayWithKey(function(k) {
+    return function() {
+      return k;
+    };
+  });
+
+  // output/Record/index.js
+  var insert3 = function(dictIsSymbol) {
+    var reflectSymbol2 = reflectSymbol(dictIsSymbol);
+    return function() {
+      return function() {
+        return function(l) {
+          return function(a) {
+            return function(r) {
+              return unsafeSet(reflectSymbol2(l))(a)(r);
+            };
+          };
+        };
+      };
+    };
+  };
+  var get2 = function(dictIsSymbol) {
+    var reflectSymbol2 = reflectSymbol(dictIsSymbol);
+    return function() {
+      return function(l) {
+        return function(r) {
+          return unsafeGet(reflectSymbol2(l))(r);
+        };
+      };
+    };
+  };
+  var $$delete3 = function(dictIsSymbol) {
+    var reflectSymbol2 = reflectSymbol(dictIsSymbol);
+    return function() {
+      return function() {
+        return function(l) {
+          return function(r) {
+            return unsafeDelete(reflectSymbol2(l))(r);
+          };
+        };
+      };
+    };
+  };
+
+  // output/Record.Builder/foreign.js
+  function copyRecord(rec) {
+    var copy = {};
+    for (var key2 in rec) {
+      if ({}.hasOwnProperty.call(rec, key2)) {
+        copy[key2] = rec[key2];
+      }
+    }
+    return copy;
+  }
+  function unsafeInsert(l) {
+    return function(a) {
+      return function(rec) {
+        rec[l] = a;
+        return rec;
+      };
+    };
+  }
+
+  // output/Record.Builder/index.js
+  var semigroupoidBuilder = semigroupoidFn;
+  var insert4 = function() {
+    return function() {
+      return function(dictIsSymbol) {
+        var reflectSymbol2 = reflectSymbol(dictIsSymbol);
+        return function(l) {
+          return function(a) {
+            return function(r1) {
+              return unsafeInsert(reflectSymbol2(l))(a)(r1);
+            };
+          };
+        };
+      };
+    };
+  };
+  var categoryBuilder = categoryFn;
+  var build = function(v) {
+    return function(r1) {
+      return v(copyRecord(r1));
+    };
+  };
 
   // output/Yoga.JSON/index.js
-  var identity9 = /* @__PURE__ */ identity(categoryBuilder);
-  var readString3 = /* @__PURE__ */ readString(monadIdentity);
+  var identity8 = /* @__PURE__ */ identity(categoryBuilder);
+  var readString2 = /* @__PURE__ */ readString(monadIdentity);
   var bindExceptT2 = /* @__PURE__ */ bindExceptT(monadIdentity);
-  var pure9 = /* @__PURE__ */ pure(applicativeNonEmptyList);
+  var pure5 = /* @__PURE__ */ pure(applicativeNonEmptyList);
   var except2 = /* @__PURE__ */ except(applicativeIdentity);
   var applicativeExceptT2 = /* @__PURE__ */ applicativeExceptT(monadIdentity);
-  var pure12 = /* @__PURE__ */ pure(applicativeExceptT2);
-  var map16 = /* @__PURE__ */ map(functorArray);
+  var pure1 = /* @__PURE__ */ pure(applicativeExceptT2);
+  var map13 = /* @__PURE__ */ map(functorArray);
   var unwrap3 = /* @__PURE__ */ unwrap();
   var compose1 = /* @__PURE__ */ compose(semigroupoidBuilder);
   var insert6 = /* @__PURE__ */ insert4()();
-  var append5 = /* @__PURE__ */ append(semigroupNonEmptyList);
+  var append3 = /* @__PURE__ */ append(semigroupNonEmptyList);
   var functorExceptT2 = /* @__PURE__ */ functorExceptT(functorIdentity);
   var map1 = /* @__PURE__ */ map(functorExceptT2);
   var map22 = /* @__PURE__ */ map(functorNonEmptyList);
   var bindFlipped3 = /* @__PURE__ */ bindFlipped(bindExceptT2);
-  var lmap3 = /* @__PURE__ */ lmap(bifunctorEither);
+  var lmap2 = /* @__PURE__ */ lmap(bifunctorEither);
   var composeKleisliFlipped2 = /* @__PURE__ */ composeKleisliFlipped(bindExceptT2);
   var readProp2 = /* @__PURE__ */ readProp(monadIdentity);
-  var mapWithIndex3 = /* @__PURE__ */ mapWithIndex(functorWithIndexArray);
+  var mapWithIndex4 = /* @__PURE__ */ mapWithIndex(functorWithIndexArray);
   var readArray2 = /* @__PURE__ */ readArray(monadIdentity);
-  var writeForeignString2 = {
+  var writeForeignString = {
     writeImpl: unsafeToForeign
   };
   var writeForeignNumber = {
@@ -6857,7 +5952,7 @@
   var writeForeignFieldsNilRowR = {
     writeImplFields: function(v) {
       return function(v1) {
-        return identity9;
+        return identity8;
       };
     }
   };
@@ -6865,12 +5960,12 @@
     writeImpl: unsafeToForeign
   };
   var readForeignString = {
-    readImpl: readString3
+    readImpl: readString2
   };
   var readForeignFieldsNilRowRo = {
     getFields: function(v) {
       return function(v1) {
-        return pure12(identity9);
+        return pure1(identity8);
       };
     }
   };
@@ -6888,29 +5983,29 @@
       };
     };
   };
-  var writeImpl2 = function(dict) {
+  var writeImpl = function(dict) {
     return dict.writeImpl;
   };
-  var writeImpl1 = /* @__PURE__ */ writeImpl2(writeForeignNumber);
+  var writeImpl1 = /* @__PURE__ */ writeImpl(writeForeignNumber);
   var writeJSON = function(dictWriteForeign) {
-    var $481 = writeImpl2(dictWriteForeign);
+    var $481 = writeImpl(dictWriteForeign);
     return function($482) {
-      return _unsafeStringify2($481($482));
+      return _unsafeStringify($481($482));
     };
   };
   var writeForeignArray = function(dictWriteForeign) {
-    var writeImpl5 = writeImpl2(dictWriteForeign);
+    var writeImpl5 = writeImpl(dictWriteForeign);
     return {
       writeImpl: function(xs) {
-        return unsafeToForeign(map16(writeImpl5)(xs));
+        return unsafeToForeign(map13(writeImpl5)(xs));
       }
     };
   };
   var writeForeignFieldsCons = function(dictIsSymbol) {
-    var get3 = get(dictIsSymbol)();
+    var get3 = get2(dictIsSymbol)();
     var insert42 = insert6(dictIsSymbol);
     return function(dictWriteForeign) {
-      var writeImpl5 = writeImpl2(dictWriteForeign);
+      var writeImpl5 = writeImpl(dictWriteForeign);
       return function(dictWriteForeignFields) {
         var writeImplFields1 = writeImplFields(dictWriteForeignFields);
         return function() {
@@ -6943,12 +6038,12 @@
     return function(dictFoldable) {
       var foldl5 = foldl(dictFoldable);
       return function(dictApplicative) {
-        var pure24 = pure(dictApplicative);
+        var pure25 = pure(dictApplicative);
         var fn = function(acc) {
           return function(elem3) {
             var v = runExcept(elem3);
             if (acc instanceof Left && v instanceof Left) {
-              return new Left(append5(acc.value0)(v.value0));
+              return new Left(append3(acc.value0)(v.value0));
             }
             ;
             if (acc instanceof Left && v instanceof Right) {
@@ -6956,7 +6051,7 @@
             }
             ;
             if (acc instanceof Right && v instanceof Right) {
-              return new Right(append22(acc.value0)(pure24(v.value0)));
+              return new Right(append22(acc.value0)(pure25(v.value0)));
             }
             ;
             if (acc instanceof Right && v instanceof Left) {
@@ -6974,11 +6069,11 @@
     };
   };
   var sequenceCombining1 = /* @__PURE__ */ sequenceCombining(monoidArray)(foldableArray)(applicativeArray);
-  var readImpl2 = function(dict) {
+  var readImpl = function(dict) {
     return dict.readImpl;
   };
   var readAtIdx = function(dictReadForeign) {
-    var readImpl5 = readImpl2(dictReadForeign);
+    var readImpl5 = readImpl(dictReadForeign);
     return function(i) {
       return function(f) {
         return withExcept(map22(ErrorAtIndex.create(i)))(readImpl5(f));
@@ -6988,7 +6083,7 @@
   var readForeignArray = function(dictReadForeign) {
     return {
       readImpl: composeKleisliFlipped2(function() {
-        var $554 = mapWithIndex3(readAtIdx(dictReadForeign));
+        var $554 = mapWithIndex4(readAtIdx(dictReadForeign));
         return function($555) {
           return sequenceCombining1($554($555));
         };
@@ -6996,16 +6091,16 @@
     };
   };
   var parseJSON = /* @__PURE__ */ function() {
-    var $560 = lmap3(function($563) {
-      return pure9(ForeignError.create(message($563)));
+    var $560 = lmap2(function($563) {
+      return pure5(ForeignError.create(message($563)));
     });
-    var $561 = runEffectFn1(_parseJSON2);
+    var $561 = runEffectFn1(_parseJSON);
     return function($562) {
       return ExceptT(Identity($560(unsafePerformEffect($$try($561($562))))));
     };
   }();
   var readJSON = function(dictReadForeign) {
-    var $564 = composeKleisliFlipped2(readImpl2(dictReadForeign))(parseJSON);
+    var $564 = composeKleisliFlipped2(readImpl(dictReadForeign))(parseJSON);
     return function($565) {
       return runExcept($564($565));
     };
@@ -7017,7 +6112,7 @@
     var reflectSymbol2 = reflectSymbol(dictIsSymbol);
     var insert42 = insert6(dictIsSymbol);
     return function(dictReadForeign) {
-      var readImpl5 = readImpl2(dictReadForeign);
+      var readImpl5 = readImpl(dictReadForeign);
       return function(dictReadForeignFields) {
         var getFields1 = getFields(dictReadForeignFields);
         return function() {
@@ -7038,7 +6133,7 @@
                     }
                     ;
                     if (v2 instanceof Left && v1 instanceof Left) {
-                      return new Left(append5(v2.value0)(v1.value0));
+                      return new Left(append3(v2.value0)(v1.value0));
                     }
                     ;
                     if (v2 instanceof Right && v1 instanceof Left) {
@@ -7071,15 +6166,15 @@
   };
 
   // output/Endpoints.ResponseParser/index.js
-  var pure10 = /* @__PURE__ */ pure(applicativeEffect);
-  var bind4 = /* @__PURE__ */ bind(bindAff);
-  var liftEffect4 = /* @__PURE__ */ liftEffect(monadEffectAff);
-  var show9 = /* @__PURE__ */ show(showInt);
-  var show14 = /* @__PURE__ */ show(/* @__PURE__ */ showNonEmptyList(showForeignError));
-  var pure13 = /* @__PURE__ */ pure(applicativeAff);
+  var pure6 = /* @__PURE__ */ pure(applicativeEffect);
+  var bind2 = /* @__PURE__ */ bind(bindAff);
+  var liftEffect3 = /* @__PURE__ */ liftEffect(monadEffectAff);
+  var show4 = /* @__PURE__ */ show(showInt);
+  var show12 = /* @__PURE__ */ show(/* @__PURE__ */ showNonEmptyList(showForeignError));
+  var pure12 = /* @__PURE__ */ pure(applicativeAff);
   var validateResponse = function(response) {
     if (response.ok) {
-      return pure10(response);
+      return pure6(response);
     }
     ;
     return throwMinsiError(new ErrorResponse(response.status));
@@ -7088,19 +6183,19 @@
     var readJSON2 = readJSON(dictReadForeign);
     return function(context) {
       return function(response) {
-        return bind4(response.text)(function(bodyText) {
+        return bind2(response.text)(function(bodyText) {
           var $13 = bodyText === "";
           if ($13) {
-            return liftEffect4(throwMinsiError(new JSONParsingError(context + (": empty response body" + (" (http " + (show9(response.status) + (" " + (response.statusText + ")"))))))));
+            return liftEffect3(throwMinsiError(new JSONParsingError(context + (": empty response body" + (" (http " + (show4(response.status) + (" " + (response.statusText + ")"))))))));
           }
           ;
           var v = readJSON2(bodyText);
           if (v instanceof Left) {
-            return liftEffect4(throwMinsiError(new JSONParsingError(context + (": " + (show14(v.value0) + (" (http " + (show9(response.status) + (" " + (response.statusText + (")" + (" body=" + bodyText)))))))))));
+            return liftEffect3(throwMinsiError(new JSONParsingError(context + (": " + (show12(v.value0) + (" (http " + (show4(response.status) + (" " + (response.statusText + (")" + (" body=" + bodyText)))))))))));
           }
           ;
           if (v instanceof Right) {
-            return pure13(v.value0);
+            return pure12(v.value0);
           }
           ;
           throw new Error("Failed pattern match at Endpoints.ResponseParser (line 33, column 5 - line 49, column 21): " + [v.constructor.name]);
@@ -7160,13 +6255,13 @@
   }();
 
   // output/JS.Fetch.RequestBody/foreign.js
-  function fromString5(a) {
+  function fromString4(a) {
     return a;
   }
 
   // output/Fetch.Internal.RequestBody/index.js
   var toRequestBodyString = {
-    toRequestBody: fromString5
+    toRequestBody: fromString4
   };
   var toRequestBody = function(dict) {
     return dict.toRequestBody;
@@ -7184,7 +6279,7 @@
 
   // output/Fetch.Internal.Request/index.js
   var fromRecord2 = /* @__PURE__ */ fromRecord();
-  var show10 = /* @__PURE__ */ show(showMethod);
+  var show5 = /* @__PURE__ */ show(showMethod);
   var toCoreRequestOptionsHelpe = {
     convertHelper: function(v) {
       return function(v1) {
@@ -7209,7 +6304,7 @@
   };
   var toCoreRequestOptionsConve9 = {
     convertImpl: function(v) {
-      return show10;
+      return show5;
     }
   };
   var $$new2 = function() {
@@ -7233,8 +6328,8 @@
       return function() {
         return function() {
           return function(dictIsSymbol) {
-            var $$delete4 = $$delete2(dictIsSymbol)()();
-            var get3 = get(dictIsSymbol)();
+            var $$delete4 = $$delete3(dictIsSymbol)()();
+            var get3 = get2(dictIsSymbol)();
             var insert7 = insert3(dictIsSymbol)()();
             return function(dictToCoreRequestOptionsHelper) {
               var convertHelper1 = convertHelper(dictToCoreRequestOptionsHelper);
@@ -7356,20 +6451,20 @@
   var voidRight2 = /* @__PURE__ */ voidRight(functorEffect);
   var mempty2 = /* @__PURE__ */ mempty(monoidCanceler);
   var thenOrCatch3 = /* @__PURE__ */ thenOrCatch2();
-  var map17 = /* @__PURE__ */ map(functorEffect);
+  var map14 = /* @__PURE__ */ map(functorEffect);
   var resolve3 = /* @__PURE__ */ resolve2();
-  var alt6 = /* @__PURE__ */ alt(altMaybe);
-  var map18 = /* @__PURE__ */ map(functorMaybe);
-  var readString4 = /* @__PURE__ */ readString(monadIdentity);
-  var bind5 = /* @__PURE__ */ bind(bindAff);
-  var liftEffect5 = /* @__PURE__ */ liftEffect(monadEffectAff);
+  var alt5 = /* @__PURE__ */ alt(altMaybe);
+  var map15 = /* @__PURE__ */ map(functorMaybe);
+  var readString3 = /* @__PURE__ */ readString(monadIdentity);
+  var bind3 = /* @__PURE__ */ bind(bindAff);
+  var liftEffect4 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var toAff$prime = function(customCoerce) {
     return function(p) {
       return makeAff(function(cb) {
         return voidRight2(mempty2)(thenOrCatch3(function(a) {
-          return map17(resolve3)(cb(new Right(a)));
+          return map14(resolve3)(cb(new Right(a)));
         })(function(e) {
-          return map17(resolve3)(cb(new Left(customCoerce(e))));
+          return map14(resolve3)(cb(new Left(customCoerce(e))));
         })(p));
       });
     };
@@ -7377,11 +6472,11 @@
   var coerce3 = function(rej) {
     return fromMaybe$prime(function(v) {
       return error("Promise failed, couldn't extract JS Error or String");
-    })(alt6(toError(rej))(map18(error)(hush(runExcept(readString4(unsafeToForeign(rej)))))));
+    })(alt5(toError(rej))(map15(error)(hush(runExcept(readString3(unsafeToForeign(rej)))))));
   };
   var toAff = /* @__PURE__ */ toAff$prime(coerce3);
   var toAffE = function(f) {
-    return bind5(liftEffect5(f))(toAff);
+    return bind3(liftEffect4(f))(toAff);
   };
 
   // output/Fetch.Internal.Response/index.js
@@ -7437,24 +6532,24 @@
   }
 
   // output/Fetch/index.js
-  var $$void6 = /* @__PURE__ */ $$void(functorEffect);
+  var $$void5 = /* @__PURE__ */ $$void(functorEffect);
   var thenOrCatch4 = /* @__PURE__ */ thenOrCatch2();
-  var map19 = /* @__PURE__ */ map(functorEffect);
+  var map16 = /* @__PURE__ */ map(functorEffect);
   var resolve4 = /* @__PURE__ */ resolve2();
-  var bind6 = /* @__PURE__ */ bind(bindAff);
-  var liftEffect6 = /* @__PURE__ */ liftEffect(monadEffectAff);
+  var bind4 = /* @__PURE__ */ bind(bindAff);
+  var liftEffect5 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var $$new4 = /* @__PURE__ */ $$new2();
   var bindFlipped4 = /* @__PURE__ */ bindFlipped(bindAff);
   var fetchWithOptions2 = /* @__PURE__ */ fetchWithOptions();
-  var pure14 = /* @__PURE__ */ pure(applicativeAff);
+  var pure13 = /* @__PURE__ */ pure(applicativeAff);
   var toAbortableAff = function(abortController) {
     return function(p) {
       return makeAff(function(cb) {
         return function __do5() {
-          $$void6(thenOrCatch4(function(a) {
-            return map19(resolve4)(cb(new Right(a)));
+          $$void5(thenOrCatch4(function(a) {
+            return map16(resolve4)(cb(new Right(a)));
           })(function(e) {
-            return map19(resolve4)(cb(new Left(coerce3(e))));
+            return map16(resolve4)(cb(new Left(coerce3(e))));
           })(p))();
           return effectCanceler(abort(abortController));
         };
@@ -7467,13 +6562,13 @@
         var convert3 = convert(dictToCoreRequestOptions);
         return function(url3) {
           return function(r) {
-            return bind6(liftEffect6($$new4(url3)(convert3(r))))(function(request) {
-              return bind6(liftEffect6(newImpl3))(function(abortController) {
+            return bind4(liftEffect5($$new4(url3)(convert3(r))))(function(request) {
+              return bind4(liftEffect5(newImpl3))(function(abortController) {
                 var signal2 = signal(abortController);
-                return bind6(bindFlipped4(toAbortableAff(abortController))(liftEffect6(fetchWithOptions2(request)({
+                return bind4(bindFlipped4(toAbortableAff(abortController))(liftEffect5(fetchWithOptions2(request)({
                   signal: signal2
                 }))))(function(cResponse) {
-                  return pure14(convert2(cResponse));
+                  return pure13(convert2(cResponse));
                 });
               });
             });
@@ -7486,8 +6581,434 @@
   // output/Main.Config/index.js
   var backendUrl = "http://localhost:8080/";
 
+  // output/Data.URL/foreign.js
+  var fromStringImpl3 = (s) => {
+    try {
+      return new URL(s);
+    } catch {
+      return null;
+    }
+  };
+  var hrefImpl = (u) => u.href;
+  var pathnameImpl = (u) => u.pathname;
+  var queryKeysImpl = (u) => Array.from(u.searchParams.keys());
+  var queryLookupImpl = (k) => (u) => u.searchParams.getAll(k);
+
+  // output/Data.Compactable/index.js
+  var $$void6 = /* @__PURE__ */ $$void(functorST);
+  var pure14 = /* @__PURE__ */ pure(applicativeST);
+  var apply4 = /* @__PURE__ */ apply(applyST);
+  var map17 = /* @__PURE__ */ map(functorST);
+  var compactableMaybe = {
+    compact: /* @__PURE__ */ join(bindMaybe),
+    separate: function(v) {
+      if (v instanceof Nothing) {
+        return {
+          left: Nothing.value,
+          right: Nothing.value
+        };
+      }
+      ;
+      if (v instanceof Just) {
+        if (v.value0 instanceof Left) {
+          return {
+            left: new Just(v.value0.value0),
+            right: Nothing.value
+          };
+        }
+        ;
+        if (v.value0 instanceof Right) {
+          return {
+            left: Nothing.value,
+            right: new Just(v.value0.value0)
+          };
+        }
+        ;
+        throw new Error("Failed pattern match at Data.Compactable (line 91, column 23 - line 93, column 48): " + [v.value0.constructor.name]);
+      }
+      ;
+      throw new Error("Failed pattern match at Data.Compactable (line 87, column 1 - line 93, column 48): " + [v.constructor.name]);
+    }
+  };
+  var compactableArray = {
+    compact: function(xs) {
+      return function __do5() {
+        var result = newSTArray();
+        var iter = iterator(function(v) {
+          return index2(xs)(v);
+        })();
+        iterate(iter)(function($108) {
+          return $$void6(function(v) {
+            if (v instanceof Nothing) {
+              return pure14(0);
+            }
+            ;
+            if (v instanceof Just) {
+              return push(v.value0)(result);
+            }
+            ;
+            throw new Error("Failed pattern match at Data.Compactable (line 111, column 34 - line 113, column 35): " + [v.constructor.name]);
+          }($108));
+        })();
+        return unsafeFreeze(result)();
+      }();
+    },
+    separate: function(xs) {
+      return function __do5() {
+        var ls = newSTArray();
+        var rs = newSTArray();
+        var iter = iterator(function(v) {
+          return index2(xs)(v);
+        })();
+        iterate(iter)(function($109) {
+          return $$void6(function(v) {
+            if (v instanceof Left) {
+              return push(v.value0)(ls);
+            }
+            ;
+            if (v instanceof Right) {
+              return push(v.value0)(rs);
+            }
+            ;
+            throw new Error("Failed pattern match at Data.Compactable (line 122, column 34 - line 124, column 31): " + [v.constructor.name]);
+          }($109));
+        })();
+        return apply4(map17(function(v) {
+          return function(v1) {
+            return {
+              left: v,
+              right: v1
+            };
+          };
+        })(unsafeFreeze(ls)))(unsafeFreeze(rs))();
+      }();
+    }
+  };
+
+  // output/Data.Filterable/index.js
+  var append4 = /* @__PURE__ */ append(semigroupArray);
+  var foldl3 = /* @__PURE__ */ foldl(foldableArray);
+  var partitionMap = function(dict) {
+    return dict.partitionMap;
+  };
+  var maybeBool = function(p) {
+    return function(x) {
+      var $66 = p(x);
+      if ($66) {
+        return new Just(x);
+      }
+      ;
+      return Nothing.value;
+    };
+  };
+  var filterableArray = {
+    partitionMap: function(p) {
+      var go2 = function(acc) {
+        return function(x) {
+          var v = p(x);
+          if (v instanceof Left) {
+            return {
+              right: acc.right,
+              left: append4(acc.left)([v.value0])
+            };
+          }
+          ;
+          if (v instanceof Right) {
+            return {
+              left: acc.left,
+              right: append4(acc.right)([v.value0])
+            };
+          }
+          ;
+          throw new Error("Failed pattern match at Data.Filterable (line 149, column 16 - line 151, column 50): " + [v.constructor.name]);
+        };
+      };
+      return foldl3(go2)({
+        left: [],
+        right: []
+      });
+    },
+    partition,
+    filterMap: mapMaybe,
+    filter,
+    Compactable0: function() {
+      return compactableArray;
+    },
+    Functor1: function() {
+      return functorArray;
+    }
+  };
+  var filterMap = function(dict) {
+    return dict.filterMap;
+  };
+  var filterDefault = function(dictFilterable) {
+    var $121 = filterMap(dictFilterable);
+    return function($122) {
+      return $121(maybeBool($122));
+    };
+  };
+  var filter3 = function(dict) {
+    return dict.filter;
+  };
+  var eitherBool = function(p) {
+    return function(x) {
+      var $84 = p(x);
+      if ($84) {
+        return new Right(x);
+      }
+      ;
+      return new Left(x);
+    };
+  };
+  var partitionDefault = function(dictFilterable) {
+    var partitionMap1 = partitionMap(dictFilterable);
+    return function(p) {
+      return function(xs) {
+        var o = partitionMap1(eitherBool(p))(xs);
+        return {
+          no: o.left,
+          yes: o.right
+        };
+      };
+    };
+  };
+  var filterableMaybe = {
+    partitionMap: function(v) {
+      return function(v1) {
+        if (v1 instanceof Nothing) {
+          return {
+            left: Nothing.value,
+            right: Nothing.value
+          };
+        }
+        ;
+        if (v1 instanceof Just) {
+          var v2 = v(v1.value0);
+          if (v2 instanceof Left) {
+            return {
+              left: new Just(v2.value0),
+              right: Nothing.value
+            };
+          }
+          ;
+          if (v2 instanceof Right) {
+            return {
+              left: Nothing.value,
+              right: new Just(v2.value0)
+            };
+          }
+          ;
+          throw new Error("Failed pattern match at Data.Filterable (line 161, column 29 - line 163, column 48): " + [v2.constructor.name]);
+        }
+        ;
+        throw new Error("Failed pattern match at Data.Filterable (line 159, column 1 - line 169, column 29): " + [v.constructor.name, v1.constructor.name]);
+      };
+    },
+    partition: function(p) {
+      return partitionDefault(filterableMaybe)(p);
+    },
+    filterMap: /* @__PURE__ */ bindFlipped(bindMaybe),
+    filter: function(p) {
+      return filterDefault(filterableMaybe)(p);
+    },
+    Compactable0: function() {
+      return compactableMaybe;
+    },
+    Functor1: function() {
+      return functorMaybe;
+    }
+  };
+
+  // output/Data.String.Utils/foreign.js
+  function startsWithImpl(searchString, s) {
+    return s.startsWith(searchString);
+  }
+
+  // output/Data.String.CodePoints/foreign.js
+  var hasArrayFrom = typeof Array.from === "function";
+  var hasStringIterator = typeof Symbol !== "undefined" && Symbol != null && typeof Symbol.iterator !== "undefined" && typeof String.prototype[Symbol.iterator] === "function";
+  var hasFromCodePoint = typeof String.prototype.fromCodePoint === "function";
+  var hasCodePointAt = typeof String.prototype.codePointAt === "function";
+
+  // output/Data.String.Regex/foreign.js
+  var regexImpl = function(left) {
+    return function(right) {
+      return function(s1) {
+        return function(s2) {
+          try {
+            return right(new RegExp(s1, s2));
+          } catch (e) {
+            return left(e.message);
+          }
+        };
+      };
+    };
+  };
+  var test = function(r) {
+    return function(s) {
+      var lastIndex = r.lastIndex;
+      var result = r.test(s);
+      r.lastIndex = lastIndex;
+      return result;
+    };
+  };
+  var _match = function(just) {
+    return function(nothing) {
+      return function(r) {
+        return function(s) {
+          var m = s.match(r);
+          if (m == null || m.length === 0) {
+            return nothing;
+          } else {
+            for (var i = 0; i < m.length; i++) {
+              m[i] = m[i] == null ? nothing : just(m[i]);
+            }
+            return just(m);
+          }
+        };
+      };
+    };
+  };
+
+  // output/Data.String.Regex.Flags/index.js
+  var noFlags = {
+    global: false,
+    ignoreCase: false,
+    multiline: false,
+    dotAll: false,
+    sticky: false,
+    unicode: false
+  };
+
+  // output/Data.String.Regex/index.js
+  var renderFlags = function(v) {
+    return function() {
+      if (v.global) {
+        return "g";
+      }
+      ;
+      return "";
+    }() + (function() {
+      if (v.ignoreCase) {
+        return "i";
+      }
+      ;
+      return "";
+    }() + (function() {
+      if (v.multiline) {
+        return "m";
+      }
+      ;
+      return "";
+    }() + (function() {
+      if (v.dotAll) {
+        return "s";
+      }
+      ;
+      return "";
+    }() + (function() {
+      if (v.sticky) {
+        return "y";
+      }
+      ;
+      return "";
+    }() + function() {
+      if (v.unicode) {
+        return "u";
+      }
+      ;
+      return "";
+    }()))));
+  };
+  var regex = function(s) {
+    return function(f) {
+      return regexImpl(Left.create)(Right.create)(s)(renderFlags(f));
+    };
+  };
+  var match = /* @__PURE__ */ function() {
+    return _match(Just.create)(Nothing.value);
+  }();
+
+  // output/Data.String.Utils/index.js
+  var startsWith = function(searchString) {
+    return function(s) {
+      return startsWithImpl(searchString, s);
+    };
+  };
+
+  // output/Data.URL/index.js
+  var filter4 = /* @__PURE__ */ filter3(filterableMaybe);
+  var fromFoldable5 = /* @__PURE__ */ fromFoldable(ordString)(foldableArray);
+  var map18 = /* @__PURE__ */ map(functorArray);
+  var wrap3 = /* @__PURE__ */ wrap();
+  var filter1 = /* @__PURE__ */ filter3(filterableArray);
+  var PathEmpty = /* @__PURE__ */ function() {
+    function PathEmpty2() {
+    }
+    ;
+    PathEmpty2.value = new PathEmpty2();
+    return PathEmpty2;
+  }();
+  var PathAbsolute = /* @__PURE__ */ function() {
+    function PathAbsolute2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    PathAbsolute2.create = function(value0) {
+      return new PathAbsolute2(value0);
+    };
+    return PathAbsolute2;
+  }();
+  var PathRelative = /* @__PURE__ */ function() {
+    function PathRelative2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    PathRelative2.create = function(value0) {
+      return new PathRelative2(value0);
+    };
+    return PathRelative2;
+  }();
+  var toString8 = hrefImpl;
+  var query = function(u) {
+    var vals = function(k) {
+      return queryLookupImpl(k)(u);
+    };
+    var ks = queryKeysImpl(u);
+    return fromFoldable5(map18(function(k) {
+      return new Tuple(k, vals(k));
+    })(ks));
+  };
+  var pathFromString = function(s) {
+    var segments = function() {
+      var $235 = filter1(function($238) {
+        return !$$null2($238);
+      });
+      var $236 = split(wrap3("/"));
+      return function($237) {
+        return $235($236($237));
+      };
+    }();
+    return maybe(PathEmpty.value)(function() {
+      var $203 = startsWith("/")(s);
+      if ($203) {
+        return PathAbsolute.create;
+      }
+      ;
+      return PathRelative.create;
+    }())(filter4(function($239) {
+      return !$$null3($239);
+    })(new Just(segments(s))));
+  };
+  var path = function($240) {
+    return pathFromString(pathnameImpl($240));
+  };
+  var fromString5 = function($255) {
+    return toMaybe(fromStringImpl3($255));
+  };
+
   // output/Model.State.State/index.js
-  var writeImpl3 = /* @__PURE__ */ writeImpl2(writeForeignString2);
+  var writeImpl3 = /* @__PURE__ */ writeImpl(writeForeignString);
   var writeForeignRecord2 = /* @__PURE__ */ writeForeignRecord();
   var Top = /* @__PURE__ */ function() {
     function Top2() {
@@ -7554,7 +7075,7 @@
   }();
   var writeForeignWURL = {
     writeImpl: function(v) {
-      return writeImpl3(toString(v));
+      return writeImpl3(toString8(v));
     }
   };
   var writeForeignPosition = {
@@ -7637,7 +7158,7 @@
     reflectSymbol: function() {
       return "value";
     }
-  })(writeForeignString2)(/* @__PURE__ */ writeForeignFieldsCons({
+  })(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons({
     reflectSymbol: function() {
       return "videoPosition";
     }
@@ -7646,7 +7167,7 @@
     reflectSymbol: function() {
       return "artist";
     }
-  })(writeForeignString2)(/* @__PURE__ */ writeForeignFieldsCons({
+  })(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons({
     reflectSymbol: function() {
       return "cutVideo";
     }
@@ -7654,7 +7175,7 @@
     reflectSymbol: function() {
       return "filename";
     }
-  })(writeForeignString2)(/* @__PURE__ */ writeForeignFieldsCons({
+  })(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons({
     reflectSymbol: function() {
       return "reverseLoop";
     }
@@ -7666,14 +7187,14 @@
     reflectSymbol: function() {
       return "title";
     }
-  })(writeForeignString2)(/* @__PURE__ */ writeForeignFieldsCons({
+  })(writeForeignString)(/* @__PURE__ */ writeForeignFieldsCons({
     reflectSymbol: function() {
       return "youtubeUrl";
     }
   })(writeForeignWURL)(writeForeignFieldsNilRowR)()()())()()())()()())()()())()()())()()())()()());
 
   // output/Endpoints.Compute/index.js
-  var bind7 = /* @__PURE__ */ bind(bindAff);
+  var bind5 = /* @__PURE__ */ bind(bindAff);
   var fetch3 = /* @__PURE__ */ fetch2()()(/* @__PURE__ */ toCoreRequestOptionsRowRo()()(/* @__PURE__ */ toCoreRequestOptionsHelpe1(/* @__PURE__ */ toCoreRequestOptionsConve7(toRequestBodyString))()()()({
     reflectSymbol: function() {
       return "body";
@@ -7688,26 +7209,26 @@
     }
   })(toCoreRequestOptionsHelpe)()())()())()()));
   var writeJSON2 = /* @__PURE__ */ writeJSON(writeState);
-  var liftEffect7 = /* @__PURE__ */ liftEffect(monadEffectAff);
+  var liftEffect6 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var computeEndpoint = /* @__PURE__ */ function() {
     return backendUrl + "compute";
   }();
   var callCompute = function(state3) {
-    return bind7(fetch3(computeEndpoint)({
+    return bind5(fetch3(computeEndpoint)({
       method: POST.value,
       body: writeJSON2(state3),
       headers: {
         "Content-Type": "application/json"
       }
     }))(function(response) {
-      return liftEffect7(validateResponse(response));
+      return liftEffect6(validateResponse(response));
     });
   };
 
   // output/Model.ProcessStatus/index.js
-  var bind8 = /* @__PURE__ */ bind(/* @__PURE__ */ bindExceptT(monadIdentity));
-  var readImpl3 = /* @__PURE__ */ readImpl2(readForeignString);
-  var pure11 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeExceptT(monadIdentity));
+  var bind6 = /* @__PURE__ */ bind(/* @__PURE__ */ bindExceptT(monadIdentity));
+  var readImpl3 = /* @__PURE__ */ readImpl(readForeignString);
+  var pure7 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeExceptT(monadIdentity));
   var fail2 = /* @__PURE__ */ fail(monadIdentity);
   var Pending = /* @__PURE__ */ function() {
     function Pending2() {
@@ -7732,17 +7253,17 @@
   }();
   var readForeignProcessStatus = {
     readImpl: function(f) {
-      return bind8(readImpl3(f))(function(s) {
+      return bind6(readImpl3(f))(function(s) {
         if (s === "Pending") {
-          return pure11(Pending.value);
+          return pure7(Pending.value);
         }
         ;
         if (s === "Succeed") {
-          return pure11(Succeed.value);
+          return pure7(Succeed.value);
         }
         ;
         if (s === "Failed") {
-          return pure11(Failed.value);
+          return pure7(Failed.value);
         }
         ;
         return fail2(new TypeMismatch("ProcessStatus", "Invalid ProcessStatus: " + s));
@@ -7751,7 +7272,7 @@
   };
 
   // output/Endpoints.Status/index.js
-  var bind9 = /* @__PURE__ */ bind(bindAff);
+  var bind7 = /* @__PURE__ */ bind(bindAff);
   var fetch4 = /* @__PURE__ */ fetch2()()(/* @__PURE__ */ toCoreRequestOptionsRowRo()()(/* @__PURE__ */ toCoreRequestOptionsHelpe1(/* @__PURE__ */ toCoreRequestOptionsConve7(toRequestBodyString))()()()({
     reflectSymbol: function() {
       return "body";
@@ -7769,7 +7290,7 @@
     reflectSymbol: function() {
       return "filename";
     }
-  })(writeForeignString2)(writeForeignFieldsNilRowR)()()()));
+  })(writeForeignString)(writeForeignFieldsNilRowR)()()()));
   var decodeJsonResponse2 = /* @__PURE__ */ decodeJsonResponse(/* @__PURE__ */ readForeignRecord()(/* @__PURE__ */ readForeignFieldsCons({
     reflectSymbol: function() {
       return "status";
@@ -7779,7 +7300,7 @@
     return backendUrl + "status";
   }();
   var callStatus = function(filename) {
-    return bind9(fetch4(statusEndpoint)({
+    return bind7(fetch4(statusEndpoint)({
       method: POST.value,
       body: writeJSON3({
         filename
@@ -7798,7 +7319,7 @@
     var $3 = map(functorArray)(function() {
       var $6 = fromMaybe([]);
       var $7 = modifyAt(0)(function($9) {
-        return char(toUpper(singleton5($9)));
+        return char(toUpper(singleton6($9)));
       });
       return function($8) {
         return fromCharArray($6($7(toCharArray($8))));
@@ -7809,6 +7330,24 @@
       return $2($3($4($5)));
     };
   }();
+
+  // output/Model.ValidationErrors/index.js
+  var union3 = /* @__PURE__ */ union(ordString);
+  var semigroupValidationErrors = {
+    append: function(v) {
+      return function(v1) {
+        return union3(v)(v1);
+      };
+    }
+  };
+  var toMap = function(v) {
+    return v;
+  };
+  var fromSingleton = function(k) {
+    return function(v) {
+      return singleton3(k)(v);
+    };
+  };
 
   // output/Parse.Font/index.js
   var parsePosition = function(v) {
@@ -7845,18 +7384,51 @@
     return White.value;
   };
 
+  // output/Validations.CutVideoValidation/index.js
+  var show6 = /* @__PURE__ */ show(showNumber);
+  var pure8 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
+  var cutVideoValidation = function(id2) {
+    return function(start2) {
+      return function(end) {
+        var $6 = start2 >= end - 100;
+        if ($6) {
+          return invalid(fromSingleton(id2)("start >= end - 100: " + (show6(start2) + (" " + show6(end)))));
+        }
+        ;
+        return pure8({
+          start: start2,
+          end
+        });
+      };
+    };
+  };
+
+  // output/Validations.RegexValidation/index.js
+  var pure9 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
+  var matches2 = function(v) {
+    return function(v1) {
+      return function(v2) {
+        if (test(v)(v2)) {
+          return pure9(v2);
+        }
+        ;
+        return invalid(fromSingleton(v1)("Invalid Input for regex: " + v2));
+      };
+    };
+  };
+
   // output/Validations.NonEmptyValidation/index.js
-  var lmap4 = /* @__PURE__ */ lmap(bifunctorEither);
-  var lmap12 = /* @__PURE__ */ lmap(bifunctorV);
+  var lmap3 = /* @__PURE__ */ lmap(bifunctorEither);
+  var lmap1 = /* @__PURE__ */ lmap(bifunctorV);
   var nonEmptyRegex = "[\\S\\s]*\\S[\\S\\s]*";
   var nonEmptyRegexValidation = function(id2) {
-    return lmap4(function(x) {
+    return lmap3(function(x) {
       return fromSingleton(id2)(x);
     })(regex(nonEmptyRegex)(noFlags));
   };
   var nonEmptyValidation = function(id2) {
     return function(v) {
-      return lmap12(function(v1) {
+      return lmap1(function(v1) {
         return fromSingleton(id2)("value cannot be empty");
       })(andThen(nonEmptyRegexValidation(id2))(function(r) {
         return matches2(r)(id2)(v);
@@ -7864,16 +7436,39 @@
     };
   };
 
+  // output/Validations.YoutubeValidation/index.js
+  var lmap4 = /* @__PURE__ */ lmap(bifunctorEither);
+  var lmap12 = /* @__PURE__ */ lmap(bifunctorV);
+  var pure10 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
+  var youtubeRegex = "^(?:https?:\\/\\/)?(?:www\\.)?(?:youtube\\.com\\/watch\\?v=([a-zA-Z0-9_-]+)|youtu\\.be\\/([a-zA-Z\\d_-]+))(?:[?&].*)?$";
+  var youtubeRegexValidation = function(id2) {
+    return lmap4(function(x) {
+      return fromSingleton(id2)(x);
+    })(regex(youtubeRegex)(noFlags));
+  };
+  var youtubeUrlValidation = function(id2) {
+    return function(v) {
+      return lmap12(function(v1) {
+        return fromSingleton(id2)("Invalid Youtube URL");
+      })(andThen(andThen(youtubeRegexValidation(id2))(function(ytRegex) {
+        return matches2(ytRegex)(id2)(v);
+      }))(function(urlString) {
+        return maybe(invalid(fromSingleton(id2)("Error validating youtube Url")))(pure10)(fromString5(urlString));
+      }));
+    };
+  };
+
   // output/Model.State.StateFromHtml/index.js
-  var bind10 = /* @__PURE__ */ bind(bindEffect);
-  var pure15 = /* @__PURE__ */ pure(applicativeEffect);
+  var bind8 = /* @__PURE__ */ bind(bindEffect);
+  var pure11 = /* @__PURE__ */ pure(applicativeEffect);
   var mapFlipped2 = /* @__PURE__ */ mapFlipped(functorEffect);
-  var bind15 = /* @__PURE__ */ bind(bindMaybe);
-  var identity10 = /* @__PURE__ */ identity(categoryFn);
-  var map20 = /* @__PURE__ */ map(functorEffect);
-  var traverse4 = /* @__PURE__ */ traverse(traversableArray)(applicativeEffect);
+  var bind14 = /* @__PURE__ */ bind(bindMaybe);
+  var show7 = /* @__PURE__ */ show(showInt);
+  var fromJust4 = /* @__PURE__ */ fromJust();
+  var identity9 = /* @__PURE__ */ identity(categoryFn);
+  var traverseWithIndex2 = /* @__PURE__ */ traverseWithIndex(traversableWithIndexArray)(applicativeEffect);
   var apply5 = /* @__PURE__ */ apply(/* @__PURE__ */ applyV(semigroupValidationErrors));
-  var map110 = /* @__PURE__ */ map(functorV);
+  var map19 = /* @__PURE__ */ map(functorV);
   var youtubeUrlFromHTMLInput = function(youtubeUrlComponent) {
     return function __do5() {
       var urlString = value2(youtubeUrlComponent)();
@@ -7890,7 +7485,7 @@
     var parentNode2 = toParentNode(element);
     return function __do5() {
       var elementMaybe = querySelector("textarea")(parentNode2)();
-      var textareaMaybe = bind15(elementMaybe)(fromElement14);
+      var textareaMaybe = bind14(elementMaybe)(fromElement14);
       if (textareaMaybe instanceof Nothing) {
         return "";
       }
@@ -7899,7 +7494,7 @@
         return value11(textareaMaybe.value0)();
       }
       ;
-      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 135, column 3 - line 137, column 40): " + [textareaMaybe.constructor.name]);
+      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 147, column 3 - line 149, column 40): " + [textareaMaybe.constructor.name]);
     };
   };
   var getSelectValueFromCell = function(cell) {
@@ -7907,7 +7502,7 @@
     var parentNode2 = toParentNode(element);
     return function __do5() {
       var elementMaybe = querySelector("select")(parentNode2)();
-      var selectMaybe = bind15(elementMaybe)(fromElement5);
+      var selectMaybe = bind14(elementMaybe)(fromElement5);
       if (selectMaybe instanceof Nothing) {
         return "";
       }
@@ -7916,7 +7511,7 @@
         return value3(selectMaybe.value0)();
       }
       ;
-      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 145, column 3 - line 147, column 35): " + [selectMaybe.constructor.name]);
+      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 157, column 3 - line 159, column 35): " + [selectMaybe.constructor.name]);
     };
   };
   var getInputValueFromCell = function(cell) {
@@ -7924,7 +7519,7 @@
     var parentNode2 = toParentNode(element);
     return function __do5() {
       var elementMaybe = querySelector("input")(parentNode2)();
-      var inputMaybe = bind15(elementMaybe)(fromElement4);
+      var inputMaybe = bind14(elementMaybe)(fromElement4);
       if (inputMaybe instanceof Nothing) {
         return Nothing.value;
       }
@@ -7933,50 +7528,64 @@
         return mapFlipped2(valueAsNumber(inputMaybe.value0))(Just.create)();
       }
       ;
-      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 125, column 3 - line 127, column 47): " + [inputMaybe.constructor.name]);
+      throw new Error("Failed pattern match at Model.State.StateFromHtml (line 137, column 3 - line 139, column 47): " + [inputMaybe.constructor.name]);
     };
   };
-  var loadSubtitleFromRow = function(row) {
-    return function __do5() {
-      var cells2 = cells(row)();
-      var cellArray = toArray2(cells2)();
-      if (cellArray.length === 8) {
+  var loadSubtitleFromRow = function(index5) {
+    return function(row) {
+      return function __do5() {
+        var cells2 = cells(row)();
+        var cellArray = toArray(cells2)();
+        var $28 = length3(cellArray) !== 8;
+        if ($28) {
+          return throwMinsiError(new HTMLElementNotFound("[Subtitle row " + (show7(index5) + ("]: Unexpected number of columns" + show7(length3(cellArray))))))();
+        }
+        ;
+        var valueCell = fromJust4(index2(cellArray)(2));
+        var startCell = fromJust4(index2(cellArray)(0));
+        var positionCell = fromJust4(index2(cellArray)(6));
+        var fontSizeCell = fromJust4(index2(cellArray)(4));
+        var fontCell = fromJust4(index2(cellArray)(3));
+        var endCell = fromJust4(index2(cellArray)(1));
+        var colorCell = fromJust4(index2(cellArray)(5));
         var startValue = function __do6() {
-          var v = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableStartCell")))(pure15)(fromElement11(cellArray[0])))(getInputValueFromCell)();
-          return maybe(0)(identity10)(v);
+          var v = bind8(maybe(throwMinsiError(new HTMLElementNotFound("[Subtitle row " + (show7(index5) + "]: SubtitleTableStartCell"))))(pure11)(fromElement11(startCell)))(getInputValueFromCell)();
+          return maybe(0)(identity9)(v);
         }();
         var endValue = function __do6() {
-          var v = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableEndCell")))(pure15)(fromElement11(cellArray[1])))(getInputValueFromCell)();
-          return maybe(0)(identity10)(v);
+          var v = bind8(maybe(throwMinsiError(new HTMLElementNotFound("[Subtitle row " + (show7(index5) + "]: SubtitleTableEndCell"))))(pure11)(fromElement11(endCell)))(getInputValueFromCell)();
+          return maybe(0)(identity9)(v);
         }();
-        var valueText = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTablevalueCell")))(pure15)(fromElement11(cellArray[2])))(getTextAreaValueFromCell)();
-        var fontValue = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTablefontCell")))(pure15)(fromElement11(cellArray[3])))(getSelectValueFromCell)();
+        var valueText = bind8(maybe(throwMinsiError(new HTMLElementNotFound("[Subtitle row " + (show7(index5) + "]: SubtitleTablevalueCell"))))(pure11)(fromElement11(valueCell)))(getTextAreaValueFromCell)();
+        var fontValue = bind8(maybe(throwMinsiError(new HTMLElementNotFound("[Subtitle row " + (show7(index5) + "]: SubtitleTablefontCell"))))(pure11)(fromElement11(fontCell)))(getSelectValueFromCell)();
         var fontSizeValue = function __do6() {
-          var v = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTablefontSizeCell")))(pure15)(fromElement11(cellArray[4])))(getInputValueFromCell)();
+          var v = bind8(maybe(throwMinsiError(new HTMLElementNotFound("[Subtitle row " + (show7(index5) + "]: SubtitleTablefontSizeCell"))))(pure11)(fromElement11(fontSizeCell)))(getInputValueFromCell)();
           return maybe(48)(floor2)(v);
         }();
-        var colorValue = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTablecolorCell")))(pure15)(fromElement11(cellArray[5])))(getSelectValueFromCell)();
-        var positionValue = bind10(maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTablepositionCell")))(pure15)(fromElement11(cellArray[6])))(getSelectValueFromCell)();
-        return new Just({
-          videoPosition: {
-            start: startValue,
-            end: endValue
-          },
-          value: toUpper(trim(valueText)),
-          font: parseFont(fontValue),
-          fontSize: fontSizeValue,
-          color: parseColor(colorValue),
-          screenPosition: parsePosition(positionValue)
-        });
-      }
-      ;
-      return Nothing.value;
+        var colorValue = bind8(maybe(throwMinsiError(new HTMLElementNotFound("[Subtitle row " + (show7(index5) + "]: SubtitleTablecolorCell"))))(pure11)(fromElement11(colorCell)))(getSelectValueFromCell)();
+        var positionValue = bind8(maybe(throwMinsiError(new HTMLElementNotFound("[Subtitle row " + (show7(index5) + "]: SubtitleTablepositionCell"))))(pure11)(fromElement11(positionCell)))(getSelectValueFromCell)();
+        return validation(function(errs) {
+          return throwMinsiError(new InvalidInputs(toMap(errs)));
+        })(function(v) {
+          return pure11({
+            videoPosition: {
+              start: startValue,
+              end: endValue
+            },
+            value: toUpper(trim(valueText)),
+            font: parseFont(fontValue),
+            fontSize: fontSizeValue,
+            color: parseColor(colorValue),
+            screenPosition: parsePosition(positionValue)
+          });
+        })(cutVideoValidation("[Subtitle row " + (show7(index5) + "]"))(startValue)(endValue))();
+      };
     };
   };
   var loadSubtitlesFromTable = function(table) {
     return function __do5() {
       var rows4 = getRows(table)();
-      var subtitles = map20(catMaybes)(traverse4(loadSubtitleFromRow)(rows4))();
+      var subtitles = traverseWithIndex2(loadSubtitleFromRow)(rows4)();
       return subtitles;
     };
   };
@@ -7998,7 +7607,7 @@
       var artistV = nonEmptyFromHtmlInput(v.value0.artist)(artistId)();
       var titleV = nonEmptyFromHtmlInput(v.value0.title)(titleId)();
       var subtitles = loadSubtitlesFromTable(v.value0.subtitleTable)();
-      return apply5(apply5(apply5(apply5(map110(function(v1) {
+      return apply5(apply5(apply5(apply5(map19(function(v1) {
         return function(v2) {
           return function(v3) {
             return function(v4) {
@@ -8039,36 +7648,61 @@
   // output/Web.DOM.DocumentFragment/index.js
   var toParentNode2 = unsafeCoerce2;
 
+  // output/Web.Event.EventTarget/foreign.js
+  function eventListener(fn) {
+    return function() {
+      return function(event) {
+        return fn(event)();
+      };
+    };
+  }
+  function addEventListener(type) {
+    return function(listener) {
+      return function(useCapture) {
+        return function(target6) {
+          return function() {
+            return target6.addEventListener(type, listener, useCapture);
+          };
+        };
+      };
+    };
+  }
+
+  // output/Web.HTML.Event.EventTypes/index.js
+  var input = "input";
+  var click2 = "click";
+  var change = "change";
+
   // output/Handlers.ApplyButtonHandler/index.js
-  var bind11 = /* @__PURE__ */ bind(bindAff);
+  var bind9 = /* @__PURE__ */ bind(bindAff);
   var voidLeft2 = /* @__PURE__ */ voidLeft(functorAff);
-  var pure16 = /* @__PURE__ */ pure(applicativeAff);
-  var liftEffect8 = /* @__PURE__ */ liftEffect(monadEffectAff);
+  var pure15 = /* @__PURE__ */ pure(applicativeAff);
+  var liftEffect7 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var tailRecM3 = /* @__PURE__ */ tailRecM(monadRecAff);
-  var map21 = /* @__PURE__ */ map(functorEffect);
-  var show11 = /* @__PURE__ */ show(showNumber);
-  var when3 = /* @__PURE__ */ when(applicativeEffect);
-  var pure17 = /* @__PURE__ */ pure(applicativeEffect);
+  var map20 = /* @__PURE__ */ map(functorEffect);
+  var show8 = /* @__PURE__ */ show(showNumber);
+  var when2 = /* @__PURE__ */ when(applicativeEffect);
+  var pure16 = /* @__PURE__ */ pure(applicativeEffect);
   var bind22 = /* @__PURE__ */ bind(bindMaybe);
   var $$void7 = /* @__PURE__ */ $$void(functorEffect);
-  var traverse5 = /* @__PURE__ */ traverse(traversableArray)(applicativeEffect);
+  var traverse3 = /* @__PURE__ */ traverse(traversableArray)(applicativeEffect);
   var unless2 = /* @__PURE__ */ unless(applicativeEffect);
   var unwrap4 = /* @__PURE__ */ unwrap();
   var applySecond3 = /* @__PURE__ */ applySecond(applyAff);
   var void1 = /* @__PURE__ */ $$void(functorAff);
   var waitForStatus = function(filename) {
     var pollStatus = function(v) {
-      return bind11(callStatus(filename))(function(response) {
+      return bind9(callStatus(filename))(function(response) {
         if (response.status instanceof Pending) {
           return voidLeft2(delay(500))(new Loop(unit));
         }
         ;
         if (response.status instanceof Succeed) {
-          return pure16(new Done(unit));
+          return pure15(new Done(unit));
         }
         ;
         if (response.status instanceof Failed) {
-          return liftEffect8(throwMinsiError(new ComputeFailed("Video download failed")));
+          return liftEffect7(throwMinsiError(new ComputeFailed("Video download failed")));
         }
         ;
         throw new Error("Failed pattern match at Handlers.ApplyButtonHandler (line 93, column 5 - line 96, column 85): " + [response.status.constructor.name]);
@@ -8080,8 +7714,8 @@
     return function(video) {
       var videoMediaElement = toHTMLMediaElement(video);
       return function __do5() {
-        var v = map21(unInstant)(now)();
-        var cacheBustedPath = filepath + ("?t=" + show11(v));
+        var v = map20(unInstant)(now)();
+        var cacheBustedPath = filepath + ("?t=" + show8(v));
         pause(videoMediaElement)();
         setSrc5(cacheBustedPath)(videoMediaElement)();
         return load(videoMediaElement)();
@@ -8099,7 +7733,7 @@
       return function __do5() {
         var classList2 = classList(element)();
         var containsClassName = contains4(classList2)(className2)();
-        return when3(containsClassName)(remove(classList2)(className2))();
+        return when2(containsClassName)(remove(classList2)(className2))();
       };
     };
   };
@@ -8107,7 +7741,7 @@
     return function __do5() {
       var fragment = content(subtitleTemplateElement)();
       var firstEl = firstElementChild(toParentNode2(fragment))();
-      return maybe(throwMinsiError(new HTMLElementNotFound("subtitleRowTemplate")))(pure17)(bind22(firstEl)(fromElement12))();
+      return maybe(throwMinsiError(new HTMLElementNotFound("subtitleRowTemplate")))(pure16)(bind22(firstEl)(fromElement12))();
     };
   };
   var setSubtitleTableMaxValues = function(v) {
@@ -8117,15 +7751,15 @@
         return function __do5() {
           var subtitleRow2 = getRow(subtitleRowTemplate)();
           var rows4 = getRows(subtitleTable)();
-          $$void7(traverse5(function(row) {
+          $$void7(traverse3(function(row) {
             return function __do6() {
               var startInput = getStartInput(row)();
               var endInput = getEndInput(row)();
-              setMax(show11(durationSeconds))(startInput)();
-              return setMax(show11(durationSeconds))(endInput)();
+              setMax(show8(durationSeconds))(startInput)();
+              return setMax(show8(durationSeconds))(endInput)();
             };
           })(cons(subtitleRow2)(rows4)))();
-          return log("Set max values for all subtitle inputs to " + (show11(durationSeconds) + " millis"))();
+          return log("Set max values for all subtitle inputs to " + (show8(durationSeconds) + " millis"))();
         };
       };
     };
@@ -8136,7 +7770,7 @@
     var stateV = fromHtmlInputs(components.htmlInputs)();
     var state3 = either(function($48) {
       return throwMinsiError(InvalidInputs.create(toMap($48)));
-    })(pure17)(toEither(stateV))();
+    })(pure16)(toEither(stateV))();
     return new Tuple(state3, components);
   };
   var addClass = function(className2) {
@@ -8191,7 +7825,7 @@
       showModal(loadingModalId)();
       return runAff_(function(result) {
         return genericErrorsHandlerEither(result);
-      })($$finally(liftEffect8(finallyHandlers(components)(state3)))(applySecond3(void1(callCompute(state3)))(waitForStatus(filename))))();
+      })($$finally(liftEffect7(finallyHandlers(components)(state3)))(applySecond3(void1(callCompute(state3)))(waitForStatus(filename))))();
     });
   };
   var setApplyButtonHandler = function(applyButton) {
@@ -8202,150 +7836,127 @@
     });
   };
 
-  // output/Web.DOM.ElementName/index.js
-  var eqElementName = eqString;
-
-  // output/Handlers.RemoveSubtitleButtonHandler/index.js
-  var bindMaybeT2 = /* @__PURE__ */ bindMaybeT(monadEffect);
-  var bind16 = /* @__PURE__ */ bind(bindMaybeT2);
-  var lift3 = /* @__PURE__ */ lift(monadTransMaybeT)(monadEffect);
-  var bind17 = /* @__PURE__ */ bind(bindEffect);
-  var applySecond4 = /* @__PURE__ */ applySecond(applyEffect);
-  var pure18 = /* @__PURE__ */ pure(applicativeEffect);
-  var map23 = /* @__PURE__ */ map(functorMaybe);
-  var eq2 = /* @__PURE__ */ eq(eqElementName);
-  var iterateUntilM2 = /* @__PURE__ */ iterateUntilM(/* @__PURE__ */ monadMaybeT(monadEffect));
-  var bind23 = /* @__PURE__ */ bind(bindMaybe);
-  var discard3 = /* @__PURE__ */ discard(discardUnit);
-  var discard1 = /* @__PURE__ */ discard3(bindMaybeT2);
-  var when4 = /* @__PURE__ */ when(/* @__PURE__ */ applicativeMaybeT(monadEffect));
-  var traverse_2 = /* @__PURE__ */ traverse_(applicativeEffect)(foldableArray);
-  var removeRowFromDom = function(tableRow) {
-    var rowNode = toNode3(tableRow);
-    return bind16(parentNode(rowNode))(function(parentNode$prime) {
-      return lift3(removeChild(rowNode)(parentNode$prime));
-    });
+  // output/Handlers.CutRangeHandler/index.js
+  var show9 = /* @__PURE__ */ show(showInt);
+  var show13 = /* @__PURE__ */ show(showNumber);
+  var CRET = /* @__PURE__ */ function() {
+    function CRET2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    CRET2.create = function(value0) {
+      return new CRET2(value0);
+    };
+    return CRET2;
+  }();
+  var updateCutValue = function(numMs) {
+    return function(cutValueInput) {
+      return setValue2(show9(floor2(numMs)))(cutValueInput);
+    };
   };
-  var isTrElement = function(node) {
-    return fromMaybe(false)(map23(function($25) {
-      return function(v) {
-        return eq2(v)("TR");
-      }(tagName($25));
-    })(fromNode(node)));
-  };
-  var getParentNode = function(node) {
-    return parentNode(node);
-  };
-  var findTrAncestor = function(node) {
-    return bind16(iterateUntilM2(isTrElement)(getParentNode)(node))(function(trNode) {
-      return pure18(bind23(fromNode(trNode))(fromElement12));
-    });
-  };
-  var removeSubtitleButtonEventListenerTrans = function(ev) {
-    return discard1(lift3(log("Remove subtitle button clicked")))(function() {
-      return bind16(pure18(bind23(target5(ev))(fromEventTarget)))(function(buttonTarget) {
-        return bind16(lift3(bind17(classList(toElement(buttonTarget)))(flip(contains4)("removeSubtitleButton"))))(function(hasRemoveClass) {
-          return discard1(when4(!hasRemoveClass)(pure18(Nothing.value)))(function() {
-            var buttonNode = toNode5(toElement(buttonTarget));
-            return bind16(findTrAncestor(buttonNode))(function(tableRow) {
-              return removeRowFromDom(tableRow);
+  var rangeToNumberListenerStart = function(cutStart) {
+    return function(v) {
+      return function(cutStartValue) {
+        return function(cutEndValue) {
+          return function(v1) {
+            return genericErrorsHandler(function __do5() {
+              var start2 = valueAsNumber(cutStart)();
+              var end = valueAsNumber(cutEndValue)();
+              return validation(function(errs) {
+                return throwMinsiError(new InvalidInputs(toMap(errs)));
+              })(function(v2) {
+                return setValue2(show13(start2))(cutStartValue);
+              })(cutVideoValidation(cutStartId)(start2)(end))();
             });
+          };
+        };
+      };
+    };
+  };
+  var rangeToNumberListenerEnd = function(v) {
+    return function(cutEnd) {
+      return function(cutStartValue) {
+        return function(cutEndValue) {
+          return function(v1) {
+            return genericErrorsHandler(function __do5() {
+              var start2 = valueAsNumber(cutStartValue)();
+              var end = valueAsNumber(cutEnd)();
+              return validation(function(errs) {
+                return throwMinsiError(new InvalidInputs(toMap(errs)));
+              })(function(v2) {
+                return setValue2(show13(end))(cutEndValue);
+              })(cutVideoValidation(cutStartId)(start2)(end))();
+            });
+          };
+        };
+      };
+    };
+  };
+  var numberToRangeListenerStart = function(cutStart) {
+    return function(cutStartValue) {
+      return function(cutEndValue) {
+        return function(v) {
+          return genericErrorsHandler(function __do5() {
+            var start2 = valueAsNumber(cutStartValue)();
+            var end = valueAsNumber(cutEndValue)();
+            return validation(function(errs) {
+              return throwMinsiError(new InvalidInputs(toMap(errs)));
+            })(function(v1) {
+              return setValue2(show13(start2))(cutStart);
+            })(cutVideoValidation(cutStartId)(start2)(end))();
           });
-        });
-      });
-    });
-  };
-  var removeSubtitleButtonEventListener = function(ev) {
-    return genericErrorsHandler(applySecond4(runMaybeT(removeSubtitleButtonEventListenerTrans(ev)))(pure18(unit)));
-  };
-  var setRemoveSubtitleButtonHandler = function(subtitleTable) {
-    var tableRowEventTarget = function(r) {
-      return toEventTarget2(toElement7(r));
+        };
+      };
     };
+  };
+  var numberToRangeListenerEnd = function(cutEnd) {
+    return function(cutStartValue) {
+      return function(cutEndValue) {
+        return function(v) {
+          return genericErrorsHandler(function __do5() {
+            var start2 = valueAsNumber(cutStartValue)();
+            var end = valueAsNumber(cutEndValue)();
+            return validation(function(errs) {
+              return throwMinsiError(new InvalidInputs(toMap(errs)));
+            })(function(v1) {
+              return setValue2(show13(end))(cutEnd);
+            })(cutVideoValidation(cutEndId)(start2)(end))();
+          });
+        };
+      };
+    };
+  };
+  var setCutRangeHandlers = function(v) {
     return genericErrorsHandler(function __do5() {
-      log("Setting up remove subtitle button handlers")();
-      var evl = eventListener(removeSubtitleButtonEventListener)();
-      var rows4 = getRows(subtitleTable)();
-      traverse_2(function(r) {
-        return addEventListener(click2)(evl)(false)(tableRowEventTarget(r));
-      })(rows4)();
-      return log("Remove subtitle button handler set up successfully")();
+      var cutStartEvL = eventListener(rangeToNumberListenerStart(v.value0.cutStart)(v.value0.cutEnd)(v.value0.cutStartValue)(v.value0.cutEndValue))();
+      var cutEndEvL = eventListener(rangeToNumberListenerEnd(v.value0.cutStart)(v.value0.cutEnd)(v.value0.cutStartValue)(v.value0.cutEndValue))();
+      var cutStartValueEvL = eventListener(numberToRangeListenerStart(v.value0.cutStart)(v.value0.cutStartValue)(v.value0.cutEndValue))();
+      var cutEndValueEvL = eventListener(numberToRangeListenerEnd(v.value0.cutEnd)(v.value0.cutStartValue)(v.value0.cutEndValue))();
+      addEventListener(input)(cutStartEvL)(false)(toEventTarget2(toElement3(v.value0.cutStart)))();
+      addEventListener(change)(cutStartEvL)(false)(toEventTarget2(toElement3(v.value0.cutStart)))();
+      addEventListener(input)(cutEndEvL)(false)(toEventTarget2(toElement3(v.value0.cutEnd)))();
+      addEventListener(change)(cutEndEvL)(false)(toEventTarget2(toElement3(v.value0.cutEnd)))();
+      addEventListener(input)(cutStartValueEvL)(false)(toEventTarget2(toElement3(v.value0.cutStartValue)))();
+      addEventListener(change)(cutStartValueEvL)(false)(toEventTarget2(toElement3(v.value0.cutStartValue)))();
+      addEventListener(input)(cutEndValueEvL)(false)(toEventTarget2(toElement3(v.value0.cutEndValue)))();
+      addEventListener(change)(cutEndValueEvL)(false)(toEventTarget2(toElement3(v.value0.cutEndValue)))();
+      return unit;
     });
-  };
-  var addRemoveSubtitleListenerToRow = function(row) {
-    return function __do5() {
-      var evl = eventListener(removeSubtitleButtonEventListener)();
-      return addEventListener(click2)(evl)(false)(toEventTarget2(toElement7(row)))();
-    };
   };
 
-  // output/Handlers.AddSubtitleButtonHandler/index.js
-  var pure19 = /* @__PURE__ */ pure(applicativeEffect);
-  var bind18 = /* @__PURE__ */ bind(bindMaybe);
-  var show15 = /* @__PURE__ */ show(showNumber);
-  var cloneFirstRow = function(firstRow) {
-    return function(subtitleTable) {
-      return function __do5() {
-        var tbody = getTBody(subtitleTable)();
-        var clonedRowNode = deepClone(toNode3(firstRow))();
-        var clonedRow = maybe(throwMinsiError(new HTMLElementNotFound("ClonedRow")))(pure19)(bind18(fromNode(clonedRowNode))(fromElement12))();
-        var firstRowEndInput = getEndInput(firstRow)();
-        var endValue = valueAsNumber(firstRowEndInput)();
-        var clonedRowStartInput = getStartInput(clonedRow)();
-        setValue2(show15(endValue))(clonedRowStartInput)();
-        var newEndValue = endValue + 1;
-        var clonedRowEndInput = getEndInput(clonedRow)();
-        setValue2(show15(newEndValue))(clonedRowEndInput)();
-        insertBefore(clonedRowNode)(toNode3(firstRow))(toNode4(tbody))();
-        addRemoveSubtitleListenerToRow(clonedRow)();
-        return log("Subtitle row cloned successfully")();
-      };
+  // output/Web.Event.Event/foreign.js
+  function _target(e) {
+    return e.target;
+  }
+  function preventDefault(e) {
+    return function() {
+      return e.preventDefault();
     };
-  };
-  var addNewRow = function(subtitleTable) {
-    return function(subtitleRowTemplate) {
-      return function __do5() {
-        var subtitleRow2 = getRow(subtitleRowTemplate)();
-        var tbody = getTBody(subtitleTable)();
-        var clonedRowNode = deepClone(toNode3(subtitleRow2))();
-        var clonedRow = maybe(throwMinsiError(new HTMLElementNotFound("subtitleRow")))(pure19)(bind18(fromNode(clonedRowNode))(fromElement12))();
-        appendChild(clonedRowNode)(toNode4(tbody))();
-        addRemoveSubtitleListenerToRow(clonedRow)();
-        return log("Subtitle row added successfully")();
-      };
-    };
-  };
-  var addSubtitleButtonEventListener = function(subtitleTable) {
-    return function(subtitleRowTemplate) {
-      return function(v) {
-        return genericErrorsHandler(function __do5() {
-          log("Add subtitle button clicked")();
-          var eitherFirstRow = $$try(getFirstRow(subtitleTable))();
-          if (eitherFirstRow instanceof Left) {
-            return addNewRow(subtitleTable)(subtitleRowTemplate)();
-          }
-          ;
-          if (eitherFirstRow instanceof Right) {
-            return cloneFirstRow(eitherFirstRow.value0)(subtitleTable)();
-          }
-          ;
-          throw new Error("Failed pattern match at Handlers.AddSubtitleButtonHandler (line 40, column 3 - line 42, column 59): " + [eitherFirstRow.constructor.name]);
-        });
-      };
-    };
-  };
-  var setAddSubtitleButtonHandler = function(addSubtitleButton) {
-    return function(subtitleTable) {
-      return function(subtitleRowTemplate) {
-        var addSubtitleButtonEventTarget = toEventTarget2(toElement(addSubtitleButton));
-        return genericErrorsHandler(function __do5() {
-          log("Setting up add subtitle button handler")();
-          var addSubtitleButtonEvL = eventListener(addSubtitleButtonEventListener(subtitleTable)(subtitleRowTemplate))();
-          addEventListener(click2)(addSubtitleButtonEvL)(false)(addSubtitleButtonEventTarget)();
-          return log("Add subtitle button handler set up successfully")();
-        });
-      };
-    };
+  }
+
+  // output/Web.Event.Event/index.js
+  var target5 = function($3) {
+    return toMaybe(_target($3));
   };
 
   // output/Web.UIEvent.KeyboardEvent/foreign.js
@@ -8369,10 +7980,10 @@
   // output/Handlers.KeyboardHandler/index.js
   var min5 = /* @__PURE__ */ min(ordNumber);
   var max6 = /* @__PURE__ */ max(ordNumber);
-  var bind19 = /* @__PURE__ */ bind(bindMaybe);
-  var when5 = /* @__PURE__ */ when(applicativeEffect);
-  var applySecond5 = /* @__PURE__ */ applySecond(applyEffect);
-  var pure20 = /* @__PURE__ */ pure(applicativeEffect);
+  var bind15 = /* @__PURE__ */ bind(bindMaybe);
+  var when3 = /* @__PURE__ */ when(applicativeEffect);
+  var applySecond4 = /* @__PURE__ */ applySecond(applyEffect);
+  var pure17 = /* @__PURE__ */ pure(applicativeEffect);
   var KHT = /* @__PURE__ */ function() {
     function KHT2(value0) {
       this.value0 = value0;
@@ -8413,7 +8024,7 @@
   var isTargetEditableElement = function(ke) {
     return maybe(false)(function(el) {
       return isJust(fromElement4(el)) || (isJust(fromElement14(el)) || isJust(fromElement5(el)));
-    })(bind19(target5(toEvent(ke)))(fromEventTarget2));
+    })(bind15(target5(toEvent(ke)))(fromEventTarget2));
   };
   var handleKeyboardEvent = function(v) {
     return function(keyboardEvent) {
@@ -8425,22 +8036,22 @@
         var stop = preventDefault(ev);
         var whenNotEditable = function(cond) {
           return function(act) {
-            return when5(cond && !isTargetEditableElement(keyboardEvent))(applySecond5(act)(stop));
+            return when3(cond && !isTargetEditableElement(keyboardEvent))(applySecond4(act)(stop));
           };
         };
         return function __do5() {
-          when5(keyValue === "Enter" && (isCtrl || isMeta))(applySecond5(applyButtonEventListener(ev))(stop))();
+          when3(keyValue === "Enter" && (isCtrl || isMeta))(applySecond4(applyButtonEventListener(ev))(stop))();
           whenNotEditable(keyValue === " ")(toggleResultVideoPlayback(v.value0.resultVideo))();
           whenNotEditable(keyValue === "ArrowLeft")(skipResultVideoBackward(v.value0.resultVideo))();
           whenNotEditable(keyValue === "ArrowRight")(skipResultVideoForward(v.value0.resultVideo))();
-          return whenNotEditable(keyValue === "?")(applySecond5(showModal(v.value0.keyboardShortcutsModalId))(stop))();
+          return whenNotEditable(keyValue === "?")(applySecond4(showModal(v.value0.keyboardShortcutsModalId))(stop))();
         };
       }());
     };
   };
   var keyboardEventListener = function(targets) {
     return function(ev) {
-      return genericErrorsHandler(maybe(pure20(unit))(handleKeyboardEvent(targets))(fromEvent(ev)));
+      return genericErrorsHandler(maybe(pure17(unit))(handleKeyboardEvent(targets))(fromEvent(ev)));
     };
   };
   var setKeyboardHandlers = function(targets) {
@@ -8462,6 +8073,21 @@
     });
   };
 
+  // output/Conversion.Time/index.js
+  var show10 = /* @__PURE__ */ show(showNumber);
+  var identity10 = /* @__PURE__ */ identity(categoryFn);
+  var append5 = /* @__PURE__ */ append(semigroupArray);
+  var formatToThreeDecimals = function(v) {
+    var v1 = span2(function(x) {
+      return x !== ".";
+    })(toCharArray(show10(v)));
+    var num = fromCharArray(v1.init);
+    var decChars = maybe([])(identity10)(tail(v1.rest));
+    var dec3 = take(3)(append5(decChars)(replicate(3)("0")));
+    var dec = fromCharArray(dec3);
+    return num + ("." + dec);
+  };
+
   // output/Handlers.ResultVideo.Handler/index.js
   var RVET = /* @__PURE__ */ function() {
     function RVET2(value0) {
@@ -8473,7 +8099,7 @@
     };
     return RVET2;
   }();
-  var updatePlaybackPosition2 = function(playbackPositionResultVideo) {
+  var updatePlaybackPosition = function(playbackPositionResultVideo) {
     return function(resultVideo) {
       return function __do5() {
         var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
@@ -8483,62 +8109,12 @@
   };
   var setResultVideoHandlers = function(v) {
     return genericErrorsHandler(function __do5() {
-      setInterval2(1e3)(updatePlaybackPosition2(v.value0.playbackPositionResultVideo)(v.value0.resultVideo))();
+      setInterval2(1e3)(updatePlaybackPosition(v.value0.playbackPositionResultVideo)(v.value0.resultVideo))();
       return unit;
     });
   };
 
-  // output/Handlers.SubtitleTimeButtonsHandler/index.js
-  var show16 = /* @__PURE__ */ show(showNumber);
-  var STBT = /* @__PURE__ */ function() {
-    function STBT2(value0) {
-      this.value0 = value0;
-    }
-    ;
-    STBT2.create = function(value0) {
-      return new STBT2(value0);
-    };
-    return STBT2;
-  }();
-  var setSubtitleStartButtonEventListener = function(subtitleTable) {
-    return function(resultVideo) {
-      return function(v) {
-        return genericErrorsHandler(function __do5() {
-          log("Set subtitle start button clicked")();
-          var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
-          var firstRow = getFirstRow(subtitleTable)();
-          var startInput = getStartInput(firstRow)();
-          setValue2(show16(currentTimeValue * 1e3))(startInput)();
-          return log("Subtitle start time set successfully")();
-        });
-      };
-    };
-  };
-  var setSubtitleEndButtonEventListener = function(subtitleTable) {
-    return function(resultVideo) {
-      return function(v) {
-        return genericErrorsHandler(function __do5() {
-          log("Set subtitle end button clicked")();
-          var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
-          var firstRow = getFirstRow(subtitleTable)();
-          var endInput = getEndInput(firstRow)();
-          setValue2(show16(currentTimeValue * 1e3))(endInput)();
-          return log("Subtitle end time set successfully")();
-        });
-      };
-    };
-  };
-  var setSubtitleTimeButtonsHandlers = function(v) {
-    return genericErrorsHandler(function __do5() {
-      var startButtonEvL = eventListener(setSubtitleStartButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo))();
-      var endButtonEvL = eventListener(setSubtitleEndButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo))();
-      addEventListener(click2)(startButtonEvL)(false)(toEventTarget2(toElement(v.value0.setSubtitleStartButton)))();
-      addEventListener(click2)(endButtonEvL)(false)(toEventTarget2(toElement(v.value0.setSubtitleEndButton)))();
-      return log("Subtitle time buttons handlers set up successfully")();
-    });
-  };
-
-  // output/Handlers.VideoSourceHandler/index.js
+  // output/Handlers.ResultVideo.VideoSourceHandler/index.js
   var unwrap5 = /* @__PURE__ */ unwrap();
   var videoSourceEventListener = function(videoSource) {
     return function(video) {
@@ -8568,6 +8144,576 @@
         return addEventListener(change)(videoSourceEvL)(false)(videoSourceEventTarget)();
       });
     };
+  };
+
+  // output/Control.Monad.Loops/index.js
+  var whileM_ = function(dictMonad) {
+    var bind20 = bind(dictMonad.Bind1());
+    var pure25 = pure(dictMonad.Applicative0());
+    return function(p) {
+      return function(f) {
+        return bind20(p)(function(v) {
+          if (v) {
+            return bind20(f)(function(v1) {
+              return whileM_(dictMonad)(p)(f);
+            });
+          }
+          ;
+          return pure25(unit);
+        });
+      };
+    };
+  };
+  var iterateUntilM = function(dictMonad) {
+    var pure25 = pure(dictMonad.Applicative0());
+    var bind20 = bind(dictMonad.Bind1());
+    return function(p) {
+      return function(f) {
+        return function(v) {
+          var $181 = p(v);
+          if ($181) {
+            return pure25(v);
+          }
+          ;
+          return bind20(f(v))(iterateUntilM(dictMonad)(p)(f));
+        };
+      };
+    };
+  };
+
+  // output/Web.DOM.ElementName/index.js
+  var eqElementName = eqString;
+
+  // output/Handlers.Subtitles.RemoveSubtitleButtonHandler/index.js
+  var bindMaybeT2 = /* @__PURE__ */ bindMaybeT(monadEffect);
+  var bind10 = /* @__PURE__ */ bind(bindMaybeT2);
+  var lift3 = /* @__PURE__ */ lift(monadTransMaybeT)(monadEffect);
+  var bind16 = /* @__PURE__ */ bind(bindEffect);
+  var applySecond5 = /* @__PURE__ */ applySecond(applyEffect);
+  var pure18 = /* @__PURE__ */ pure(applicativeEffect);
+  var map21 = /* @__PURE__ */ map(functorMaybe);
+  var eq2 = /* @__PURE__ */ eq(eqElementName);
+  var iterateUntilM2 = /* @__PURE__ */ iterateUntilM(/* @__PURE__ */ monadMaybeT(monadEffect));
+  var bind23 = /* @__PURE__ */ bind(bindMaybe);
+  var discard2 = /* @__PURE__ */ discard(discardUnit);
+  var discard1 = /* @__PURE__ */ discard2(bindMaybeT2);
+  var when4 = /* @__PURE__ */ when(/* @__PURE__ */ applicativeMaybeT(monadEffect));
+  var traverse_2 = /* @__PURE__ */ traverse_(applicativeEffect)(foldableArray);
+  var removeRowFromDom = function(tableRow) {
+    var rowNode = toNode3(tableRow);
+    return bind10(parentNode(rowNode))(function(parentNode$prime) {
+      return lift3(removeChild(rowNode)(parentNode$prime));
+    });
+  };
+  var isTrElement = function(node) {
+    return fromMaybe(false)(map21(function($25) {
+      return function(v) {
+        return eq2(v)("TR");
+      }(tagName($25));
+    })(fromNode(node)));
+  };
+  var getParentNode = function(node) {
+    return parentNode(node);
+  };
+  var findTrAncestor = function(node) {
+    return bind10(iterateUntilM2(isTrElement)(getParentNode)(node))(function(trNode) {
+      return pure18(bind23(fromNode(trNode))(fromElement12));
+    });
+  };
+  var removeSubtitleButtonEventListenerTrans = function(ev) {
+    return discard1(lift3(log("Remove subtitle button clicked")))(function() {
+      return bind10(pure18(bind23(target5(ev))(fromEventTarget)))(function(buttonTarget) {
+        return bind10(lift3(bind16(classList(toElement(buttonTarget)))(flip(contains4)("removeSubtitleButton"))))(function(hasRemoveClass) {
+          return discard1(when4(!hasRemoveClass)(pure18(Nothing.value)))(function() {
+            var buttonNode = toNode5(toElement(buttonTarget));
+            return bind10(findTrAncestor(buttonNode))(function(tableRow) {
+              return removeRowFromDom(tableRow);
+            });
+          });
+        });
+      });
+    });
+  };
+  var removeSubtitleButtonEventListener = function(ev) {
+    return genericErrorsHandler(applySecond5(runMaybeT(removeSubtitleButtonEventListenerTrans(ev)))(pure18(unit)));
+  };
+  var setRemoveSubtitleButtonHandler = function(subtitleTable) {
+    var tableRowEventTarget = function(r) {
+      return toEventTarget2(toElement7(r));
+    };
+    return genericErrorsHandler(function __do5() {
+      log("Setting up remove subtitle button handlers")();
+      var evl = eventListener(removeSubtitleButtonEventListener)();
+      var rows4 = getRows(subtitleTable)();
+      traverse_2(function(r) {
+        return addEventListener(click2)(evl)(false)(tableRowEventTarget(r));
+      })(rows4)();
+      return log("Remove subtitle button handler set up successfully")();
+    });
+  };
+  var addRemoveSubtitleListenerToRow = function(row) {
+    return function __do5() {
+      var evl = eventListener(removeSubtitleButtonEventListener)();
+      return addEventListener(click2)(evl)(false)(toEventTarget2(toElement7(row)))();
+    };
+  };
+
+  // output/Handlers.Subtitles.AddSubtitleButtonHandler/index.js
+  var pure19 = /* @__PURE__ */ pure(applicativeEffect);
+  var bind17 = /* @__PURE__ */ bind(bindMaybe);
+  var show11 = /* @__PURE__ */ show(showNumber);
+  var cloneFirstRow = function(firstRow) {
+    return function(subtitleTable) {
+      return function __do5() {
+        var tbody = getTBody(subtitleTable)();
+        var clonedRowNode = deepClone(toNode3(firstRow))();
+        var clonedRow = maybe(throwMinsiError(new HTMLElementNotFound("ClonedRow")))(pure19)(bind17(fromNode(clonedRowNode))(fromElement12))();
+        var firstRowEndInput = getEndInput(firstRow)();
+        var endValue = valueAsNumber(firstRowEndInput)();
+        var clonedRowStartInput = getStartInput(clonedRow)();
+        setValue2(show11(endValue))(clonedRowStartInput)();
+        var newEndValue = endValue + 1;
+        var clonedRowEndInput = getEndInput(clonedRow)();
+        setValue2(show11(newEndValue))(clonedRowEndInput)();
+        insertBefore(clonedRowNode)(toNode3(firstRow))(toNode4(tbody))();
+        addRemoveSubtitleListenerToRow(clonedRow)();
+        return log("Subtitle row cloned successfully")();
+      };
+    };
+  };
+  var addNewRow = function(subtitleTable) {
+    return function(subtitleRowTemplate) {
+      return function __do5() {
+        var subtitleRow2 = getRow(subtitleRowTemplate)();
+        var tbody = getTBody(subtitleTable)();
+        var clonedRowNode = deepClone(toNode3(subtitleRow2))();
+        var clonedRow = maybe(throwMinsiError(new HTMLElementNotFound("subtitleRow")))(pure19)(bind17(fromNode(clonedRowNode))(fromElement12))();
+        appendChild(clonedRowNode)(toNode4(tbody))();
+        addRemoveSubtitleListenerToRow(clonedRow)();
+        return log("Subtitle row added successfully")();
+      };
+    };
+  };
+  var addSubtitleButtonEventListener = function(subtitleTable) {
+    return function(subtitleRowTemplate) {
+      return function(v) {
+        return genericErrorsHandler(function __do5() {
+          log("Add subtitle button clicked")();
+          var eitherFirstRow = $$try(getFirstRow(subtitleTable))();
+          if (eitherFirstRow instanceof Left) {
+            return addNewRow(subtitleTable)(subtitleRowTemplate)();
+          }
+          ;
+          if (eitherFirstRow instanceof Right) {
+            return cloneFirstRow(eitherFirstRow.value0)(subtitleTable)();
+          }
+          ;
+          throw new Error("Failed pattern match at Handlers.Subtitles.AddSubtitleButtonHandler (line 40, column 3 - line 42, column 59): " + [eitherFirstRow.constructor.name]);
+        });
+      };
+    };
+  };
+  var setAddSubtitleButtonHandler = function(addSubtitleButton) {
+    return function(subtitleTable) {
+      return function(subtitleRowTemplate) {
+        var addSubtitleButtonEventTarget = toEventTarget2(toElement(addSubtitleButton));
+        return genericErrorsHandler(function __do5() {
+          log("Setting up add subtitle button handler")();
+          var addSubtitleButtonEvL = eventListener(addSubtitleButtonEventListener(subtitleTable)(subtitleRowTemplate))();
+          addEventListener(click2)(addSubtitleButtonEvL)(false)(addSubtitleButtonEventTarget)();
+          return log("Add subtitle button handler set up successfully")();
+        });
+      };
+    };
+  };
+
+  // output/Handlers.Subtitles.SubtitleTimeButtonsHandler/index.js
+  var show14 = /* @__PURE__ */ show(showNumber);
+  var STBT = /* @__PURE__ */ function() {
+    function STBT2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    STBT2.create = function(value0) {
+      return new STBT2(value0);
+    };
+    return STBT2;
+  }();
+  var setSubtitleStartButtonEventListener = function(subtitleTable) {
+    return function(resultVideo) {
+      return function(v) {
+        return genericErrorsHandler(function __do5() {
+          log("Set subtitle start button clicked")();
+          var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
+          var firstRow = getFirstRow(subtitleTable)();
+          var startInput = getStartInput(firstRow)();
+          setValue2(show14(currentTimeValue * 1e3))(startInput)();
+          return log("Subtitle start time set successfully")();
+        });
+      };
+    };
+  };
+  var setSubtitleEndButtonEventListener = function(subtitleTable) {
+    return function(resultVideo) {
+      return function(v) {
+        return genericErrorsHandler(function __do5() {
+          log("Set subtitle end button clicked")();
+          var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
+          var firstRow = getFirstRow(subtitleTable)();
+          var endInput = getEndInput(firstRow)();
+          setValue2(show14(currentTimeValue * 1e3))(endInput)();
+          return log("Subtitle end time set successfully")();
+        });
+      };
+    };
+  };
+  var setSubtitleTimeButtonsHandlers = function(v) {
+    return genericErrorsHandler(function __do5() {
+      var startButtonEvL = eventListener(setSubtitleStartButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo))();
+      var endButtonEvL = eventListener(setSubtitleEndButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo))();
+      addEventListener(click2)(startButtonEvL)(false)(toEventTarget2(toElement(v.value0.setSubtitleStartButton)))();
+      addEventListener(click2)(endButtonEvL)(false)(toEventTarget2(toElement(v.value0.setSubtitleEndButton)))();
+      return log("Subtitle time buttons handlers set up successfully")();
+    });
+  };
+
+  // output/Handlers.TextInputValidationHandler/index.js
+  var pure20 = /* @__PURE__ */ pure(applicativeEffect);
+  var TIVT = /* @__PURE__ */ function() {
+    function TIVT2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    TIVT2.create = function(value0) {
+      return new TIVT2(value0);
+    };
+    return TIVT2;
+  }();
+  var nonEmptyChangeListener = function(input2) {
+    return function(id2) {
+      return function(v) {
+        return genericErrorsHandler(function __do5() {
+          var v1 = value2(input2)();
+          return validation(function(errs) {
+            return throwMinsiError(new InvalidInputs(toMap(errs)));
+          })(function(v2) {
+            return pure20(unit);
+          })(nonEmptyValidation(id2)(v1))();
+        });
+      };
+    };
+  };
+  var setTextInputValidationHandlers = function(v) {
+    return function __do5() {
+      var outputFilenameEvL = eventListener(nonEmptyChangeListener(v.value0.outputFilename)(outputFilenameId))();
+      var artistEvL = eventListener(nonEmptyChangeListener(v.value0.artist)(artistId))();
+      var titleEvL = eventListener(nonEmptyChangeListener(v.value0.title)(titleId))();
+      addEventListener(change)(outputFilenameEvL)(false)(toEventTarget2(toElement3(v.value0.outputFilename)))();
+      addEventListener(change)(artistEvL)(false)(toEventTarget2(toElement3(v.value0.artist)))();
+      addEventListener(change)(titleEvL)(false)(toEventTarget2(toElement3(v.value0.title)))();
+      return unit;
+    };
+  };
+
+  // output/Handlers.YoutubeVideo.Foreign/foreign.js
+  var player;
+  var embedVideo = function(embedVideoConfig) {
+    return function() {
+      if (typeof player !== "undefined" && player !== null) {
+        try {
+          if (player.getVideoData && typeof player.getVideoData === "function") {
+            const videoData = player.getVideoData();
+            const currentVideoId = videoData && videoData.video_id;
+            if (currentVideoId === embedVideoConfig.videoId) {
+              console.log("Video ID is the same, skipping reload");
+              return;
+            }
+          }
+        } catch (e) {
+          console.log("Could not get current video data, proceeding with load");
+        }
+        try {
+          player.loadVideoById({
+            videoId: embedVideoConfig.videoId,
+            startSeconds: embedVideoConfig.startTime
+            // endSeconds: Number,
+          });
+          console.log("Video loaded using loadVideoById");
+        } catch (error3) {
+          console.error("Error loading video:", error3);
+          throw error3;
+        }
+      } else {
+        try {
+          player = new YT.Player(embedVideoConfig.resultPreviewId, {
+            height: embedVideoConfig.height,
+            width: embedVideoConfig.width,
+            videoId: embedVideoConfig.videoId,
+            playerVars: {
+              playsinline: 1,
+              start: embedVideoConfig.startTime,
+              loop: 1
+            }
+          });
+          console.log("Player created successfully");
+        } catch (error3) {
+          console.error("Error creating YouTube player:", error3);
+          throw error3;
+        }
+      }
+    };
+  };
+  var getPlayerCurrentTime = () => {
+    if (typeof player !== "undefined" && player !== null) {
+      try {
+        if (player.getCurrentTime && typeof player.getCurrentTime === "function") {
+          return player.getCurrentTime();
+        }
+      } catch (e) {
+        console.error("Error calling getCurrentTime:", e);
+      }
+    }
+    return 0;
+  };
+  var getVideoDuration = () => {
+    if (typeof player !== "undefined" && player !== null) {
+      try {
+        if (player.getDuration && typeof player.getDuration === "function") {
+          const duration2 = player.getDuration();
+          if (duration2 && !isNaN(duration2) && duration2 > 0) {
+            return duration2;
+          }
+        }
+      } catch (e) {
+        console.error("Error calling getDuration:", e);
+      }
+    }
+    return 100;
+  };
+  var isPlayerReady = () => {
+    if (typeof player === "undefined" || player === null) {
+      return false;
+    }
+    const hasGetDuration = player.getDuration && typeof player.getDuration === "function";
+    const hasGetCurrentTime = player.getCurrentTime && typeof player.getCurrentTime === "function";
+    let isReady = false;
+    if (hasGetDuration) {
+      try {
+        const duration2 = player.getDuration();
+        isReady = duration2 && !isNaN(duration2) && duration2 > 0;
+      } catch (e) {
+        isReady = false;
+      }
+    }
+    return hasGetDuration && hasGetCurrentTime && isReady;
+  };
+
+  // output/Handlers.YoutubeVideo.CutButtonsHandlers/index.js
+  var discard3 = /* @__PURE__ */ discard(discardUnit);
+  var show15 = /* @__PURE__ */ show(showInt);
+  var discard22 = /* @__PURE__ */ discard3(bindAff);
+  var whileM_2 = /* @__PURE__ */ whileM_(monadAff);
+  var liftEffect8 = /* @__PURE__ */ liftEffect(monadEffectAff);
+  var map23 = /* @__PURE__ */ map(functorEffect);
+  var not4 = /* @__PURE__ */ not(heytingAlgebraBoolean);
+  var bind18 = /* @__PURE__ */ bind(bindAff);
+  var setCutInputButtonEvL = function(cutInput) {
+    return function(cutValueInput) {
+      return function(v) {
+        return genericErrorsHandler(function __do5() {
+          var currentTimeSeconds = getPlayerCurrentTime();
+          var currentTimeMs = currentTimeSeconds * 1e3;
+          setValue2(show15(floor2(currentTimeMs)))(cutInput)();
+          return updateCutValue(currentTimeMs)(cutValueInput)();
+        });
+      };
+    };
+  };
+  var initializeCutInputs = function(cutStart) {
+    return function(cutEnd) {
+      return function(cutStartValue) {
+        return function(cutEndValue) {
+          return function(startTime) {
+            return launchAff_(discard22(whileM_2(liftEffect8(map23(not4)(isPlayerReady)))(delay(500)))(function() {
+              return bind18(liftEffect8(getVideoDuration))(function(durationSeconds) {
+                var durationMs = durationSeconds * 1e3;
+                var startTimeMs = toNumber(startTime) * 1e3;
+                return discard22(liftEffect8(setMax(show15(floor2(durationMs)))(cutStart)))(function() {
+                  return discard22(liftEffect8(setValue2(show15(floor2(startTimeMs)))(cutStart)))(function() {
+                    return discard22(liftEffect8(setMax(show15(floor2(durationMs)))(cutEnd)))(function() {
+                      return discard22(liftEffect8(updateCutValue(startTimeMs)(cutStartValue)))(function() {
+                        return liftEffect8(updateCutValue(startTimeMs)(cutEndValue));
+                      });
+                    });
+                  });
+                });
+              });
+            }));
+          };
+        };
+      };
+    };
+  };
+
+  // output/Handlers.YoutubeVideo.PlaybackPositionHandler/index.js
+  var when5 = /* @__PURE__ */ when(applicativeEffect);
+  var updatePlaybackPosition2 = function(playbackPosition) {
+    return function __do5() {
+      var playerReady = isPlayerReady();
+      var currentTime2 = getPlayerCurrentTime();
+      return when5(playerReady)(setTextContent(formatToThreeDecimals(currentTime2))(toNode2(playbackPosition)))();
+    };
+  };
+
+  // output/Handlers.YoutubeVideo.YoutubeUrlExtraction/index.js
+  var join2 = /* @__PURE__ */ join(bindMaybe);
+  var bind11 = /* @__PURE__ */ bind(bindMaybe);
+  var lookup4 = /* @__PURE__ */ lookup(ordString);
+  var alt6 = /* @__PURE__ */ alt(altMaybe);
+  var pathToArray = function(v) {
+    if (v instanceof PathEmpty) {
+      return [];
+    }
+    ;
+    if (v instanceof PathAbsolute) {
+      return v.value0;
+    }
+    ;
+    if (v instanceof PathRelative) {
+      return v.value0;
+    }
+    ;
+    throw new Error("Failed pattern match at Handlers.YoutubeVideo.YoutubeUrlExtraction (line 23, column 1 - line 23, column 36): " + [v.constructor.name]);
+  };
+  var parseUnit = function(str) {
+    return function(unit2) {
+      var v = regex("(\\d+)" + unit2)(noFlags);
+      if (v instanceof Left) {
+        return 0;
+      }
+      ;
+      if (v instanceof Right) {
+        var v1 = join2(bind11(match(v.value0)(str))(flip(index4)(1)));
+        if (v1 instanceof Just) {
+          return fromMaybe(0)(fromString(v1.value0));
+        }
+        ;
+        if (v1 instanceof Nothing) {
+          return 0;
+        }
+        ;
+        throw new Error("Failed pattern match at Handlers.YoutubeVideo.YoutubeUrlExtraction (line 39, column 7 - line 41, column 21): " + [v1.constructor.name]);
+      }
+      ;
+      throw new Error("Failed pattern match at Handlers.YoutubeVideo.YoutubeUrlExtraction (line 36, column 3 - line 41, column 21): " + [v.constructor.name]);
+    };
+  };
+  var parseYouTubeT = function(raw) {
+    var str = toLower(raw);
+    var v = fromString(str);
+    if (v instanceof Just) {
+      return new Just(v.value0);
+    }
+    ;
+    if (v instanceof Nothing) {
+      var s = parseUnit(str)("s");
+      var m = parseUnit(str)("m");
+      var h = parseUnit(str)("h");
+      var total = ((h * 3600 | 0) + (m * 60 | 0) | 0) + s | 0;
+      var $24 = total > 0;
+      if ($24) {
+        return new Just(total);
+      }
+      ;
+      return Nothing.value;
+    }
+    ;
+    throw new Error("Failed pattern match at Handlers.YoutubeVideo.YoutubeUrlExtraction (line 49, column 5 - line 58, column 52): " + [v.constructor.name]);
+  };
+  var extractYoutubeVideoStartTime = function(url3) {
+    return fromMaybe(0)(bind11(lookup4("t")(query(url3)))(function(values) {
+      return bind11(head(values))(function(v) {
+        return parseYouTubeT(v);
+      });
+    }));
+  };
+  var extractYoutubeVideoId = function(url3) {
+    var maybeVQueryString = function(v) {
+      return bind11(lookup4("v")(v))(head);
+    }(query(url3));
+    var lastPath = function($25) {
+      return last(pathToArray($25));
+    }(path(url3));
+    return alt6(maybeVQueryString)(lastPath);
+  };
+
+  // output/Handlers.YoutubeVideo.YoutubeVideoHandler/index.js
+  var traverse4 = /* @__PURE__ */ traverse(traversableMaybe)(applicativeEffect);
+  var bind19 = /* @__PURE__ */ bind(bindMaybe);
+  var foldl4 = /* @__PURE__ */ foldl(foldableV);
+  var pure21 = /* @__PURE__ */ pure(applicativeEffect);
+  var show16 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(showString));
+  var show17 = /* @__PURE__ */ show(showString);
+  var VET = /* @__PURE__ */ function() {
+    function VET2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    VET2.create = function(value0) {
+      return new VET2(value0);
+    };
+    return VET2;
+  }();
+  var getInputValue = function(ev) {
+    return traverse4(value2)(bind19(bind19(target5(ev))(fromEventTarget2))(fromElement4));
+  };
+  var youtubeUrlEventListener = function(cutStart) {
+    return function(cutEnd) {
+      return function(cutStartValue) {
+        return function(cutEndValue) {
+          return function(ev) {
+            return genericErrorsHandler(function __do5() {
+              var rawValue = getInputValue(ev)();
+              var youtubeUrlV = maybe(invalid(fromSingleton(youtubeUrlId)("Empty YoutubeUrl Input")))(function(v) {
+                return youtubeUrlValidation(youtubeUrlId)(v);
+              })(rawValue);
+              var youtubeUrl = foldl4(function(v) {
+                return function(v1) {
+                  return pure21(v1);
+                };
+              })(throwMinsiError(new InvalidInput(youtubeUrlId, show16(rawValue))))(youtubeUrlV)();
+              var videoId = maybe(throwMinsiError(new InvalidInput(youtubeUrlId, show16(rawValue))))(pure21)(extractYoutubeVideoId(youtubeUrl))();
+              var startTime = extractYoutubeVideoStartTime(youtubeUrl);
+              log("Youtube Url Handler fired with value: " + show17(videoId))();
+              embedVideo({
+                resultPreviewId,
+                videoId,
+                width: 1e3,
+                height: 500,
+                startTime
+              })();
+              return initializeCutInputs(cutStart)(cutEnd)(cutStartValue)(cutEndValue)(startTime)();
+            });
+          };
+        };
+      };
+    };
+  };
+  var setVideoHandlers = function(v) {
+    var ytUrlEventTarget = toEventTarget2(toElement3(v.value0.youtubeUrl));
+    var setCutStartButtonTarget = toEventTarget2(toElement(v.value0.setCutStartButton));
+    var setCutEndButtonTarget = toEventTarget2(toElement(v.value0.setCutEndButton));
+    return genericErrorsHandler(function __do5() {
+      var ytEvL = eventListener(youtubeUrlEventListener(v.value0.cutStart)(v.value0.cutEnd)(v.value0.cutStartValue)(v.value0.cutEndValue))();
+      addEventListener(input)(ytEvL)(false)(ytUrlEventTarget)();
+      addEventListener(change)(ytEvL)(false)(ytUrlEventTarget)();
+      setInterval2(1e3)(updatePlaybackPosition2(v.value0.playbackPositionYoutube))();
+      var setCutStartButtonEvLV = eventListener(setCutInputButtonEvL(v.value0.cutStart)(v.value0.cutStartValue))();
+      var setCutEndButtonEvLV = eventListener(setCutInputButtonEvL(v.value0.cutEnd)(v.value0.cutEndValue))();
+      addEventListener(click2)(setCutStartButtonEvLV)(false)(setCutStartButtonTarget)();
+      addEventListener(click2)(setCutEndButtonEvLV)(false)(setCutEndButtonTarget)();
+      return unit;
+    });
   };
 
   // output/Handlers.Handlers/index.js
@@ -8613,12 +8759,17 @@
         subtitleTable: v.htmlInputs.value0.subtitleTable,
         resultVideo: v.htmlOutputs.resultVideo
       }))();
-      return setVideoSourceHandler(v.htmlInputs.value0.videoSource)(v.htmlOutputs.resultVideo)();
+      setVideoSourceHandler(v.htmlInputs.value0.videoSource)(v.htmlOutputs.resultVideo)();
+      return setTextInputValidationHandlers(new TIVT({
+        outputFilename: v.htmlInputs.value0.filename,
+        artist: v.htmlInputs.value0.artist,
+        title: v.htmlInputs.value0.title
+      }))();
     };
   };
 
   // output/Endpoints.CheckDependencies/index.js
-  var pure21 = /* @__PURE__ */ pure(applicativeAff);
+  var pure23 = /* @__PURE__ */ pure(applicativeAff);
   var decodeJsonResponse3 = /* @__PURE__ */ decodeJsonResponse(/* @__PURE__ */ readForeignRecord()(/* @__PURE__ */ readForeignFieldsCons({
     reflectSymbol: function() {
       return "missedDependencies";
@@ -8636,7 +8787,7 @@
       method: POST.value
     }))(function(response) {
       if (response.ok) {
-        return pure21({
+        return pure23({
           missedDependencies: []
         });
       }
@@ -8647,12 +8798,12 @@
 
   // output/Main.CheckDependencies/index.js
   var $$null5 = /* @__PURE__ */ $$null(foldableArray);
-  var pure23 = /* @__PURE__ */ pure(applicativeAff);
+  var pure24 = /* @__PURE__ */ pure(applicativeAff);
   var liftEffect9 = /* @__PURE__ */ liftEffect(monadEffectAff);
   var checkDependecies = /* @__PURE__ */ bind(bindAff)(callCheckDependencies)(function(v) {
     var $6 = $$null5(v.missedDependencies);
     if ($6) {
-      return pure23(unit);
+      return pure24(unit);
     }
     ;
     return liftEffect9(throwMinsiError(new MissingDependenciesError(v.missedDependencies)));
