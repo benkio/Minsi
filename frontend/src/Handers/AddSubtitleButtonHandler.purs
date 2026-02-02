@@ -34,7 +34,7 @@ setAddSubtitleButtonHandler addSubtitleButton subtitleTable subtitleRowTemplate 
   addSubtitleButtonEventTarget = toEventTarget (HB.toElement addSubtitleButton)
 
 addSubtitleButtonEventListener :: HT.HTMLTableElement -> HTP.HTMLTemplateElement -> Event -> Effect Unit
-addSubtitleButtonEventListener subtitleTable subtitleRowTemplate _ = do
+addSubtitleButtonEventListener subtitleTable subtitleRowTemplate _ = genericErrorsHandler $ do
   log "Add subtitle button clicked"
   eitherFirstRow <- try $ getFirstRow subtitleTable
   case eitherFirstRow of

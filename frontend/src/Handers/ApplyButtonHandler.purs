@@ -59,7 +59,7 @@ setApplyButtonHandler applyButton = genericErrorsHandler $ do
   applyButtonEventTarget = toEventTarget (HB.toElement applyButton)
 
 applyButtonEventListener :: Event -> Effect Unit
-applyButtonEventListener _ = do
+applyButtonEventListener _ = genericErrorsHandler $ do
   stateComponents <- getCurrentState
   let state = fst stateComponents
   let components = snd stateComponents

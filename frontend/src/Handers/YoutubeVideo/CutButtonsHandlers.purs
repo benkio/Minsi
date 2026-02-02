@@ -8,12 +8,13 @@ import Effect.Aff (delay, launchAff_)
 import Effect.Class (liftEffect)
 import Web.Event.Internal.Types (Event)
 import Web.HTML.HTMLInputElement as HI
+import Handers.ErrorHandlers (genericErrorsHandler)
 import Handers.YoutubeVideo.Foreign (getPlayerCurrentTime, getVideoDuration, isPlayerReady)
 import Handlers.CutRangeHandler (updateCutValue)
 import Prelude
 
 setCutInputButtonEvL :: HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
-setCutInputButtonEvL cutInput cutValueInput _ = do
+setCutInputButtonEvL cutInput cutValueInput _ = genericErrorsHandler $ do
   currentTimeSeconds <- getPlayerCurrentTime
   let currentTimeMs = currentTimeSeconds * 1000.0
   HI.setValue (show (floor currentTimeMs)) cutInput

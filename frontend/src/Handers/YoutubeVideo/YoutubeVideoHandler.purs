@@ -65,7 +65,7 @@ setVideoHandlers
   setCutEndButtonTarget = toEventTarget (HB.toElement setCutEndButton)
 
 youtubeUrlEventListener :: HI.HTMLInputElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
-youtubeUrlEventListener cutStart cutEnd cutStartValue cutEndValue ev = do
+youtubeUrlEventListener cutStart cutEnd cutStartValue cutEndValue ev = genericErrorsHandler $ do
   rawValue <- getInputValue ev
   let youtubeUrlV = maybe (invalid (fromSingleton youtubeUrlId "Empty YoutubeUrl Input")) (\v -> youtubeUrlValidation youtubeUrlId v) rawValue
   youtubeUrl <- foldl (\_ v -> pure v) (throwMinsiError (InvalidInput youtubeUrlId (show rawValue))) youtubeUrlV

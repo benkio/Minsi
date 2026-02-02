@@ -564,11 +564,11 @@
     return Just2;
   }();
   var showMaybe = function(dictShow) {
-    var show16 = show(dictShow);
+    var show17 = show(dictShow);
     return {
       show: function(v) {
         if (v instanceof Just) {
-          return "(Just " + (show16(v.value0) + ")");
+          return "(Just " + (show17(v.value0) + ")");
         }
         ;
         if (v instanceof Nothing) {
@@ -1302,12 +1302,12 @@
     };
   };
   var showNonEmpty = function(dictShow) {
-    var show16 = show(dictShow);
+    var show17 = show(dictShow);
     return function(dictShow1) {
-      var show17 = show(dictShow1);
+      var show18 = show(dictShow1);
       return {
         show: function(v) {
-          return "(NonEmpty " + (show16(v.value0) + (" " + (show17(v.value1) + ")")));
+          return "(NonEmpty " + (show17(v.value0) + (" " + (show18(v.value1) + ")")));
         }
       };
     };
@@ -1515,22 +1515,22 @@
     }
   };
   var showList = function(dictShow) {
-    var show16 = show(dictShow);
+    var show17 = show(dictShow);
     return {
       show: function(v) {
         if (v instanceof Nil) {
           return "Nil";
         }
         ;
-        return "(" + (intercalate2(" : ")(map3(show16)(v)) + " : Nil)");
+        return "(" + (intercalate2(" : ")(map3(show17)(v)) + " : Nil)");
       }
     };
   };
   var showNonEmptyList = function(dictShow) {
-    var show16 = show(showNonEmpty(dictShow)(showList(dictShow)));
+    var show17 = show(showNonEmpty(dictShow)(showList(dictShow)));
     return {
       show: function(v) {
-        return "(NonEmptyList " + (show16(v) + ")");
+        return "(NonEmptyList " + (show17(v) + ")");
       }
     };
   };
@@ -5076,6 +5076,43 @@
     return hasGetDuration && hasGetCurrentTime && isReady;
   };
 
+  // output/Model.ValidationErrors/index.js
+  var union2 = /* @__PURE__ */ union(ordString);
+  var semigroupValidationErrors = {
+    append: function(v) {
+      return function(v1) {
+        return union2(v)(v1);
+      };
+    }
+  };
+  var toMap = function(v) {
+    return v;
+  };
+  var fromSingleton = function(k) {
+    return function(v) {
+      return singleton3(k)(v);
+    };
+  };
+
+  // output/Validations.CutVideoValidation/index.js
+  var show3 = /* @__PURE__ */ show(showNumber);
+  var pure4 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
+  var cutVideoValidation = function(id2) {
+    return function(start2) {
+      return function(end) {
+        var $6 = start2 >= end - 100;
+        if ($6) {
+          return invalid(fromSingleton(id2)("start >= end - 100: " + (show3(start2) + (" " + show3(end)))));
+        }
+        ;
+        return pure4({
+          start: start2,
+          end
+        });
+      };
+    };
+  };
+
   // output/Web.Event.EventTarget/foreign.js
   function eventListener(fn) {
     return function() {
@@ -5102,8 +5139,8 @@
   var change = "change";
 
   // output/Handlers.CutRangeHandler/index.js
-  var show3 = /* @__PURE__ */ show(showInt);
-  var when2 = /* @__PURE__ */ when(applicativeEffect);
+  var show4 = /* @__PURE__ */ show(showInt);
+  var show1 = /* @__PURE__ */ show(showNumber);
   var CRET = /* @__PURE__ */ function() {
     function CRET2(value0) {
       this.value0 = value0;
@@ -5116,38 +5153,87 @@
   }();
   var updateCutValue = function(numMs) {
     return function(cutValueInput) {
-      return setValue2(show3(floor2(numMs)))(cutValueInput);
+      return setValue2(show4(floor2(numMs)))(cutValueInput);
     };
   };
-  var rangeToNumberListener = function(rangeInput) {
-    return function(numberInput) {
-      return function(v) {
-        return function __do5() {
-          var rangeVal = value2(rangeInput)();
-          return setValue2(rangeVal)(numberInput)();
+  var rangeToNumberListenerStart = function(cutStart) {
+    return function(v) {
+      return function(cutStartValue) {
+        return function(cutEndValue) {
+          return function(v1) {
+            return genericErrorsHandler(function __do5() {
+              var start2 = valueAsNumber(cutStart)();
+              var end = valueAsNumber(cutEndValue)();
+              return validation(function(errs) {
+                return throwMinsiError(new InvalidInputs(toMap(errs)));
+              })(function(v2) {
+                return setValue2(show1(start2))(cutStartValue);
+              })(cutVideoValidation(cutStartId)(start2)(end))();
+            });
+          };
         };
       };
     };
   };
-  var numberToRangeListener = function(rangeInput) {
-    return function(numberInput) {
-      return function(v) {
-        var nan2 = function(x) {
-          return x !== x;
+  var rangeToNumberListenerEnd = function(v) {
+    return function(cutEnd) {
+      return function(cutStartValue) {
+        return function(cutEndValue) {
+          return function(v1) {
+            return genericErrorsHandler(function __do5() {
+              var start2 = valueAsNumber(cutStartValue)();
+              var end = valueAsNumber(cutEnd)();
+              return validation(function(errs) {
+                return throwMinsiError(new InvalidInputs(toMap(errs)));
+              })(function(v2) {
+                return setValue2(show1(end))(cutEndValue);
+              })(cutVideoValidation(cutStartId)(start2)(end))();
+            });
+          };
         };
-        return function __do5() {
-          var numVal = valueAsNumber(numberInput)();
-          return when2(!nan2(numVal) && numVal >= 0)(setValue2(show3(floor2(numVal)))(rangeInput))();
+      };
+    };
+  };
+  var numberToRangeListenerStart = function(cutStart) {
+    return function(cutStartValue) {
+      return function(cutEndValue) {
+        return function(v) {
+          return genericErrorsHandler(function __do5() {
+            var start2 = valueAsNumber(cutStartValue)();
+            var end = valueAsNumber(cutEndValue)();
+            return validation(function(errs) {
+              return throwMinsiError(new InvalidInputs(toMap(errs)));
+            })(function(v1) {
+              return setValue2(show1(start2))(cutStart);
+            })(cutVideoValidation(cutStartId)(start2)(end))();
+          });
+        };
+      };
+    };
+  };
+  var numberToRangeListenerEnd = function(cutEnd) {
+    return function(cutStartValue) {
+      return function(cutEndValue) {
+        return function(v) {
+          return genericErrorsHandler(function __do5() {
+            var start2 = valueAsNumber(cutStartValue)();
+            var end = valueAsNumber(cutEndValue)();
+            return validation(function(errs) {
+              return throwMinsiError(new InvalidInputs(toMap(errs)));
+            })(function(v1) {
+              return setValue2(show1(end))(cutEnd);
+            })(cutVideoValidation(cutEndId)(start2)(end))();
+          });
         };
       };
     };
   };
   var setCutRangeHandlers = function(v) {
     return genericErrorsHandler(function __do5() {
-      var cutStartEvL = eventListener(rangeToNumberListener(v.value0.cutStart)(v.value0.cutStartValue))();
-      var cutEndEvL = eventListener(rangeToNumberListener(v.value0.cutEnd)(v.value0.cutEndValue))();
-      var cutStartValueEvL = eventListener(numberToRangeListener(v.value0.cutStart)(v.value0.cutStartValue))();
-      var cutEndValueEvL = eventListener(numberToRangeListener(v.value0.cutEnd)(v.value0.cutEndValue))();
+      var cutStartEvL = eventListener(rangeToNumberListenerStart(v.value0.cutStart)(v.value0.cutEnd)(v.value0.cutStartValue)(v.value0.cutEndValue))();
+      var cutEndEvL = eventListener(rangeToNumberListenerEnd(v.value0.cutStart)(v.value0.cutEnd)(v.value0.cutStartValue)(v.value0.cutEndValue))();
+      var cutStartValueEvL = eventListener(numberToRangeListenerStart(v.value0.cutStart)(v.value0.cutStartValue)(v.value0.cutEndValue))();
+      var cutEndValueEvL = eventListener(numberToRangeListenerEnd(v.value0.cutEnd)(v.value0.cutStartValue)(v.value0.cutEndValue))();
       addEventListener(input)(cutStartEvL)(false)(toEventTarget2(toElement3(v.value0.cutStart)))();
       addEventListener(change)(cutStartEvL)(false)(toEventTarget2(toElement3(v.value0.cutStart)))();
       addEventListener(input)(cutEndEvL)(false)(toEventTarget2(toElement3(v.value0.cutEnd)))();
@@ -5162,7 +5248,7 @@
 
   // output/Handers.YoutubeVideo.CutButtonsHandlers/index.js
   var discard2 = /* @__PURE__ */ discard(discardUnit);
-  var show4 = /* @__PURE__ */ show(showInt);
+  var show5 = /* @__PURE__ */ show(showInt);
   var discard22 = /* @__PURE__ */ discard2(bindAff);
   var whileM_2 = /* @__PURE__ */ whileM_(monadAff);
   var liftEffect3 = /* @__PURE__ */ liftEffect(monadEffectAff);
@@ -5172,12 +5258,12 @@
   var setCutInputButtonEvL = function(cutInput) {
     return function(cutValueInput) {
       return function(v) {
-        return function __do5() {
+        return genericErrorsHandler(function __do5() {
           var currentTimeSeconds = getPlayerCurrentTime();
           var currentTimeMs = currentTimeSeconds * 1e3;
-          setValue2(show4(floor2(currentTimeMs)))(cutInput)();
+          setValue2(show5(floor2(currentTimeMs)))(cutInput)();
           return updateCutValue(currentTimeMs)(cutValueInput)();
-        };
+        });
       };
     };
   };
@@ -5190,9 +5276,9 @@
               return bind13(liftEffect3(getVideoDuration))(function(durationSeconds) {
                 var durationMs = durationSeconds * 1e3;
                 var startTimeMs = toNumber(startTime) * 1e3;
-                return discard22(liftEffect3(setMax(show4(floor2(durationMs)))(cutStart)))(function() {
-                  return discard22(liftEffect3(setValue2(show4(floor2(startTimeMs)))(cutStart)))(function() {
-                    return discard22(liftEffect3(setMax(show4(floor2(durationMs)))(cutEnd)))(function() {
+                return discard22(liftEffect3(setMax(show5(floor2(durationMs)))(cutStart)))(function() {
+                  return discard22(liftEffect3(setValue2(show5(floor2(startTimeMs)))(cutStart)))(function() {
+                    return discard22(liftEffect3(setMax(show5(floor2(durationMs)))(cutEnd)))(function() {
                       return discard22(liftEffect3(updateCutValue(startTimeMs)(cutStartValue)))(function() {
                         return liftEffect3(updateCutValue(startTimeMs)(cutEndValue));
                       });
@@ -5539,13 +5625,13 @@
   };
 
   // output/Conversion.Time/index.js
-  var show5 = /* @__PURE__ */ show(showNumber);
+  var show6 = /* @__PURE__ */ show(showNumber);
   var identity8 = /* @__PURE__ */ identity(categoryFn);
   var append3 = /* @__PURE__ */ append(semigroupArray);
   var formatToThreeDecimals = function(v) {
     var v1 = span2(function(x) {
       return x !== ".";
-    })(toCharArray(show5(v)));
+    })(toCharArray(show6(v)));
     var num = fromCharArray(v1.init);
     var decChars = maybe([])(identity8)(tail(v1.rest));
     var dec3 = take(3)(append3(decChars)(replicate(3)("0")));
@@ -5554,12 +5640,12 @@
   };
 
   // output/Handers.YoutubeVideo.PlaybackPositionHandler/index.js
-  var when3 = /* @__PURE__ */ when(applicativeEffect);
+  var when2 = /* @__PURE__ */ when(applicativeEffect);
   var updatePlaybackPosition = function(playbackPosition) {
     return function __do5() {
       var playerReady = isPlayerReady();
       var currentTime2 = getPlayerCurrentTime();
-      return when3(playerReady)(setTextContent(formatToThreeDecimals(currentTime2))(toNode2(playbackPosition)))();
+      return when2(playerReady)(setTextContent(formatToThreeDecimals(currentTime2))(toNode2(playbackPosition)))();
     };
   };
 
@@ -5949,8 +6035,8 @@
   }();
 
   // output/Foreign/index.js
-  var show6 = /* @__PURE__ */ show(showString);
-  var show1 = /* @__PURE__ */ show(showInt);
+  var show7 = /* @__PURE__ */ show(showString);
+  var show12 = /* @__PURE__ */ show(showInt);
   var ForeignError = /* @__PURE__ */ function() {
     function ForeignError2(value0) {
       this.value0 = value0;
@@ -6005,19 +6091,19 @@
   var showForeignError = {
     show: function(v) {
       if (v instanceof ForeignError) {
-        return "(ForeignError " + (show6(v.value0) + ")");
+        return "(ForeignError " + (show7(v.value0) + ")");
       }
       ;
       if (v instanceof ErrorAtIndex) {
-        return "(ErrorAtIndex " + (show1(v.value0) + (" " + (show(showForeignError)(v.value1) + ")")));
+        return "(ErrorAtIndex " + (show12(v.value0) + (" " + (show(showForeignError)(v.value1) + ")")));
       }
       ;
       if (v instanceof ErrorAtProperty) {
-        return "(ErrorAtProperty " + (show6(v.value0) + (" " + (show(showForeignError)(v.value1) + ")")));
+        return "(ErrorAtProperty " + (show7(v.value0) + (" " + (show(showForeignError)(v.value1) + ")")));
       }
       ;
       if (v instanceof TypeMismatch) {
-        return "(TypeMismatch " + (show6(v.value0) + (" " + (show6(v.value1) + ")")));
+        return "(TypeMismatch " + (show7(v.value0) + (" " + (show7(v.value1) + ")")));
       }
       ;
       throw new Error("Failed pattern match at Foreign (line 69, column 1 - line 73, column 89): " + [v.constructor.name]);
@@ -6342,31 +6428,13 @@
     return alt5(maybeVQueryString)(lastPath);
   };
 
-  // output/Model.ValidationErrors/index.js
-  var union3 = /* @__PURE__ */ union(ordString);
-  var semigroupValidationErrors = {
-    append: function(v) {
-      return function(v1) {
-        return union3(v)(v1);
-      };
-    }
-  };
-  var toMap = function(v) {
-    return v;
-  };
-  var fromSingleton = function(k) {
-    return function(v) {
-      return singleton3(k)(v);
-    };
-  };
-
   // output/Validations.RegexValidation/index.js
-  var pure4 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
+  var pure5 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
   var matches2 = function(v) {
     return function(v1) {
       return function(v2) {
         if (test(v)(v2)) {
-          return pure4(v2);
+          return pure5(v2);
         }
         ;
         return invalid(fromSingleton(v1)("Invalid Input for regex: " + v2));
@@ -6377,7 +6445,7 @@
   // output/Validations.YoutubeValidation/index.js
   var lmap2 = /* @__PURE__ */ lmap(bifunctorEither);
   var lmap1 = /* @__PURE__ */ lmap(bifunctorV);
-  var pure5 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
+  var pure6 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
   var youtubeRegex = "^(?:https?:\\/\\/)?(?:www\\.)?(?:youtube\\.com\\/watch\\?v=([a-zA-Z0-9_-]+)|youtu\\.be\\/([a-zA-Z\\d_-]+))(?:[?&].*)?$";
   var youtubeRegexValidation = function(id2) {
     return lmap2(function(x) {
@@ -6391,7 +6459,7 @@
       })(andThen(andThen(youtubeRegexValidation(id2))(function(ytRegex) {
         return matches2(ytRegex)(id2)(v);
       }))(function(urlString) {
-        return maybe(invalid(fromSingleton(id2)("Error validating youtube Url")))(pure5)(fromString2(urlString));
+        return maybe(invalid(fromSingleton(id2)("Error validating youtube Url")))(pure6)(fromString2(urlString));
       }));
     };
   };
@@ -6415,9 +6483,9 @@
   var traverse3 = /* @__PURE__ */ traverse(traversableMaybe)(applicativeEffect);
   var bind3 = /* @__PURE__ */ bind(bindMaybe);
   var foldl3 = /* @__PURE__ */ foldl(foldableV);
-  var pure6 = /* @__PURE__ */ pure(applicativeEffect);
-  var show7 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(showString));
-  var show12 = /* @__PURE__ */ show(showString);
+  var pure7 = /* @__PURE__ */ pure(applicativeEffect);
+  var show8 = /* @__PURE__ */ show(/* @__PURE__ */ showMaybe(showString));
+  var show13 = /* @__PURE__ */ show(showString);
   var VET = /* @__PURE__ */ function() {
     function VET2(value0) {
       this.value0 = value0;
@@ -6436,19 +6504,19 @@
       return function(cutStartValue) {
         return function(cutEndValue) {
           return function(ev) {
-            return function __do5() {
+            return genericErrorsHandler(function __do5() {
               var rawValue = getInputValue(ev)();
               var youtubeUrlV = maybe(invalid(fromSingleton(youtubeUrlId)("Empty YoutubeUrl Input")))(function(v) {
                 return youtubeUrlValidation(youtubeUrlId)(v);
               })(rawValue);
               var youtubeUrl = foldl3(function(v) {
                 return function(v1) {
-                  return pure6(v1);
+                  return pure7(v1);
                 };
-              })(throwMinsiError(new InvalidInput(youtubeUrlId, show7(rawValue))))(youtubeUrlV)();
-              var videoId = maybe(throwMinsiError(new InvalidInput(youtubeUrlId, show7(rawValue))))(pure6)(extractYoutubeVideoId(youtubeUrl))();
+              })(throwMinsiError(new InvalidInput(youtubeUrlId, show8(rawValue))))(youtubeUrlV)();
+              var videoId = maybe(throwMinsiError(new InvalidInput(youtubeUrlId, show8(rawValue))))(pure7)(extractYoutubeVideoId(youtubeUrl))();
               var startTime = extractYoutubeVideoStartTime(youtubeUrl);
-              log("Youtube Url Handler fired with value: " + show12(videoId))();
+              log("Youtube Url Handler fired with value: " + show13(videoId))();
               embedVideo({
                 resultPreviewId,
                 videoId,
@@ -6457,7 +6525,7 @@
                 startTime
               })();
               return initializeCutInputs(cutStart)(cutEnd)(cutStartValue)(cutEndValue)(startTime)();
-            };
+            });
           };
         };
       };
@@ -6488,25 +6556,25 @@
   }
 
   // output/Components.HTMLTableElement/index.js
-  var pure7 = /* @__PURE__ */ pure(applicativeEffect);
+  var pure8 = /* @__PURE__ */ pure(applicativeEffect);
   var bind14 = /* @__PURE__ */ bind(bindMaybe);
   var map15 = /* @__PURE__ */ map(functorArray);
   var getTBody = function(table) {
     return function __do5() {
       var tBodies2 = tBodies(table)();
       var tBodyArray = toArray2(tBodies2)();
-      return maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableBody")))(pure7)(bind14(head(tBodyArray))(fromElement13))();
+      return maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableBody")))(pure8)(bind14(head(tBodyArray))(fromElement13))();
     };
   };
   var getStartInput = function(row) {
     return function __do5() {
       var cells2 = cells(row)();
       var cellArray = toArray2(cells2)();
-      var startCell = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableStartCell")))(pure7)(bind14(head(cellArray))(fromElement11))();
+      var startCell = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableStartCell")))(pure8)(bind14(head(cellArray))(fromElement11))();
       var element = toElement6(startCell);
       var parentNode2 = toParentNode(element);
       var elementMaybe = querySelector("input")(parentNode2)();
-      var input2 = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableStartInput")))(pure7)(bind14(elementMaybe)(fromElement4))();
+      var input2 = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableStartInput")))(pure8)(bind14(elementMaybe)(fromElement4))();
       return input2;
     };
   };
@@ -6521,18 +6589,18 @@
   var getFirstRow = function(table) {
     return function __do5() {
       var rows4 = getRows(table)();
-      return maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableFirstRow")))(pure7)(head(rows4))();
+      return maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableFirstRow")))(pure8)(head(rows4))();
     };
   };
   var getEndInput = function(row) {
     return function __do5() {
       var cells2 = cells(row)();
       var cellArray = toArray2(cells2)();
-      var endCell = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableEndCell")))(pure7)(bind14(head(drop(1)(cellArray)))(fromElement11))();
+      var endCell = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableEndCell")))(pure8)(bind14(head(drop(1)(cellArray)))(fromElement11))();
       var element = toElement6(endCell);
       var parentNode2 = toParentNode(element);
       var elementMaybe = querySelector("input")(parentNode2)();
-      var input2 = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableEndInput")))(pure7)(bind14(elementMaybe)(fromElement4))();
+      var input2 = maybe(throwMinsiError(new HTMLElementNotFound("SubtitleTableEndInput")))(pure8)(bind14(elementMaybe)(fromElement4))();
       return input2;
     };
   };
@@ -6759,7 +6827,7 @@
   var identity9 = /* @__PURE__ */ identity(categoryBuilder);
   var readString3 = /* @__PURE__ */ readString(monadIdentity);
   var bindExceptT2 = /* @__PURE__ */ bindExceptT(monadIdentity);
-  var pure8 = /* @__PURE__ */ pure(applicativeNonEmptyList);
+  var pure9 = /* @__PURE__ */ pure(applicativeNonEmptyList);
   var except2 = /* @__PURE__ */ except(applicativeIdentity);
   var applicativeExceptT2 = /* @__PURE__ */ applicativeExceptT(monadIdentity);
   var pure12 = /* @__PURE__ */ pure(applicativeExceptT2);
@@ -6929,7 +6997,7 @@
   };
   var parseJSON = /* @__PURE__ */ function() {
     var $560 = lmap3(function($563) {
-      return pure8(ForeignError.create(message($563)));
+      return pure9(ForeignError.create(message($563)));
     });
     var $561 = runEffectFn1(_parseJSON2);
     return function($562) {
@@ -7003,15 +7071,15 @@
   };
 
   // output/Endpoints.ResponseParser/index.js
-  var pure9 = /* @__PURE__ */ pure(applicativeEffect);
+  var pure10 = /* @__PURE__ */ pure(applicativeEffect);
   var bind4 = /* @__PURE__ */ bind(bindAff);
   var liftEffect4 = /* @__PURE__ */ liftEffect(monadEffectAff);
-  var show8 = /* @__PURE__ */ show(showInt);
-  var show13 = /* @__PURE__ */ show(/* @__PURE__ */ showNonEmptyList(showForeignError));
+  var show9 = /* @__PURE__ */ show(showInt);
+  var show14 = /* @__PURE__ */ show(/* @__PURE__ */ showNonEmptyList(showForeignError));
   var pure13 = /* @__PURE__ */ pure(applicativeAff);
   var validateResponse = function(response) {
     if (response.ok) {
-      return pure9(response);
+      return pure10(response);
     }
     ;
     return throwMinsiError(new ErrorResponse(response.status));
@@ -7023,12 +7091,12 @@
         return bind4(response.text)(function(bodyText) {
           var $13 = bodyText === "";
           if ($13) {
-            return liftEffect4(throwMinsiError(new JSONParsingError(context + (": empty response body" + (" (http " + (show8(response.status) + (" " + (response.statusText + ")"))))))));
+            return liftEffect4(throwMinsiError(new JSONParsingError(context + (": empty response body" + (" (http " + (show9(response.status) + (" " + (response.statusText + ")"))))))));
           }
           ;
           var v = readJSON2(bodyText);
           if (v instanceof Left) {
-            return liftEffect4(throwMinsiError(new JSONParsingError(context + (": " + (show13(v.value0) + (" (http " + (show8(response.status) + (" " + (response.statusText + (")" + (" body=" + bodyText)))))))))));
+            return liftEffect4(throwMinsiError(new JSONParsingError(context + (": " + (show14(v.value0) + (" (http " + (show9(response.status) + (" " + (response.statusText + (")" + (" body=" + bodyText)))))))))));
           }
           ;
           if (v instanceof Right) {
@@ -7116,7 +7184,7 @@
 
   // output/Fetch.Internal.Request/index.js
   var fromRecord2 = /* @__PURE__ */ fromRecord();
-  var show9 = /* @__PURE__ */ show(showMethod);
+  var show10 = /* @__PURE__ */ show(showMethod);
   var toCoreRequestOptionsHelpe = {
     convertHelper: function(v) {
       return function(v1) {
@@ -7141,7 +7209,7 @@
   };
   var toCoreRequestOptionsConve9 = {
     convertImpl: function(v) {
-      return show9;
+      return show10;
     }
   };
   var $$new2 = function() {
@@ -7639,7 +7707,7 @@
   // output/Model.ProcessStatus/index.js
   var bind8 = /* @__PURE__ */ bind(/* @__PURE__ */ bindExceptT(monadIdentity));
   var readImpl3 = /* @__PURE__ */ readImpl2(readForeignString);
-  var pure10 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeExceptT(monadIdentity));
+  var pure11 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeExceptT(monadIdentity));
   var fail2 = /* @__PURE__ */ fail(monadIdentity);
   var Pending = /* @__PURE__ */ function() {
     function Pending2() {
@@ -7666,15 +7734,15 @@
     readImpl: function(f) {
       return bind8(readImpl3(f))(function(s) {
         if (s === "Pending") {
-          return pure10(Pending.value);
+          return pure11(Pending.value);
         }
         ;
         if (s === "Succeed") {
-          return pure10(Succeed.value);
+          return pure11(Succeed.value);
         }
         ;
         if (s === "Failed") {
-          return pure10(Failed.value);
+          return pure11(Failed.value);
         }
         ;
         return fail2(new TypeMismatch("ProcessStatus", "Invalid ProcessStatus: " + s));
@@ -7775,25 +7843,6 @@
     }
     ;
     return White.value;
-  };
-
-  // output/Validations.CutVideoValidation/index.js
-  var show10 = /* @__PURE__ */ show(showNumber);
-  var pure11 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeV(semigroupValidationErrors));
-  var cutVideoValidation = function(id2) {
-    return function(start2) {
-      return function(end) {
-        var $6 = start2 >= end - 100;
-        if ($6) {
-          return invalid(fromSingleton(id2)("start >= end - 100: " + (show10(start2) + (" " + show10(end)))));
-        }
-        ;
-        return pure11({
-          start: start2,
-          end
-        });
-      };
-    };
   };
 
   // output/Validations.NonEmptyValidation/index.js
@@ -7998,7 +8047,7 @@
   var tailRecM3 = /* @__PURE__ */ tailRecM(monadRecAff);
   var map21 = /* @__PURE__ */ map(functorEffect);
   var show11 = /* @__PURE__ */ show(showNumber);
-  var when4 = /* @__PURE__ */ when(applicativeEffect);
+  var when3 = /* @__PURE__ */ when(applicativeEffect);
   var pure17 = /* @__PURE__ */ pure(applicativeEffect);
   var bind22 = /* @__PURE__ */ bind(bindMaybe);
   var $$void7 = /* @__PURE__ */ $$void(functorEffect);
@@ -8050,7 +8099,7 @@
       return function __do5() {
         var classList2 = classList(element)();
         var containsClassName = contains4(classList2)(className2)();
-        return when4(containsClassName)(remove(classList2)(className2))();
+        return when3(containsClassName)(remove(classList2)(className2))();
       };
     };
   };
@@ -8134,7 +8183,7 @@
     };
   };
   var applyButtonEventListener = function(v) {
-    return function __do5() {
+    return genericErrorsHandler(function __do5() {
       var stateComponents = getCurrentState();
       var state3 = fst(stateComponents);
       var components = snd(stateComponents);
@@ -8143,7 +8192,7 @@
       return runAff_(function(result) {
         return genericErrorsHandlerEither(result);
       })($$finally(liftEffect8(finallyHandlers(components)(state3)))(applySecond3(void1(callCompute(state3)))(waitForStatus(filename))))();
-    };
+    });
   };
   var setApplyButtonHandler = function(applyButton) {
     var applyButtonEventTarget = toEventTarget2(toElement(applyButton));
@@ -8169,7 +8218,7 @@
   var bind23 = /* @__PURE__ */ bind(bindMaybe);
   var discard3 = /* @__PURE__ */ discard(discardUnit);
   var discard1 = /* @__PURE__ */ discard3(bindMaybeT2);
-  var when5 = /* @__PURE__ */ when(/* @__PURE__ */ applicativeMaybeT(monadEffect));
+  var when4 = /* @__PURE__ */ when(/* @__PURE__ */ applicativeMaybeT(monadEffect));
   var traverse_2 = /* @__PURE__ */ traverse_(applicativeEffect)(foldableArray);
   var removeRowFromDom = function(tableRow) {
     var rowNode = toNode3(tableRow);
@@ -8196,7 +8245,7 @@
     return discard1(lift3(log("Remove subtitle button clicked")))(function() {
       return bind16(pure18(bind23(target5(ev))(fromEventTarget)))(function(buttonTarget) {
         return bind16(lift3(bind17(classList(toElement(buttonTarget)))(flip(contains4)("removeSubtitleButton"))))(function(hasRemoveClass) {
-          return discard1(when5(!hasRemoveClass)(pure18(Nothing.value)))(function() {
+          return discard1(when4(!hasRemoveClass)(pure18(Nothing.value)))(function() {
             var buttonNode = toNode5(toElement(buttonTarget));
             return bind16(findTrAncestor(buttonNode))(function(tableRow) {
               return removeRowFromDom(tableRow);
@@ -8207,7 +8256,7 @@
     });
   };
   var removeSubtitleButtonEventListener = function(ev) {
-    return applySecond4(runMaybeT(removeSubtitleButtonEventListenerTrans(ev)))(pure18(unit));
+    return genericErrorsHandler(applySecond4(runMaybeT(removeSubtitleButtonEventListenerTrans(ev)))(pure18(unit)));
   };
   var setRemoveSubtitleButtonHandler = function(subtitleTable) {
     var tableRowEventTarget = function(r) {
@@ -8233,7 +8282,7 @@
   // output/Handlers.AddSubtitleButtonHandler/index.js
   var pure19 = /* @__PURE__ */ pure(applicativeEffect);
   var bind18 = /* @__PURE__ */ bind(bindMaybe);
-  var show14 = /* @__PURE__ */ show(showNumber);
+  var show15 = /* @__PURE__ */ show(showNumber);
   var cloneFirstRow = function(firstRow) {
     return function(subtitleTable) {
       return function __do5() {
@@ -8243,10 +8292,10 @@
         var firstRowEndInput = getEndInput(firstRow)();
         var endValue = valueAsNumber(firstRowEndInput)();
         var clonedRowStartInput = getStartInput(clonedRow)();
-        setValue2(show14(endValue))(clonedRowStartInput)();
+        setValue2(show15(endValue))(clonedRowStartInput)();
         var newEndValue = endValue + 1;
         var clonedRowEndInput = getEndInput(clonedRow)();
-        setValue2(show14(newEndValue))(clonedRowEndInput)();
+        setValue2(show15(newEndValue))(clonedRowEndInput)();
         insertBefore(clonedRowNode)(toNode3(firstRow))(toNode4(tbody))();
         addRemoveSubtitleListenerToRow(clonedRow)();
         return log("Subtitle row cloned successfully")();
@@ -8269,7 +8318,7 @@
   var addSubtitleButtonEventListener = function(subtitleTable) {
     return function(subtitleRowTemplate) {
       return function(v) {
-        return function __do5() {
+        return genericErrorsHandler(function __do5() {
           log("Add subtitle button clicked")();
           var eitherFirstRow = $$try(getFirstRow(subtitleTable))();
           if (eitherFirstRow instanceof Left) {
@@ -8281,7 +8330,7 @@
           }
           ;
           throw new Error("Failed pattern match at Handlers.AddSubtitleButtonHandler (line 40, column 3 - line 42, column 59): " + [eitherFirstRow.constructor.name]);
-        };
+        });
       };
     };
   };
@@ -8321,7 +8370,7 @@
   var min5 = /* @__PURE__ */ min(ordNumber);
   var max6 = /* @__PURE__ */ max(ordNumber);
   var bind19 = /* @__PURE__ */ bind(bindMaybe);
-  var when6 = /* @__PURE__ */ when(applicativeEffect);
+  var when5 = /* @__PURE__ */ when(applicativeEffect);
   var applySecond5 = /* @__PURE__ */ applySecond(applyEffect);
   var pure20 = /* @__PURE__ */ pure(applicativeEffect);
   var KHT = /* @__PURE__ */ function() {
@@ -8371,25 +8420,27 @@
       var keyValue = key(keyboardEvent);
       var isMeta = metaKey(keyboardEvent);
       var isCtrl = ctrlKey(keyboardEvent);
-      var ev = toEvent(keyboardEvent);
-      var stop = preventDefault(ev);
-      var whenNotEditable = function(cond) {
-        return function(act) {
-          return when6(cond && !isTargetEditableElement(keyboardEvent))(applySecond5(act)(stop));
+      return genericErrorsHandler(function() {
+        var ev = toEvent(keyboardEvent);
+        var stop = preventDefault(ev);
+        var whenNotEditable = function(cond) {
+          return function(act) {
+            return when5(cond && !isTargetEditableElement(keyboardEvent))(applySecond5(act)(stop));
+          };
         };
-      };
-      return function __do5() {
-        when6(keyValue === "Enter" && (isCtrl || isMeta))(applySecond5(applyButtonEventListener(ev))(stop))();
-        whenNotEditable(keyValue === " ")(toggleResultVideoPlayback(v.value0.resultVideo))();
-        whenNotEditable(keyValue === "ArrowLeft")(skipResultVideoBackward(v.value0.resultVideo))();
-        whenNotEditable(keyValue === "ArrowRight")(skipResultVideoForward(v.value0.resultVideo))();
-        return whenNotEditable(keyValue === "?")(applySecond5(showModal(v.value0.keyboardShortcutsModalId))(stop))();
-      };
+        return function __do5() {
+          when5(keyValue === "Enter" && (isCtrl || isMeta))(applySecond5(applyButtonEventListener(ev))(stop))();
+          whenNotEditable(keyValue === " ")(toggleResultVideoPlayback(v.value0.resultVideo))();
+          whenNotEditable(keyValue === "ArrowLeft")(skipResultVideoBackward(v.value0.resultVideo))();
+          whenNotEditable(keyValue === "ArrowRight")(skipResultVideoForward(v.value0.resultVideo))();
+          return whenNotEditable(keyValue === "?")(applySecond5(showModal(v.value0.keyboardShortcutsModalId))(stop))();
+        };
+      }());
     };
   };
   var keyboardEventListener = function(targets) {
     return function(ev) {
-      return maybe(pure20(unit))(handleKeyboardEvent(targets))(fromEvent(ev));
+      return genericErrorsHandler(maybe(pure20(unit))(handleKeyboardEvent(targets))(fromEvent(ev)));
     };
   };
   var setKeyboardHandlers = function(targets) {
@@ -8438,7 +8489,7 @@
   };
 
   // output/Handlers.SubtitleTimeButtonsHandler/index.js
-  var show15 = /* @__PURE__ */ show(showNumber);
+  var show16 = /* @__PURE__ */ show(showNumber);
   var STBT = /* @__PURE__ */ function() {
     function STBT2(value0) {
       this.value0 = value0;
@@ -8452,28 +8503,28 @@
   var setSubtitleStartButtonEventListener = function(subtitleTable) {
     return function(resultVideo) {
       return function(v) {
-        return function __do5() {
+        return genericErrorsHandler(function __do5() {
           log("Set subtitle start button clicked")();
           var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
           var firstRow = getFirstRow(subtitleTable)();
           var startInput = getStartInput(firstRow)();
-          setValue2(show15(currentTimeValue * 1e3))(startInput)();
+          setValue2(show16(currentTimeValue * 1e3))(startInput)();
           return log("Subtitle start time set successfully")();
-        };
+        });
       };
     };
   };
   var setSubtitleEndButtonEventListener = function(subtitleTable) {
     return function(resultVideo) {
       return function(v) {
-        return function __do5() {
+        return genericErrorsHandler(function __do5() {
           log("Set subtitle end button clicked")();
           var currentTimeValue = currentTime(toHTMLMediaElement(resultVideo))();
           var firstRow = getFirstRow(subtitleTable)();
           var endInput = getEndInput(firstRow)();
-          setValue2(show15(currentTimeValue * 1e3))(endInput)();
+          setValue2(show16(currentTimeValue * 1e3))(endInput)();
           return log("Subtitle end time set successfully")();
-        };
+        });
       };
     };
   };

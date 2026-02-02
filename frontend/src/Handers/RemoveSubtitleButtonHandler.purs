@@ -40,7 +40,7 @@ addRemoveSubtitleListenerToRow row = do
   addEventListener E.click evl false (toEventTarget (HR.toElement row))
 
 removeSubtitleButtonEventListener :: Event -> Effect Unit
-removeSubtitleButtonEventListener ev =
+removeSubtitleButtonEventListener ev = genericErrorsHandler $
     runMaybeT (removeSubtitleButtonEventListenerTrans ev)
     *> pure unit
 

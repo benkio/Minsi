@@ -5,11 +5,7 @@ import Components.Modal (showModal)
 import Data.Maybe (maybe, isJust)
 import Effect (Effect)
 import Handers.ErrorHandlers (genericErrorsHandler)
-import Handlers.AddSubtitleButtonHandler (addSubtitleButtonEventListener)
-import Handlers.RemoveSubtitleButtonHandler (removeFirstSubtitleRow)
 import Handlers.ApplyButtonHandler (applyButtonEventListener)
-import Handlers.CutRangeHandler (rangeToNumberListener)
-import Handlers.SubtitleTimeButtonsHandler (setSubtitleEndButtonEventListener, setSubtitleStartButtonEventListener)
 import Web.DOM.Element (fromEventTarget, toEventTarget)
 import Web.Event.Event (preventDefault, target)
 import Web.Event.EventTarget (addEventListener, eventListener)
@@ -26,7 +22,7 @@ import Web.HTML.Window (document)
 import Web.HTML.Event.EventTypes as EClick
 import Web.HTML.HTMLMediaElement (currentTime, duration, play, pause, paused, setCurrentTime)
 import Web.HTML.HTMLVideoElement (HTMLVideoElement, toHTMLMediaElement)
-import Web.UIEvent.KeyboardEvent (KeyboardEvent, altKey, ctrlKey, key, metaKey, fromEvent, toEvent)
+import Web.UIEvent.KeyboardEvent (KeyboardEvent, ctrlKey, key, metaKey, fromEvent, toEvent)
 import Web.UIEvent.KeyboardEvent.EventTypes as E
 
 data KeyboardHandlerTargets = KHT
@@ -54,7 +50,7 @@ setKeyboardHandlers targets = genericErrorsHandler $ do
   showShortcutsModal (KHT { keyboardShortcutsModalId: id }) = showModal id
 
 keyboardEventListener :: KeyboardHandlerTargets -> Event -> Effect Unit
-keyboardEventListener targets ev = maybe (pure unit) (handleKeyboardEvent targets) (fromEvent ev)
+keyboardEventListener targets ev = genericErrorsHandler $ maybe (pure unit) (handleKeyboardEvent targets) (fromEvent ev)
 
 -- True when the keydown target is an input, textarea, or select (so we don't steal arrow/space from typing).
 isTargetEditableElement :: KeyboardEvent -> Boolean
@@ -64,7 +60,7 @@ isTargetEditableElement ke =
     (target (toEvent ke) >>= fromEventTarget)
 
 handleKeyboardEvent :: KeyboardHandlerTargets -> KeyboardEvent -> Effect Unit
-handleKeyboardEvent (KHT { cutStart, cutEnd, cutStartValue, cutEndValue, subtitleTable, subtitleRow, resultVideo, keyboardShortcutsModalId: shortcutsModalId }) keyboardEvent = do
+handleKeyboardEvent (KHT { resultVideo, keyboardShortcutsModalId: shortcutsModalId }) keyboardEvent = genericErrorsHandler $ do
   let ev = toEvent keyboardEvent
   let stop = preventDefault ev
   let whenNotEditable cond act = when (cond && not (isTargetEditableElement keyboardEvent)) (act *> stop)
