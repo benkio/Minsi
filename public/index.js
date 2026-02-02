@@ -260,9 +260,9 @@
     }
   };
   var join = function(dictBind) {
-    var bind19 = bind(dictBind);
+    var bind110 = bind(dictBind);
     return function(m) {
-      return bind19(m)(identity3);
+      return bind110(m)(identity3);
     };
   };
 
@@ -610,6 +610,7 @@
     };
   };
   var isNothing = /* @__PURE__ */ maybe(true)(/* @__PURE__ */ $$const(false));
+  var isJust = /* @__PURE__ */ maybe(false)(/* @__PURE__ */ $$const(true));
   var functorMaybe = {
     map: function(v) {
       return function(v1) {
@@ -916,13 +917,13 @@
     })(true);
   };
   var traverse_ = function(dictApplicative) {
-    var applySecond5 = applySecond(dictApplicative.Apply0());
+    var applySecond6 = applySecond(dictApplicative.Apply0());
     var pure24 = pure(dictApplicative);
     return function(dictFoldable) {
       var foldr3 = foldr(dictFoldable);
       return function(f) {
         return foldr3(function($473) {
-          return applySecond5(f($473));
+          return applySecond6(f($473));
         })(pure24(unit));
       };
     };
@@ -2115,23 +2116,23 @@
 
   // output/Control.Monad/index.js
   var liftM1 = function(dictMonad) {
-    var bind19 = bind(dictMonad.Bind1());
+    var bind20 = bind(dictMonad.Bind1());
     var pure24 = pure(dictMonad.Applicative0());
     return function(f) {
       return function(a) {
-        return bind19(a)(function(a$prime) {
+        return bind20(a)(function(a$prime) {
           return pure24(f(a$prime));
         });
       };
     };
   };
   var ap = function(dictMonad) {
-    var bind19 = bind(dictMonad.Bind1());
+    var bind20 = bind(dictMonad.Bind1());
     var pure24 = pure(dictMonad.Applicative0());
     return function(f) {
       return function(a) {
-        return bind19(f)(function(f$prime) {
-          return bind19(a)(function(a$prime) {
+        return bind20(f)(function(f$prime) {
+          return bind20(a)(function(a$prime) {
             return pure24(f$prime(a$prime));
           });
         });
@@ -4057,12 +4058,12 @@
     };
   };
   var bindExceptT = function(dictMonad) {
-    var bind19 = bind(dictMonad.Bind1());
+    var bind20 = bind(dictMonad.Bind1());
     var pure24 = pure(dictMonad.Applicative0());
     return {
       bind: function(v) {
         return function(k) {
-          return bind19(v)(either(function($193) {
+          return bind20(v)(either(function($193) {
             return pure24(Left.create($193));
           })(function(a) {
             var v1 = k(a);
@@ -4149,12 +4150,12 @@
     };
   };
   var bindMaybeT = function(dictMonad) {
-    var bind19 = bind(dictMonad.Bind1());
+    var bind20 = bind(dictMonad.Bind1());
     var pure24 = pure(dictMonad.Applicative0());
     return {
       bind: function(v) {
         return function(f) {
-          return bind19(v)(function(v1) {
+          return bind20(v)(function(v1) {
             if (v1 instanceof Nothing) {
               return pure24(Nothing.value);
             }
@@ -4877,13 +4878,13 @@
 
   // output/Control.Monad.Loops/index.js
   var whileM_ = function(dictMonad) {
-    var bind19 = bind(dictMonad.Bind1());
+    var bind20 = bind(dictMonad.Bind1());
     var pure24 = pure(dictMonad.Applicative0());
     return function(p) {
       return function(f) {
-        return bind19(p)(function(v) {
+        return bind20(p)(function(v) {
           if (v) {
-            return bind19(f)(function(v1) {
+            return bind20(f)(function(v1) {
               return whileM_(dictMonad)(p)(f);
             });
           }
@@ -4895,7 +4896,7 @@
   };
   var iterateUntilM = function(dictMonad) {
     var pure24 = pure(dictMonad.Applicative0());
-    var bind19 = bind(dictMonad.Bind1());
+    var bind20 = bind(dictMonad.Bind1());
     return function(p) {
       return function(f) {
         return function(v) {
@@ -4904,7 +4905,7 @@
             return pure24(v);
           }
           ;
-          return bind19(f(v))(iterateUntilM(dictMonad)(p)(f));
+          return bind20(f(v))(iterateUntilM(dictMonad)(p)(f));
         };
       };
     };
@@ -6398,6 +6399,11 @@
   // output/Web.Event.Event/foreign.js
   function _target(e) {
     return e.target;
+  }
+  function preventDefault(e) {
+    return function() {
+      return e.preventDefault();
+    };
   }
 
   // output/Web.Event.Event/index.js
@@ -8382,7 +8388,9 @@
   // output/Handlers.KeyboardHandler/index.js
   var min5 = /* @__PURE__ */ min(ordNumber);
   var max6 = /* @__PURE__ */ max(ordNumber);
+  var bind19 = /* @__PURE__ */ bind(bindMaybe);
   var when6 = /* @__PURE__ */ when(applicativeEffect);
+  var applySecond5 = /* @__PURE__ */ applySecond(applyEffect);
   var pure20 = /* @__PURE__ */ pure(applicativeEffect);
   var KHT = /* @__PURE__ */ function() {
     function KHT2(value0) {
@@ -8405,7 +8413,7 @@
       return pause(media4)();
     };
   };
-  var skipSeconds = 5;
+  var skipSeconds = 0.5;
   var skipResultVideoForward = function(video) {
     var media4 = toHTMLMediaElement(video);
     return function __do5() {
@@ -8421,24 +8429,36 @@
       return setCurrentTime(max6(0)(t - skipSeconds))(media4)();
     };
   };
+  var isTargetEditableElement = function(ke) {
+    return maybe(false)(function(el) {
+      return isJust(fromElement4(el)) || (isJust(fromElement14(el)) || isJust(fromElement5(el)));
+    })(bind19(target5(toEvent(ke)))(fromEventTarget2));
+  };
   var handleKeyboardEvent = function(v) {
     return function(keyboardEvent) {
       var keyValue = key(keyboardEvent);
       var isMeta = metaKey(keyboardEvent);
       var isCtrl = ctrlKey(keyboardEvent);
       var isAlt = altKey(keyboardEvent);
+      var ev = toEvent(keyboardEvent);
+      var stop = preventDefault(ev);
+      var whenNotEditable = function(cond) {
+        return function(act) {
+          return when6(cond && !isTargetEditableElement(keyboardEvent))(applySecond5(act)(stop));
+        };
+      };
       return function __do5() {
-        when6(keyValue === "Enter" && (isCtrl || isMeta))(applyButtonEventListener(toEvent(keyboardEvent)))();
-        when6(keyValue === " " && isCtrl)(toggleResultVideoPlayback(v.value0.resultVideo))();
-        when6(keyValue === "ArrowLeft" && isCtrl)(skipResultVideoBackward(v.value0.resultVideo))();
-        when6(keyValue === "ArrowRight" && isCtrl)(skipResultVideoForward(v.value0.resultVideo))();
-        when6(keyValue === "?" && isCtrl)(showModal(v.value0.keyboardShortcutsModalId))();
-        when6(keyValue === "s" && (isCtrl || isMeta))(rangeToNumberListener(v.value0.cutStart)(v.value0.cutStartValue)(toEvent(keyboardEvent)))();
-        when6(keyValue === "e" && (isCtrl || isMeta))(rangeToNumberListener(v.value0.cutEnd)(v.value0.cutEndValue)(toEvent(keyboardEvent)))();
-        when6(keyValue === "s" && isAlt)(setSubtitleStartButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo)(toEvent(keyboardEvent)))();
-        when6(keyValue === "e" && isAlt)(setSubtitleEndButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo)(toEvent(keyboardEvent)))();
-        when6(keyValue === "+" && isAlt)(addSubtitleButtonEventListener(v.value0.subtitleTable)(v.value0.subtitleRow)(toEvent(keyboardEvent)))();
-        return when6(keyValue === "-" && isAlt)(removeFirstSubtitleRow(v.value0.subtitleTable))();
+        when6(keyValue === "Enter" && (isCtrl || isMeta))(applySecond5(applyButtonEventListener(ev))(stop))();
+        whenNotEditable(keyValue === " ")(toggleResultVideoPlayback(v.value0.resultVideo))();
+        whenNotEditable(keyValue === "ArrowLeft")(skipResultVideoBackward(v.value0.resultVideo))();
+        whenNotEditable(keyValue === "ArrowRight")(skipResultVideoForward(v.value0.resultVideo))();
+        when6(keyValue === "?" && isCtrl)(applySecond5(showModal(v.value0.keyboardShortcutsModalId))(stop))();
+        when6(keyValue === "s" && (isCtrl || isMeta))(applySecond5(rangeToNumberListener(v.value0.cutStart)(v.value0.cutStartValue)(ev))(stop))();
+        when6(keyValue === "e" && (isCtrl || isMeta))(applySecond5(rangeToNumberListener(v.value0.cutEnd)(v.value0.cutEndValue)(ev))(stop))();
+        when6(keyValue === "s" && isAlt)(applySecond5(setSubtitleStartButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo)(ev))(stop))();
+        when6(keyValue === "e" && isAlt)(applySecond5(setSubtitleEndButtonEventListener(v.value0.subtitleTable)(v.value0.resultVideo)(ev))(stop))();
+        when6(keyValue === "a" && isAlt)(applySecond5(addSubtitleButtonEventListener(v.value0.subtitleTable)(v.value0.subtitleRow)(ev))(stop))();
+        return when6(keyValue === "r" && isAlt)(applySecond5(removeFirstSubtitleRow(v.value0.subtitleTable))(stop))();
       };
     };
   };

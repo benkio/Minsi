@@ -2,7 +2,7 @@ module Handlers.KeyboardHandler where
 
 import Prelude
 import Components.Modal (showModal)
-import Data.Maybe (maybe)
+import Data.Maybe (maybe, isJust)
 import Effect (Effect)
 import Handers.ErrorHandlers (genericErrorsHandler)
 import Handlers.AddSubtitleButtonHandler (addSubtitleButtonEventListener)
@@ -10,15 +10,18 @@ import Handlers.RemoveSubtitleButtonHandler (removeFirstSubtitleRow)
 import Handlers.ApplyButtonHandler (applyButtonEventListener)
 import Handlers.CutRangeHandler (rangeToNumberListener)
 import Handlers.SubtitleTimeButtonsHandler (setSubtitleEndButtonEventListener, setSubtitleStartButtonEventListener)
-import Web.DOM.Element (toEventTarget)
+import Web.DOM.Element (fromEventTarget, toEventTarget)
+import Web.Event.Event (preventDefault, target)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
 import Web.HTML (window)
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLDocument as HTMLDocument
 import Web.HTML.HTMLInputElement as HI
+import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.HTMLTableElement as HT
 import Web.HTML.HTMLTemplateElement as HTP
+import Web.HTML.HTMLTextAreaElement as HTA
 import Web.HTML.Window (document)
 import Web.HTML.Event.EventTypes as EClick
 import Web.HTML.HTMLMediaElement (currentTime, duration, play, pause, paused, setCurrentTime)
@@ -53,24 +56,26 @@ setKeyboardHandlers targets = genericErrorsHandler $ do
 keyboardEventListener :: KeyboardHandlerTargets -> Event -> Effect Unit
 keyboardEventListener targets ev = maybe (pure unit) (handleKeyboardEvent targets) (fromEvent ev)
 
+-- True when the keydown target is an input, textarea, or select (so we don't steal arrow/space from typing).
+isTargetEditableElement :: KeyboardEvent -> Boolean
+isTargetEditableElement ke =
+  maybe false
+    (\el -> isJust (HI.fromElement el) || isJust (HTA.fromElement el) || isJust (HS.fromElement el))
+    (target (toEvent ke) >>= fromEventTarget)
+
 handleKeyboardEvent :: KeyboardHandlerTargets -> KeyboardEvent -> Effect Unit
 handleKeyboardEvent (KHT { cutStart, cutEnd, cutStartValue, cutEndValue, subtitleTable, subtitleRow, resultVideo, keyboardShortcutsModalId: shortcutsModalId }) keyboardEvent = do
-  when (keyValue == "Enter" && (isCtrl || isMeta)) (applyButtonEventListener (toEvent keyboardEvent))
-  when (keyValue == " " && isCtrl) (toggleResultVideoPlayback resultVideo)
-  when (keyValue == "ArrowLeft") (skipResultVideoBackward resultVideo)
-  when (keyValue == "ArrowRight") (skipResultVideoForward resultVideo)
-  when (keyValue == "?" && isCtrl) (showModal shortcutsModalId)
-  --TODO: to be tested
-  when (keyValue == "s" && (isCtrl || isMeta)) (rangeToNumberListener cutStart cutStartValue (toEvent keyboardEvent))
-  when (keyValue == "e" && (isCtrl || isMeta)) (rangeToNumberListener cutEnd cutEndValue (toEvent keyboardEvent))
-  when (keyValue == "s" && isAlt) (setSubtitleStartButtonEventListener subtitleTable resultVideo (toEvent keyboardEvent))
-  when (keyValue == "e" && isAlt) (setSubtitleEndButtonEventListener subtitleTable resultVideo (toEvent keyboardEvent))
-  when (keyValue == "+" && isAlt) (addSubtitleButtonEventListener subtitleTable subtitleRow (toEvent keyboardEvent))
-  when (keyValue == "-" && isAlt) (removeFirstSubtitleRow subtitleTable)
+  let ev = toEvent keyboardEvent
+  let stop = preventDefault ev
+  let whenNotEditable cond act = when (cond && not (isTargetEditableElement keyboardEvent)) (act *> stop)
+  when (keyValue == "Enter" && (isCtrl || isMeta)) (applyButtonEventListener ev *> stop)
+  whenNotEditable (keyValue == " ") (toggleResultVideoPlayback resultVideo)
+  whenNotEditable (keyValue == "ArrowLeft") (skipResultVideoBackward resultVideo)
+  whenNotEditable (keyValue == "ArrowRight") (skipResultVideoForward resultVideo)
+  whenNotEditable (keyValue == "?") (showModal shortcutsModalId *> stop)
   where
   isCtrl = ctrlKey keyboardEvent
   isMeta = metaKey keyboardEvent
-  isAlt = altKey keyboardEvent
   keyValue = key keyboardEvent
 
 toggleResultVideoPlayback :: HTMLVideoElement -> Effect Unit
