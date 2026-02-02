@@ -25,13 +25,21 @@ program = do
 
 -- TODOs --------------------------------
 {-
+-------Bugs-------------------
+- when subtitles are invalid the backend is called. Show the error on the log instead.
 - minsi log not showing stuff anymore (eg. empty artist)
-- artist as dropdown with bots names
-- new dropdown for filename prefix
-- Enable the usage of local file
-- Add the full transcript of the subtitles
 - after cutting and reloading the video shows the video even if the videosource is gif.
------keyboard shortcut for------
+------Improvements------------
+- Minsi background
+- improve error Video Download Failed
+- Docker support
+- When the cut end and cut start aren't changed, skip the yt-dlp step and just create the gifs
+------Additions---------------
+- artist as dropdown with bots names and filename prefix
+- Enable the usage of local file
+- Add the full transcript of the subtitles and export of client compute payload
+- Download Button
+-----keyboard shortcut for----
 - removing/adding the table row
 - cut start/end
 - set start/end subtitle

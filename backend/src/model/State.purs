@@ -134,7 +134,6 @@ instance Ord Subtitle where
   compare (Subtitle {videoPosition: (DurationRange { start: Milliseconds str1 })}) (Subtitle {videoPosition: (DurationRange { start: Milliseconds str2 })}) =
     compare str1 str2
 
---TODO: test it
 validateState :: State -> Either (Array String) State
 validateState state@(State ({cutVideo: durationRange, subtitles, reverseLoop})) = do
   _ <- validateRange durationRange
