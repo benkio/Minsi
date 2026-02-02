@@ -26,11 +26,9 @@ program = do
 -- TODOs --------------------------------
 {-
 -------Bugs-------------------
-- when subtitles are invalid the backend is called. Show the error on the log instead.
-- minsi log not showing stuff anymore (eg. empty artist)
+- video silent prefix on firefox
 - after cutting and reloading the video shows the video even if the videosource is gif.
 ------Improvements------------
-- improve error Video Download Failed
 - Docker support
 - When the cut end and cut start aren't changed, skip the yt-dlp step and just create the gifs
 ------Additions---------------
