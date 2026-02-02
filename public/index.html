@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="en">
-    <head>
+  <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <title>Minsi</title>
 
     <link
@@ -22,19 +22,20 @@
     </style>
   </head>
 
-  <body style="background-image: url(imgs/minsiBackground.jpg); background-size: cover">
+  <body
+    style="
+      background-image: url(imgs/minsiBackground.jpg);
+      background-size: cover;
+    "
+  >
     <div class="container-fluid">
       <!-- Header -->
-        <div class="row text-center mb-4 text-white">
+      <div class="row text-center mb-4 text-white">
         <div class="col">
           <h1 class="mb-1">Minsi</h1>
-          <p class="mb-0">
-            Opinionated YouTube Clip Video Gif Audio Extractor
-          </p>
+          <p class="mb-0">Opinionated YouTube Clip Video Gif Audio Extractor</p>
           <p class="mt-2 mb-0">
-            <a
-              href="./instructions.html"
-              class="btn btn-outline-info btn-sm"
+            <a href="./instructions.html" class="btn btn-outline-info btn-sm"
               >How to use (Video, MP3, GIF)</a
             >
             <button
@@ -84,47 +85,47 @@
               </div>
 
               <div class="mb-4">
-                  <label for="cutStart" class="form-label small">
-                      Start Time
-                  </label>
-                  <input
-                      type="range"
-                      class="form-range"
-                      id="cutStart"
-                      min="0"
-                      max="10000000"
-                      value="0"
-                  />
+                <label for="cutStart" class="form-label small">
+                  Start Time
+                </label>
                 <input
-                    type="number"
-                    id="cutStartValue"
-                    class="form-control form-control-sm d-inline-block ms-1"
-                    style="width: 7em"
-                    min="0"
-                    step="50"
-                    value="0"
+                  type="range"
+                  class="form-range"
+                  id="cutStart"
+                  min="0"
+                  max="10000000"
+                  value="0"
+                />
+                <input
+                  type="number"
+                  id="cutStartValue"
+                  class="form-control form-control-sm d-inline-block ms-1"
+                  style="width: 7em"
+                  min="0"
+                  step="50"
+                  value="0"
                 />
                 <small class="text-muted ms-1">ms</small>
               </div>
 
               <div class="mb-4">
-                  <label for="cutEnd" class="form-label small"> End Time </label>
-                  <input
-                      type="range"
-                      class="form-range"
-                      id="cutEnd"
-                      min="0"
-                      max="10000000"
-                      value="100000"
-                  />
+                <label for="cutEnd" class="form-label small"> End Time </label>
                 <input
-                    type="number"
-                    id="cutEndValue"
-                    class="form-control form-control-sm d-inline-block ms-1"
-                    style="width: 7em"
-                    min="0"
-                    value="100000"
-                    step="50"
+                  type="range"
+                  class="form-range"
+                  id="cutEnd"
+                  min="0"
+                  max="10000000"
+                  value="100000"
+                />
+                <input
+                  type="number"
+                  id="cutEndValue"
+                  class="form-control form-control-sm d-inline-block ms-1"
+                  style="width: 7em"
+                  min="0"
+                  value="100000"
+                  step="50"
                 />
                 <small class="text-muted ms-1">ms</small>
               </div>
@@ -223,7 +224,9 @@
             </div>
             <div class="px-3 pb-3 d-none" id="playbackPositionResultRowId">
               <p class="mb-0 text-center">
-                <span id="playbackPositionResultVideo" class="fs-3 fw-bold">0</span>
+                <span id="playbackPositionResultVideo" class="fs-3 fw-bold"
+                  >0</span
+                >
               </p>
             </div>
           </div>
@@ -380,11 +383,26 @@
           <div class="modal-body">
             <table class="table table-sm table-borderless mb-0">
               <tbody>
-                <tr><th scope="row">Ctrl/⌘ + Enter</th><td>Apply (cut video / MP3 / GIF)</td></tr>
-                <tr><th scope="row">Space</th><td>Toggle result video play/pause</td></tr>
-                <tr><th scope="row">←</th><td>Skip result video backward (0.5 s)</td></tr>
-                <tr><th scope="row">→</th><td>Skip result video forward (0.5 s)</td></tr>
-                <tr><th scope="row">?</th><td>Show this shortcuts modal</td></tr>
+                <tr>
+                  <th scope="row">Ctrl/⌘ + Enter</th>
+                  <td>Apply (cut video / MP3 / GIF)</td>
+                </tr>
+                <tr>
+                  <th scope="row">Space</th>
+                  <td>Toggle result video play/pause</td>
+                </tr>
+                <tr>
+                  <th scope="row">←</th>
+                  <td>Skip result video backward (0.5 s)</td>
+                </tr>
+                <tr>
+                  <th scope="row">→</th>
+                  <td>Skip result video forward (0.5 s)</td>
+                </tr>
+                <tr>
+                  <th scope="row">?</th>
+                  <td>Show this shortcuts modal</td>
+                </tr>
               </tbody>
             </table>
           </div>
