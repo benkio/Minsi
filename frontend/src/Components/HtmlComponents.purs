@@ -1,8 +1,8 @@
 module Components.HtmlComponents where
 
 import Components.HTMLComponentsLoader (loadHtmlElement)
-import Components.HtmlIds(
-  addSubtitleId
+import Components.HtmlIds
+  ( addSubtitleId
   , applyId
   , artistId
   , cutEndId
@@ -31,7 +31,6 @@ import Components.HtmlIds(
   , videoSourceRowId
   , youtubeUrlId
   , subtitleRow
-  , keyboardShortcutsModalId
   , keyboardShortcutsButtonId
   )
 import Control.Monad.Error.Class (catchError)
@@ -59,7 +58,7 @@ import Web.HTML.HTMLTableElement as HT
 import Web.HTML.HTMLTemplateElement (HTMLTemplateElement)
 import Web.HTML.HTMLTemplateElement as HTP
 
-data HtmlInputs = HtmlInputs
+newtype HtmlInputs = HtmlInputs
   { cutStart :: HTMLInputElement
   , cutEnd :: HTMLInputElement
   , youtubeUrl :: HTMLInputElement
@@ -96,6 +95,7 @@ newtype HtmlOutputs = HtmlOutputs
   }
 
 derive instance Newtype HtmlOutputs _
+derive instance Newtype HtmlInputs _
 
 data HtmlVisualElements = HtmlVisualElements
   { videoSourceRow :: HTMLDivElement

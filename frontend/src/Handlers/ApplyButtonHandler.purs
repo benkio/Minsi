@@ -2,14 +2,15 @@ module Handlers.ApplyButtonHandler where
 
 import Prelude
 
+import Web.HTML.HTMLSelectElement as HS
 import Data.Array (cons)
 import Data.Tuple (Tuple(..), fst, snd)
-import Model.State.State (State(..),DurationRange(..))
+import Model.State.State (State(..), DurationRange(..))
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlVisualElements(..), loadComponents)
 import Components.HtmlIds (loadingModalId, videoSourceId)
 import Components.Modal (hideModal, showModal)
 import Components.Window (getDocument)
-import Constants (mp4)
+import Constants (mp4, gif)
 import Control.Monad.Rec.Class (Step(..), tailRecM)
 import Data.Either (either)
 import Data.Newtype (unwrap)
@@ -67,24 +68,24 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   let filename = (unwrap state).filename
   showModal loadingModalId
   runAff_
-    ( \result -> genericErrorsHandlerEither result) $
+    (\result -> genericErrorsHandlerEither result) $
     finally (liftEffect (finallyHandlers components state)) (void (callCompute state) *> waitForStatus filename)
 
 finallyHandlers :: HtmlComponents -> State -> Effect Unit
 finallyHandlers components state = do
   let reverseLoop = (unwrap state).reverseLoop
   let filename = (unwrap state).filename
-  let filepath = mp4 filename
   log "return from server, show elements and set src"
   showHiddenElements components.htmlVisualElements reverseLoop
   log "hide modal, and scroll"
   hideModal loadingModalId
   scrollToVideoSource
-  let videoMediaElement = (unwrap components.htmlOutputs).resultVideo
-  setVideoSrc filepath videoMediaElement
+  let
+    videoMediaElement = (unwrap components.htmlOutputs).resultVideo
+    videoSourceElement = (unwrap components.htmlInputs).videoSource
+  setVideoSrc filename videoMediaElement videoSourceElement
   let HtmlInputs { subtitleTable, subtitleRow } = components.htmlInputs
   setSubtitleTableMaxValues state subtitleTable subtitleRow
-
 
 waitForStatus :: String -> Aff Unit
 waitForStatus filename = tailRecM pollStatus unit
@@ -96,14 +97,17 @@ waitForStatus filename = tailRecM pollStatus unit
       Succeed -> pure $ Done unit
       (Failed error) -> liftEffect $ throwMinsiError (ComputeFailed ("Video download failed: " <> error))
 
-setVideoSrc :: String -> HTMLVideoElement -> Effect Unit
-setVideoSrc filepath video = do
+setVideoSrc :: String -> HTMLVideoElement -> HS.HTMLSelectElement -> Effect Unit
+setVideoSrc filename video videoSource = do
   (Milliseconds m) <- unInstant <$> now
-  let cacheBustedPath = filepath <> "?t=" <> show m
   let media = toHTMLMediaElement video
   pause media
   Element.removeAttribute (AttrName "src") (toElement video)
-  setSrc cacheBustedPath media
+  selectedValue <- HS.value videoSource
+  let
+    filepath = if selectedValue == "gif" then gif filename else mp4 filename
+    filePathNoCache = filepath <> "?t=" <> show m
+  setSrc filePathNoCache media
   load media
 
 showHiddenElements :: HtmlVisualElements -> Boolean -> Effect Unit

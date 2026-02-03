@@ -8,6 +8,7 @@ import Data.String.CodeUnits (fromCharArray)
 import Data.Maybe (maybe)
 import Data.Array.NonEmpty (cons')
 import Data.Int (toNumber)
+
 data Range = Range Number Number
 
 instance Arbitrary Range where

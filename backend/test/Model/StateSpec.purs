@@ -31,5 +31,5 @@ spec = do
 
 buildSubtitle :: Array DurationRange -> Array Subtitle
 buildSubtitle ranges =
-  map (\videoPosition -> Subtitle { videoPosition, value: "", font: Impact, fontSize: 24, color: White, screenPosition: Bottom }) ranges 
+  map (\videoPosition -> Subtitle { videoPosition, value: "", font: Impact, fontSize: 24, color: White, screenPosition: Bottom }) ranges
 

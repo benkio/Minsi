@@ -12,11 +12,11 @@ import Data.String.Unsafe (char)
 capitalize :: String -> String
 capitalize =
   split (Pattern " ")
-  >>> map (
-    toCharArray
-    >>> modifyAt 0 (singleton >>> toUpper >>> char)
-    >>> fromMaybe []
-    >>> fromCharArray
-  )
-  >>> joinWith " "
+    >>> map
+      ( toCharArray
+          >>> modifyAt 0 (singleton >>> toUpper >>> char)
+          >>> fromMaybe []
+          >>> fromCharArray
+      )
+    >>> joinWith " "
 

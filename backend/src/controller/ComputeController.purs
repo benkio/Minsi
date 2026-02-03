@@ -29,8 +29,8 @@ import Node.Library.Execa (ExecaResult)
 import Node.Path (FilePath)
 import Prelude
 
-data ComputeResponse =
-  InvalidInput (Array String)
+data ComputeResponse
+  = InvalidInput (Array String)
   | PendingComputation
   | Success State
 
@@ -89,10 +89,10 @@ exceptTMultiple label affs = do
 
 execaResultToEither :: String -> ExecaResult -> Either String Unit
 execaResultToEither label r =
-  if isSuccessExit r.exit then Right unit else Left (label <> " failed. Command: "<> command <> " - stderr: " <> error)
+  if isSuccessExit r.exit then Right unit else Left (label <> " failed. Command: " <> command <> " - stderr: " <> error)
   where
-    error = r.stderr
-    command = r.escapedCommand
+  error = r.stderr
+  command = r.escapedCommand
 
 checkExecaResult :: String -> ExecaResult -> ExceptT String Aff Unit
 checkExecaResult label r = ExceptT $ pure $ execaResultToEither label r

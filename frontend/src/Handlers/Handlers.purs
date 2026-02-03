@@ -63,33 +63,41 @@ setupEventHandlers
         , cutEndValue: cutEndValue
         }
     )
-  setResultVideoHandlers ( RVET {
-                             playbackPositionResultVideo: playbackPositionResultVideo,
-                             resultVideo: resultVideo
-                             })
+  setResultVideoHandlers
+    ( RVET
+        { playbackPositionResultVideo: playbackPositionResultVideo
+        , resultVideo: resultVideo
+        }
+    )
   setApplyButtonHandler applyButton
-  setKeyboardHandlers (KHT {
-    cutStart,
-    cutEnd,
-    cutStartValue,
-    cutEndValue,
-    subtitleTable,
-    subtitleRow,
-    resultVideo,
-    keyboardShortcutsModalId,
-    keyboardShortcutsButton
-  })
+  setKeyboardHandlers
+    ( KHT
+        { cutStart
+        , cutEnd
+        , cutStartValue
+        , cutEndValue
+        , subtitleTable
+        , subtitleRow
+        , resultVideo
+        , keyboardShortcutsModalId
+        , keyboardShortcutsButton
+        }
+    )
   setAddSubtitleButtonHandler addSubtitleButton subtitleTable subtitleRow
   setRemoveSubtitleButtonHandler subtitleTable
-  setSubtitleTimeButtonsHandlers (STBT {
-    setSubtitleStartButton: setSubtitleStartButton
-    , setSubtitleEndButton: setSubtitleEndButton
-    , subtitleTable: subtitleTable
-    , resultVideo: resultVideo
-  })
+  setSubtitleTimeButtonsHandlers
+    ( STBT
+        { setSubtitleStartButton: setSubtitleStartButton
+        , setSubtitleEndButton: setSubtitleEndButton
+        , subtitleTable: subtitleTable
+        , resultVideo: resultVideo
+        }
+    )
   setVideoSourceHandler videoSource resultVideo
-  setTextInputValidationHandlers (TIVT {
-    outputFilename: filename,
-    artist,
-    title
-  })
+  setTextInputValidationHandlers
+    ( TIVT
+        { outputFilename: filename
+        , artist
+        , title
+        }
+    )

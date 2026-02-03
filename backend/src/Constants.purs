@@ -35,12 +35,12 @@ reversedFull filename = outputPath >>= \ofp -> resolve [ ofp ] (filename <> "_re
 
 files :: String -> Effect (Array FilePath)
 files filename =
-  traverse (\f -> f filename) [
-  mp4,
-  mp3,
-  gif,
-  srt,
-  txt,
-  reversed,
-  reversedFull
-  ]
+  traverse (\f -> f filename)
+    [ mp4
+    , mp3
+    , gif
+    , srt
+    , txt
+    , reversed
+    , reversedFull
+    ]

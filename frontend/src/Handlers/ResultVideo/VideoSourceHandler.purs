@@ -27,7 +27,4 @@ videoSourceEventListener videoSource video _ = genericErrorsHandler $ do
   stateTuple <- getCurrentState
   let filename = (unwrap (fst stateTuple)).filename
   selectedValue <- HS.value videoSource
-  case selectedValue of
-    "video" -> setVideoSrc (mp4 filename) video
-    "gif"   -> setVideoSrc (gif filename) video
-    v       -> log $ "⚠️ Unexpected VideoSource Input: " <> v
+  setVideoSrc filename video videoSource

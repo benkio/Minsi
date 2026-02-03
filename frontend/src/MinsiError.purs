@@ -38,21 +38,21 @@ throwMinsiError =
   throwException <<< (const errorWithName <*> show <*> minsiErrorName)
 
 minsiErrorName :: MinsiError -> String
-minsiErrorName (HTMLElementNotFound       _) = "HTMLElementNotFound"
-minsiErrorName (MissingDependenciesError  _) = "MissingDependenciesError"
-minsiErrorName (InvalidInput      _       _) = "InvalidInput"
-minsiErrorName (InvalidInputs             _) = "InvalidInputs"
-minsiErrorName (JSONParsingError          _) = "JSONParsingError"
-minsiErrorName (ErrorResponse             _) = "ErrorResponse"
-minsiErrorName (ComputeFailed             _) = "ComputeFailed"
+minsiErrorName (HTMLElementNotFound _) = "HTMLElementNotFound"
+minsiErrorName (MissingDependenciesError _) = "MissingDependenciesError"
+minsiErrorName (InvalidInput _ _) = "InvalidInput"
+minsiErrorName (InvalidInputs _) = "InvalidInputs"
+minsiErrorName (JSONParsingError _) = "JSONParsingError"
+minsiErrorName (ErrorResponse _) = "ErrorResponse"
+minsiErrorName (ComputeFailed _) = "ComputeFailed"
 
 isCriticalError :: Error -> Boolean
 isCriticalError e = case name e of
-                      "HTMLElementNotFound"      -> false
-                      "MissingDependenciesError" -> true
-                      "InvalidInput"             -> false
-                      "InvalidInputs"            -> false
-                      "JSONParsingError"         -> true
-                      "ErrorResponse"            -> true
-                      "ComputeFailed"            -> true
-                      _                          -> false
+  "HTMLElementNotFound" -> false
+  "MissingDependenciesError" -> true
+  "InvalidInput" -> false
+  "InvalidInputs" -> false
+  "JSONParsingError" -> true
+  "ErrorResponse" -> true
+  "ComputeFailed" -> true
+  _ -> false

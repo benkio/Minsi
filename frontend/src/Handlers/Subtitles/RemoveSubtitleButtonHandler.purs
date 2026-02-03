@@ -41,7 +41,7 @@ addRemoveSubtitleListenerToRow row = do
 
 removeSubtitleButtonEventListener :: Event -> Effect Unit
 removeSubtitleButtonEventListener ev = genericErrorsHandler $
-    runMaybeT (removeSubtitleButtonEventListenerTrans ev)
+  runMaybeT (removeSubtitleButtonEventListenerTrans ev)
     *> pure unit
 
 removeSubtitleButtonEventListenerTrans :: Event -> MaybeT Effect Unit
@@ -58,7 +58,7 @@ isTrElement :: Node -> Boolean
 isTrElement node =
   fromMaybe false
     $ (_ == ElementName "TR") <<< tagName
-    <$> fromNode node
+        <$> fromNode node
 
 getParentNode :: Node -> MaybeT Effect Node
 getParentNode node = MaybeT $ parentNode node

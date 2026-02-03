@@ -131,23 +131,22 @@ instance Show Subtitle where
     "Subtitle { videoPosition: " <> show videoPosition <> ", value: " <> show value <> ", font: " <> show font <> ", fontSize: " <> show fontSize <> ", color: " <> show color <> ", screenPosition: " <> show screenPosition <> " }"
 
 instance Ord Subtitle where
-  compare (Subtitle {videoPosition: (DurationRange { start: Milliseconds str1 })}) (Subtitle {videoPosition: (DurationRange { start: Milliseconds str2 })}) =
+  compare (Subtitle { videoPosition: (DurationRange { start: Milliseconds str1 }) }) (Subtitle { videoPosition: (DurationRange { start: Milliseconds str2 }) }) =
     compare str1 str2
 
 validateState :: State -> Either (Array String) State
-validateState state@(State ({cutVideo: durationRange, subtitles, reverseLoop})) = do
+validateState state@(State ({ cutVideo: durationRange, subtitles, reverseLoop })) = do
   _ <- validateRange durationRange
   _ <- validateSubtitles subtitles reverseLoop
   pure state
 
 validateSubtitles :: Array Subtitle -> Boolean -> Either (Array String) Unit
 validateSubtitles subtitles reverseLoop = do
-  _ <- traverse_ (\(Subtitle {videoPosition}) -> validateRange videoPosition) subtitles
-  if reverseLoop && (not <<< null) subtitles
-    then Left ["ReverseLoop and subtitles not supported"]
-    else Right unit
+  _ <- traverse_ (\(Subtitle { videoPosition }) -> validateRange videoPosition) subtitles
+  if reverseLoop && (not <<< null) subtitles then Left [ "ReverseLoop and subtitles not supported" ]
+  else Right unit
 
 validateRange :: DurationRange -> Either (Array String) Unit
-validateRange (DurationRange {start:(Milliseconds start), end:(Milliseconds end)})
+validateRange (DurationRange { start: (Milliseconds start), end: (Milliseconds end) })
   | start < end - 100.0 = Right unit
-  | otherwise = Left ["State Validation: range start >= end - 100"]
+  | otherwise = Left [ "State Validation: range start >= end - 100" ]

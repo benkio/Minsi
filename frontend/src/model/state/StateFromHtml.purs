@@ -4,10 +4,9 @@ import Conversion.String (capitalize)
 import Data.Int (floor)
 import Parse.Font (parseFont, parseColor, parsePosition)
 import Main.MinsiError (MinsiError(..), throwMinsiError)
-import Data.Array (catMaybes, length, (!!))
-import Data.Maybe (Maybe(..), maybe, fromMaybe, fromJust)
+import Data.Array (length, (!!))
+import Data.Maybe (Maybe(..), maybe, fromJust)
 import Partial.Unsafe (unsafePartial)
-import Data.Traversable (traverse)
 import Data.TraversableWithIndex (traverseWithIndex)
 import Data.Time.Duration (Milliseconds(..))
 import Web.DOM.Element (toParentNode)
@@ -96,26 +95,26 @@ loadSubtitleFromRow :: Int -> HTR.HTMLTableRowElement -> Effect Subtitle
 loadSubtitleFromRow index row = do
   cells <- HTR.cells row
   cellArray <- HC.toArray cells
-  if length cellArray /= 8
-    then throwMinsiError (HTMLElementNotFound ("[Subtitle row "<> show index <>"]: Unexpected number of columns" <> (show (length cellArray))))
-    else do
-      let startCell = unsafePartial fromJust (cellArray !! 0)
-          endCell = unsafePartial fromJust (cellArray !! 1)
-          valueCell = unsafePartial fromJust (cellArray !! 2)
-          fontCell = unsafePartial fromJust (cellArray !! 3)
-          fontSizeCell = unsafePartial fromJust (cellArray !! 4)
-          colorCell = unsafePartial fromJust (cellArray !! 5)
-          positionCell = unsafePartial fromJust (cellArray !! 6)
-      startValue <- maybe (throwMinsiError (HTMLElementNotFound ("[Subtitle row " <> show index <> "]: SubtitleTableStartCell"))) pure (HTC.fromElement startCell) >>= getInputValueFromCell >>= \v -> pure $ maybe 0.0 identity v
-      endValue <- maybe (throwMinsiError (HTMLElementNotFound ("[Subtitle row " <> show index <> "]: SubtitleTableEndCell"))) pure (HTC.fromElement endCell) >>= getInputValueFromCell >>= \v -> pure $ maybe 0.0 identity v
-      valueText <- maybe (throwMinsiError (HTMLElementNotFound ("[Subtitle row " <> show index <> "]: SubtitleTablevalueCell"))) pure (HTC.fromElement valueCell) >>= getTextAreaValueFromCell
-      fontValue <- maybe (throwMinsiError (HTMLElementNotFound ("[Subtitle row " <> show index <> "]: SubtitleTablefontCell"))) pure (HTC.fromElement fontCell) >>= getSelectValueFromCell
-      fontSizeValue <- maybe (throwMinsiError (HTMLElementNotFound ("[Subtitle row " <> show index <> "]: SubtitleTablefontSizeCell"))) pure (HTC.fromElement fontSizeCell) >>= getInputValueFromCell >>= \v -> pure $ maybe 48 floor v
-      colorValue <- maybe (throwMinsiError (HTMLElementNotFound ("[Subtitle row " <> show index <> "]: SubtitleTablecolorCell"))) pure (HTC.fromElement colorCell) >>= getSelectValueFromCell
-      positionValue <- maybe (throwMinsiError (HTMLElementNotFound ("[Subtitle row " <> show index <> "]: SubtitleTablepositionCell"))) pure (HTC.fromElement positionCell) >>= getSelectValueFromCell
-      validation
-        (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
-        (\_ -> pure $ Subtitle
+  if length cellArray /= 8 then throwMinsiError (HTMLElementNotFound ("[Subtitle row " <> show index <> "]: Unexpected number of columns" <> (show (length cellArray))))
+  else do
+    let
+      startCell = unsafePartial fromJust (cellArray !! 0)
+      endCell = unsafePartial fromJust (cellArray !! 1)
+      valueCell = unsafePartial fromJust (cellArray !! 2)
+      fontCell = unsafePartial fromJust (cellArray !! 3)
+      fontSizeCell = unsafePartial fromJust (cellArray !! 4)
+      colorCell = unsafePartial fromJust (cellArray !! 5)
+      positionCell = unsafePartial fromJust (cellArray !! 6)
+    startValue <- maybe (throwMinsiError (HTMLElementNotFound ("[Subtitle row " <> show index <> "]: SubtitleTableStartCell"))) pure (HTC.fromElement startCell) >>= getInputValueFromCell >>= \v -> pure $ maybe 0.0 identity v
+    endValue <- maybe (throwMinsiError (HTMLElementNotFound ("[Subtitle row " <> show index <> "]: SubtitleTableEndCell"))) pure (HTC.fromElement endCell) >>= getInputValueFromCell >>= \v -> pure $ maybe 0.0 identity v
+    valueText <- maybe (throwMinsiError (HTMLElementNotFound ("[Subtitle row " <> show index <> "]: SubtitleTablevalueCell"))) pure (HTC.fromElement valueCell) >>= getTextAreaValueFromCell
+    fontValue <- maybe (throwMinsiError (HTMLElementNotFound ("[Subtitle row " <> show index <> "]: SubtitleTablefontCell"))) pure (HTC.fromElement fontCell) >>= getSelectValueFromCell
+    fontSizeValue <- maybe (throwMinsiError (HTMLElementNotFound ("[Subtitle row " <> show index <> "]: SubtitleTablefontSizeCell"))) pure (HTC.fromElement fontSizeCell) >>= getInputValueFromCell >>= \v -> pure $ maybe 48 floor v
+    colorValue <- maybe (throwMinsiError (HTMLElementNotFound ("[Subtitle row " <> show index <> "]: SubtitleTablecolorCell"))) pure (HTC.fromElement colorCell) >>= getSelectValueFromCell
+    positionValue <- maybe (throwMinsiError (HTMLElementNotFound ("[Subtitle row " <> show index <> "]: SubtitleTablepositionCell"))) pure (HTC.fromElement positionCell) >>= getSelectValueFromCell
+    validation
+      (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
+      ( \_ -> pure $ Subtitle
           { videoPosition: DurationRange
               { start: Milliseconds (startValue)
               , end: Milliseconds (endValue)
@@ -125,8 +124,9 @@ loadSubtitleFromRow index row = do
           , fontSize: fontSizeValue
           , color: parseColor colorValue
           , screenPosition: parsePosition positionValue
-          })
-        (cutVideoValidation ("[Subtitle row " <> show index <> "]") startValue endValue)
+          }
+      )
+      (cutVideoValidation ("[Subtitle row " <> show index <> "]") startValue endValue)
 
 getInputValueFromCell :: HTC.HTMLTableCellElement -> Effect (Maybe Number)
 getInputValueFromCell cell = do

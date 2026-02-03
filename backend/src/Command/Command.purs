@@ -36,6 +36,6 @@ commandOptions = do
   pure (\options -> options { shell = Just sh, timeout = Just { killSignal: stringSignal "SIGTERM", milliseconds: Milliseconds 300000.0 } })
 
 commandSyncOptions :: Effect (ExecaSyncOptions -> ExecaSyncOptions)
-commandSyncOptions  = do
+commandSyncOptions = do
   sh <- shell
   pure (\options -> options { shell = Just sh, timeout = Just { killSignal: stringSignal "SIGTERM", milliseconds: Milliseconds 300000.0 } })

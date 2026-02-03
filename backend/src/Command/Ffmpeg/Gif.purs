@@ -21,10 +21,10 @@ import Node.Path (FilePath)
 import Prelude
 
 makeGif :: State -> Aff (Array ExecaResult)
-makeGif (State {filename, subtitles, reverseLoop})
-  | reverseLoop && null subtitles               = finally (reverseGifCleanup filename) (makeReverseGif filename)
+makeGif (State { filename, subtitles, reverseLoop })
+  | reverseLoop && null subtitles = finally (reverseGifCleanup filename) (makeReverseGif filename)
   | not reverseLoop && (not <<< null) subtitles = finally (subtitleGifCleanup filename) (singleton <$> makeSubtitleGif filename subtitles)
-  | not reverseLoop && null subtitles           = singleton <$> makePlainGif filename
+  | not reverseLoop && null subtitles = singleton <$> makePlainGif filename
   | otherwise = liftEffect $ throwMinsiError (FfmpegGifError "Unsupported gif operation")
 
 makePlainGif :: FilePath -> Aff ExecaResult
@@ -37,7 +37,7 @@ makePlainGif filename = do
 
 addFfmpegPlainGifArgs :: FilePath -> FilePath -> Array String
 addFfmpegPlainGifArgs mp4 gif =
-  [ "-hide_banner", "-loglevel", "warning", "-i", show mp4, "-an", show gif]
+  [ "-hide_banner", "-loglevel", "warning", "-i", show mp4, "-an", show gif ]
 
 makeSubtitleGif :: FilePath -> Array Subtitle -> Aff ExecaResult
 makeSubtitleGif filename subtitles = do
@@ -54,11 +54,12 @@ makeSubtitleGif filename subtitles = do
 
 addFfmpegSubtitleGifArgs :: FilePath -> FilePath -> FilePath -> Array String
 addFfmpegSubtitleGifArgs mp4 gif srt =
-  [ "-hide_banner", "-loglevel", "warning", "-i", show mp4, "-an", "-vf", show subtitleArg, show gif]
+  [ "-hide_banner", "-loglevel", "warning", "-i", show mp4, "-an", "-vf", show subtitleArg, show gif ]
   where
-    subtitleArg = "subtitles="<>srt
-    -- Can't really support multiple font dirs 🤔
-    -- "subtitles="<>srt<>":fontsdir='"<>${fontDirectory}<> "'",
+  subtitleArg = "subtitles=" <> srt
+
+-- Can't really support multiple font dirs 🤔
+-- "subtitles="<>srt<>":fontsdir='"<>${fontDirectory}<> "'",
 
 makeReverseGif :: FilePath -> Aff (Array ExecaResult)
 makeReverseGif filename = do
@@ -69,32 +70,32 @@ makeReverseGif filename = do
   reversedGif <- makeReverseSingleGif filename
   merge <- mergeVideos filename filepathGif filepathReversed
 
-  pure [plainGif, reversedGif, merge]
+  pure [ plainGif, reversedGif, merge ]
 
 makeReverseSingleGif :: FilePath -> Aff ExecaResult
 makeReverseSingleGif filename = do
   filepathReversed <- liftEffect $ reversed filename
-  filepathGif      <- liftEffect $ gif filename
+  filepathGif <- liftEffect $ gif filename
   let args = addFfmpegReverseGifArgs filepathGif filepathReversed
   process <- runCommand args FfmpegGifError "ffmpeg"
   process.getResult
 
 addFfmpegReverseGifArgs :: FilePath -> FilePath -> Array String
 addFfmpegReverseGifArgs filepathGif filepathReversed =
-  [ "-hide_banner", "-loglevel", "warning", "-i", show filepathGif, "-vf", "reverse", show filepathReversed]
+  [ "-hide_banner", "-loglevel", "warning", "-i", show filepathGif, "-vf", "reverse", show filepathReversed ]
 
 mergeVideos :: FilePath -> FilePath -> FilePath -> Aff ExecaResult
 mergeVideos filename filepathGif filepathReversed = do
-  filepathTxt          <- liftEffect $ txt filename
+  filepathTxt <- liftEffect $ txt filename
   filepathReversedFull <- liftEffect $ reversedFull filename
-  liftEffect $ writeMergeTxt filename [filepathGif, filepathReversed]
+  liftEffect $ writeMergeTxt filename [ filepathGif, filepathReversed ]
   let args = addFfmpegMergeVideosArgs filepathTxt filepathReversedFull
   process <- runCommand args FfmpegGifError "ffmpeg"
   process.getResult
 
 addFfmpegMergeVideosArgs :: FilePath -> FilePath -> Array String
 addFfmpegMergeVideosArgs filepathTxt filepathReversedFull =
-  [ "-hide_banner", "-loglevel", "warning", "-f", "concat", "-safe", "0", "-i", show filepathTxt, "-c", "copy", show filepathReversedFull]
+  [ "-hide_banner", "-loglevel", "warning", "-f", "concat", "-safe", "0", "-i", show filepathTxt, "-c", "copy", show filepathReversedFull ]
 
 reverseGifCleanup :: String -> Aff Unit
 reverseGifCleanup filename = liftEffect $ do
@@ -102,7 +103,7 @@ reverseGifCleanup filename = liftEffect $ do
   filepathTxt <- liftEffect $ txt filename
   filepathReversed <- liftEffect $ reversed filename
   filepathReversedFull <- liftEffect $ reversedFull filename
-  let filesToDelete = [filepathGif, filepathReversed, filepathTxt]
+  let filesToDelete = [ filepathGif, filepathReversed, filepathTxt ]
   log $ "Execute Command, delete multiple files:" <> show filesToDelete
   traverse_ rm filesToDelete
   log $ "Execute Command, rename:" <> show filepathReversedFull <> " into " <> filepathGif
@@ -131,7 +132,7 @@ writeMergeTxt filename files = do
   log $ "Execute Command: writeFile " <> show f <> " with content " <> txtContent
   writeFile f bufferContent
   where
-    txtContent = intercalate "\n" $ files <#> (\f -> "file '"<>f<>"'")
+  txtContent = intercalate "\n" $ files <#> (\f -> "file '" <> f <> "'")
 
 -- SRT String Creation -------------------------------------
 
@@ -139,13 +140,18 @@ makeSrtsString :: Array Subtitle -> String
 makeSrtsString = fold <<< mapWithIndex (\i s -> makeSrtString (i + 1) s)
 
 makeSrtString :: Int -> Subtitle -> String
-makeSrtString index (Subtitle { videoPosition : (DurationRange {start:start, end:end}) , value : value, font : font, fontSize : fontSize, color : color, screenPosition :screenPosition }) =
+makeSrtString index (Subtitle { videoPosition: (DurationRange { start: start, end: end }), value: value, font: font, fontSize: fontSize, color: color, screenPosition: screenPosition }) =
   show index <> "\n"
-    <> startStr <> " --> " <> endStr <> "\n"
-    <> positionStr <> fontStr <> "\n"
+    <> startStr
+    <> " --> "
+    <> endStr
+    <> "\n"
+    <> positionStr
+    <> fontStr
+    <> "\n"
     <> "\n"
   where
-    startStr = millisecondsToSecondsString start Nothing
-    endStr = millisecondsToSecondsString end Nothing
-    positionStr = if screenPosition == Top then "{\\an8}" else ""
-    fontStr = "<font face=\"" <> show font <> "\" size=\"" <> show fontSize <> "px\" color=\"" <> show color <> "\">" <> value <> "</font>"
+  startStr = millisecondsToSecondsString start Nothing
+  endStr = millisecondsToSecondsString end Nothing
+  positionStr = if screenPosition == Top then "{\\an8}" else ""
+  fontStr = "<font face=\"" <> show font <> "\" size=\"" <> show fontSize <> "px\" color=\"" <> show color <> "\">" <> value <> "</font>"
