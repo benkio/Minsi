@@ -34,15 +34,17 @@ FROM --platform=linux/amd64 node:22-bookworm-slim
 
 WORKDIR /usr/src/minsi
 
-# Runtime system deps only; contrib needed for ttf-mscorefonts-installer
+# Runtime system deps; install latest yt-dlp from GitHub (Debian package is often outdated and breaks with YouTube)
 RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib" > /etc/apt/sources.list.d/bookworm.list && \
     echo "deb http://security.debian.org/ bookworm-security main contrib" >> /etc/apt/sources.list.d/bookworm.list && \
     apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
-    yt-dlp \
     ttf-mscorefonts-installer \
     id3v2 \
     curl \
+    ca-certificates \
+    && curl -sSL -o /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux \
+    && chmod +x /usr/local/bin/yt-dlp \
     && fc-cache -f \
     && rm -rf /var/lib/apt/lists/*
 
