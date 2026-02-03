@@ -1,0 +1,41 @@
+package:
+  dependencies:
+  - aff
+  - arrays
+  - bifunctors
+  - console
+  - datetime
+  - effect
+  - either
+  - exceptions
+  - express
+  - foldable-traversable
+  - foreign
+  - integers
+  - lists
+  - maybe
+  - monad-loops
+  - node-buffer
+  - node-child-process
+  - node-execa
+  - node-fs
+  - node-path
+  - open-foreign-generic
+  - ordered-collections
+  - prelude
+  - printf
+  - quickcheck
+  - refs
+  - spec
+  - spec-discovery
+  - strings
+  - stringutils
+  - transformers
+  - tuples
+  - url-immutable
+  - yoga-json
+  name: my-project
+workspace:
+  extra_packages: {}
+  package_set:
+    url: https://raw.githubusercontent.com/purescript/package-sets/psc-0.15.15-20260110/packages.json

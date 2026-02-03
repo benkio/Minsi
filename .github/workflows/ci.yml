@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Setup PureScript
+        uses: purescript-contrib/setup-purescript@main
+
+      - name: Cache PureScript dependencies (backend)
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-spago-backend-${{ hashFiles('backend/spago.yaml') }}
+          path: |
+            backend/.spago
+            backend/output
+
+      - name: Install backend dependencies
+        run: npm ci --prefix backend
+
+      - name: Build backend
+        working-directory: backend
+        run: spago build
+
+      - name: Test backend
+        working-directory: backend
+        run: spago test --no-install
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup PureScript
+        uses: purescript-contrib/setup-purescript@main
+
+      - name: Cache PureScript dependencies (frontend)
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-spago-frontend-${{ hashFiles('frontend/spago.yaml') }}
+          path: |
+            frontend/.spago
+            frontend/output
+
+      - name: Build frontend
+        working-directory: frontend
+        run: spago build
+
+      - name: Test frontend
+        working-directory: frontend
+        run: spago test --no-install
