@@ -14,7 +14,7 @@ find dist -mindepth 1 ! -name .gitignore -exec rm -rf {} + 2>/dev/null || true
 echo "==> Building frontend"
 cd frontend
 spago build
-spago bundle-app -t ../public/index.js
+spago bundle -p minsi-frontend --platform browser --source-maps --minify --outfile=public/bundle.js
 cd "$ROOT"
 
 echo "==> Installing backend dependencies (npm install)"

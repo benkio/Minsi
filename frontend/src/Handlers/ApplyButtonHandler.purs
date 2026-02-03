@@ -34,7 +34,6 @@ import Web.DOM.Element as Element
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
 import Web.HTML (window)
-import Web.DOM.AttrName (AttrName(..))
 import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLDivElement as HTMLDivElement
@@ -102,7 +101,7 @@ setVideoSrc filename video videoSource = do
   (Milliseconds m) <- unInstant <$> now
   let media = toHTMLMediaElement video
   pause media
-  Element.removeAttribute (AttrName "src") (toElement video)
+  Element.removeAttribute "src" (toElement video)
   selectedValue <- HS.value videoSource
   let
     filepath = if selectedValue == "gif" then gif filename else mp4 filename

@@ -38,7 +38,7 @@ You also need **Impact** and **Arial Black** fonts installed if you use subtitle
    cd frontend
    spago install
    spago build
-   spago bundle-app -t ../public/index.js
+   spago bundle -p minsi-frontend --platform browser --source-maps --minify --outfile=public/bundle.js
    ```
 
 3. **Use the app**
@@ -46,6 +46,32 @@ You also need **Impact** and **Arial Black** fonts installed if you use subtitle
    - See **[Instructions](http://localhost:8080/instructions.html)** for how to get video, MP3, and GIF from a YouTube URL.
 
 Output files are written to **`public/output/`** (e.g. `filename.mp4`, `filename.mp3`, `filenameGif.mp4`).
+
+## Running with Docker
+
+The project includes a multi-stage **Dockerfile** that builds the frontend and backend and runs the app with only the required runtime dependencies (Node, ffmpeg, yt-dlp, id3v2, fonts).
+
+**Build the image** (from project root):
+
+```bash
+docker build -t minsi:1.0 .
+```
+
+**Run the container** (publish port 8080 so the app is reachable from your host):
+
+```bash
+docker run -d -p 8080:8080 minsi:1.0
+```
+
+Then open **http://localhost:8080** in your browser.
+
+- **Run in background:** The `-d` flag runs the container detached. Omit it to see server logs in the terminal.
+- **Name the container:** Add `--name minsi-app` to make it easier to stop or inspect:  
+  `docker stop minsi-app` and `docker logs -f minsi-app`.
+- **Host on a different port:** Use e.g. `-p 3000:8080` to access the app at http://localhost:3000.
+
+The image is built for **linux/amd64**. On **ARM** (e.g. Apple Silicon) it runs via emulation. To avoid the platform warning, run with:  
+`docker run --platform linux/amd64 -d -p 8080:8080 minsi:1.0`.
 
 ## Bundle for Node
 

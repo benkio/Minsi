@@ -13,7 +13,6 @@ import Effect.Console (log)
 import Handlers.ErrorHandlers (genericErrorsHandler)
 import Web.DOM.DOMTokenList (contains)
 import Web.DOM.Element (classList, fromNode, tagName, toEventTarget, toNode)
-import Web.DOM.ElementName (ElementName(..))
 import Web.DOM.Internal.Types (Node)
 import Web.DOM.Node (parentNode, removeChild)
 import Web.Event.Event (target)
@@ -57,7 +56,7 @@ removeSubtitleButtonEventListenerTrans ev = do
 isTrElement :: Node -> Boolean
 isTrElement node =
   fromMaybe false
-    $ (_ == ElementName "TR") <<< tagName
+    $ (_ == "TR") <<< tagName
         <$> fromNode node
 
 getParentNode :: Node -> MaybeT Effect Node

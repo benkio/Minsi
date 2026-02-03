@@ -1,38 +1,60 @@
 # Use linux/amd64 so npm install -g purescript gets a prebuilt binary (linux-aarch64 often 403)
-FROM --platform=linux/amd64 node:latest
+# Stage 1: build frontend and backend
+FROM --platform=linux/amd64 node:22-bookworm-slim AS builder
 
 WORKDIR /usr/src/minsi
 
-# Copy source over
+# Install only build deps (no ffmpeg/yt-dlp needed for build)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    git \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN npm install -g spago@next purescript esbuild
+
+# Copy package files first for better layer caching
+COPY backend/package.json backend/package-lock.json* backend/
+COPY frontend/spago.yaml frontend/spago.lock* frontend/
+
+# Copy full source
 COPY . .
-
-# Install dependencies
-RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib" > /etc/apt/sources.list && \
-    echo "deb-src http://deb.debian.org/debian/ bookworm main contrib" >> /etc/apt/sources.list && \
-    echo "deb http://security.debian.org/ bookworm-security main contrib" >> /etc/apt/sources.list && \
-    echo "deb-src http://security.debian.org/ bookworm-security main contrib" >> /etc/apt/sources.list
-RUN sed -i'.bak' 's/$/ contrib/' /etc/apt/sources.list
-
-RUN apt-get update && apt-get -y upgrade
-RUN apt-get install -y ffmpeg
-RUN apt-get install -y yt-dlp
-RUN apt-get install -y ttf-mscorefonts-installer
-RUN apt-get install -y id3v2
-RUN apt-get install -y curl
-RUN npm install -g spago@next
-RUN npm install -g purescript
-RUN fc-cache -f
 
 # Bundle frontend
 WORKDIR /usr/src/minsi/frontend
-RUN spago build
-RUN spago bundle-app -t ../public/index.js
+RUN spago build && \
+    spago bundle -p minsi-frontend --platform browser --source-maps --minify --outfile=public/bundle.js
 
-# Install/Build backend
+# Build backend
 WORKDIR /usr/src/minsi/backend
-RUN npm install
-RUN spago build
+RUN npm ci && spago build
 
-# Run server from backend directory
+# Stage 2: minimal runtime image
+FROM --platform=linux/amd64 node:22-bookworm-slim
+
+WORKDIR /usr/src/minsi
+
+# Runtime system deps only; contrib needed for ttf-mscorefonts-installer
+RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib" > /etc/apt/sources.list.d/bookworm.list && \
+    echo "deb http://security.debian.org/ bookworm-security main contrib" >> /etc/apt/sources.list.d/bookworm.list && \
+    apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg \
+    yt-dlp \
+    ttf-mscorefonts-installer \
+    id3v2 \
+    curl \
+    && fc-cache -f \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy built app from builder (no spago/purescript/esbuild, no frontend src)
+COPY --from=builder /usr/src/minsi/public ./public
+COPY --from=builder /usr/src/minsi/backend/output ./backend/output
+COPY --from=builder /usr/src/minsi/backend/run.js ./backend/
+COPY --from=builder /usr/src/minsi/backend/package.json ./backend/
+COPY --from=builder /usr/src/minsi/backend/package-lock.json* ./backend/
+COPY --from=builder /usr/src/minsi/backend/node_modules ./backend/node_modules
+
+WORKDIR /usr/src/minsi/backend
+
 EXPOSE 8080
-CMD ["spago", "run"]
+CMD ["node", "run.js"]

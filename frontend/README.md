@@ -31,7 +31,7 @@ The backend must be running (see [root README](../README.md)) so the app can cal
 
 2. **Bundle for the browser:**
    ```bash
-   spago bundle-app -t ../public/index.js
+   spago bundle -p minsi-frontend --platform browser --source-maps --minify --outfile=public/bundle.js
    ```
    This writes the app bundle to **`public/index.js`**, which the backend serves.
 
