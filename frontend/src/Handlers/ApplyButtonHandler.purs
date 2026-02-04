@@ -2,8 +2,6 @@ module Handlers.ApplyButtonHandler where
 
 import Prelude
 
-import Web.HTML.HTMLSourceElement (HTMLSourceElement)
-import Web.HTML.HTMLSourceElement as HSC
 import Web.HTML.HTMLSelectElement as HS
 import Data.Array (cons)
 import Data.Tuple (Tuple(..), fst, snd)
@@ -40,7 +38,9 @@ import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLDivElement as HTMLDivElement
 import Web.HTML.HTMLInputElement as HI
-import Web.HTML.HTMLMediaElement (load, pause, setSrc)
+import Web.HTML.HTMLMediaElement (HTMLMediaElement, load, pause, setSrc)
+import Web.HTML.HTMLAudioElement (HTMLAudioElement)
+import Web.HTML.HTMLAudioElement as HA
 import Web.HTML.HTMLVideoElement (HTMLVideoElement)
 import Web.HTML.HTMLVideoElement as HV
 import Web.HTML.HTMLTableElement as HT
@@ -83,9 +83,10 @@ finallyHandlers components state = do
   hideModal loadingModalId
   scrollToVideoSource
   let
-    videoMediaElement = (unwrap components.htmlOutputs).resultVideo
+    resultVideo = (unwrap components.htmlOutputs).resultVideo
+    resultAudio = (unwrap components.htmlOutputs).resultAudio
     videoSourceElement = (unwrap components.htmlInputs).videoSource
-  setVideoSrc filename videoMediaElement videoSourceElement
+  setResultMediaSrc filename videoSourceElement resultVideo resultAudio
   let HtmlInputs { subtitleTable, subtitleRow } = components.htmlInputs
   setSubtitleTableMaxValues state subtitleTable subtitleRow
 
@@ -99,24 +100,54 @@ waitForStatus filename = tailRecM pollStatus unit
       Succeed -> pure $ Done unit
       (Failed error) -> liftEffect $ throwMinsiError (ComputeFailed ("Video download failed: " <> error))
 
-setVideoSrc :: String -> HTMLVideoElement -> HS.HTMLSelectElement -> Effect Unit
-setVideoSrc filename video videoSource = do
+setResultMediaSrc :: String -> HS.HTMLSelectElement -> HTMLVideoElement -> HTMLAudioElement -> Effect Unit
+setResultMediaSrc filename videoSource resultVideo resultAudio = do
   (Milliseconds m) <- unInstant <$> now
-  let videoMedia = HV.toHTMLMediaElement video
-  pause videoMedia
-  --TODO: if doesn't work.
-  -- - Option 1. Try by creating the source on the spot and append it as child.
-  -- - Option 2. Add an audio element and swap the display none between the two based on the videosource (to be renamed), then make this funcion based on HTMLMediaElement if possible, if not, factor it out as much as possible, then duplicate it and select which one to run dinamically.
-  Element.removeAttribute "src" (HV.toElement video)
   selectedVideoSourceValue <- HS.value videoSource
-  filepathType <- case selectedVideoSourceValue of
-    "gif" -> pure $ Tuple (gif filename) "video/mp4"
-    "video" -> pure $ Tuple (mp4 filename) "video/mp4"
-    "mp3" -> pure $ Tuple (mp3 filename) "audio/mpeg"
+  path <- case selectedVideoSourceValue of
+    "video" -> pure (mp4 filename)
+    "gif" -> pure (gif filename)
+    "mp3" -> pure (mp3 filename)
     x -> throwMinsiError (InvalidInput "videoSource" ("Value " <> x <> " not recognized as valid input"))
-  let filePathNoCache = (fst filepathType) <> "?t=" <> show m
-  setSrc filePathNoCache videoMedia
-  load videoMedia
+  let showVideo = selectedVideoSourceValue == "video" || selectedVideoSourceValue == "gif"
+  let filePathNoCache = path <> "?t=" <> show m
+  Element.removeAttribute "src" (HV.toElement resultVideo)
+  Element.removeAttribute "src" (HA.toElement resultAudio)
+  if showVideo then setResultVideoSrcAndVisibility filePathNoCache resultVideo resultAudio
+  else setResultAudioSrcAndVisibility filePathNoCache resultVideo resultAudio
+
+setResultVideoSrcAndVisibility :: String -> HTMLVideoElement -> HTMLAudioElement -> Effect Unit
+setResultVideoSrcAndVisibility filePathNoCache resultVideo resultAudio = do
+  setMediaSrcAndLoad filePathNoCache (HV.toHTMLMediaElement resultVideo)
+  showElementHideOther (HV.toElement resultVideo) (HA.toElement resultAudio)
+
+setResultAudioSrcAndVisibility :: String -> HTMLVideoElement -> HTMLAudioElement -> Effect Unit
+setResultAudioSrcAndVisibility filePathNoCache resultVideo resultAudio = do
+  setMediaSrcAndLoad filePathNoCache (HA.toHTMLMediaElement resultAudio)
+  showElementHideOther (HA.toElement resultAudio) (HV.toElement resultVideo)
+
+setMediaSrcAndLoad :: String -> HTMLMediaElement -> Effect Unit
+setMediaSrcAndLoad url media = do
+  pause media
+  setSrc url media
+  load media
+
+showElementHideOther :: Element.Element -> Element.Element -> Effect Unit
+showElementHideOther toShow toHide = do
+  removeClassFromElement "d-none" toShow
+  addClassToElement "d-none" toHide
+
+removeClassFromElement :: String -> Element.Element -> Effect Unit
+removeClassFromElement className element = do
+  classList <- Element.classList element
+  containsClassName <- DOMTokenList.contains classList className
+  when containsClassName $ DOMTokenList.remove classList className
+
+addClassToElement :: String -> Element.Element -> Effect Unit
+addClassToElement className element = do
+  classList <- Element.classList element
+  containsClassName <- DOMTokenList.contains classList className
+  unless containsClassName $ DOMTokenList.add classList className
 
 showHiddenElements :: HtmlVisualElements -> Boolean -> Effect Unit
 showHiddenElements (HtmlVisualElements { videoSourceRow, videoRow, subtitlesRow, playbackPositionResultRow }) reverseLoop = do

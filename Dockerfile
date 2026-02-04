@@ -23,7 +23,7 @@ COPY . .
 # Bundle frontend
 WORKDIR /usr/src/minsi/frontend
 RUN spago build && \
-    spago bundle -p minsi-frontend --platform browser --source-maps --minify --outfile=public/bundle.js
+    spago bundle -p minsi-frontend --platform browser --source-maps --minify --outfile=../public/index.js
 
 # Build backend
 WORKDIR /usr/src/minsi/backend

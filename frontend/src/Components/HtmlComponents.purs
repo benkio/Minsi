@@ -17,6 +17,7 @@ import Components.HtmlIds
   , playbackPositionResultVideoId
   , playbackPositionYoutubeId
   , resultPreviewId
+  , resultAudioId
   , resultVideoId
   , reverseLoopGifId
   , setCutEndButton
@@ -49,6 +50,8 @@ import Web.HTML.HTMLSelectElement (HTMLSelectElement)
 import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.HTMLSpanElement (HTMLSpanElement)
 import Web.HTML.HTMLSpanElement as HSP
+import Web.HTML.HTMLAudioElement (HTMLAudioElement)
+import Web.HTML.HTMLAudioElement as HA
 import Web.HTML.HTMLVideoElement (HTMLVideoElement)
 import Web.HTML.HTMLVideoElement as HV
 import Web.HTML.HTMLIFrameElement (HTMLIFrameElement)
@@ -91,6 +94,7 @@ newtype HtmlOutputs = HtmlOutputs
   , loadingModal :: HTMLDivElement
   , minsiErrorModal :: HTMLDivElement
   , resultVideo :: HTMLVideoElement
+  , resultAudio :: HTMLAudioElement
   , keyboardShortcutsButton :: HTMLButtonElement
   }
 
@@ -170,6 +174,7 @@ loadHtmlOutputs doc = do
   loadingModal <- loadDiv loadingModalId doc
   minsiErrorModal <- loadDiv minsiErrorModalId doc
   resultVideo <- loadVideo resultVideoId doc
+  resultAudio <- loadAudio resultAudioId doc
   keyboardShortcutsButton <- loadButton keyboardShortcutsButtonId doc
   pure
     ( HtmlOutputs
@@ -182,6 +187,7 @@ loadHtmlOutputs doc = do
         , loadingModal: loadingModal
         , minsiErrorModal: minsiErrorModal
         , resultVideo: resultVideo
+        , resultAudio: resultAudio
         , keyboardShortcutsButton: keyboardShortcutsButton
         }
     )
@@ -229,6 +235,9 @@ loadTable id = loadHtmlElement id HT.fromElement
 
 loadVideo :: String -> NonElementParentNode -> Effect HTMLVideoElement
 loadVideo id = loadHtmlElement id HV.fromElement
+
+loadAudio :: String -> NonElementParentNode -> Effect HTMLAudioElement
+loadAudio id = loadHtmlElement id HA.fromElement
 
 loadTemplate :: String -> NonElementParentNode -> Effect HTMLTemplateElement
 loadTemplate id = loadHtmlElement id HTP.fromElement

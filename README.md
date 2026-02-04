@@ -38,7 +38,7 @@ You also need **Impact** and **Arial Black** fonts installed if you use subtitle
    cd frontend
    spago install
    spago build
-   spago bundle -p minsi-frontend --platform browser --source-maps --minify --outfile=public/bundle.js
+   spago bundle -p minsi-frontend --platform browser --source-maps --minify --outfile=../public/index.js
    ```
 
 3. **Use the app**
