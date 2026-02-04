@@ -22,7 +22,10 @@ jobs:
 
       - name: Setup PureScript
         uses: purescript-contrib/setup-purescript@main
-
+        with:
+          purescript: "latest"
+          purs-tidy: "latest"
+          spago: "unstable"
       - name: Cache PureScript dependencies (backend)
         uses: actions/cache@v4
         with:
@@ -33,6 +36,10 @@ jobs:
 
       - name: Install backend dependencies
         run: npm ci --prefix backend
+
+      - name: Check Formatting
+        working-directory: backend
+        run: purs-tidy check "src/**/*.purs" && purs-tidy check "test/**/*.purs"
 
       - name: Build backend
         working-directory: backend
@@ -56,6 +63,10 @@ jobs:
 
       - name: Setup PureScript
         uses: purescript-contrib/setup-purescript@main
+        with:
+          purescript: "latest"
+          purs-tidy: "latest"
+          spago: "unstable"
 
       - name: Cache PureScript dependencies (frontend)
         uses: actions/cache@v4
@@ -64,6 +75,10 @@ jobs:
           path: |
             frontend/.spago
             frontend/output
+
+      - name: Check Formatting
+        working-directory: frontend
+        run: purs-tidy check "src/**/*.purs" && purs-tidy check "test/**/*.purs"
 
       - name: Build frontend
         working-directory: frontend
