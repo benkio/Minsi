@@ -31,6 +31,7 @@ import Model.ValidationErrors (ValidationErrors, toMap)
 import Validations.YoutubeValidation (youtubeUrlValidation)
 import Validations.NonEmptyValidation (nonEmptyValidation)
 import Validations.CutVideoValidation (cutVideoValidation)
+import Validations.OutputFilenameValidation (outputFilenameValidation, normalizeOutputFilename)
 import Components.HtmlIds (youtubeUrlId, outputFilenameId, artistId, titleId, cutStartId)
 
 fromHtmlInputs :: HtmlInputs -> Effect (V ValidationErrors State)
@@ -48,7 +49,7 @@ fromHtmlInputs
   ) = do
   cutVideoV <- cutVideoFromHtmlRange cutStart cutEnd
   youtubeUrlV <- youtubeUrlFromHTMLInput youtubeUrlInput
-  filenameV <- nonEmptyFromHtmlInput filenameInput outputFilenameId
+  filenameV <- value filenameInput <#> outputFilenameValidation outputFilenameId
   reverseLoopValue <- checked reverseLoopInput
   artistV <- nonEmptyFromHtmlInput artistInput artistId
   titleV <- nonEmptyFromHtmlInput titleInput titleId
@@ -63,7 +64,7 @@ fromHtmlInputs
       State
         { cutVideo: cutVideo
         , youtubeUrl: WURL youtubeUrl
-        , filename: filename
+        , filename: normalizeOutputFilename filename
         , reverseLoop: reverseLoopValue
         , artist: capitalize artist
         , title: capitalize title

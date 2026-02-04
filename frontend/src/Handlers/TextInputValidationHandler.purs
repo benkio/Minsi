@@ -10,6 +10,7 @@ import Model.ArtistPrefix (prefixForArtist)
 import Model.ValidationErrors (toMap)
 import Prelude
 import Validations.NonEmptyValidation (nonEmptyValidation)
+import Validations.OutputFilenameValidation (outputFilenameValidation)
 import Web.DOM.Element (toEventTarget)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
@@ -25,13 +26,22 @@ data TextInputValidationTargets = TIVT
 
 setTextInputValidationHandlers :: TextInputValidationTargets -> Effect Unit
 setTextInputValidationHandlers (TIVT { outputFilename, artist, title }) = do
-  outputFilenameEvL <- eventListener (nonEmptyChangeListener outputFilename outputFilenameId)
+  outputFilenameEvL <- eventListener (outputFilenameChangeListener outputFilename)
   artistEvL <- eventListener (artistChangeListener outputFilename artist)
   titleEvL <- eventListener (nonEmptyChangeListener title titleId)
   addEventListener E.change outputFilenameEvL false (toEventTarget (HI.toElement outputFilename))
   addEventListener E.change artistEvL false (toEventTarget (HI.toElement artist))
   addEventListener E.change titleEvL false (toEventTarget (HI.toElement title))
   pure unit
+
+-- | On output filename change: validate letters, numbers and underscores only (no spaces).
+outputFilenameChangeListener :: HI.HTMLInputElement -> Event -> Effect Unit
+outputFilenameChangeListener input _ = genericErrorsHandler $ do
+  v <- value input
+  validation
+    (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
+    (\_ -> pure unit)
+    (outputFilenameValidation outputFilenameId v)
 
 -- | On artist change: if artist matches a known value, set output filename to that prefix; then validate non-empty.
 artistChangeListener :: HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
