@@ -29,6 +29,7 @@ program = do
 - video silent prefix on firefox
 ------Improvements------------
 - When the cut end and cut start aren't changed, skip the yt-dlp step and just create the gifs
+- add health check and add a step in CI to: build the docker image, run it, test the healthcheck endpoint
 ------Additions---------------
 - artist as dropdown with bots names and filename prefix
 - Enable the usage of local file
