@@ -47,7 +47,7 @@ jobs:
 
       - name: Test backend
         working-directory: backend
-        run: spago test --no-install
+        run: spago test
 
   frontend:
     name: Frontend
@@ -86,4 +86,4 @@ jobs:
 
       - name: Test frontend
         working-directory: frontend
-        run: spago test --no-install
+        run: spago test
