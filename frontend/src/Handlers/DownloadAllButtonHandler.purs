@@ -1,6 +1,5 @@
 module Handlers.DownloadAllButtonHandler where
 
-
 import Prelude
 import Data.Newtype (unwrap)
 import Data.Tuple (fst)
