@@ -72,9 +72,6 @@ minsiErrorModalContentId = "minsiErrorModalContent"
 resultVideoId :: String
 resultVideoId = "resultVideo"
 
-resultVideoSourceId :: String
-resultVideoSourceId = "resultVideoSource"
-
 videoSourceRowId :: String
 videoSourceRowId = "videoSourceRowId"
 

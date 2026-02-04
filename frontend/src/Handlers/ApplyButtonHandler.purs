@@ -40,7 +40,7 @@ import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLDivElement as HTMLDivElement
 import Web.HTML.HTMLInputElement as HI
-import Web.HTML.HTMLMediaElement (load, pause)
+import Web.HTML.HTMLMediaElement (load, pause, setSrc)
 import Web.HTML.HTMLVideoElement (HTMLVideoElement)
 import Web.HTML.HTMLVideoElement as HV
 import Web.HTML.HTMLTableElement as HT
@@ -84,9 +84,8 @@ finallyHandlers components state = do
   scrollToVideoSource
   let
     videoMediaElement = (unwrap components.htmlOutputs).resultVideo
-    videoSourceMediaElement = (unwrap components.htmlOutputs).resultVideoSource
     videoSourceElement = (unwrap components.htmlInputs).videoSource
-  setVideoSrc filename videoMediaElement videoSourceElement videoSourceMediaElement
+  setVideoSrc filename videoMediaElement videoSourceElement
   let HtmlInputs { subtitleTable, subtitleRow } = components.htmlInputs
   setSubtitleTableMaxValues state subtitleTable subtitleRow
 
@@ -100,16 +99,15 @@ waitForStatus filename = tailRecM pollStatus unit
       Succeed -> pure $ Done unit
       (Failed error) -> liftEffect $ throwMinsiError (ComputeFailed ("Video download failed: " <> error))
 
-setVideoSrc :: String -> HTMLVideoElement -> HS.HTMLSelectElement -> HTMLSourceElement -> Effect Unit
-setVideoSrc filename video videoSource resultVideoSource = do
+setVideoSrc :: String -> HTMLVideoElement -> HS.HTMLSelectElement -> Effect Unit
+setVideoSrc filename video videoSource = do
   (Milliseconds m) <- unInstant <$> now
   let videoMedia = HV.toHTMLMediaElement video
   pause videoMedia
-  --TODO: test. if doesn't work.
+  --TODO: if doesn't work.
   -- - Option 1. Try by creating the source on the spot and append it as child.
   -- - Option 2. Add an audio element and swap the display none between the two based on the videosource (to be renamed), then make this funcion based on HTMLMediaElement if possible, if not, factor it out as much as possible, then duplicate it and select which one to run dinamically.
   Element.removeAttribute "src" (HV.toElement video)
-  Element.removeAttribute "src" (HSC.toElement resultVideoSource)
   selectedVideoSourceValue <- HS.value videoSource
   filepathType <- case selectedVideoSourceValue of
     "gif" -> pure $ Tuple (gif filename) "video/mp4"
@@ -117,8 +115,7 @@ setVideoSrc filename video videoSource resultVideoSource = do
     "mp3" -> pure $ Tuple (mp3 filename) "audio/mpeg"
     x -> throwMinsiError (InvalidInput "videoSource" ("Value " <> x <> " not recognized as valid input"))
   let filePathNoCache = (fst filepathType) <> "?t=" <> show m
-  Element.setAttribute "src" filePathNoCache (HSC.toElement resultVideoSource)
-  HSC.setType (snd filepathType) resultVideoSource
+  setSrc filePathNoCache videoMedia
   load videoMedia
 
 showHiddenElements :: HtmlVisualElements -> Boolean -> Effect Unit

@@ -18,7 +18,6 @@ import Components.HtmlIds
   , playbackPositionYoutubeId
   , resultPreviewId
   , resultVideoId
-  , resultVideoSourceId
   , reverseLoopGifId
   , setCutEndButton
   , setCutStartButton
@@ -52,8 +51,6 @@ import Web.HTML.HTMLSpanElement (HTMLSpanElement)
 import Web.HTML.HTMLSpanElement as HSP
 import Web.HTML.HTMLVideoElement (HTMLVideoElement)
 import Web.HTML.HTMLVideoElement as HV
-import Web.HTML.HTMLSourceElement (HTMLSourceElement)
-import Web.HTML.HTMLSourceElement as HSC
 import Web.HTML.HTMLIFrameElement (HTMLIFrameElement)
 import Web.HTML.HTMLIFrameElement as IF
 import Web.HTML.HTMLTableElement (HTMLTableElement)
@@ -94,7 +91,6 @@ newtype HtmlOutputs = HtmlOutputs
   , loadingModal :: HTMLDivElement
   , minsiErrorModal :: HTMLDivElement
   , resultVideo :: HTMLVideoElement
-  , resultVideoSource :: HTMLSourceElement
   , keyboardShortcutsButton :: HTMLButtonElement
   }
 
@@ -174,7 +170,6 @@ loadHtmlOutputs doc = do
   loadingModal <- loadDiv loadingModalId doc
   minsiErrorModal <- loadDiv minsiErrorModalId doc
   resultVideo <- loadVideo resultVideoId doc
-  resultVideoSource <- loadHtmlElement resultVideoSourceId HSC.fromElement doc
   keyboardShortcutsButton <- loadButton keyboardShortcutsButtonId doc
   pure
     ( HtmlOutputs
@@ -187,7 +182,6 @@ loadHtmlOutputs doc = do
         , loadingModal: loadingModal
         , minsiErrorModal: minsiErrorModal
         , resultVideo: resultVideo
-        , resultVideoSource: resultVideoSource
         , keyboardShortcutsButton: keyboardShortcutsButton
         }
     )
