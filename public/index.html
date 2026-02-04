@@ -65,7 +65,14 @@
 
               <div class="mb-3">
                 <label for="artist" class="form-label">Artist</label>
-                <input type="text" class="form-control" id="artist" />
+                <input type="text" class="form-control" id="artist" list="artists" />
+                <datalist id="artists">
+                  <option value="Richard Philip Henry John Benson"></option>
+                  <option value="Omar Palermo"></option>
+                  <option value="Xah Lee"></option>
+                  <option value="Alessandro Barbero"></option>
+                  <option value="Germano Mosconi"></option>
+                </datalist>
               </div>
 
               <div class="mb-3">
@@ -201,7 +208,9 @@
 
           <!-- Result block: video source + result video + playback + subtitles (like youtube block) -->
           <div class="d-none mt-5" id="videoSourceRowId">
-            <div class="text-center mb-3 d-flex justify-content-center align-items-center gap-2 flex-wrap">
+            <div
+              class="text-center mb-3 d-flex justify-content-center align-items-center gap-2 flex-wrap"
+            >
               <select
                 name="videoSource"
                 id="videoSource"
@@ -215,7 +224,11 @@
               <button type="button" class="btn btn-primary" id="downloadButton">
                 Download
               </button>
-              <button type="button" class="btn btn-success" id="downloadAllButton">
+              <button
+                type="button"
+                class="btn btn-success"
+                id="downloadAllButton"
+              >
                 Download all
               </button>
             </div>
@@ -229,11 +242,7 @@
                 style="object-fit: contain; height: 60vh"
                 controls
               ></video>
-              <audio
-                id="resultAudio"
-                class="w-100 d-none"
-                controls
-              ></audio>
+              <audio id="resultAudio" class="w-100 d-none" controls></audio>
             </div>
             <div class="px-3 pb-3 d-none" id="playbackPositionResultRowId">
               <p class="mb-0 text-center">
