@@ -30,6 +30,8 @@ import Components.HtmlIds
   , videoRowId
   , videoSourceId
   , videoSourceRowId
+  , downloadButtonId
+  , downloadAllButtonId
   , youtubeUrlId
   , subtitleRow
   , keyboardShortcutsButtonId
@@ -71,6 +73,8 @@ newtype HtmlInputs = HtmlInputs
   , title :: HTMLInputElement
   , applyButton :: HTMLButtonElement
   , videoSource :: HTMLSelectElement
+  , downloadButton :: HTMLButtonElement
+  , downloadAllButton :: HTMLButtonElement
   , setCutEndButton :: HTMLButtonElement
   , setCutStartButton :: HTMLButtonElement
   , subtitleTable :: HTMLTableElement
@@ -135,6 +139,8 @@ loadHtmlInputs doc = do
   title <- loadInput titleId doc
   applyButton <- loadButton applyId doc
   videoSource <- loadVideoSource doc
+  downloadButton <- loadButton downloadButtonId doc
+  downloadAllButton <- loadButton downloadAllButtonId doc
   setCutStartButton <- loadButton setCutStartButton doc
   setCutEndButton <- loadButton setCutEndButton doc
   subtitleTable <- loadTable subtitleTableId doc
@@ -153,6 +159,8 @@ loadHtmlInputs doc = do
         , title: title
         , applyButton: applyButton
         , videoSource: videoSource
+        , downloadButton: downloadButton
+        , downloadAllButton: downloadAllButton
         , setCutStartButton: setCutStartButton
         , setCutEndButton: setCutEndButton
         , subtitleTable: subtitleTable

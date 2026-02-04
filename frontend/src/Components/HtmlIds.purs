@@ -42,6 +42,12 @@ addSubtitleId = "addSubtitleButton"
 videoSourceId :: String
 videoSourceId = "videoSource"
 
+downloadButtonId :: String
+downloadButtonId = "downloadButton"
+
+downloadAllButtonId :: String
+downloadAllButtonId = "downloadAllButton"
+
 minsiLogId :: String
 minsiLogId = "minsiLog"
 

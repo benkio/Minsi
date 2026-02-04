@@ -2,6 +2,8 @@ module Handlers.Handlers where
 
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CutRangeHandler (CutRangeTargets(..), setCutRangeHandlers)
+import Handlers.DownloadAllButtonHandler (setDownloadAllButtonHandler)
+import Handlers.DownloadButtonHandler (setDownloadButtonHandler)
 import Handlers.KeyboardHandler (KeyboardHandlerTargets(..), setKeyboardHandlers)
 import Handlers.ResultVideo.Handler (ResultVideoEventTargets(..), setResultVideoHandlers)
 import Handlers.ResultVideo.VideoSourceHandler (setVideoSourceHandler)
@@ -15,6 +17,9 @@ import Effect (Effect)
 import Handlers.YoutubeVideo.YoutubeVideoHandler (setVideoHandlers, VideoEventTargets(..))
 import Prelude
 
+--TODO: Handlers here get too much parameters
+-- the idea is to set the handler with the given target
+-- then inside the element itself, compute the current state and get the extra elements from there.
 setupEventHandlers :: HtmlComponents -> Effect Unit
 setupEventHandlers
   { htmlInputs: HtmlInputs
@@ -26,6 +31,8 @@ setupEventHandlers
       , setCutEndButton
       , applyButton
       , videoSource
+      , downloadButton
+      , downloadAllButton
       , subtitleTable
       , subtitleRow
       , addSubtitleButton
@@ -95,6 +102,8 @@ setupEventHandlers
         }
     )
   setVideoSourceHandler videoSource resultVideo resultAudio
+  setDownloadButtonHandler downloadButton videoSource
+  setDownloadAllButtonHandler downloadAllButton
   setTextInputValidationHandlers
     ( TIVT
         { outputFilename: filename

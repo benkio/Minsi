@@ -201,16 +201,23 @@
 
           <!-- Result block: video source + result video + playback + subtitles (like youtube block) -->
           <div class="d-none mt-5" id="videoSourceRowId">
-            <div class="text-center mb-3">
+            <div class="text-center mb-3 d-flex justify-content-center align-items-center gap-2 flex-wrap">
               <select
                 name="videoSource"
                 id="videoSource"
-                class="form-select w-50 mx-auto text-center"
+                class="form-select w-50 text-center"
+                style="max-width: 12rem"
               >
                 <option value="video">Video</option>
                 <option value="gif">Gif</option>
                 <option value="mp3">Mp3</option>
               </select>
+              <button type="button" class="btn btn-primary" id="downloadButton">
+                Download
+              </button>
+              <button type="button" class="btn btn-success" id="downloadAllButton">
+                Download all
+              </button>
             </div>
           </div>
 
