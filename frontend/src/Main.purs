@@ -30,11 +30,12 @@ program = do
 - fix frontend tests and make the backend dependecy ones skipped on CI
 ------Improvements------------
 - When the cut end and cut start aren't changed, skip the yt-dlp step and just create the gifs
-- add health check and add a step in CI to: build the docker image, run it, test the healthcheck endpoint
+- Add health check and add a step in CI to: build the docker image, run it, test the healthcheck endpoint
 ------Additions---------------
-- artist as dropdown with bots names and filename prefix
+- Artist as dropdown with bots names and filename prefix
 - Enable the usage of local file
-- Add the full transcript of the subtitles and export of client compute payload
+- Button to Export client compute payload
+- Option to compute from payload
 -----keyboard shortcut for----
 - removing/adding the table row
 - cut start/end

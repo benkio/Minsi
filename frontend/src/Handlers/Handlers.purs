@@ -2,6 +2,7 @@ module Handlers.Handlers where
 
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CutRangeHandler (CutRangeTargets(..), setCutRangeHandlers)
+import Handlers.CopyTranscriptButtonHandler (setCopyTranscriptButtonHandler)
 import Handlers.DownloadAllButtonHandler (setDownloadAllButtonHandler)
 import Handlers.DownloadButtonHandler (setDownloadButtonHandler)
 import Handlers.KeyboardHandler (KeyboardHandlerTargets(..), setKeyboardHandlers)
@@ -33,6 +34,7 @@ setupEventHandlers
       , videoSource
       , downloadButton
       , downloadAllButton
+      , copyTranscriptButton
       , subtitleTable
       , subtitleRow
       , addSubtitleButton
@@ -104,6 +106,7 @@ setupEventHandlers
   setVideoSourceHandler videoSource resultVideo resultAudio
   setDownloadButtonHandler downloadButton videoSource
   setDownloadAllButtonHandler downloadAllButton
+  setCopyTranscriptButtonHandler copyTranscriptButton
   setTextInputValidationHandlers
     ( TIVT
         { outputFilename: filename

@@ -1,9 +1,8 @@
 module Model.State.State where
 
 import Prelude
-
 import Data.Newtype (class Newtype)
-import Data.Time.Duration (Milliseconds)
+import Data.Time.Duration (Milliseconds(..))
 import Data.URL (URL, toString)
 import Node.Path (FilePath)
 import Yoga.JSON (class WriteForeign, writeImpl)
@@ -45,6 +44,8 @@ data Position = Top | Bottom
 derive instance Eq Font
 derive instance Eq Color
 derive instance Eq Position
+derive newtype instance eqDurationRange :: Eq DurationRange
+derive newtype instance eqSubtitle :: Eq Subtitle
 
 instance Show Font where
   show Impact = "Impact"
@@ -84,3 +85,7 @@ instance WriteForeign WURL where
 
 derive newtype instance writeState :: WriteForeign State
 derive instance Newtype State _
+
+instance Ord Subtitle where
+  compare (Subtitle { videoPosition: (DurationRange { start: Milliseconds str1 }) }) (Subtitle { videoPosition: (DurationRange { start: Milliseconds str2 }) }) =
+    compare str1 str2

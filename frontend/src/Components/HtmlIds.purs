@@ -48,6 +48,9 @@ downloadButtonId = "downloadButton"
 downloadAllButtonId :: String
 downloadAllButtonId = "downloadAllButton"
 
+copyTranscriptButtonId :: String
+copyTranscriptButtonId = "copyTranscriptButton"
+
 minsiLogId :: String
 minsiLogId = "minsiLog"
 
