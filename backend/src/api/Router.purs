@@ -4,12 +4,10 @@ import Prelude
 
 import Controller.CheckDependenciesController (checkDependenciesController)
 import Controller.ComputeController (computeController)
-import Controller.DownloadAllController (downloadAllController)
-import Controller.DownloadController (downloadController)
 import Controller.ErrorHandlers (generalErrorHandler)
 import Controller.StatusController (statusController)
 import InMemoryDB (Store)
-import Node.Express.App (App, get, post)
+import Node.Express.App (App, post)
 import Node.Express.Handler (Handler)
 import Node.Express.Response (setResponseHeader)
 
@@ -18,8 +16,6 @@ router store = do
   post "/checkDependencies" (controllerLogic (checkDependenciesController store))
   post "/compute" (controllerLogic (computeController store))
   post "/status" (controllerLogic (statusController store))
-  get "/download" (controllerLogic downloadController)
-  get "/downloadall" (controllerLogic downloadAllController)
 
 defaultResponseSettings :: Handler
 defaultResponseSettings = setResponseHeader "Access-Control-Allow-Origin" "*"
