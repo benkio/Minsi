@@ -41,7 +41,8 @@ import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLDivElement as HTMLDivElement
 import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLMediaElement (load, pause)
-import Web.HTML.HTMLVideoElement (HTMLVideoElement, toHTMLMediaElement)
+import Web.HTML.HTMLVideoElement (HTMLVideoElement)
+import Web.HTML.HTMLVideoElement as HV
 import Web.HTML.HTMLTableElement as HT
 import Web.HTML.HTMLTableRowElement as HR
 import Web.HTML.HTMLTemplateElement as HTP
@@ -102,8 +103,10 @@ waitForStatus filename = tailRecM pollStatus unit
 setVideoSrc :: String -> HTMLVideoElement -> HS.HTMLSelectElement -> HTMLSourceElement -> Effect Unit
 setVideoSrc filename video videoSource resultVideoSource = do
   (Milliseconds m) <- unInstant <$> now
-  let videoMedia = toHTMLMediaElement video
+  let videoMedia = HV.toHTMLMediaElement video
   pause videoMedia
+  --TODO: test. if doesn't work. Try by creating the source on the spot and append it as child. Last resort. Try change element type
+  Element.removeAttribute "src" (HV.toElement video)
   Element.removeAttribute "src" (HSC.toElement resultVideoSource)
   selectedVideoSourceValue <- HS.value videoSource
   filepathType <- case selectedVideoSourceValue of
@@ -112,7 +115,7 @@ setVideoSrc filename video videoSource resultVideoSource = do
     "mp3" -> pure $ Tuple (mp3 filename) "audio/mpeg"
     x -> throwMinsiError (InvalidInput "videoSource" ("Value " <> x <> " not recognized as valid input"))
   let filePathNoCache = (fst filepathType) <> "?t=" <> show m
-  HSC.setSrc filePathNoCache resultVideoSource
+  Element.setAttribute "src" filePathNoCache (HSC.toElement resultVideoSource)
   HSC.setType (snd filepathType) resultVideoSource
   load videoMedia
 
