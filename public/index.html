@@ -209,6 +209,7 @@
               >
                 <option value="video">Video</option>
                 <option value="gif">Gif</option>
+                <option value="mp3">Mp3</option>
               </select>
             </div>
           </div>
@@ -220,7 +221,9 @@
                 class="w-100 bg-dark"
                 style="object-fit: contain; height: 60vh"
                 controls
-              ></video>
+              >
+                  <source id="resultVideoSource"/>
+              </video>
             </div>
             <div class="px-3 pb-3 d-none" id="playbackPositionResultRowId">
               <p class="mb-0 text-center">

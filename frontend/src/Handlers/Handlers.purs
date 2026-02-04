@@ -40,6 +40,7 @@ setupEventHandlers
       , cutEndValue
       , cutStartValue
       , resultVideo
+      , resultVideoSource
       , keyboardShortcutsButton
       }
   } = do
@@ -93,7 +94,7 @@ setupEventHandlers
         , resultVideo: resultVideo
         }
     )
-  setVideoSourceHandler videoSource resultVideo
+  setVideoSourceHandler videoSource resultVideo resultVideoSource
   setTextInputValidationHandlers
     ( TIVT
         { outputFilename: filename
