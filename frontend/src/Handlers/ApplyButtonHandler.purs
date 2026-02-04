@@ -105,11 +105,11 @@ setResultMediaSrc filename videoSource resultVideo resultAudio = do
   (Milliseconds m) <- unInstant <$> now
   selectedVideoSourceValue <- HS.value videoSource
   path <- case selectedVideoSourceValue of
-    "video" -> pure (mp4 filename)
+    "mp4" -> pure (mp4 filename)
     "gif" -> pure (gif filename)
     "mp3" -> pure (mp3 filename)
     x -> throwMinsiError (InvalidInput "videoSource" ("Value " <> x <> " not recognized as valid input"))
-  let showVideo = selectedVideoSourceValue == "video" || selectedVideoSourceValue == "gif"
+  let showVideo = selectedVideoSourceValue == "mp4" || selectedVideoSourceValue == "gif"
   let filePathNoCache = path <> "?t=" <> show m
   Element.removeAttribute "src" (HV.toElement resultVideo)
   Element.removeAttribute "src" (HA.toElement resultAudio)

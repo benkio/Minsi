@@ -51,7 +51,7 @@ spec = do
       pathToArray PathEmpty `shouldEqual` []
 
     it "should convert PathAbsolute to array" $ liftEffect $ do
-      pathToArray (PathAbsolute [ "video", "dQw4w9WgXcQ" ]) `shouldEqual` [ "video", "dQw4w9WgXcQ" ]
+      pathToArray (PathAbsolute [ "mp4", "dQw4w9WgXcQ" ]) `shouldEqual` [ "mp4", "dQw4w9WgXcQ" ]
 
     it "should convert PathRelative to array" $ liftEffect $ do
       pathToArray (PathRelative [ "watch" ]) `shouldEqual` [ "watch" ]

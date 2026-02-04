@@ -5,7 +5,7 @@ import Data.Newtype (unwrap)
 import Data.Tuple (fst)
 import Effect (Effect)
 import Effect.Aff (runAff_)
-import Endpoints.Download (callDownload)
+import Endpoints.Download (triggerDownload)
 import Handlers.ApplyButtonHandler (getCurrentState)
 import Handlers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
 import Web.DOM.Element (toEventTarget)
@@ -26,4 +26,4 @@ downloadButtonEventListener videoSource _ = do
   let state = fst stateComponents
   let filename = (unwrap state).filename
   selectedVideoSourceValue <- HS.value videoSource
-  runAff_ genericErrorsHandlerEither (void (callDownload filename selectedVideoSourceValue))
+  runAff_ genericErrorsHandlerEither (triggerDownload filename selectedVideoSourceValue)

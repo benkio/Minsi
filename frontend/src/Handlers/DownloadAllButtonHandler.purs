@@ -1,10 +1,13 @@
 module Handlers.DownloadAllButtonHandler where
 
+
 import Prelude
 import Data.Newtype (unwrap)
 import Data.Tuple (fst)
 import Effect (Effect)
-import Effect.Aff (runAff_)
+import Effect.Aff (Aff, runAff_)
+import Effect.Class (liftEffect)
+import Endpoints.Download (triggerDownloadLink)
 import Handlers.ApplyButtonHandler (getCurrentState)
 import Handlers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
 import Web.DOM.Element (toEventTarget)
@@ -26,6 +29,6 @@ downloadAllButtonEventListener _ = do
 
 downloadAll :: String -> Aff Unit
 downloadAll filename = do
-  void $ callDownload filename "video"
-  void $ callDownload filename "gif"
-  void $ callDownload filename "mp3"
+  liftEffect (triggerDownloadLink filename "mp4")
+  liftEffect (triggerDownloadLink filename "gif")
+  liftEffect (triggerDownloadLink filename "mp3")
