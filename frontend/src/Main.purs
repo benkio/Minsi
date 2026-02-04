@@ -27,6 +27,7 @@ program = do
 {-
 -------Bugs-------------------
 - video silent prefix on firefox
+- fix frontend tests and make the backend dependecy ones skipped on CI
 ------Improvements------------
 - When the cut end and cut start aren't changed, skip the yt-dlp step and just create the gifs
 - add health check and add a step in CI to: build the docker image, run it, test the healthcheck endpoint
