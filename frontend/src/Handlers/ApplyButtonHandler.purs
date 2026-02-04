@@ -105,7 +105,9 @@ setVideoSrc filename video videoSource resultVideoSource = do
   (Milliseconds m) <- unInstant <$> now
   let videoMedia = HV.toHTMLMediaElement video
   pause videoMedia
-  --TODO: test. if doesn't work. Try by creating the source on the spot and append it as child. Last resort. Try change element type
+  --TODO: test. if doesn't work.
+  -- - Option 1. Try by creating the source on the spot and append it as child.
+  -- - Option 2. Add an audio element and swap the display none between the two based on the videosource (to be renamed), then make this funcion based on HTMLMediaElement if possible, if not, factor it out as much as possible, then duplicate it and select which one to run dinamically.
   Element.removeAttribute "src" (HV.toElement video)
   Element.removeAttribute "src" (HSC.toElement resultVideoSource)
   selectedVideoSourceValue <- HS.value videoSource
