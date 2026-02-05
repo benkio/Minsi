@@ -2,7 +2,7 @@ module Test.Arbitrary where
 
 import Prelude
 import Test.QuickCheck.Arbitrary (class Arbitrary, arbitrary)
-import Test.QuickCheck.Gen (Gen, suchThat, chooseInt, arrayOf, elements)
+import Test.QuickCheck.Gen (Gen, chooseInt, arrayOf, elements)
 import Data.Char (fromCharCode)
 import Data.String.CodeUnits (fromCharArray)
 import Data.Maybe (maybe)
@@ -14,9 +14,8 @@ data Range = Range Number Number
 instance Arbitrary Range where
   arbitrary = do
     start <- arbitrary
-    -- cutVideoValidation requires start < end - 100.0 (i.e. end - start > 100 ms)
-    gap <- suchThat arbitrary (\g -> g > 100.0)
-    pure (Range start (start + gap))
+    end <- arbitrary
+    pure (Range start (end + 101.0))
 
 newtype NonEmptyASCIIString = NonEmptyASCIIString String
 newtype EmptyASCIIString = EmptyASCIIString String
