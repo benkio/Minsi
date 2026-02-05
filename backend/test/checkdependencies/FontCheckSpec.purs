@@ -1,16 +1,16 @@
 module Test.CheckDependencies.FontCheckSpec where
 
-import Prelude
-
 import CheckDependencies.FontCheck (searchFont, searchFontInDir, checkFileMatch)
 import Effect.Class (liftEffect)
+import Prelude
+import Test.Main (isNotCI)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldReturn, shouldEqual)
 
 spec :: Spec Unit
 spec = do
   describe "searchFont" do
-    it "should find the Impact and Arial Black font" $ liftEffect $ do
+    it "should find the Impact and Arial Black font" $ liftEffect $ whenM (isNotCI) $ do
       (searchFont "Impact") `shouldReturn` true
       (searchFont "Arial Black") `shouldReturn` true
   describe "checkFileMatch" do

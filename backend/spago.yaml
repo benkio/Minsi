@@ -16,6 +16,7 @@ package:
     - maybe
     - monad-loops
     - node-buffer
+    - node-process
     - node-child-process
     - node-execa
     - node-fs

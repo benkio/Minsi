@@ -25,6 +25,7 @@
             "node-execa",
             "node-fs",
             "node-path",
+            "node-process",
             "open-foreign-generic",
             "ordered-collections",
             "prelude",
