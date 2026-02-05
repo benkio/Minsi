@@ -26,11 +26,11 @@ program = do
 -- TODOs --------------------------------
 {-
 -------Bugs-------------------
-- video silent prefix on firefox
-- fix frontend tests and make the backend dependecy ones skipped on CI
+- video silent prefix on firefox. Try converting the result video from yt-dlp with ffmpeg
 ------Improvements------------
 - When the cut end and cut start aren't changed, skip the yt-dlp step and just create the gifs
 - Add health check and add a step in CI to: build the docker image, run it, test the healthcheck endpoint
+- Upload the image to dockerhub
 ------Additions---------------
 - Artist as dropdown with bots names and filename prefix
 - Enable the usage of local file
