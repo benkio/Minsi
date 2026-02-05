@@ -32,7 +32,6 @@ program = do
 - Add health check and add a step in CI to: build the docker image, run it, test the healthcheck endpoint
 - Upload the image to dockerhub
 ------Additions---------------
-- Artist as dropdown with bots names and filename prefix
 - Enable the usage of local file
 - Button to Export client compute payload
 - Option to compute from payload

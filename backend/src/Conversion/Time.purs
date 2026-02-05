@@ -28,14 +28,3 @@ millisToString (Milliseconds ms) millisSeparator =
 millisecondsToSecondsString :: Milliseconds -> Maybe Char -> String
 millisecondsToSecondsString ms Nothing = millisToString ms ','
 millisecondsToSecondsString ms (Just c) = millisToString ms c
-
-formatToThreeDecimals :: Number -> String
-formatToThreeDecimals v =
-  let
-    { init: i, rest: r } = span (\x -> x /= '.') <<< toCharArray $ show v
-    num = fromCharArray i
-    decChars = maybe [] identity (tail r)
-    dec3 = take 3 (decChars <> replicate 3 '0')
-    dec = fromCharArray dec3
-  in
-    num <> "." <> dec

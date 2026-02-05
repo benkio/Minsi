@@ -10,7 +10,4 @@ import Endpoints.CheckDependencies (callCheckDependencies, MissingDependenciesRe
 checkDependecies :: Aff Unit
 checkDependecies = do
   { missedDependencies: deps } :: MissingDependenciesResponse <- callCheckDependencies
-  if null deps then
-    pure unit
-  else
-    liftEffect $ throwMinsiError $ MissingDependenciesError deps
+  unless (null deps) (liftEffect $ throwMinsiError $ MissingDependenciesError deps)
