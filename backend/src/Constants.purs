@@ -33,6 +33,9 @@ reversed filename = outputPath >>= \ofp -> resolve [ ofp ] (filename <> "_revers
 reversedFull :: String -> Effect FilePath
 reversedFull filename = outputPath >>= \ofp -> resolve [ ofp ] (filename <> "_reversed_full.mp4")
 
+tempVideo :: String -> Effect FilePath
+tempVideo filename = outputPath >>= (\tv -> resolve [ tv ] (filename <> "_temp.mp4"))
+
 files :: String -> Effect (Array FilePath)
 files filename =
   traverse (\f -> f filename)
@@ -43,4 +46,5 @@ files filename =
     , txt
     , reversed
     , reversedFull
+    , tempVideo
     ]

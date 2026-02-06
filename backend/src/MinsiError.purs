@@ -7,12 +7,14 @@ import Prelude
 data MinsiError
   = DependencyError String
   | YtdlpError String
-  | FfmpegMp3Error String
+  | FfmpegVideoError String
   | FfmpegGifError String
+  | FfmpegMp3Error String
   | Id3v2Error String
 
 instance Show MinsiError where
   show (YtdlpError s) = "🚫 Ytdlp error: " <> s
+  show (FfmpegVideoError s) = "🚫 Ffmpeg video error: " <> s
   show (FfmpegMp3Error s) = "🚫 Ffmpeg mp3 error: " <> s
   show (FfmpegGifError s) = "🚫 Ffmpeg gif error: " <> s
   show (Id3v2Error s) = "🚫 Id3v2 error: " <> s

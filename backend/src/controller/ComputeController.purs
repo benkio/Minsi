@@ -1,18 +1,18 @@
 module Controller.ComputeController where
 
 import Command.Ffmpeg.Gif (makeGif)
-import Node.FS.Sync (rm)
-import Data.Traversable (traverse_)
-import Constants (files)
 import Command.Ffmpeg.Mp3 (extractMp3)
+import Command.Ffmpeg.Video (normalizeVideo)
 import Command.Id3v2 (addId3Tags)
 import Command.Ytdlp (downloadVideo)
+import Constants (files)
 import Control.Monad.Error.Class (catchError)
 import Control.Monad.Except (ExceptT(..), runExcept, runExceptT, lift)
 import Data.Array (fromFoldable)
 import Data.Bifunctor (lmap)
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
+import Data.Traversable (traverse_)
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
@@ -25,6 +25,7 @@ import Node.ChildProcess.Types (Exit(..))
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody)
 import Node.Express.Response (sendJson, setStatus, end)
+import Node.FS.Sync (rm)
 import Node.Library.Execa (ExecaResult)
 import Node.Path (FilePath)
 import Prelude
@@ -77,6 +78,7 @@ runComputePipeline :: State -> Aff (Either String Unit)
 runComputePipeline state@(State { youtubeUrl, filename, cutVideo: DurationRange { start, end }, artist, title }) =
   runExceptT do
     void $ exceptTStep "Video download" $ downloadVideo youtubeUrl filename start end
+    void $ exceptTStep "Video Normalization" $ normalizeVideo filename
     void $ exceptTStep "MP3 extraction" $ extractMp3 filename
     void $ exceptTStep "ID3 tags" $ addId3Tags filename artist title
     void $ exceptTMultiple "Gif Creation" $ makeGif state

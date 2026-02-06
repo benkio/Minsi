@@ -27,7 +27,7 @@ setCutRangeHandlers :: CutRangeTargets -> Effect Unit
 setCutRangeHandlers (CRET { cutStart, cutEnd, cutStartValue, cutEndValue }) = genericErrorsHandler $ do
   cutStartEvL <- eventListener (rangeToNumberListenerStart cutStart cutEnd cutStartValue cutEndValue)
   cutEndEvL <- eventListener (rangeToNumberListenerEnd cutStart cutEnd cutStartValue cutEndValue)
-  cutStartValueEvL <- eventListener (numberToRangeListenerStart cutStart cutStartValue cutEndValue)
+  cutStartValueEvL <- eventListener (numberToRangeListenerStart cutStart cutEndValue cutStartValue)
   cutEndValueEvL <- eventListener (numberToRangeListenerEnd cutEnd cutStartValue cutEndValue)
   addEventListener E.input cutStartEvL false (toEventTarget (HI.toElement cutStart))
   addEventListener E.change cutStartEvL false (toEventTarget (HI.toElement cutStart))
@@ -61,7 +61,7 @@ rangeToNumberListenerEnd _ cutEnd cutStartValue cutEndValue _ = genericErrorsHan
 
 -- When start number input changes, update start range if cutVideoValidation is satisfied
 numberToRangeListenerStart :: HI.HTMLInputElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
-numberToRangeListenerStart cutStart cutStartValue cutEndValue _ = genericErrorsHandler $ do
+numberToRangeListenerStart cutStart cutEndValue cutStartValue _ = genericErrorsHandler $ do
   start <- valueAsNumber cutStartValue
   end <- valueAsNumber cutEndValue
   validation
