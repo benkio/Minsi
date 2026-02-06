@@ -1,11 +1,11 @@
 module Endpoints.Download where
 
-import Prelude
+import Constants (fromType, suggestedDownloadName)
 import Data.Maybe (maybe)
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
-import Constants (fromType)
+import Prelude
 import Unsafe.Coerce (unsafeCoerce)
 import Web.DOM.Document (createElement)
 import Web.DOM.Element (toNode)
@@ -16,13 +16,6 @@ import Web.HTML.HTMLDocument (body, toDocument)
 import Web.HTML.HTMLElement (click, toElement) as HE
 import Web.HTML.HTMLHyperlinkElementUtils (setHref)
 import Web.HTML.Window (document)
-
-suggestedDownloadName :: String -> String -> String
-suggestedDownloadName filename = case _ of
-  "mp4" -> filename <> ".mp4"
-  "gif" -> filename <> "Gif.mp4"
-  "mp3" -> filename <> ".mp3"
-  _ -> filename
 
 triggerDownload :: String -> String -> Aff Unit
 triggerDownload filename filetype = liftEffect (triggerDownloadLink filename filetype)
@@ -49,4 +42,3 @@ triggerDownloadLink filename filetype = do
     appendChild anchorNode bodyNode
     HE.click (HA.toHTMLElement anchor)
     removeChild anchorNode bodyNode
-

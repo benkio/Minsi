@@ -2,27 +2,28 @@ module Handlers.Subtitles.AddSubtitleButtonHandler where
 
 import Prelude
 
-import Components.HTMLTableElement (getEndInput, getFirstRow, getStartInput, getTBody)
+import Components.HTMLTableElement (getFirstRow, getStartInput, getTBody)
+import Components.HTMLTableRowElement (getEndInput)
 import Data.Either (Either(..))
 import Data.Maybe (maybe)
 import Effect (Effect)
 import Effect.Console (log)
 import Effect.Exception (try)
-import Handlers.ErrorHandlers (genericErrorsHandler)
 import Handlers.ApplyButtonHandler (getRow)
+import Handlers.ErrorHandlers (genericErrorsHandler)
 import Handlers.Subtitles.RemoveSubtitleButtonHandler (addRemoveSubtitleListenerToRow)
-import Web.HTML.HTMLTemplateElement as HTP
 import Main.MinsiError (MinsiError(..), throwMinsiError)
 import Web.DOM.Element (fromNode, toEventTarget)
 import Web.DOM.Node (appendChild, deepClone, insertBefore)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
+import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLInputElement (setValue, valueAsNumber)
 import Web.HTML.HTMLTableElement as HT
 import Web.HTML.HTMLTableRowElement as HTR
 import Web.HTML.HTMLTableSectionElement as HTS
-import Web.HTML.Event.EventTypes as E
+import Web.HTML.HTMLTemplateElement as HTP
 
 setAddSubtitleButtonHandler :: HB.HTMLButtonElement -> HT.HTMLTableElement -> HTP.HTMLTemplateElement -> Effect Unit
 setAddSubtitleButtonHandler addSubtitleButton subtitleTable subtitleRowTemplate = genericErrorsHandler $ do

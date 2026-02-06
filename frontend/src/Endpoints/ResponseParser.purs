@@ -2,7 +2,8 @@ module Endpoints.ResponseParser where
 
 import Effect (Effect)
 
-import Data.Either (Either(..))
+import Data.Either (Either(..), either)
+import Data.String (joinWith)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
 import Fetch (Response)
@@ -17,34 +18,13 @@ validateResponse response =
 decodeJsonResponse :: forall a. ReadForeign a => String -> Response -> Aff a
 decodeJsonResponse context response = do
   bodyText <- response.text
-  if bodyText == "" then
-    liftEffect $
-      throwMinsiError
-        ( JSONParsingError
-            ( context <> ": empty response body"
-                <> " (http "
-                <> show response.status
-                <> " "
-                <> response.statusText
-                <> ")"
-            )
-        )
-  else
-    case (readJSON bodyText :: Either _ a) of
-      Left err ->
-        liftEffect $
-          throwMinsiError
-            ( JSONParsingError
-                ( context <> ": " <> show err
-                    <> " (http "
-                    <> show response.status
-                    <> " "
-                    <> response.statusText
-                    <> ")"
-                    <> " body="
-                    <> bodyText
-                )
-            )
-      Right decoded ->
-        pure decoded
-
+  decodeBody context bodyText
+  where
+  decodeBody :: forall a. ReadForeign a => String -> String -> Aff a
+  decodeBody context "" =
+    liftEffect $ throwMinsiError (JSONParsingError (joinWith " " [ context, ": empty response body", "(http", show response.status, response.statusText, ")" ]))
+  decodeBody context b =
+    either
+      (\err -> liftEffect $ throwMinsiError (JSONParsingError (joinWith " " [ context, ":", show err, " (http ", show response.status, response.statusText, ")", " body=", b ])))
+      pure
+      (readJSON b)

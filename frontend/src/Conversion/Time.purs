@@ -8,4 +8,4 @@ formatToFirstFour :: Number -> String
 formatToFirstFour =
   show >>> toCharArray >>> take 5 >>> filter isDigit >>> fromCharArray
   where
-    isDigit c = c >= '0' && c <= '9'
+  isDigit c = c >= '0' && c <= '9'

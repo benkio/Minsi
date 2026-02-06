@@ -14,7 +14,8 @@ import Web.HTML.HTMLMediaElement (currentTime)
 import Web.HTML.HTMLInputElement (setValue)
 import Web.HTML.Event.EventTypes as E
 import Handlers.ErrorHandlers (genericErrorsHandler)
-import Components.HTMLTableElement (getFirstRow, getStartInput, getEndInput)
+import Components.HTMLTableElement (getFirstRow, getStartInput)
+import Components.HTMLTableRowElement (getEndInput)
 
 data SubtitleTimeButtonsTargets = STBT
   { setSubtitleStartButton :: HB.HTMLButtonElement

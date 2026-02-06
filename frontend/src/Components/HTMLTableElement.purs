@@ -4,8 +4,10 @@ import Prelude
 
 import Data.Array (catMaybes, drop, head, last)
 import Data.Maybe (maybe)
+import Data.TraversableWithIndex (traverseWithIndex)
 import Effect (Effect)
 import Main.MinsiError (MinsiError(..), throwMinsiError)
+import Model.State.State (Subtitle)
 import Web.DOM.Element (toParentNode)
 import Web.DOM.HTMLCollection as HC
 import Web.DOM.ParentNode (QuerySelector(..), querySelector)
@@ -60,16 +62,8 @@ getStartInput row = do
     $ (elementMaybe >>= HI.fromElement)
   pure input
 
--- | Get the end input element from a table row (second cell)
-getEndInput :: HTR.HTMLTableRowElement -> Effect HTMLInputElement
-getEndInput row = do
-  cells <- HTR.cells row
-  cellArray <- HC.toArray cells
-  endCell <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableEndCell")) pure
-    $ (head (drop 1 cellArray) >>= HTC.fromElement)
-  let element = HTC.toElement endCell
-  let parentNode = toParentNode element
-  elementMaybe <- querySelector (QuerySelector "input") parentNode
-  input <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableEndInput")) pure
-    $ (elementMaybe >>= HI.fromElement)
-  pure input
+loadSubtitlesFromTable :: (Int -> HTR.HTMLTableRowElement -> Effect Subtitle) -> HT.HTMLTableElement -> Effect (Array Subtitle)
+loadSubtitlesFromTable loadSubtitleFromRow table = do
+  rows <- getRows table
+  subtitles <- traverseWithIndex loadSubtitleFromRow rows
+  pure subtitles

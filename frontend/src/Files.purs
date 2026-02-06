@@ -20,3 +20,9 @@ fromType "mp3" = mp3
 fromType "mp4" = mp4
 fromType _ = mp4
 
+suggestedDownloadName :: String -> String -> String
+suggestedDownloadName filename = case _ of
+  "mp4" -> filename <> ".mp4"
+  "gif" -> filename <> "Gif.mp4"
+  "mp3" -> filename <> ".mp3"
+  _ -> filename
