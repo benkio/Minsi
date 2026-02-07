@@ -26,10 +26,15 @@ program = do
 -- TODOs --------------------------------
 {-
 -------Bugs-------------------
+- Remove Single Download Button
+- Force Different Font for Colored Text:
+  - Impact: Only Black/White
+  - Arial Black: Only Colors
 ------Improvements------------
 - Remove files after Download and after 1h from creation
 - When the cut end and cut start aren't changed, skip the yt-dlp step and just create the gifs
 - Add health check and add a step in CI to: build the docker image, run it, test the healthcheck endpoint
+- Make minsilog red when there's an error
 ------Additions---------------
 - Enable the usage of local file
 - Button to Export client compute payload
