@@ -1,13 +1,13 @@
 module Handlers.DownloadButtonHandler where
 
-import Prelude
 import Data.Newtype (unwrap)
 import Data.Tuple (fst)
 import Effect (Effect)
 import Effect.Aff (runAff_)
 import Endpoints.Download (triggerDownload)
-import Handlers.ApplyButtonHandler (getCurrentState)
 import Handlers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
+import Model.State.StateFromHtml (getCurrentState)
+import Prelude
 import Web.DOM.Element (toEventTarget)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)

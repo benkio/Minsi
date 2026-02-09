@@ -4,21 +4,21 @@ import Prelude
 
 import Components.HTMLTableElement (getRows, getStartInput)
 import Components.HTMLTableRowElement (getEndInput)
-import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlVisualElements(..), loadComponents)
+import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlVisualElements(..))
 import Components.HtmlIds (loadingModalId, videoSourceId)
 import Components.Modal (hideModal, showModal)
-import Components.Window (getDocument)
+
 import Constants (mp4, gif, mp3)
 import Control.Monad.Rec.Class (Step(..), tailRecM)
 import Data.Array (cons)
 import Data.DateTime.Instant (unInstant)
-import Data.Either (either)
+
 import Data.Maybe (maybe)
 import Data.Newtype (unwrap)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Traversable (traverse)
-import Data.Tuple (Tuple(..), fst, snd)
-import Data.Validation.Semigroup (toEither)
+import Data.Tuple (fst, snd)
+
 import Effect (Effect)
 import Effect.Aff (Aff, delay, runAff_, finally)
 import Effect.Class (liftEffect)
@@ -30,8 +30,8 @@ import Handlers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
 import Main.MinsiError (MinsiError(..), throwMinsiError)
 import Model.ProcessStatus (ProcessStatus(..))
 import Model.State.State (State(..), DurationRange(..))
-import Model.State.StateFromHtml (fromHtmlInputs)
-import Model.ValidationErrors (toMap)
+import Model.State.StateFromHtml (getCurrentState)
+
 import Web.DOM.DOMTokenList as DOMTokenList
 import Web.DOM.DocumentFragment as DF
 import Web.DOM.Element (toEventTarget)
@@ -176,14 +176,6 @@ scrollToVideoSource = do
   w <- window
   loc <- location w
   setHash ("#" <> videoSourceId) loc
-
-getCurrentState :: Effect (Tuple State HtmlComponents)
-getCurrentState = do
-  doc <- getDocument
-  components <- loadComponents doc
-  stateV <- fromHtmlInputs components.htmlInputs
-  state <- (either (throwMinsiError <<< InvalidInputs <<< toMap) pure <<< toEither) stateV
-  pure $ Tuple state components
 
 setSubtitleTableMaxValues :: State -> HT.HTMLTableElement -> HTP.HTMLTemplateElement -> Effect Unit
 setSubtitleTableMaxValues (State { cutVideo: DurationRange { start: Milliseconds startMs, end: Milliseconds endMs } }) subtitleTable subtitleRowTemplate = do

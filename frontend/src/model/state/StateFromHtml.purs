@@ -3,16 +3,19 @@ module Model.State.StateFromHtml where
 import Prelude
 
 import Components.HTMLTableElement (loadSubtitlesFromTable)
-import Components.HtmlComponents (HtmlInputs(..))
+import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), loadComponents)
 import Components.HtmlIds (youtubeUrlId, outputFilenameId, artistId, titleId, cutStartId)
+import Components.Window (getDocument)
 import Conversion.String (capitalize)
 import Data.Array (length, (!!))
+import Data.Either (either)
 import Data.Int (toNumber)
 import Data.Maybe (fromJust)
 import Data.String.Common (trim, toUpper)
 import Data.Time.Duration (Milliseconds(..))
+import Data.Tuple (Tuple(..))
 import Data.URL (URL)
-import Data.Validation.Semigroup (V, validation)
+import Data.Validation.Semigroup (V, validation, toEither)
 import Effect (Effect)
 import HTMLInputElement as HTMLInputElement
 import HTMLTableCellElement (valueFromInputTableCell, valueFromSelectTableCell, valueFromTextAreaTableCell)
@@ -27,6 +30,14 @@ import Validations.YoutubeValidation (youtubeUrlValidation)
 import Web.DOM.HTMLCollection as HC
 import Web.HTML.HTMLInputElement (HTMLInputElement, value, valueAsNumber, checked)
 import Web.HTML.HTMLTableRowElement as HTR
+
+getCurrentState :: Effect (Tuple State HtmlComponents)
+getCurrentState = do
+ doc <- getDocument
+ components <- loadComponents doc
+ stateV <- fromHtmlInputs components.htmlInputs
+ state <- (either (throwMinsiError <<< InvalidInputs <<< toMap) pure <<< toEither) stateV
+ pure $ Tuple state components
 
 fromHtmlInputs :: HtmlInputs -> Effect (V ValidationErrors State)
 fromHtmlInputs
