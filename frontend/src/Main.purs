@@ -30,6 +30,7 @@ program = do
 - Force Different Font for Colored Text:
   - Impact: Only Black/White
   - Arial Black: Only Colors
+- Remove the sliders
 ------Improvements------------
 - Remove files after Download and after 1h from creation
 - When the cut end and cut start aren't changed, skip the yt-dlp step and just create the gifs
