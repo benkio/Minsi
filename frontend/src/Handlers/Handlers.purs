@@ -27,6 +27,7 @@ setupEventHandlers
       { cutStart
       , cutEnd
       , youtubeUrl
+      , localFile
       , filename
       , setCutStartButton
       , setCutEndButton
@@ -46,8 +47,6 @@ setupEventHandlers
   , htmlOutputs: HtmlOutputs
       { playbackPositionYoutube
       , playbackPositionResultVideo
-      , cutEndValue
-      , cutStartValue
       , resultVideo
       , resultAudio
       , keyboardShortcutsButton
@@ -57,8 +56,6 @@ setupEventHandlers
     ( CRET
         { cutStart: cutStart
         , cutEnd: cutEnd
-        , cutEndValue: cutEndValue
-        , cutStartValue: cutStartValue
         }
     )
   setVideoHandlers
@@ -69,8 +66,6 @@ setupEventHandlers
         , setCutStartButton: setCutStartButton
         , setCutEndButton: setCutEndButton
         , youtubeUrl: youtubeUrl
-        , cutStartValue: cutStartValue
-        , cutEndValue: cutEndValue
         }
     )
   setResultVideoHandlers
@@ -84,8 +79,6 @@ setupEventHandlers
     ( KHT
         { cutStart
         , cutEnd
-        , cutStartValue
-        , cutEndValue
         , subtitleTable
         , subtitleRow
         , resultVideo
@@ -114,3 +107,4 @@ setupEventHandlers
         , title
         }
     )
+-- TODO: Add handler to load the video tag with the local file

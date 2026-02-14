@@ -28,8 +28,6 @@ import Web.UIEvent.KeyboardEvent.EventTypes as E
 data KeyboardHandlerTargets = KHT
   { cutStart :: HI.HTMLInputElement
   , cutEnd :: HI.HTMLInputElement
-  , cutStartValue :: HI.HTMLInputElement
-  , cutEndValue :: HI.HTMLInputElement
   , subtitleTable :: HT.HTMLTableElement
   , subtitleRow :: HTP.HTMLTemplateElement
   , resultVideo :: HTMLVideoElement

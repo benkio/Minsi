@@ -15,17 +15,14 @@ reverseLoopGifId = "reverseLoopGif"
 cutStartId :: String
 cutStartId = "cutStart"
 
-cutStartValueId :: String
-cutStartValueId = "cutStartValue"
-
 cutEndId :: String
 cutEndId = "cutEnd"
 
-cutEndValueId :: String
-cutEndValueId = "cutEndValue"
-
 youtubeUrlId :: String
 youtubeUrlId = "youtubeUrl"
+
+localFileId :: String
+localFileId = "localFile"
 
 resultPreviewId :: String
 resultPreviewId = "youtubeResultPreview"

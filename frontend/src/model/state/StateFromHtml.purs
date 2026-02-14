@@ -33,11 +33,11 @@ import Web.HTML.HTMLTableRowElement as HTR
 
 getCurrentState :: Effect (Tuple State HtmlComponents)
 getCurrentState = do
- doc <- getDocument
- components <- loadComponents doc
- stateV <- fromHtmlInputs components.htmlInputs
- state <- (either (throwMinsiError <<< InvalidInputs <<< toMap) pure <<< toEither) stateV
- pure $ Tuple state components
+  doc <- getDocument
+  components <- loadComponents doc
+  stateV <- fromHtmlInputs components.htmlInputs
+  state <- (either (throwMinsiError <<< InvalidInputs <<< toMap) pure <<< toEither) stateV
+  pure $ Tuple state components
 
 fromHtmlInputs :: HtmlInputs -> Effect (V ValidationErrors State)
 fromHtmlInputs

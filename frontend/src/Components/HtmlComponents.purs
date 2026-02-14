@@ -6,9 +6,7 @@ import Components.HtmlIds
   , applyId
   , artistId
   , cutEndId
-  , cutEndValueId
   , cutStartId
-  , cutStartValueId
   , loadingModalId
   , minsiErrorModalId
   , minsiLogId
@@ -36,6 +34,7 @@ import Components.HtmlIds
   , youtubeUrlId
   , subtitleRow
   , keyboardShortcutsButtonId
+  , localFileId
   )
 import Control.Monad.Error.Class (catchError)
 import Data.Newtype (class Newtype)
@@ -68,6 +67,7 @@ newtype HtmlInputs = HtmlInputs
   { cutStart :: HTMLInputElement
   , cutEnd :: HTMLInputElement
   , youtubeUrl :: HTMLInputElement
+  , localFile :: HTMLInputElement
   , filename :: HTMLInputElement
   , reverseLoop :: HTMLInputElement
   , artist :: HTMLInputElement
@@ -95,8 +95,6 @@ newtype HtmlOutputs = HtmlOutputs
   , minsiLog :: HTMLDivElement
   , playbackPositionYoutube :: HTMLSpanElement
   , playbackPositionResultVideo :: HTMLSpanElement
-  , cutStartValue :: HTMLInputElement
-  , cutEndValue :: HTMLInputElement
   , loadingModal :: HTMLDivElement
   , minsiErrorModal :: HTMLDivElement
   , resultVideo :: HTMLVideoElement
@@ -135,6 +133,7 @@ loadHtmlInputs :: NonElementParentNode -> Effect HtmlInputs
 loadHtmlInputs doc = do
   rangeTuple <- loadCutRange doc
   youtubeUrl <- loadInput youtubeUrlId doc
+  localFile <- loadInput localFileId doc
   filename <- loadInput outputFilenameId doc
   reverseLoop <- loadInput reverseLoopGifId doc
   artist <- loadInput artistId doc
@@ -156,6 +155,7 @@ loadHtmlInputs doc = do
         { cutStart: fst rangeTuple
         , cutEnd: snd rangeTuple
         , youtubeUrl: youtubeUrl
+        , localFile: localFile
         , filename: filename
         , reverseLoop: reverseLoop
         , artist: artist
@@ -181,8 +181,6 @@ loadHtmlOutputs doc = do
   minsiLog <- loadDiv minsiLogId doc
   playbackPositionYoutube <- loadSpan playbackPositionYoutubeId doc
   playbackPositionResultVideo <- loadSpan playbackPositionResultVideoId doc
-  cutStartValue <- loadHtmlElement cutStartValueId HI.fromElement doc
-  cutEndValue <- loadHtmlElement cutEndValueId HI.fromElement doc
   loadingModal <- loadDiv loadingModalId doc
   minsiErrorModal <- loadDiv minsiErrorModalId doc
   resultVideo <- loadVideo resultVideoId doc
@@ -194,8 +192,6 @@ loadHtmlOutputs doc = do
         , minsiLog: minsiLog
         , playbackPositionYoutube: playbackPositionYoutube
         , playbackPositionResultVideo: playbackPositionResultVideo
-        , cutStartValue: cutStartValue
-        , cutEndValue: cutEndValue
         , loadingModal: loadingModal
         , minsiErrorModal: minsiErrorModal
         , resultVideo: resultVideo

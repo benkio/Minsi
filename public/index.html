@@ -98,51 +98,34 @@
                 </label>
               </div>
 
-              <div class="mb-4">
+              <div class="row">
+              <div class="mb-4 col-6">
                 <label for="cutStart" class="form-label small">
-                  Start Time
+                  Start Time (ms)
                 </label>
                 <input
-                  type="range"
-                  class="form-range"
-                  id="cutStart"
-                  min="0"
-                  max="10000000"
-                  value="0"
-                />
-                <input
                   type="number"
-                  id="cutStartValue"
+                  id="cutStart"
                   class="form-control form-control-sm d-inline-block ms-1"
                   style="width: 7em"
                   min="0"
                   step="50"
                   value="0"
                 />
-                <small class="text-muted ms-1">ms</small>
               </div>
 
-              <div class="mb-4">
-                <label for="cutEnd" class="form-label small"> End Time </label>
-                <input
-                  type="range"
-                  class="form-range"
-                  id="cutEnd"
-                  min="0"
-                  max="10000000"
-                  value="100000"
-                />
+              <div class="mb-4 col-6">
+                <label for="cutEnd" class="form-label small"> End Time (ms)</label>
                 <input
                   type="number"
-                  id="cutEndValue"
+                  id="cutEnd"
                   class="form-control form-control-sm d-inline-block ms-1"
                   style="width: 7em"
                   min="0"
                   value="100000"
                   step="50"
                 />
-                <small class="text-muted ms-1">ms</small>
-              </div>
+              </div></div>
 
               <div class="d-flex justify-content-center">
                 <button
@@ -174,8 +157,9 @@
         <div class="col-12 col-lg-9">
           <!-- YouTube block (URL + preview + cut buttons) -->
           <div class="card shadow-sm mb-4">
-            <div class="card-body text-center">
-              <div class="mb-4">
+              <div class="card-body text-center">
+              <div class="row">
+              <div class="mb-4 col-5">
                 <label for="youtubeUrl" class="form-label"> YouTube URL </label>
                 <input
                   type="url"
@@ -184,6 +168,16 @@
                   id="youtubeUrl"
                   placeholder="https://www.youtube.com/watch?v=..."
                 />
+              </div>
+              <p class="col-2"> or </p>
+              <div class="mb-4 col-5">
+                  <label for="localFile" class="form-label"> Local File </label>
+                  <input
+                      type="file"
+                      class="form-control w-100 w-md-75 mx-auto"
+                      id="localFile"
+                  />
+              </div>
               </div>
 
               <div
