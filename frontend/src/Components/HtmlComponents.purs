@@ -28,7 +28,6 @@ import Components.HtmlIds
   , videoRowId
   , videoSourceId
   , videoSourceRowId
-  , downloadButtonId
   , downloadAllButtonId
   , copyTranscriptButtonId
   , youtubeUrlId
@@ -42,26 +41,26 @@ import Data.Tuple (Tuple(..), fst, snd)
 import Effect (Effect)
 import Prelude (bind, pure)
 import Web.DOM.NonElementParentNode (NonElementParentNode)
-import Web.HTML.HTMLInputElement (HTMLInputElement)
-import Web.HTML.HTMLInputElement as HI
+import Web.HTML.HTMLAudioElement (HTMLAudioElement)
+import Web.HTML.HTMLAudioElement as HA
 import Web.HTML.HTMLButtonElement (HTMLButtonElement)
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLDivElement (HTMLDivElement)
 import Web.HTML.HTMLDivElement as HD
+import Web.HTML.HTMLIFrameElement (HTMLIFrameElement)
+import Web.HTML.HTMLIFrameElement as IF
+import Web.HTML.HTMLInputElement (HTMLInputElement)
+import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLSelectElement (HTMLSelectElement)
 import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.HTMLSpanElement (HTMLSpanElement)
 import Web.HTML.HTMLSpanElement as HSP
-import Web.HTML.HTMLAudioElement (HTMLAudioElement)
-import Web.HTML.HTMLAudioElement as HA
-import Web.HTML.HTMLVideoElement (HTMLVideoElement)
-import Web.HTML.HTMLVideoElement as HV
-import Web.HTML.HTMLIFrameElement (HTMLIFrameElement)
-import Web.HTML.HTMLIFrameElement as IF
 import Web.HTML.HTMLTableElement (HTMLTableElement)
 import Web.HTML.HTMLTableElement as HT
 import Web.HTML.HTMLTemplateElement (HTMLTemplateElement)
 import Web.HTML.HTMLTemplateElement as HTP
+import Web.HTML.HTMLVideoElement (HTMLVideoElement)
+import Web.HTML.HTMLVideoElement as HV
 
 newtype HtmlInputs = HtmlInputs
   { cutStart :: HTMLInputElement
@@ -74,7 +73,6 @@ newtype HtmlInputs = HtmlInputs
   , title :: HTMLInputElement
   , applyButton :: HTMLButtonElement
   , videoSource :: HTMLSelectElement
-  , downloadButton :: HTMLButtonElement
   , downloadAllButton :: HTMLButtonElement
   , copyTranscriptButton :: HTMLButtonElement
   , setCutEndButton :: HTMLButtonElement
@@ -140,7 +138,6 @@ loadHtmlInputs doc = do
   title <- loadInput titleId doc
   applyButton <- loadButton applyId doc
   videoSource <- loadVideoSource doc
-  downloadButton <- loadButton downloadButtonId doc
   downloadAllButton <- loadButton downloadAllButtonId doc
   copyTranscriptButton <- loadButton copyTranscriptButtonId doc
   setCutStartButton <- loadButton setCutStartButton doc
@@ -162,7 +159,6 @@ loadHtmlInputs doc = do
         , title: title
         , applyButton: applyButton
         , videoSource: videoSource
-        , downloadButton: downloadButton
         , downloadAllButton: downloadAllButton
         , copyTranscriptButton: copyTranscriptButton
         , setCutStartButton: setCutStartButton

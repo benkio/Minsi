@@ -1,10 +1,12 @@
 module Handlers.Handlers where
 
+import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlOutputs(..))
+import Components.HtmlIds (keyboardShortcutsModalId)
+import Effect (Effect)
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
-import Handlers.CutRangeHandler (CutRangeTargets(..), setCutRangeHandlers)
 import Handlers.CopyTranscriptButtonHandler (setCopyTranscriptButtonHandler)
+import Handlers.CutRangeHandler (CutRangeTargets(..), setCutRangeHandlers)
 import Handlers.DownloadAllButtonHandler (setDownloadAllButtonHandler)
-import Handlers.DownloadButtonHandler (setDownloadButtonHandler)
 import Handlers.KeyboardHandler (KeyboardHandlerTargets(..), setKeyboardHandlers)
 import Handlers.ResultVideo.Handler (ResultVideoEventTargets(..), setResultVideoHandlers)
 import Handlers.ResultVideo.VideoSourceHandler (setVideoSourceHandler)
@@ -12,9 +14,6 @@ import Handlers.Subtitles.AddSubtitleButtonHandler (setAddSubtitleButtonHandler)
 import Handlers.Subtitles.RemoveSubtitleButtonHandler (setRemoveSubtitleButtonHandler)
 import Handlers.Subtitles.SubtitleTimeButtonsHandler (SubtitleTimeButtonsTargets(..), setSubtitleTimeButtonsHandlers)
 import Handlers.TextInputValidationHandler (TextInputValidationTargets(..), setTextInputValidationHandlers)
-import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlOutputs(..))
-import Components.HtmlIds (keyboardShortcutsModalId)
-import Effect (Effect)
 import Handlers.YoutubeVideo.YoutubeVideoHandler (setVideoHandlers, VideoEventTargets(..))
 import Prelude
 
@@ -33,7 +32,6 @@ setupEventHandlers
       , setCutEndButton
       , applyButton
       , videoSource
-      , downloadButton
       , downloadAllButton
       , copyTranscriptButton
       , subtitleTable
@@ -97,7 +95,6 @@ setupEventHandlers
         }
     )
   setVideoSourceHandler videoSource resultVideo resultAudio
-  setDownloadButtonHandler downloadButton videoSource
   setDownloadAllButtonHandler downloadAllButton
   setCopyTranscriptButtonHandler copyTranscriptButton
   setTextInputValidationHandlers
