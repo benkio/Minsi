@@ -26,11 +26,9 @@ program = do
 -- TODOs --------------------------------
 {-
 -------Bugs-------------------
-- Remove Single Download Button
 - Force Different Font for Colored Text:
   - Impact: Only Black/White
   - Arial Black: Only Colors
-- Remove the sliders
 ------Improvements------------
 - Remove files after Download and after 1h from creation
 - When the cut end and cut start aren't changed, skip the yt-dlp step and just create the gifs
@@ -38,7 +36,7 @@ program = do
 - Make minsilog red when there's an error
 ------Additions---------------
 - Enable the usage of local file
-- Button to Export client compute payload
+- Button to Export client compute payload (maybe directly the curl command)
 - Option to compute from payload
 -----keyboard shortcut for----
 - removing/adding the table row
