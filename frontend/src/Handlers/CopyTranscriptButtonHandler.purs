@@ -2,6 +2,7 @@ module Handlers.CopyTranscriptButtonHandler where
 
 import Prelude
 
+import Conversion.String (capitalize)
 import Data.Array (sort)
 import Data.Newtype (unwrap)
 import Data.String (joinWith)
@@ -28,6 +29,6 @@ copyTranscriptButtonEventListener _ = do
   state <- getCurrentState
   let
     subtitles = (unwrap (fst state)).subtitles
-    values = (\(Subtitle { value }) -> toLower value) <$> sort subtitles
+    transcript = capitalize <<< joinWith " " $ (\(Subtitle { value }) -> toLower value) <$> sort subtitles
   w <- window
-  void $ promptDefault "Copy to clipboard: Ctrl+C, Enter" (joinWith " " values) w
+  void $ promptDefault "Copy to clipboard: Ctrl+C, Enter" transcript w
