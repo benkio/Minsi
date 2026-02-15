@@ -55,11 +55,11 @@ downloadVideo youtubeUri filename start end = do
     case uncons cookies of
       Just { head: c, tail: cs } ->
         catchError
-          (getYtdlpOutputUrl c url filepath startStr endStr
-           >>= _.getResult
-           >>= \r -> case r.exit of
-             Normally 0 -> pure r
-             _ -> liftEffect $ throwMinsiError (YtdlpError r.message)
+          ( getYtdlpOutputUrl c url filepath startStr endStr
+              >>= _.getResult
+              >>= \r -> case r.exit of
+                Normally 0 -> pure r
+                _ -> liftEffect $ throwMinsiError (YtdlpError r.message)
           )
           (\_ -> tryCookies cs url filepath)
       Nothing -> liftEffect $ throwMinsiError (YtdlpError "All yt-dlp cookie attempts failed")
