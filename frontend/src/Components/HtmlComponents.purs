@@ -6,9 +6,7 @@ import Components.HtmlIds
   , applyId
   , artistId
   , cutEndId
-  , cutEndValueId
   , cutStartId
-  , cutStartValueId
   , loadingModalId
   , minsiErrorModalId
   , minsiLogId
@@ -30,12 +28,12 @@ import Components.HtmlIds
   , videoRowId
   , videoSourceId
   , videoSourceRowId
-  , downloadButtonId
   , downloadAllButtonId
   , copyTranscriptButtonId
   , youtubeUrlId
   , subtitleRow
   , keyboardShortcutsButtonId
+  , localFileId
   )
 import Control.Monad.Error.Class (catchError)
 import Data.Newtype (class Newtype)
@@ -43,38 +41,38 @@ import Data.Tuple (Tuple(..), fst, snd)
 import Effect (Effect)
 import Prelude (bind, pure)
 import Web.DOM.NonElementParentNode (NonElementParentNode)
-import Web.HTML.HTMLInputElement (HTMLInputElement)
-import Web.HTML.HTMLInputElement as HI
+import Web.HTML.HTMLAudioElement (HTMLAudioElement)
+import Web.HTML.HTMLAudioElement as HA
 import Web.HTML.HTMLButtonElement (HTMLButtonElement)
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLDivElement (HTMLDivElement)
 import Web.HTML.HTMLDivElement as HD
+import Web.HTML.HTMLIFrameElement (HTMLIFrameElement)
+import Web.HTML.HTMLIFrameElement as IF
+import Web.HTML.HTMLInputElement (HTMLInputElement)
+import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLSelectElement (HTMLSelectElement)
 import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.HTMLSpanElement (HTMLSpanElement)
 import Web.HTML.HTMLSpanElement as HSP
-import Web.HTML.HTMLAudioElement (HTMLAudioElement)
-import Web.HTML.HTMLAudioElement as HA
-import Web.HTML.HTMLVideoElement (HTMLVideoElement)
-import Web.HTML.HTMLVideoElement as HV
-import Web.HTML.HTMLIFrameElement (HTMLIFrameElement)
-import Web.HTML.HTMLIFrameElement as IF
 import Web.HTML.HTMLTableElement (HTMLTableElement)
 import Web.HTML.HTMLTableElement as HT
 import Web.HTML.HTMLTemplateElement (HTMLTemplateElement)
 import Web.HTML.HTMLTemplateElement as HTP
+import Web.HTML.HTMLVideoElement (HTMLVideoElement)
+import Web.HTML.HTMLVideoElement as HV
 
 newtype HtmlInputs = HtmlInputs
   { cutStart :: HTMLInputElement
   , cutEnd :: HTMLInputElement
   , youtubeUrl :: HTMLInputElement
+  , localFile :: HTMLInputElement
   , filename :: HTMLInputElement
   , reverseLoop :: HTMLInputElement
   , artist :: HTMLInputElement
   , title :: HTMLInputElement
   , applyButton :: HTMLButtonElement
   , videoSource :: HTMLSelectElement
-  , downloadButton :: HTMLButtonElement
   , downloadAllButton :: HTMLButtonElement
   , copyTranscriptButton :: HTMLButtonElement
   , setCutEndButton :: HTMLButtonElement
@@ -95,8 +93,6 @@ newtype HtmlOutputs = HtmlOutputs
   , minsiLog :: HTMLDivElement
   , playbackPositionYoutube :: HTMLSpanElement
   , playbackPositionResultVideo :: HTMLSpanElement
-  , cutStartValue :: HTMLInputElement
-  , cutEndValue :: HTMLInputElement
   , loadingModal :: HTMLDivElement
   , minsiErrorModal :: HTMLDivElement
   , resultVideo :: HTMLVideoElement
@@ -135,13 +131,13 @@ loadHtmlInputs :: NonElementParentNode -> Effect HtmlInputs
 loadHtmlInputs doc = do
   rangeTuple <- loadCutRange doc
   youtubeUrl <- loadInput youtubeUrlId doc
+  localFile <- loadInput localFileId doc
   filename <- loadInput outputFilenameId doc
   reverseLoop <- loadInput reverseLoopGifId doc
   artist <- loadInput artistId doc
   title <- loadInput titleId doc
   applyButton <- loadButton applyId doc
   videoSource <- loadVideoSource doc
-  downloadButton <- loadButton downloadButtonId doc
   downloadAllButton <- loadButton downloadAllButtonId doc
   copyTranscriptButton <- loadButton copyTranscriptButtonId doc
   setCutStartButton <- loadButton setCutStartButton doc
@@ -156,13 +152,13 @@ loadHtmlInputs doc = do
         { cutStart: fst rangeTuple
         , cutEnd: snd rangeTuple
         , youtubeUrl: youtubeUrl
+        , localFile: localFile
         , filename: filename
         , reverseLoop: reverseLoop
         , artist: artist
         , title: title
         , applyButton: applyButton
         , videoSource: videoSource
-        , downloadButton: downloadButton
         , downloadAllButton: downloadAllButton
         , copyTranscriptButton: copyTranscriptButton
         , setCutStartButton: setCutStartButton
@@ -181,8 +177,6 @@ loadHtmlOutputs doc = do
   minsiLog <- loadDiv minsiLogId doc
   playbackPositionYoutube <- loadSpan playbackPositionYoutubeId doc
   playbackPositionResultVideo <- loadSpan playbackPositionResultVideoId doc
-  cutStartValue <- loadHtmlElement cutStartValueId HI.fromElement doc
-  cutEndValue <- loadHtmlElement cutEndValueId HI.fromElement doc
   loadingModal <- loadDiv loadingModalId doc
   minsiErrorModal <- loadDiv minsiErrorModalId doc
   resultVideo <- loadVideo resultVideoId doc
@@ -194,8 +188,6 @@ loadHtmlOutputs doc = do
         , minsiLog: minsiLog
         , playbackPositionYoutube: playbackPositionYoutube
         , playbackPositionResultVideo: playbackPositionResultVideo
-        , cutStartValue: cutStartValue
-        , cutEndValue: cutEndValue
         , loadingModal: loadingModal
         , minsiErrorModal: minsiErrorModal
         , resultVideo: resultVideo

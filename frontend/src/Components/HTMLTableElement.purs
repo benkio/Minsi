@@ -2,7 +2,7 @@ module Components.HTMLTableElement where
 
 import Prelude
 
-import Data.Array (catMaybes, drop, head, last)
+import Data.Array (catMaybes, head, last)
 import Data.Maybe (maybe)
 import Data.TraversableWithIndex (traverseWithIndex)
 import Effect (Effect)
@@ -13,10 +13,10 @@ import Web.DOM.HTMLCollection as HC
 import Web.DOM.ParentNode (QuerySelector(..), querySelector)
 import Web.HTML.HTMLInputElement (HTMLInputElement)
 import Web.HTML.HTMLInputElement as HI
+import Web.HTML.HTMLTableCellElement as HTC
 import Web.HTML.HTMLTableElement as HT
 import Web.HTML.HTMLTableRowElement as HTR
 import Web.HTML.HTMLTableSectionElement as HTS
-import Web.HTML.HTMLTableCellElement as HTC
 
 -- | Get the tbody element from a table
 getTBody :: HT.HTMLTableElement -> Effect HTS.HTMLTableSectionElement

@@ -98,50 +98,36 @@
                 </label>
               </div>
 
-              <div class="mb-4">
-                <label for="cutStart" class="form-label small">
-                  Start Time
-                </label>
-                <input
-                  type="range"
-                  class="form-range"
-                  id="cutStart"
-                  min="0"
-                  max="10000000"
-                  value="0"
-                />
-                <input
-                  type="number"
-                  id="cutStartValue"
-                  class="form-control form-control-sm d-inline-block ms-1"
-                  style="width: 7em"
-                  min="0"
-                  step="50"
-                  value="0"
-                />
-                <small class="text-muted ms-1">ms</small>
-              </div>
+              <div class="row">
+                <div class="mb-4 col-6">
+                  <label for="cutStart" class="form-label small">
+                    Start Time (ms)
+                  </label>
+                  <input
+                    type="number"
+                    id="cutStart"
+                    class="form-control form-control-sm d-inline-block ms-1"
+                    style="width: 7em"
+                    min="0"
+                    step="50"
+                    value="0"
+                  />
+                </div>
 
-              <div class="mb-4">
-                <label for="cutEnd" class="form-label small"> End Time </label>
-                <input
-                  type="range"
-                  class="form-range"
-                  id="cutEnd"
-                  min="0"
-                  max="10000000"
-                  value="100000"
-                />
-                <input
-                  type="number"
-                  id="cutEndValue"
-                  class="form-control form-control-sm d-inline-block ms-1"
-                  style="width: 7em"
-                  min="0"
-                  value="100000"
-                  step="50"
-                />
-                <small class="text-muted ms-1">ms</small>
+                <div class="mb-4 col-6">
+                  <label for="cutEnd" class="form-label small">
+                    End Time (ms)</label
+                  >
+                  <input
+                    type="number"
+                    id="cutEnd"
+                    class="form-control form-control-sm d-inline-block ms-1"
+                    style="width: 7em"
+                    min="0"
+                    value="100000"
+                    step="50"
+                  />
+                </div>
               </div>
 
               <div class="d-flex justify-content-center">
@@ -175,15 +161,29 @@
           <!-- YouTube block (URL + preview + cut buttons) -->
           <div class="card shadow-sm mb-4">
             <div class="card-body text-center">
-              <div class="mb-4">
-                <label for="youtubeUrl" class="form-label"> YouTube URL </label>
-                <input
-                  type="url"
-                  class="form-control w-100 w-md-75 mx-auto"
-                  pattern="https?://(www\.)?(youtube\.com|youtu\.be)/.+"
-                  id="youtubeUrl"
-                  placeholder="https://www.youtube.com/watch?v=..."
-                />
+              <div class="row">
+                <div class="mb-4 col-5">
+                  <label for="youtubeUrl" class="form-label">
+                    YouTube URL
+                  </label>
+                  <input
+                    type="url"
+                    class="form-control w-100 w-md-75 mx-auto"
+                    pattern="https?://(www\.)?(youtube\.com|youtu\.be)/.+"
+                    id="youtubeUrl"
+                    placeholder="https://www.youtube.com/watch?v=..."
+                  />
+                </div>
+                <p class="col-2">or</p>
+                <div class="mb-4 col-5">
+                  <label for="localFile" class="form-label"> Local File </label>
+                  <input
+                    type="file"
+                    class="form-control w-100 w-md-75 mx-auto"
+                    id="localFile"
+                    disabled
+                  />
+                </div>
               </div>
 
               <div
@@ -228,9 +228,6 @@
                 <option value="gif">Gif</option>
                 <option value="mp3">Mp3</option>
               </select>
-              <button type="button" class="btn btn-primary" id="downloadButton">
-                Download
-              </button>
               <button
                 type="button"
                 class="btn btn-success"
@@ -295,9 +292,8 @@
                       </button>
                     </th>
                     <th>Value</th>
-                    <th style="width: 7em">Font</th>
+                    <th style="width: 7em">Font & Color</th>
                     <th style="width: 5em">Size</th>
-                    <th style="width: 6em">Color</th>
                     <th style="width: 7em">Position</th>
                     <th style="width: 1em" class="text-center">
                       <button
@@ -341,8 +337,16 @@
         </td>
         <td>
           <select class="form-select form-select-sm">
-            <option selected>Impact</option>
-            <option>Arial Black</option>
+            <optgroup label="Impact">
+              <option value="ImpactWhite" selected>White</option>
+              <option value="ImpactBlack">Black</option>
+            </optgroup>
+            <hr />
+            <optgroup label="Arial Black">
+              <option value="ArialBlackYellow">Yellow</option>
+              <option value="ArialBlackLightGreen">Light Green</option>
+              <option value="ArialBlackLightOrange">Light Orange</option>
+            </optgroup>
           </select>
         </td>
         <td>
@@ -353,15 +357,6 @@
             value="36"
             max="48"
           />
-        </td>
-        <td>
-          <select class="form-select form-select-sm">
-            <option selected>White</option>
-            <option>Black</option>
-            <option>Light Green</option>
-            <option>Light Orange</option>
-            <option>Yellow</option>
-          </select>
         </td>
         <td>
           <select class="form-select form-select-sm">

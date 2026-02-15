@@ -5,15 +5,16 @@ import Prelude
 import Command.Command (runCommand)
 import Constants (mp4)
 import Control.Monad.Error.Class (catchError)
+import Conversion.Time (millisecondsToSecondsString)
 import Data.Array (uncons)
 import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Milliseconds)
 import Data.URL (toString)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
-import Conversion.Time (millisecondsToSecondsString)
 import MinsiError (MinsiError(..), throwMinsiError)
 import Model.State (WURL(..))
+import Node.ChildProcess.Types (Exit(..))
 import Node.Library.Execa (ExecaProcess, ExecaResult)
 
 ytdlpSupportedBrowserCookies :: Array String
@@ -53,5 +54,12 @@ downloadVideo youtubeUri filename start end = do
   tryCookies cookies url filepath =
     case uncons cookies of
       Just { head: c, tail: cs } ->
-        catchError (getYtdlpOutputUrl c url filepath startStr endStr >>= _.getResult) (\_ -> tryCookies cs url filepath)
+        catchError
+          ( getYtdlpOutputUrl c url filepath startStr endStr
+              >>= _.getResult
+              >>= \r -> case r.exit of
+                Normally 0 -> pure r
+                _ -> liftEffect $ throwMinsiError (YtdlpError r.message)
+          )
+          (\_ -> tryCookies cs url filepath)
       Nothing -> liftEffect $ throwMinsiError (YtdlpError "All yt-dlp cookie attempts failed")
