@@ -23,7 +23,7 @@ setVideoSourceHandler videoSource resultVideo resultAudio = genericErrorsHandler
   videoSourceEventTarget = toEventTarget (HS.toElement videoSource)
 
 videoSourceEventListener :: HS.HTMLSelectElement -> HTMLVideoElement -> HTMLAudioElement -> Event -> Effect Unit
-videoSourceEventListener videoSource resultVideo resultAudio _ = genericErrorsHandler $ do
+videoSourceEventListener videoSource resultVideo resultAudio _ = do
   stateTuple <- getCurrentState
   let filename = (unwrap (fst stateTuple)).filename
   setResultMediaSrc filename videoSource resultVideo resultAudio
