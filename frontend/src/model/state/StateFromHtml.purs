@@ -22,7 +22,7 @@ import HTMLTableCellElement (valueFromInputTableCell, valueFromSelectTableCell, 
 import Main.MinsiError (MinsiError(..), throwMinsiError)
 import Model.State.State (State(..), DurationRange(..), WURL(..), Subtitle(..))
 import Model.ValidationErrors (ValidationErrors, toMap)
-import Parse.Font (parseFont, parseColor, parsePosition)
+import Parse.Font (parseFontAndColor, parsePosition)
 import Partial.Unsafe (unsafePartial)
 import Validations.CutVideoValidation (cutVideoValidation)
 import Validations.OutputFilenameValidation (outputFilenameValidation, normalizeOutputFilename)
@@ -91,22 +91,21 @@ loadSubtitleFromRow :: Int -> HTR.HTMLTableRowElement -> Effect Subtitle
 loadSubtitleFromRow index row = do
   cells <- HTR.cells row
   cellArray <- HC.toArray cells
-  if length cellArray /= 8 then throwMinsiError (HTMLElementNotFound ("[Subtitle row " <> show index <> "]: Unexpected number of columns" <> (show (length cellArray))))
+  if length cellArray /= 7 then throwMinsiError (HTMLElementNotFound ("[Subtitle row " <> show index <> "]: Unexpected number of columns" <> (show (length cellArray))))
   else do
     let
       startCell = unsafePartial fromJust (cellArray !! 0)
       endCell = unsafePartial fromJust (cellArray !! 1)
       valueCell = unsafePartial fromJust (cellArray !! 2)
-      fontCell = unsafePartial fromJust (cellArray !! 3)
+      fontColorCell = unsafePartial fromJust (cellArray !! 3)
       fontSizeCell = unsafePartial fromJust (cellArray !! 4)
-      colorCell = unsafePartial fromJust (cellArray !! 5)
-      positionCell = unsafePartial fromJust (cellArray !! 6)
+      positionCell = unsafePartial fromJust (cellArray !! 5)
     startValue <- valueFromInputTableCell index "SubtitleTableStartCell" 0 startCell
     endValue <- valueFromInputTableCell index "SubtitleTableEndCell" 0 endCell
     valueText <- valueFromTextAreaTableCell index "SubtitleTableValueCell" valueCell
-    fontValue <- valueFromSelectTableCell index "SubtitleTableFontCell" fontCell
+    fontColorValue <- valueFromSelectTableCell index "SubtitleTableFontColorCell" fontColorCell
+    let { font: fontValue, color: colorValue } = parseFontAndColor fontColorValue
     fontSizeValue <- valueFromInputTableCell index "SubtitleTableFontSizeCell" 48 fontSizeCell
-    colorValue <- valueFromSelectTableCell index "SubtitleTableColorCell" colorCell
     positionValue <- valueFromSelectTableCell index "SubtitleTablePositionCell" positionCell
     validation
       (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
@@ -116,9 +115,9 @@ loadSubtitleFromRow index row = do
               , end: Milliseconds (toNumber endValue)
               }
           , value: (toUpper <<< trim) valueText
-          , font: parseFont fontValue
+          , font: fontValue
           , fontSize: fontSizeValue
-          , color: parseColor colorValue
+          , color: colorValue
           , screenPosition: parsePosition positionValue
           }
       )

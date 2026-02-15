@@ -1,34 +1,27 @@
 module Test.Parse.FontSpec where
 
 import Model.State.State (Font(..), Color(..), Position(..))
-import Parse.Font (parseFont, parseColor, parsePosition)
+import Parse.Font (parseFontAndColor, parsePosition)
 import Prelude
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 
 spec :: Spec Unit
 spec = do
-  describe "parseFont" do
-    it "parses Arial Black" do
-      parseFont "Arial Black" `shouldEqual` ArialBlack
-    it "defaults to Impact for unknown font" do
-      parseFont "Impact" `shouldEqual` Impact
-      parseFont "Other" `shouldEqual` Impact
-      parseFont "" `shouldEqual` Impact
-
-  describe "parseColor" do
-    it "parses Black" do
-      parseColor "Black" `shouldEqual` Black
-    it "parses Light Green" do
-      parseColor "Light Green" `shouldEqual` LightGreen
-    it "parses Light Orange" do
-      parseColor "Light Orange" `shouldEqual` LightOrange
-    it "parses Yellow" do
-      parseColor "Yellow" `shouldEqual` Yellow
-    it "defaults to White for unknown color" do
-      parseColor "White" `shouldEqual` White
-      parseColor "Other" `shouldEqual` White
-      parseColor "" `shouldEqual` White
+  describe "parseFontAndColor" do
+    it "parses Impact with Black" do
+      parseFontAndColor "ImpactBlack" `shouldEqual` { font: Impact, color: Black }
+    it "parses Impact with White" do
+      parseFontAndColor "ImpactWhite" `shouldEqual` { font: Impact, color: White }
+    it "parses ArialBlack with Yellow" do
+      parseFontAndColor "ArialBlackYellow" `shouldEqual` { font: ArialBlack, color: Yellow }
+    it "parses ArialBlack with LightGreen" do
+      parseFontAndColor "ArialBlackLightGreen" `shouldEqual` { font: ArialBlack, color: LightGreen }
+    it "parses ArialBlack with LightOrange" do
+      parseFontAndColor "ArialBlackLightOrange" `shouldEqual` { font: ArialBlack, color: LightOrange }
+    it "defaults to Impact and White for unknown" do
+      parseFontAndColor "Other" `shouldEqual` { font: Impact, color: White }
+      parseFontAndColor "" `shouldEqual` { font: Impact, color: White }
 
   describe "parsePosition" do
     it "parses Top" do
