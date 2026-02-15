@@ -18,7 +18,7 @@ setInputsourcehandler inputSource youtubeUrl localFile = genericErrorsHandler $ 
   inputSourceEvL <- eventListener (inputSourceEventListener inputSource youtubeUrl localFile)
   addEventListener E.change inputSourceEvL false inputSourceEventTarget
   where
-    inputSourceEventTarget = toEventTarget (HS.toElement inputSource)
+  inputSourceEventTarget = toEventTarget (HS.toElement inputSource)
 
 inputSourceEventListener :: HS.HTMLSelectElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
 inputSourceEventListener inputSource youtubeUrl localFile _ = do
