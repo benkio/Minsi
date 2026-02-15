@@ -1,8 +1,8 @@
-module Handlers.YoutubeVideo.PlaybackPositionHandler where
+module Handlers.InputVideo.PlaybackPositionHandler where
 
 import Conversion.Time (formatToFirstFour)
 import Effect (Effect)
-import Handlers.YoutubeVideo.Foreign (getPlayerCurrentTime, isPlayerReady)
+import Handlers.InputVideo.Foreign (getPlayerCurrentTime, isPlayerReady)
 import Prelude
 import Web.DOM.Node (setTextContent)
 import Web.HTML.HTMLSpanElement as HSP

@@ -104,3 +104,6 @@ keyboardShortcutsModalId = "keyboardShortcutsModal"
 
 keyboardShortcutsButtonId :: String
 keyboardShortcutsButtonId = "keyboardShortcutsButton"
+
+inputSourceId :: String
+inputSourceId = "inputSource"

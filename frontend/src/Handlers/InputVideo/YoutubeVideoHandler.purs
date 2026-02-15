@@ -1,6 +1,9 @@
-module Handlers.YoutubeVideo.YoutubeVideoHandler where
+module Handlers.InputVideo.YoutubeVideoHandler where
+
+import Prelude
 
 import Components.HtmlIds (resultPreviewId, youtubeUrlId)
+import Data.Either (Either, either)
 import Data.Foldable (foldl)
 import Data.Maybe (Maybe, maybe)
 import Data.Traversable (traverse)
@@ -9,13 +12,12 @@ import Effect (Effect)
 import Effect.Console (log)
 import Effect.Timer (setInterval)
 import Handlers.ErrorHandlers (genericErrorsHandler)
-import Handlers.YoutubeVideo.CutButtonsHandlers (initializeCutInputs, setCutInputButtonEvL)
-import Handlers.YoutubeVideo.Foreign (embedVideo)
-import Handlers.YoutubeVideo.PlaybackPositionHandler (updatePlaybackPosition)
-import Handlers.YoutubeVideo.YoutubeUrlExtraction (extractYoutubeVideoId, extractYoutubeVideoStartTime)
+import Handlers.InputVideo.CutButtonsHandlers (initializeCutInputs, setCutInputButtonEvL)
+import Handlers.InputVideo.Foreign (embedVideo)
+import Handlers.InputVideo.PlaybackPositionHandler (updatePlaybackPosition)
+import Handlers.InputVideo.YoutubeUrlExtraction (extractYoutubeVideoId, extractYoutubeVideoStartTime)
 import Main.MinsiError (MinsiError(..), throwMinsiError)
 import Model.ValidationErrors (fromSingleton)
-import Prelude
 import Validations.YoutubeValidation (youtubeUrlValidation)
 import Web.DOM.Element (fromEventTarget, toEventTarget)
 import Web.Event.Event (target)
@@ -32,7 +34,7 @@ data VideoEventTargets = VET
   , playbackPositionYoutube :: HSP.HTMLSpanElement
   , setCutEndButton :: HB.HTMLButtonElement
   , setCutStartButton :: HB.HTMLButtonElement
-  , youtubeUrl :: HI.HTMLInputElement
+  , source :: Either HI.HTMLInputElement HI.HTMLInputElement
   }
 
 setVideoHandlers :: VideoEventTargets -> Effect Unit
@@ -43,7 +45,7 @@ setVideoHandlers
       , playbackPositionYoutube
       , cutEnd
       , setCutEndButton
-      , youtubeUrl: youtubeUrl
+      , source
       }
   ) = genericErrorsHandler $ do
   ytEvL <- eventListener (youtubeUrlEventListener cutStart cutEnd)
@@ -56,7 +58,7 @@ setVideoHandlers
   addEventListener E.click setCutEndButtonEvLV false setCutEndButtonTarget
   pure unit
   where
-  ytUrlEventTarget = toEventTarget (HI.toElement youtubeUrl)
+  ytUrlEventTarget = either (toEventTarget <<< HI.toElement) (toEventTarget <<< HI.toElement) source
   setCutStartButtonTarget = toEventTarget (HB.toElement setCutStartButton)
   setCutEndButtonTarget = toEventTarget (HB.toElement setCutEndButton)
 
@@ -64,9 +66,9 @@ youtubeUrlEventListener :: HI.HTMLInputElement -> HI.HTMLInputElement -> Event -
 youtubeUrlEventListener cutStart cutEnd ev = genericErrorsHandler $ do
   rawValue <- getInputValue ev
   let youtubeUrlV = maybe (invalid (fromSingleton youtubeUrlId "Empty YoutubeUrl Input")) (\v -> youtubeUrlValidation youtubeUrlId v) rawValue
-  youtubeUrl <- foldl (\_ v -> pure v) (throwMinsiError (InvalidInput youtubeUrlId (show rawValue))) youtubeUrlV
-  videoId <- (maybe (throwMinsiError (InvalidInput youtubeUrlId (show rawValue))) pure <<< extractYoutubeVideoId) youtubeUrl
-  let startTime = extractYoutubeVideoStartTime youtubeUrl
+  source <- foldl (\_ v -> pure v) (throwMinsiError (InvalidInput youtubeUrlId (show rawValue))) youtubeUrlV
+  videoId <- (maybe (throwMinsiError (InvalidInput youtubeUrlId (show rawValue))) pure <<< extractYoutubeVideoId) source
+  let startTime = extractYoutubeVideoStartTime source
   log ("Youtube Url Handler fired with value: " <> show videoId)
   embedVideo
     { resultPreviewId: resultPreviewId

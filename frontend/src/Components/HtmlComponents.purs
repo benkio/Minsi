@@ -27,6 +27,7 @@ import Components.HtmlIds
   , titleId
   , videoRowId
   , videoSourceId
+  , inputSourceId
   , videoSourceRowId
   , downloadAllButtonId
   , copyTranscriptButtonId
@@ -73,6 +74,7 @@ newtype HtmlInputs = HtmlInputs
   , title :: HTMLInputElement
   , applyButton :: HTMLButtonElement
   , videoSource :: HTMLSelectElement
+  , inputSource :: HTMLSelectElement
   , downloadAllButton :: HTMLButtonElement
   , copyTranscriptButton :: HTMLButtonElement
   , setCutEndButton :: HTMLButtonElement
@@ -137,7 +139,8 @@ loadHtmlInputs doc = do
   artist <- loadInput artistId doc
   title <- loadInput titleId doc
   applyButton <- loadButton applyId doc
-  videoSource <- loadVideoSource doc
+  videoSource <- loadSelect videoSourceId doc
+  inputSource <- loadSelect inputSourceId doc
   downloadAllButton <- loadButton downloadAllButtonId doc
   copyTranscriptButton <- loadButton copyTranscriptButtonId doc
   setCutStartButton <- loadButton setCutStartButton doc
@@ -159,6 +162,7 @@ loadHtmlInputs doc = do
         , title: title
         , applyButton: applyButton
         , videoSource: videoSource
+        , inputSource: inputSource
         , downloadAllButton: downloadAllButton
         , copyTranscriptButton: copyTranscriptButton
         , setCutStartButton: setCutStartButton
@@ -228,8 +232,8 @@ loadCutRange doc = do
 loadDiv :: String -> NonElementParentNode -> Effect HTMLDivElement
 loadDiv id = loadHtmlElement id HD.fromElement
 
-loadVideoSource :: NonElementParentNode -> Effect HTMLSelectElement
-loadVideoSource = loadHtmlElement videoSourceId HS.fromElement
+loadSelect :: String -> NonElementParentNode -> Effect HTMLSelectElement
+loadSelect id = loadHtmlElement id HS.fromElement
 
 loadSpan :: String -> NonElementParentNode -> Effect HTMLSpanElement
 loadSpan id = loadHtmlElement id HSP.fromElement

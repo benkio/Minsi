@@ -2,11 +2,14 @@ module Handlers.Handlers where
 
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlOutputs(..))
 import Components.HtmlIds (keyboardShortcutsModalId)
+import Data.Either (Either(..))
 import Effect (Effect)
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CopyTranscriptButtonHandler (setCopyTranscriptButtonHandler)
 import Handlers.CutRangeHandler (CutRangeTargets(..), setCutRangeHandlers)
 import Handlers.DownloadAllButtonHandler (setDownloadAllButtonHandler)
+import Handlers.InputVideo.InputSourceHandler (setInputsourcehandler)
+import Handlers.InputVideo.YoutubeVideoHandler (setVideoHandlers, VideoEventTargets(..))
 import Handlers.KeyboardHandler (KeyboardHandlerTargets(..), setKeyboardHandlers)
 import Handlers.ResultVideo.Handler (ResultVideoEventTargets(..), setResultVideoHandlers)
 import Handlers.ResultVideo.VideoSourceHandler (setVideoSourceHandler)
@@ -14,7 +17,6 @@ import Handlers.Subtitles.AddSubtitleButtonHandler (setAddSubtitleButtonHandler)
 import Handlers.Subtitles.RemoveSubtitleButtonHandler (setRemoveSubtitleButtonHandler)
 import Handlers.Subtitles.SubtitleTimeButtonsHandler (SubtitleTimeButtonsTargets(..), setSubtitleTimeButtonsHandlers)
 import Handlers.TextInputValidationHandler (TextInputValidationTargets(..), setTextInputValidationHandlers)
-import Handlers.YoutubeVideo.YoutubeVideoHandler (setVideoHandlers, VideoEventTargets(..))
 import Prelude
 
 --TODO: Handlers here get too much parameters
@@ -32,6 +34,7 @@ setupEventHandlers
       , setCutEndButton
       , applyButton
       , videoSource
+      , inputSource
       , downloadAllButton
       , copyTranscriptButton
       , subtitleTable
@@ -63,7 +66,7 @@ setupEventHandlers
         , playbackPositionYoutube: playbackPositionYoutube
         , setCutStartButton: setCutStartButton
         , setCutEndButton: setCutEndButton
-        , youtubeUrl: youtubeUrl
+        , source: Right youtubeUrl -- TODO: set the one selected
         }
     )
   setResultVideoHandlers
@@ -95,6 +98,7 @@ setupEventHandlers
         }
     )
   setVideoSourceHandler videoSource resultVideo resultAudio
+  setInputsourcehandler inputSource youtubeUrl localFile
   setDownloadAllButtonHandler downloadAllButton
   setCopyTranscriptButtonHandler copyTranscriptButton
   setTextInputValidationHandlers

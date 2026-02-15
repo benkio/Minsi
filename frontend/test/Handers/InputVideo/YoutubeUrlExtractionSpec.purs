@@ -1,19 +1,19 @@
-module Test.Handers.YoutubeVideo.YoutubeUrlExtractionSpec where
+module Test.Handers.InputVideo.YoutubeUrlExtractionSpec where
 
-import Prelude
 import Data.Maybe (Maybe(..), fromJust)
 import Data.URL (Path(..), URL, fromString)
 import Effect.Class (liftEffect)
-import Partial.Unsafe (unsafePartial)
-import Test.Spec (Spec, describe, it)
-import Test.Spec.Assertions (shouldEqual)
-import Handlers.YoutubeVideo.YoutubeUrlExtraction
+import Handlers.InputVideo.YoutubeUrlExtraction
   ( extractYoutubeVideoId
   , extractYoutubeVideoStartTime
   , parseUnit
   , parseYouTubeT
   , pathToArray
   )
+import Partial.Unsafe (unsafePartial)
+import Prelude
+import Test.Spec (Spec, describe, it)
+import Test.Spec.Assertions (shouldEqual)
 
 -- Helper to create URL from string (unsafe but fine for tests)
 urlFromString :: String -> URL
