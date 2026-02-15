@@ -36,7 +36,6 @@ program = do
 - Button to Export client compute payload (maybe directly the curl command)
 - Option to compute from payload
 -----keyboard shortcut for----
-- removing/adding the table row
 - cut start/end
 - set start/end subtitle
 -}

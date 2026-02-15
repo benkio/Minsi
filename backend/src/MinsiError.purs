@@ -1,8 +1,10 @@
 module MinsiError where
 
-import Effect.Exception (error, throwException)
-import Effect (Effect)
 import Prelude
+
+import Effect (Effect)
+import Effect.Console (log)
+import Effect.Exception (error, throwException)
 
 data MinsiError
   = DependencyError String
@@ -21,5 +23,8 @@ instance Show MinsiError where
   show (DependencyError s) = "🚫 Error while checking dependencies: " <> s
 
 throwMinsiError :: forall a. MinsiError -> Effect a
-throwMinsiError =
-  throwException <<< error <<< show
+throwMinsiError e = do
+  log message
+  throwException (error message)
+  where
+    message = show e

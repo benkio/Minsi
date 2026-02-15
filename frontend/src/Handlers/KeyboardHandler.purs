@@ -1,27 +1,30 @@
 module Handlers.KeyboardHandler where
 
 import Prelude
+
 import Components.Modal (showModal)
 import Data.Maybe (maybe, isJust)
 import Effect (Effect)
-import Handlers.ErrorHandlers (genericErrorsHandler)
 import Handlers.ApplyButtonHandler (applyButtonEventListener)
+import Handlers.ErrorHandlers (genericErrorsHandler)
+import Handlers.Subtitles.AddSubtitleButtonHandler (addSubtitleButtonEventListener)
+import Handlers.Subtitles.RemoveSubtitleButtonHandler (removeFirstSubtitleRow)
 import Web.DOM.Element (fromEventTarget, toEventTarget)
 import Web.Event.Event (preventDefault, target)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
 import Web.HTML (window)
+import Web.HTML.Event.EventTypes as EClick
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLDocument as HTMLDocument
 import Web.HTML.HTMLInputElement as HI
+import Web.HTML.HTMLMediaElement (currentTime, duration, play, pause, paused, setCurrentTime)
 import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.HTMLTableElement as HT
 import Web.HTML.HTMLTemplateElement as HTP
 import Web.HTML.HTMLTextAreaElement as HTA
-import Web.HTML.Window (document)
-import Web.HTML.Event.EventTypes as EClick
-import Web.HTML.HTMLMediaElement (currentTime, duration, play, pause, paused, setCurrentTime)
 import Web.HTML.HTMLVideoElement (HTMLVideoElement, toHTMLMediaElement)
+import Web.HTML.Window (document)
 import Web.UIEvent.KeyboardEvent (KeyboardEvent, ctrlKey, key, metaKey, fromEvent, toEvent)
 import Web.UIEvent.KeyboardEvent.EventTypes as E
 
@@ -58,15 +61,17 @@ isTargetEditableElement ke =
     (target (toEvent ke) >>= fromEventTarget)
 
 handleKeyboardEvent :: KeyboardHandlerTargets -> KeyboardEvent -> Effect Unit
-handleKeyboardEvent (KHT { resultVideo, keyboardShortcutsModalId: shortcutsModalId }) keyboardEvent = genericErrorsHandler $ do
+handleKeyboardEvent (KHT { resultVideo, keyboardShortcutsModalId, subtitleTable, subtitleRow }) keyboardEvent = genericErrorsHandler $ do
   let ev = toEvent keyboardEvent
   let stop = preventDefault ev
   let whenNotEditable cond act = when (cond && not (isTargetEditableElement keyboardEvent)) (act *> stop)
   when (keyValue == "Enter" && (isCtrl || isMeta)) (applyButtonEventListener ev *> stop)
+  when (keyValue == "+") (addSubtitleButtonEventListener subtitleTable subtitleRow (toEvent keyboardEvent) *> stop)
+  when (keyValue == "-") (removeFirstSubtitleRow subtitleTable *> stop)
   whenNotEditable (keyValue == " ") (toggleResultVideoPlayback resultVideo)
   whenNotEditable (keyValue == "ArrowLeft") (skipResultVideoBackward resultVideo)
   whenNotEditable (keyValue == "ArrowRight") (skipResultVideoForward resultVideo)
-  whenNotEditable (keyValue == "?") (showModal shortcutsModalId *> stop)
+  whenNotEditable (keyValue == "?") (showModal keyboardShortcutsModalId *> stop)
   where
   isCtrl = ctrlKey keyboardEvent
   isMeta = metaKey keyboardEvent
