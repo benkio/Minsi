@@ -56,7 +56,7 @@ Pull the latest version with: `docker pull benkio/minsi:latest`
 **Build the image** (from project root):
 
 ```bash
-docker build -t minsi:latest .
+docker build -t benkio/minsi:latest .
 ```
 
 **Run the container** (publish port 8080 so the app is reachable from your host):
@@ -74,6 +74,18 @@ Then open **http://localhost:8080** in your browser.
 
 The image is built for **linux/amd64**. On **ARM** (e.g. Apple Silicon) it runs via emulation. To avoid the platform warning, run with:
 `docker run --platform linux/amd64 -d -p 8080:8080 minsi:latest`.
+
+## Publish Docker Image
+
+- Build the image
+```
+docker build -t benkio/minsi:latest .
+```
+
+- Push the image
+```
+docker push benkio/minsi:latest
+```
 
 ## Bundle for Node
 

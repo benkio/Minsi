@@ -19,6 +19,7 @@ artistPrefixMap =
     , Tuple "Xah Lee" "xah_"
     , Tuple "Alessandro Barbero" "abar_"
     , Tuple "Germano Mosconi" "mos_"
+    , Tuple "Pino Scotto" "pino_"
     ]
 
 -- | Look up the output filename prefix for a known artist (trimmed input). Nothing if not in the map.
