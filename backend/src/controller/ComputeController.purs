@@ -59,19 +59,19 @@ computeResponse _ (Left errors) = pure (InvalidInput errors)
 computeResponse store (Right state@(State { filename })) = do
   m <- lookup filename store
   case m of
-    Just p | not (isFinished p) -> pure PendingComputation
+    Just { processStatus } | not (isFinished processStatus) -> pure PendingComputation
     _ -> deleteFiles filename *> pure (Success state)
 
 compute :: State -> Store -> Effect Unit
 compute state@(State { filename }) store = do
-  insert filename Pending store
+  insert filename state Pending store
   log "Starting video download in background..."
   launchAff_ $ do
     result <- runComputePipeline state
     processResult <- case result of
       Right _ -> pure Succeed
       Left e -> liftEffect (log ("error during compute: " <> e)) *> pure (Failed e)
-    liftEffect $ insert filename processResult store
+    liftEffect $ insert filename state processResult store
   log "Video download launched, returning HTTP response"
 
 runComputePipeline :: State -> Aff (Either String Unit)

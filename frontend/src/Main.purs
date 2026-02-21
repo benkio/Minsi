@@ -26,8 +26,7 @@ program = do
 -- TODOs --------------------------------
 {-
 -------Bugs-------------------
-------Improvements------------
-- Make the font size limited to 36,24,48 (or maybe remove it entirely)
+------Improvements------------)
 - Remove files after Download and after 1h from creation
 - When the cut end and cut start aren't changed, skip the yt-dlp step and just create the gifs
 - Add health check and add a step in CI to: build the docker image, run it, test the healthcheck endpoint

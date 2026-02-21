@@ -27,7 +27,7 @@ badRequest errors = do
 handleStatus :: Store -> { filename :: String } -> Handler
 handleStatus store body = do
   maybeStatus <- liftEffect $ lookup body.filename store
-  maybe notFound respondWithStatus maybeStatus
+  maybe notFound (respondWithStatus <<< _.processStatus) maybeStatus
 
 notFound :: Handler
 notFound = setStatus 404 *> sendJson { error: "Not found" } *> end
