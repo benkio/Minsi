@@ -9,8 +9,8 @@ import Components.Window (getDocument)
 import Conversion.String (capitalize)
 import Data.Array (length, (!!))
 import Data.Either (either)
-import Data.Int (toNumber)
-import Data.Maybe (fromJust)
+import Data.Int (fromString, toNumber)
+import Data.Maybe (fromJust, fromMaybe)
 import Data.String.Common (trim, toUpper)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Tuple (Tuple(..))
@@ -105,7 +105,8 @@ loadSubtitleFromRow index row = do
     valueText <- valueFromTextAreaTableCell index "SubtitleTableValueCell" valueCell
     fontColorValue <- valueFromSelectTableCell index "SubtitleTableFontColorCell" fontColorCell
     let { font: fontValue, color: colorValue } = parseFontAndColor fontColorValue
-    fontSizeValue <- valueFromInputTableCell index "SubtitleTableFontSizeCell" 48 fontSizeCell
+    fontSizeString <- valueFromSelectTableCell index "SubtitleTableFontSizeCell" fontSizeCell
+    let fontSizeValue = fromMaybe 36 (fromString fontSizeString)
     positionValue <- valueFromSelectTableCell index "SubtitleTablePositionCell" positionCell
     validation
       (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
