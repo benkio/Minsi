@@ -62,7 +62,7 @@ docker build -t benkio/minsi:latest .
 **Run the container** (publish port 8080 so the app is reachable from your host):
 
 ```bash
-docker run -d -p 8080:8080 minsi:latest
+docker run -d -p 8080:8080 benkio/minsi:latest
 ```
 
 Then open **http://localhost:8080** in your browser.
