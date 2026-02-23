@@ -30,6 +30,8 @@ makePlainGif :: FilePath -> Aff ExecaResult
 makePlainGif filename = do
   filepathMp4 <- liftEffect $ mp4 filename
   filepathGif <- liftEffect $ gif filename
+  log "[Gif] Delete" <> show filepathGif
+  apathize (rm filepathGif)
   let args = addFfmpegPlainGifArgs filepathMp4 filepathGif
   process <- runCommand args FfmpegGifError "ffmpeg"
   process.getResult
@@ -43,6 +45,8 @@ makeSubtitleGif filename subtitles = do
   filepathMp4 <- liftEffect $ mp4 filename
   filepathGif <- liftEffect $ gif filename
   filepathSrt <- liftEffect $ srt filename
+  log "[Gif] Delete" <> show filepathGif
+  apathize (rm filepathGif)
 
   let subtitleContent = makeSrtsString subtitles
   liftEffect $ writeSrtFile filename subtitleContent
