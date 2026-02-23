@@ -5,7 +5,6 @@ import Command.Ffmpeg.Mp3 (extractMp3)
 import Command.Ffmpeg.Video (normalizeVideo)
 import Command.Id3v2 (addId3Tags)
 import Command.Ytdlp (downloadVideo)
-import Constants (files)
 import Control.Monad.Error.Class (catchError)
 import Control.Monad.Except (ExceptT(..), runExcept, runExceptT, lift)
 import Data.Array (fromFoldable)
@@ -25,15 +24,13 @@ import Node.ChildProcess.Types (Exit(..))
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody)
 import Node.Express.Response (sendJson, setStatus, end)
-import Node.FS.Sync (rm)
 import Node.Library.Execa (ExecaResult)
-import Node.Path (FilePath)
 import Prelude
 
 data ComputeResponse
   = InvalidInput (Array String)
   | PendingComputation
-  | Success State
+  | Success (Maybe State) State
 
 computeController :: Store -> Handler
 computeController store = do
@@ -51,38 +48,47 @@ computeController store = do
         *> setStatus 500
         *> sendJson { error: "Pending Computation" }
         *> end
-    Success state ->
-      liftEffect (compute state store) *> setStatus 200 *> end
+    Success mayOldState state ->
+      liftEffect (compute mayOldState state store) *> setStatus 200 *> end
 
 computeResponse :: Store -> Either (Array String) State -> Effect ComputeResponse
 computeResponse _ (Left errors) = pure (InvalidInput errors)
 computeResponse store (Right state@(State { filename })) = do
   m <- lookup filename store
   case m of
-    Just p | not (isFinished p) -> pure PendingComputation
-    _ -> deleteFiles filename *> pure (Success state)
+    Just { processStatus } | not (isFinished processStatus) -> pure PendingComputation
+    Just { state: oldState } -> pure (Success (Just oldState) state)
+    _ -> pure (Success Nothing state)
 
-compute :: State -> Store -> Effect Unit
-compute state@(State { filename }) store = do
-  insert filename Pending store
+compute :: Maybe State -> State -> Store -> Effect Unit
+compute mayOldState state@(State { filename }) store = do
+  insert filename state Pending store
   log "Starting video download in background..."
   launchAff_ $ do
-    result <- runComputePipeline state
+    result <- runComputePipeline mayOldState state
     processResult <- case result of
       Right _ -> pure Succeed
       Left e -> liftEffect (log ("error during compute: " <> e)) *> pure (Failed e)
-    liftEffect $ insert filename processResult store
+    liftEffect $ insert filename state processResult store
   log "Video download launched, returning HTTP response"
 
-runComputePipeline :: State -> Aff (Either String Unit)
-runComputePipeline state@(State { youtubeUrl, filename, cutVideo: DurationRange { start, end }, artist, title }) =
+runComputePipeline :: Maybe State -> State -> Aff (Either String Unit)
+runComputePipeline mayOldState state@(State { youtubeUrl, filename, cutVideo: DurationRange { start, end }, artist, title }) =
   runExceptT do
-    void $ exceptTStep "Video download" $ downloadVideo youtubeUrl filename start end
-    void $ exceptTStep "Video Normalization" $ normalizeVideo filename
+    when (cutDownloadRequired mayOldState state)
+      ( do
+          void $ exceptTStep "Video download" $ downloadVideo youtubeUrl filename start end
+          void $ exceptTStep "Video Normalization" $ normalizeVideo filename
+      )
     void $ exceptTStep "MP3 extraction" $ extractMp3 filename
     void $ exceptTStep "ID3 tags" $ addId3Tags filename artist title
     void $ exceptTMultiple "Gif Creation" $ makeGif state
     pure unit
+
+cutDownloadRequired :: Maybe State -> State -> Boolean
+cutDownloadRequired Nothing _ = true
+cutDownloadRequired (Just (State { youtubeUrl: oldYoutubeurl, cutVideo: oldCutVideo })) (State { youtubeUrl: newYoutubeurl, cutVideo: newCutVideo }) =
+  oldYoutubeurl /= newYoutubeurl || oldCutVideo /= newCutVideo
 
 exceptTMultiple :: String -> Aff (Array ExecaResult) -> ExceptT String Aff Unit
 exceptTMultiple label affs = do
@@ -108,7 +114,3 @@ exceptTStep label aff =
 isSuccessExit :: Exit -> Boolean
 isSuccessExit (Normally 0) = true
 isSuccessExit _ = false
-
-deleteFiles :: FilePath -> Effect Unit
-deleteFiles filename =
-  files filename >>= \fs -> traverse_ (\f -> catchError (rm f) (\_ -> pure unit)) fs
