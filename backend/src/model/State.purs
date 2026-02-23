@@ -20,6 +20,7 @@ import Data.Either (Either(..))
 -------------------------------------------------------------------------------
 
 newtype WURL = WURL URL
+derive newtype instance Eq WURL
 
 newtype State = State
   { cutVideo :: DurationRange

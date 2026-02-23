@@ -3,6 +3,7 @@ module Command.Ytdlp where
 import Prelude
 
 import Command.Command (runCommand)
+import Effect.Console (log)
 import Constants (mp4)
 import Control.Monad.Error.Class (catchError)
 import Conversion.Time (millisecondsToSecondsString)
@@ -46,7 +47,7 @@ getYtdlpOutputUrl cookie (WURL url) filepath start end =
 downloadVideo :: WURL -> String -> Milliseconds -> Milliseconds -> Aff ExecaResult
 downloadVideo youtubeUri filename start end = do
   filepath <- liftEffect $ mp4 filename
-  log "[Ytdlp] Delete" <> show filepath
+  liftEffect $ log ("[Ytdlp] Delete " <> show filepath)
   apathize (rm filepath)
   tryCookies ytdlpSupportedBrowserCookies youtubeUri filepath
   where

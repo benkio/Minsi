@@ -7,7 +7,7 @@ import Data.Array (mapWithIndex, null, singleton)
 import Data.Foldable (intercalate, fold, traverse_)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
-import Effect.Aff (Aff, finally)
+import Effect.Aff (Aff, finally, apathize)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
 import MinsiError (MinsiError(..), throwMinsiError)
@@ -30,8 +30,8 @@ makePlainGif :: FilePath -> Aff ExecaResult
 makePlainGif filename = do
   filepathMp4 <- liftEffect $ mp4 filename
   filepathGif <- liftEffect $ gif filename
-  log "[Gif] Delete" <> show filepathGif
-  apathize (rm filepathGif)
+  liftEffect $ log ("[Gif] Delete " <> show filepathGif)
+  apathize (liftEffect $ rm filepathGif)
   let args = addFfmpegPlainGifArgs filepathMp4 filepathGif
   process <- runCommand args FfmpegGifError "ffmpeg"
   process.getResult
@@ -45,8 +45,8 @@ makeSubtitleGif filename subtitles = do
   filepathMp4 <- liftEffect $ mp4 filename
   filepathGif <- liftEffect $ gif filename
   filepathSrt <- liftEffect $ srt filename
-  log "[Gif] Delete" <> show filepathGif
-  apathize (rm filepathGif)
+  liftEffect $ log ("[Gif] Delete " <> show filepathGif)
+  apathize (liftEffect $ rm filepathGif)
 
   let subtitleContent = makeSrtsString subtitles
   liftEffect $ writeSrtFile filename subtitleContent
