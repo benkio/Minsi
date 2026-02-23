@@ -26,7 +26,7 @@ program = do
 -- TODOs --------------------------------
 {-
 -------Bugs-------------------
-------Improvements------------)
+------Improvements------------
 - Remove files after Download and after 1h from creation
 - When the cut end and cut start aren't changed, skip the yt-dlp step and just create the gifs
 - Add health check and add a step in CI to: build the docker image, run it, test the healthcheck endpoint

@@ -25,7 +25,6 @@ import Node.ChildProcess.Types (Exit(..))
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody)
 import Node.Express.Response (sendJson, setStatus, end)
-import Node.FS.Sync (rm)
 import Node.Library.Execa (ExecaResult)
 import Node.Path (FilePath)
 import Prelude
@@ -60,7 +59,7 @@ computeResponse store (Right state@(State { filename })) = do
   m <- lookup filename store
   case m of
     Just { processStatus } | not (isFinished processStatus) -> pure PendingComputation
-    _ -> deleteFiles filename *> pure (Success state)
+    _ -> pure (Success state)
 
 compute :: State -> Store -> Effect Unit
 compute state@(State { filename }) store = do
@@ -108,7 +107,3 @@ exceptTStep label aff =
 isSuccessExit :: Exit -> Boolean
 isSuccessExit (Normally 0) = true
 isSuccessExit _ = false
-
-deleteFiles :: FilePath -> Effect Unit
-deleteFiles filename =
-  files filename >>= \fs -> traverse_ (\f -> catchError (rm f) (\_ -> pure unit)) fs
