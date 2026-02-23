@@ -75,11 +75,11 @@ compute mayOldState state@(State { filename }) store = do
 runComputePipeline :: Maybe State -> State -> Aff (Either String Unit)
 runComputePipeline mayOldState state@(State { youtubeUrl, filename, cutVideo: DurationRange { start, end }, artist, title }) =
   runExceptT do
-    when (cutDownloadRequired mayOldState state) (
-      do
-        void $ exceptTStep "Video download" $ downloadVideo youtubeUrl filename start end
-        void $ exceptTStep "Video Normalization" $ normalizeVideo filename
-    )
+    when (cutDownloadRequired mayOldState state)
+      ( do
+          void $ exceptTStep "Video download" $ downloadVideo youtubeUrl filename start end
+          void $ exceptTStep "Video Normalization" $ normalizeVideo filename
+      )
     void $ exceptTStep "MP3 extraction" $ extractMp3 filename
     void $ exceptTStep "ID3 tags" $ addId3Tags filename artist title
     void $ exceptTMultiple "Gif Creation" $ makeGif state

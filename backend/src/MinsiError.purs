@@ -27,4 +27,4 @@ throwMinsiError e = do
   log message
   throwException (error message)
   where
-    message = show e
+  message = show e
