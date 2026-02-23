@@ -26,6 +26,7 @@
             "node-fs",
             "node-path",
             "node-process",
+            "now",
             "open-foreign-generic",
             "ordered-collections",
             "prelude",

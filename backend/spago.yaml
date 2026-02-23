@@ -21,6 +21,7 @@ package:
     - node-execa
     - node-fs
     - node-path
+    - now
     - open-foreign-generic
     - ordered-collections
     - prelude
