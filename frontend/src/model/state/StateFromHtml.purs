@@ -20,7 +20,7 @@ import Effect (Effect)
 import HTMLInputElement as HTMLInputElement
 import HTMLTableCellElement (valueFromInputTableCell, valueFromSelectTableCell, valueFromTextAreaTableCell)
 import Main.MinsiError (MinsiError(..), throwMinsiError)
-import Model.State.State (State(..), DurationRange(..), WURL(..), Subtitle(..))
+import Model.State.State (State(..), DurationRange(..), WURL(..), Source(..), Subtitle(..))
 import Model.ValidationErrors (ValidationErrors, toMap)
 import Parse.Font (parseFontAndColor, parsePosition)
 import Partial.Unsafe (unsafePartial)
@@ -68,7 +68,7 @@ fromHtmlInputs
     in
       State
         { cutVideo: cutVideo
-        , youtubeUrl: WURL youtubeUrl
+        , source: WebURL (WURL youtubeUrl)
         , filename: normalizeOutputFilename filename
         , reverseLoop: reverseLoopValue
         , artist: capitalize artist

@@ -1,5 +1,7 @@
 module Controller.ComputeController where
 
+import Prelude
+
 import Command.Ffmpeg.Gif (makeGif)
 import Command.Ffmpeg.Mp3 (extractMp3)
 import Command.Ffmpeg.Video (normalizeVideo)
@@ -19,13 +21,12 @@ import Effect.Console (log)
 import Effect.Exception (message)
 import InMemoryDB (Store, insert, lookup)
 import Model.ProcessStatus (ProcessStatus(..), isFinished)
-import Model.State (State(..), DurationRange(..), validateState)
+import Model.State (DurationRange(..), Source(WebURL), State(..), validateState)
 import Node.ChildProcess.Types (Exit(..))
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody)
 import Node.Express.Response (sendJson, setStatus, end)
 import Node.Library.Execa (ExecaResult)
-import Prelude
 
 data ComputeResponse
   = InvalidInput (Array String)
@@ -73,7 +74,7 @@ compute mayOldState state@(State { filename }) store = do
   log "Video download launched, returning HTTP response"
 
 runComputePipeline :: Maybe State -> State -> Aff (Either String Unit)
-runComputePipeline mayOldState state@(State { youtubeUrl, filename, cutVideo: DurationRange { start, end }, artist, title }) =
+runComputePipeline mayOldState state@(State { source: WebURL youtubeUrl, filename, cutVideo: DurationRange { start, end }, artist, title }) =
   runExceptT do
     when (cutDownloadRequired mayOldState state)
       ( do
@@ -84,11 +85,13 @@ runComputePipeline mayOldState state@(State { youtubeUrl, filename, cutVideo: Du
     void $ exceptTStep "ID3 tags" $ addId3Tags filename artist title
     void $ exceptTMultiple "Gif Creation" $ makeGif state
     pure unit
+runComputePipeline _ _ = liftEffect (log "Unimplemented LocalFile yet") *> pure (Left "Unimplemented LocalFile yet")
+
 
 cutDownloadRequired :: Maybe State -> State -> Boolean
 cutDownloadRequired Nothing _ = true
-cutDownloadRequired (Just (State { youtubeUrl: oldYoutubeurl, cutVideo: oldCutVideo })) (State { youtubeUrl: newYoutubeurl, cutVideo: newCutVideo }) =
-  oldYoutubeurl /= newYoutubeurl || oldCutVideo /= newCutVideo
+cutDownloadRequired (Just (State { source: oldSource, cutVideo: oldCutVideo })) (State { source: newSource, cutVideo: newCutVideo }) =
+  oldSource /= newSource || oldCutVideo /= newCutVideo
 
 exceptTMultiple :: String -> Aff (Array ExecaResult) -> ExceptT String Aff Unit
 exceptTMultiple label affs = do

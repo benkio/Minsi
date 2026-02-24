@@ -12,10 +12,14 @@ import Yoga.JSON (class WriteForeign, writeImpl)
 -------------------------------------------------------------------------------
 
 newtype WURL = WURL URL
+data Source = LocalFile | WebURL WURL
+
+derive instance Eq WURL
+derive instance Eq Source
 
 newtype State = State
   { cutVideo :: DurationRange
-  , youtubeUrl :: WURL
+  , source :: Source
   , filename :: FilePath
   , reverseLoop :: Boolean
   , artist :: String
@@ -82,6 +86,10 @@ derive newtype instance writeSubtitle :: WriteForeign Subtitle
 
 instance WriteForeign WURL where
   writeImpl (WURL url) = writeImpl (toString url)
+
+instance WriteForeign Source where
+  writeImpl LocalFile = writeImpl "LocalFile"
+  writeImpl (WebURL w) = writeImpl w
 
 derive newtype instance writeState :: WriteForeign State
 derive instance Newtype State _

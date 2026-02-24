@@ -20,12 +20,14 @@ import Data.Either (Either(..))
 -------------------------------------------------------------------------------
 
 newtype WURL = WURL URL
+data Source = LocalFile | WebURL WURL
 
-derive newtype instance Eq WURL
+derive instance Eq WURL
+derive instance Eq Source
 
 newtype State = State
   { cutVideo :: DurationRange
-  , youtubeUrl :: WURL
+  , source :: Source
   , filename :: FilePath
   , reverseLoop :: Boolean
   , artist :: String
@@ -99,6 +101,14 @@ instance ReadForeign WURL where
     case fromString s of
       Nothing -> fail $ TypeMismatch "URL" $ "Invalid URL: " <> s
       Just url -> pure (WURL url)
+
+instance ReadForeign Source where
+  readImpl f = do
+    s <- readImpl f
+    if s == "LocalFile" then pure LocalFile
+    else case fromString s of
+      Nothing -> fail $ TypeMismatch "Source" $ "Invalid Source: " <> s
+      Just url -> pure (WebURL (WURL url))
 
 instance Decode State where
   decode = readImpl

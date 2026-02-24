@@ -3,7 +3,7 @@ module Test.StateSpec where
 import Prelude
 import Data.Maybe (Maybe(..), fromJust)
 import Partial.Unsafe (unsafePartial)
-import Model.State.State (State(..), DurationRange(..), Subtitle(..), Font(..), Color(..), Position(..), WURL(..))
+import Model.State.State (State(..), DurationRange(..), Subtitle(..), Font(..), Color(..), Position(..), WURL(..), Source(..))
 import Effect.Class (liftEffect)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
@@ -64,7 +64,7 @@ spec = do
         state =
           State
             { cutVideo: cutVideo
-            , youtubeUrl: youtubeUrl
+            , source: WebURL youtubeUrl
             , filename: filename
             , reverseLoop: reverseLoop
             , artist: artist
@@ -95,11 +95,11 @@ spec = do
       startValue `shouldEqual` 0.0
       endValue `shouldEqual` 100.0
 
-      -- Check youtubeUrl
-      youtubeUrlValue <- case lookup "youtubeUrl" jsonObj of
-        Just yu -> liftEffect $ readForeignString yu
-        Nothing -> liftEffect $ throwException $ error "youtubeUrl field missing"
-      youtubeUrlValue `shouldEqual` "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      -- Check source (WebURL is encoded as URL string)
+      sourceValue <- case lookup "source" jsonObj of
+        Just s -> liftEffect $ readForeignString s
+        Nothing -> liftEffect $ throwException $ error "source field missing"
+      sourceValue `shouldEqual` "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 
       -- Check filename
       filenameValue <- case lookup "filename" jsonObj of
