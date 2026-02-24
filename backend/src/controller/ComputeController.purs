@@ -6,7 +6,7 @@ import Command.Ffmpeg.Gif (makeGif)
 import Command.Ffmpeg.Mp3 (extractMp3)
 import Command.Ffmpeg.Video (normalizeVideo)
 import Command.Id3v2 (addId3Tags)
-import Command.Ytdlp (downloadVideo)
+import Command.Ytdlp (downloadOrCutVideo)
 import Control.Monad.Error.Class (catchError)
 import Control.Monad.Except (ExceptT(..), runExcept, runExceptT, lift)
 import Data.Array (fromFoldable)
@@ -74,18 +74,17 @@ compute mayOldState state@(State { filename }) store = do
   log "Video download launched, returning HTTP response"
 
 runComputePipeline :: Maybe State -> State -> Aff (Either String Unit)
-runComputePipeline mayOldState state@(State { source: WebURL youtubeUrl, filename, cutVideo: DurationRange { start, end }, artist, title }) =
+runComputePipeline mayOldState state@(State { source, filename, cutVideo: DurationRange { start, end }, artist, title }) =
   runExceptT do
     when (cutDownloadRequired mayOldState state)
       ( do
-          void $ exceptTStep "Video download" $ downloadVideo youtubeUrl filename start end
+          void $ exceptTStep "Video download" $ downloadOrCutVideo source filename start end
           void $ exceptTStep "Video Normalization" $ normalizeVideo filename
       )
     void $ exceptTStep "MP3 extraction" $ extractMp3 filename
     void $ exceptTStep "ID3 tags" $ addId3Tags filename artist title
     void $ exceptTMultiple "Gif Creation" $ makeGif state
     pure unit
-runComputePipeline _ _ = liftEffect (log "Unimplemented LocalFile yet") *> pure (Left "Unimplemented LocalFile yet")
 
 
 cutDownloadRequired :: Maybe State -> State -> Boolean

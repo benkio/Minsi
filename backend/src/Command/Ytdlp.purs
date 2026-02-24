@@ -3,7 +3,6 @@ module Command.Ytdlp where
 import Prelude
 
 import Command.Command (runCommand)
-import Effect.Console (log)
 import Constants (mp4)
 import Control.Monad.Error.Class (catchError)
 import Conversion.Time (millisecondsToSecondsString)
@@ -13,8 +12,10 @@ import Data.Time.Duration (Milliseconds)
 import Data.URL (toString)
 import Effect.Aff (Aff, apathize)
 import Effect.Class (liftEffect)
+import Effect.Console (log)
+import Effect.Exception (throwException, error)
 import MinsiError (MinsiError(..), throwMinsiError)
-import Model.State (WURL(..))
+import Model.State (Source(..), WURL(..))
 import Node.ChildProcess.Types (Exit(..))
 import Node.FS.Aff (rm)
 import Node.Library.Execa (ExecaProcess, ExecaResult)
@@ -44,8 +45,9 @@ getYtdlpOutputUrl cookie (WURL url) filepath start end =
     else
       [ "-f", "\"best[ext=mp4]\"", "--force-overwrite", "--download-sections", show ("*" <> start <> "-" <> end), "-o", show filepath, "--cookies-from-browser", cookie, show urlString ]
 
-downloadVideo :: WURL -> String -> Milliseconds -> Milliseconds -> Aff ExecaResult
-downloadVideo youtubeUri filename start end = do
+downloadOrCutVideo :: Source -> String -> Milliseconds -> Milliseconds -> Aff ExecaResult
+downloadOrCutVideo LocalFile _ _ _ = liftEffect $ throwException (error "Not implemented") -- TODO: Implement
+downloadOrCutVideo (WebURL youtubeUri) filename start end = do
   filepath <- liftEffect $ mp4 filename
   liftEffect $ log ("[Ytdlp] Delete " <> show filepath)
   apathize (rm filepath)
