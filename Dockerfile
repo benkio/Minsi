@@ -1,6 +1,6 @@
 # Use linux/amd64 so npm install -g purescript gets a prebuilt binary (linux-aarch64 often 403)
 # Stage 1: build frontend and backend
-FROM --platform=linux/amd64 node:22-bookworm-slim AS builder
+FROM node:22-bookworm-slim AS builder
 
 WORKDIR /usr/src/minsi
 
@@ -30,7 +30,7 @@ WORKDIR /usr/src/minsi/backend
 RUN npm ci && spago build
 
 # Stage 2: minimal runtime image
-FROM --platform=linux/amd64 node:22-bookworm-slim
+FROM node:22-bookworm-slim
 
 WORKDIR /usr/src/minsi
 
