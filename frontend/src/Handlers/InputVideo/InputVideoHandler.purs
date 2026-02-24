@@ -1,4 +1,4 @@
-module Handlers.InputVideo.YoutubeVideoHandler where
+module Handlers.InputVideo.InputVideoHandler where
 
 import Prelude
 

@@ -8,8 +8,8 @@ import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CopyTranscriptButtonHandler (setCopyTranscriptButtonHandler)
 import Handlers.CutRangeHandler (CutRangeTargets(..), setCutRangeHandlers)
 import Handlers.DownloadAllButtonHandler (setDownloadAllButtonHandler)
-import Handlers.InputVideo.InputSourceHandler (setInputsourcehandler)
-import Handlers.InputVideo.YoutubeVideoHandler (setVideoHandlers, VideoEventTargets(..))
+import Handlers.InputVideo.InputSourceHandler (setInputSourceHandler)
+import Handlers.InputVideo.InputVideoHandler (setVideoHandlers, VideoEventTargets(..))
 import Handlers.KeyboardHandler (KeyboardHandlerTargets(..), setKeyboardHandlers)
 import Handlers.ResultVideo.Handler (ResultVideoEventTargets(..), setResultVideoHandlers)
 import Handlers.ResultVideo.VideoSourceHandler (setVideoSourceHandler)
@@ -98,7 +98,7 @@ setupEventHandlers
         }
     )
   setVideoSourceHandler videoSource resultVideo resultAudio
-  setInputsourcehandler inputSource youtubeUrl localFile
+  setInputSourceHandler inputSource youtubeUrl localFile
   setDownloadAllButtonHandler downloadAllButton
   setCopyTranscriptButtonHandler copyTranscriptButton
   setTextInputValidationHandlers
