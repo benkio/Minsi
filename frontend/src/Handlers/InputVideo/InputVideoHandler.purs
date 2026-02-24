@@ -2,10 +2,11 @@ module Handlers.InputVideo.InputVideoHandler where
 
 import Prelude
 
+import Components.HtmlComponents (loadComponents, resultPreviewToMaybeIframe, resultPreviewToMaybeVideo)
 import Components.HtmlIds (resultPreviewId, youtubeUrlId)
-import Data.Either (Either, either)
 import Data.Foldable (foldl)
-import Data.Maybe (Maybe, maybe)
+import Data.Maybe (Maybe(..), maybe)
+import Data.Newtype (unwrap)
 import Data.Traversable (traverse)
 import Data.Validation.Semigroup (invalid)
 import Effect (Effect)
@@ -13,20 +14,27 @@ import Effect.Console (log)
 import Effect.Timer (setInterval)
 import Handlers.ErrorHandlers (genericErrorsHandler)
 import Handlers.InputVideo.CutButtonsHandlers (initializeCutInputs, setCutInputButtonEvL)
-import Handlers.InputVideo.Foreign (embedVideo)
+import Handlers.InputVideo.Foreign (destroyIFramePlayer,   embedIFrameVideo)
 import Handlers.InputVideo.PlaybackPositionHandler (updatePlaybackPosition)
 import Handlers.InputVideo.YoutubeUrlExtraction (extractYoutubeVideoId, extractYoutubeVideoStartTime)
 import Main.MinsiError (MinsiError(..), throwMinsiError)
 import Model.ValidationErrors (fromSingleton)
 import Validations.YoutubeValidation (youtubeUrlValidation)
-import Web.DOM.Element (fromEventTarget, toEventTarget)
+import Web.DOM.Element (fromEventTarget, toEventTarget, toNode)
+import Web.DOM.Node (appendChild, parentNode, removeChild)
 import Web.Event.Event (target)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
 import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLButtonElement as HB
+import Web.HTML.HTMLIFrameElement as IF
 import Web.HTML.HTMLInputElement as HI
+import Web.File.File (toBlob)
+import Web.File.FileList (item)
+import Web.File.Url (createObjectURL)
+import Web.HTML.HTMLMediaElement (setSrc)
 import Web.HTML.HTMLSpanElement as HSP
+import Web.HTML.HTMLVideoElement as HV
 
 data VideoEventTargets = VET
   { cutStart :: HI.HTMLInputElement
@@ -76,7 +84,7 @@ youtubeUrlEventListener cutStart cutEnd ev = genericErrorsHandler $ do
   videoId <- (maybe (throwMinsiError (InvalidInput youtubeUrlId (show rawValue))) pure <<< extractYoutubeVideoId) source
   let startTime = extractYoutubeVideoStartTime source
   log ("Youtube Url Handler fired with value: " <> show videoId)
-  embedVideo
+  embedIFrameVideo
     { resultPreviewId: resultPreviewId
     , videoId: videoId
     , width: 1000
@@ -90,4 +98,26 @@ getInputValue ev =
   traverse (HI.value) (target ev >>= fromEventTarget >>= HI.fromElement)
 
 localFileEventListener :: Event -> Effect Unit
-localFileEventListener ev = genericErrorsHandler $ pure unit
+localFileEventListener _ = genericErrorsHandler $ do
+  components <- loadComponents
+  let resultPreview = (unwrap components.htmlOutputs).resultPreview
+  maybe (pure unit)
+    ( \_ -> do
+         log "Descroy YT IFrame"
+         destroyIFramePlayer
+    )
+    (resultPreviewToMaybeIframe resultPreview)
+  newComponents <- loadComponents
+  let newResultPreview = (unwrap newComponents.htmlOutputs).resultPreview
+      localFileInput = (unwrap newComponents.htmlInputs).localFile
+  maybe (throwMinsiError (HTMLElementNotFound "resultPreviewId"))
+      ( \video -> do
+           fileListMaybe <- HI.files localFileInput
+           maybe
+             (pure unit)
+             (\file -> do
+                 blobUrl <- createObjectURL file
+                 setSrc blobUrl (HV.toHTMLMediaElement video)
+             ) (fileListMaybe >>= item 0)
+      )
+      (resultPreviewToMaybeVideo newResultPreview)

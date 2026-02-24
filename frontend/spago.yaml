@@ -35,6 +35,7 @@ package:
     - validation
     - web-dom
     - web-events
+    - web-file
     - web-html
     - web-uievents
     - yoga-json

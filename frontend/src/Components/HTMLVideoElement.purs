@@ -1,14 +1,18 @@
 module Components.HTMLVideoElement where
 
-import Prelude
-
 import Effect (Effect)
-import Effect.Console (log)
+import Prelude
+import Web.HTML.HTMLMediaElement (currentTime, duration, readyState)
+import Web.HTML.HTMLMediaElement.ReadyState (ReadyState(..))
+import Web.HTML.HTMLVideoElement (HTMLVideoElement, toHTMLMediaElement)
 
--- TODO: implement
-isVideoTagReady :: Effect Boolean
-isVideoTagReady = log "isVideoTagReady" *> pure true
-getVideoTagDuration :: Effect Number
-getVideoTagDuration = log "getVideoTagDuration" *> pure 42.0
-getVideoTagCurrentTime :: Effect Number
-getVideoTagCurrentTime = log "getVideoCurrentTime" *> pure 69.0
+getVideoTagCurrentTime :: HTMLVideoElement -> Effect Number
+getVideoTagCurrentTime = currentTime <<< toHTMLMediaElement
+
+getVideoTagDuration :: HTMLVideoElement -> Effect Number
+getVideoTagDuration = duration <<< toHTMLMediaElement
+
+isVideoTagReady :: HTMLVideoElement -> Effect Boolean
+isVideoTagReady v = do
+  rs <- readyState (toHTMLMediaElement v)
+  pure (rs == HaveEnoughData)

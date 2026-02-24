@@ -25,7 +25,7 @@ localFileId :: String
 localFileId = "localFile"
 
 resultPreviewId :: String
-resultPreviewId = "youtubeResultPreview"
+resultPreviewId = "resultPreviewId"
 
 cutVideoId :: String
 cutVideoId = "cutVideoButton"

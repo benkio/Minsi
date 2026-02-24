@@ -5,7 +5,6 @@ import Prelude
 import Components.HTMLTableElement (loadSubtitlesFromTable)
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), loadComponents)
 import Components.HtmlIds (youtubeUrlId, outputFilenameId, artistId, titleId, cutStartId, localFileId, inputSourceId)
-import Components.Window (getDocument)
 import Conversion.String (capitalize)
 import Data.Array (length, (!!))
 import Data.Either (either)
@@ -36,8 +35,7 @@ import Web.HTML.HTMLTableRowElement as HTR
 
 getCurrentState :: Effect (Tuple State HtmlComponents)
 getCurrentState = do
-  doc <- getDocument
-  components <- loadComponents doc
+  components <- loadComponents
   stateV <- fromHtmlInputs components.htmlInputs
   state <- (either (throwMinsiError <<< InvalidInputs <<< toMap) pure <<< toEither) stateV
   pure $ Tuple state components

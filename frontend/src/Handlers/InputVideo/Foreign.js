@@ -22,6 +22,7 @@ export const embedIFrameVideo = function (embedVideoConfig) {
 
       // Player exists and video ID is different, load new video using loadVideoById
       try {
+        console.log("Create YT Player");
         player.loadVideoById({
           videoId: embedVideoConfig.videoId,
           startSeconds: embedVideoConfig.startTime,
@@ -116,4 +117,17 @@ export const isIFramePlayerReady = () => {
 
   // Return true only if all checks pass
   return hasGetDuration && hasGetCurrentTime && isReady;
+};
+
+export const destroyIFramePlayer = function () {
+  if (typeof player !== "undefined" && player !== null) {
+    try {
+      if (player.destroy && typeof player.destroy === "function") {
+        player.destroy();
+      }
+    } catch (e) {
+      console.error("Error destroying YT player:", e);
+    }
+    player = null;
+  }
 };

@@ -10,6 +10,7 @@ export const helmet = helmetPkg({
       "connect-src": ["'self'", "https://cdn.jsdelivr.net", "https://www.youtube.com", "https://s.ytimg.com", "https://i.ytimg.com"],
       "frame-src": ["'self'", "https://www.youtube.com"],
       "img-src": ["'self'", "data:", "https://i.ytimg.com"],
+      "media-src": ["'self'", "blob:"],
     },
   },
 });

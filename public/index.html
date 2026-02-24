@@ -181,13 +181,14 @@
                     type="file"
                     class="form-control w-100 w-md-75 mx-auto d-none"
                     id="localFile"
+                    accept="video/*"
                   />
                 </div>
               </div>
-              <div
+              <video
                 class="w-100 w-md-75 mx-auto bg-dark mb-3"
-                id="youtubeResultPreview"
-              ></div>
+                  id="resultPreviewId"
+              ></video>
             </div>
 
             <div class="w-100 w-md-75 mx-auto px-3 pb-3">
@@ -349,9 +350,9 @@
         </td>
         <td>
           <select type="number" class="form-control form-control-sm">
-            <option >24</option>
+            <option>24</option>
             <option selected>36</option>
-            <option >48</option>
+            <option>48</option>
           </select>
         </td>
         <td>
