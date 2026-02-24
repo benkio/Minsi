@@ -6,6 +6,7 @@ import Controller.CheckDependenciesController (checkDependenciesController)
 import Controller.ComputeController (computeController)
 import Controller.ErrorHandlers (generalErrorHandler)
 import Controller.StatusController (statusController)
+import Controller.UploadController (uploadController)
 import InMemoryDB (Store)
 import Node.Express.App (App, post)
 import Node.Express.Handler (Handler)
@@ -16,6 +17,7 @@ router store = do
   post "/checkDependencies" (controllerLogic (checkDependenciesController store))
   post "/compute" (controllerLogic (computeController store))
   post "/status" (controllerLogic (statusController store))
+  post "/upload" (controllerLogic (uploadController store))
 
 defaultResponseSettings :: Handler
 defaultResponseSettings = setResponseHeader "Access-Control-Allow-Origin" "*"
