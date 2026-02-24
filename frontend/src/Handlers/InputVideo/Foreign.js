@@ -1,5 +1,5 @@
 let player;
-export const embedVideo = function (embedVideoConfig) {
+export const embedIFrameVideo = function (embedVideoConfig) {
   return function () {
     // Check if player already exists
     if (typeof player !== "undefined" && player !== null) {
@@ -53,7 +53,7 @@ export const embedVideo = function (embedVideoConfig) {
     }
   };
 };
-export const getPlayerCurrentTime = () => {
+export const getIFramePlayerCurrentTime = () => {
   if (typeof player !== "undefined" && player !== null) {
     try {
       if (
@@ -69,7 +69,7 @@ export const getPlayerCurrentTime = () => {
   return 0;
 };
 
-export const getVideoDuration = () => {
+export const getIFrameVideoDuration = () => {
   if (typeof player !== "undefined" && player !== null) {
     try {
       // Check if getDuration method exists and player is ready
@@ -87,7 +87,7 @@ export const getVideoDuration = () => {
   return 100; // Default fallback
 };
 
-export const isPlayerReady = () => {
+export const isIFramePlayerReady = () => {
   // Check if player exists
   if (typeof player === "undefined" || player === null) {
     return false;

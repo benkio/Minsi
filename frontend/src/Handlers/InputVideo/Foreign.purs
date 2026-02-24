@@ -1,7 +1,7 @@
 module Handlers.InputVideo.Foreign where
 
-import Prelude
 import Effect (Effect)
+import Prelude
 
 type EmbedVideoConfig =
   { resultPreviewId :: String
@@ -11,7 +11,19 @@ type EmbedVideoConfig =
   , startTime :: Int
   }
 
-foreign import embedVideo :: EmbedVideoConfig -> Effect Unit
-foreign import getPlayerCurrentTime :: Effect Number
-foreign import getVideoDuration :: Effect Number
-foreign import isPlayerReady :: Effect Boolean
+foreign import embedIFrameVideo :: EmbedVideoConfig -> Effect Unit
+foreign import getIFramePlayerCurrentTime :: Effect Number
+foreign import getIFrameVideoDuration :: Effect Number
+foreign import isIFramePlayerReady :: Effect Boolean
+
+embedVideo :: EmbedVideoConfig -> Effect Unit
+embedVideo = embedIFrameVideo
+
+getPlayerCurrentTime :: Effect Number
+getPlayerCurrentTime = getIFramePlayerCurrentTime
+
+getVideoDuration :: Effect Number
+getVideoDuration = getIFrameVideoDuration
+
+isPlayerReady :: Effect Boolean
+isPlayerReady = isIFramePlayerReady

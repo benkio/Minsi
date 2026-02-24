@@ -66,7 +66,8 @@ setupEventHandlers
         , playbackPositionYoutube: playbackPositionYoutube
         , setCutStartButton: setCutStartButton
         , setCutEndButton: setCutEndButton
-        , source: Right youtubeUrl -- TODO: set the one selected
+        , youtubeUrl: youtubeUrl
+        , localFile: localFile
         }
     )
   setResultVideoHandlers

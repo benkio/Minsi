@@ -34,7 +34,8 @@ data VideoEventTargets = VET
   , playbackPositionYoutube :: HSP.HTMLSpanElement
   , setCutEndButton :: HB.HTMLButtonElement
   , setCutStartButton :: HB.HTMLButtonElement
-  , source :: Either HI.HTMLInputElement HI.HTMLInputElement
+  , youtubeUrl :: HI.HTMLInputElement
+  , localFile :: HI.HTMLInputElement
   }
 
 setVideoHandlers :: VideoEventTargets -> Effect Unit
@@ -45,12 +46,16 @@ setVideoHandlers
       , playbackPositionYoutube
       , cutEnd
       , setCutEndButton
-      , source
+      , youtubeUrl
+      , localFile
       }
   ) = genericErrorsHandler $ do
   ytEvL <- eventListener (youtubeUrlEventListener cutStart cutEnd)
+  lfEvL <- eventListener localFileEventListener
   addEventListener E.input ytEvL false ytUrlEventTarget
   addEventListener E.change ytEvL false ytUrlEventTarget
+  addEventListener E.input lfEvL false localFileEventTarget
+  addEventListener E.change lfEvL false localFileEventTarget
   _ <- setInterval 1000 (updatePlaybackPosition playbackPositionYoutube)
   setCutStartButtonEvLV <- eventListener (setCutInputButtonEvL cutStart)
   setCutEndButtonEvLV <- eventListener (setCutInputButtonEvL cutEnd)
@@ -58,7 +63,8 @@ setVideoHandlers
   addEventListener E.click setCutEndButtonEvLV false setCutEndButtonTarget
   pure unit
   where
-  ytUrlEventTarget = either (toEventTarget <<< HI.toElement) (toEventTarget <<< HI.toElement) source
+  ytUrlEventTarget = (toEventTarget <<< HI.toElement) youtubeUrl
+  localFileEventTarget = (toEventTarget <<< HI.toElement) localFile
   setCutStartButtonTarget = toEventTarget (HB.toElement setCutStartButton)
   setCutEndButtonTarget = toEventTarget (HB.toElement setCutEndButton)
 
@@ -82,3 +88,6 @@ youtubeUrlEventListener cutStart cutEnd ev = genericErrorsHandler $ do
 getInputValue :: Event -> Effect (Maybe String)
 getInputValue ev =
   traverse (HI.value) (target ev >>= fromEventTarget >>= HI.fromElement)
+
+localFileEventListener :: Event -> Effect Unit
+localFileEventListener ev = genericErrorsHandler $ pure unit
