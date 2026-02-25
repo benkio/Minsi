@@ -2,7 +2,6 @@ module Handlers.Handlers where
 
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlOutputs(..))
 import Components.HtmlIds (keyboardShortcutsModalId)
-import Data.Either (Either(..))
 import Effect (Effect)
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CopyTranscriptButtonHandler (setCopyTranscriptButtonHandler)
@@ -29,6 +28,7 @@ setupEventHandlers
       , cutEnd
       , youtubeUrl
       , localFile
+      , uploadLocalFile
       , filename
       , setCutStartButton
       , setCutEndButton
@@ -57,13 +57,12 @@ setupEventHandlers
     ( CRET
         { cutStart: cutStart
         , cutEnd: cutEnd
+        , uploadLocalFile: uploadLocalFile
         }
     )
   setVideoHandlers
     ( VET
-        { cutStart: cutStart
-        , cutEnd: cutEnd
-        , playbackPositionYoutube: playbackPositionYoutube
+        { playbackPositionYoutube: playbackPositionYoutube
         , setCutStartButton: setCutStartButton
         , setCutEndButton: setCutEndButton
         , youtubeUrl: youtubeUrl
@@ -109,4 +108,3 @@ setupEventHandlers
         , title
         }
     )
--- TODO: Add handler to load the video tag with the local file

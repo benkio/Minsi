@@ -39,13 +39,13 @@ program = do
 {-
 FE:
   - Send the filename+file extension as well using form data
-    - Add a boolean in state to signal the need to upload the file, when:
-    - The cut is changed
-    - filename is changed.
-    - file name is changed
+    - ✅ Add a boolean in state to signal the need to upload the file, when:
+    - ✅ The cut is changed
+    - ✅ filename is changed.
+    - ✅ localfile is changed
     It starts as true
   - in compute.
-    - localfile is selected and the upload is true. Send it
+    - localfile is selected and the upload is true. Send it. Put the upload to false
     - localfile is selected. don't send the youtubeUrl
 
 BE:

@@ -18,12 +18,13 @@ import Web.HTML.HTMLInputElement as HI
 data CutRangeTargets = CRET
   { cutStart :: HI.HTMLInputElement
   , cutEnd :: HI.HTMLInputElement
+  , uploadLocalFile :: HI.HTMLInputElement
   }
 
 setCutRangeHandlers :: CutRangeTargets -> Effect Unit
-setCutRangeHandlers (CRET { cutStart, cutEnd }) = genericErrorsHandler $ do
-  cutStartEvL <- eventListener (rangeToNumberListenerStart cutStart cutEnd)
-  cutEndEvL <- eventListener (rangeToNumberListenerEnd cutStart cutEnd)
+setCutRangeHandlers (CRET { cutStart, cutEnd, uploadLocalFile }) = genericErrorsHandler $ do
+  cutStartEvL <- eventListener (rangeToNumberListenerStart cutStart cutEnd uploadLocalFile)
+  cutEndEvL <- eventListener (rangeToNumberListenerEnd cutStart cutEnd uploadLocalFile)
   addEventListener E.input cutStartEvL false (toEventTarget (HI.toElement cutStart))
   addEventListener E.change cutStartEvL false (toEventTarget (HI.toElement cutStart))
   addEventListener E.input cutEndEvL false (toEventTarget (HI.toElement cutEnd))
@@ -31,21 +32,21 @@ setCutRangeHandlers (CRET { cutStart, cutEnd }) = genericErrorsHandler $ do
   pure unit
 
 -- When start range changes, update start number input if cutVideoValidation is satisfied
-rangeToNumberListenerStart :: HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
-rangeToNumberListenerStart cutStart cutEnd _ = genericErrorsHandler $ do
+rangeToNumberListenerStart :: HI.HTMLInputElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
+rangeToNumberListenerStart cutStart cutEnd uploadLocalFile _ = genericErrorsHandler $ do
   start <- valueAsNumber cutStart
   end <- valueAsNumber cutEnd
   validation
     (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
-    (\_ -> pure unit)
+    (\_ -> HI.setChecked true uploadLocalFile)
     (cutVideoValidation cutStartId start end)
 
 -- When end range changes, update end number input if cutVideoValidation is satisfied
-rangeToNumberListenerEnd :: HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
-rangeToNumberListenerEnd cutStart cutEnd _ = genericErrorsHandler $ do
+rangeToNumberListenerEnd :: HI.HTMLInputElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
+rangeToNumberListenerEnd cutStart cutEnd uploadLocalFile _ = genericErrorsHandler $ do
   start <- valueAsNumber cutStart
   end <- valueAsNumber cutEnd
   validation
     (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
-    (\_ -> pure unit)
+    (\_ -> HI.setChecked true uploadLocalFile)
     (cutVideoValidation cutEndId start end)

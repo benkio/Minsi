@@ -93,8 +93,9 @@ sourceFromHTMLInput inputSourceSelect youtubeUrlComponent localFileComponent = d
   urlString <- HI.value youtubeUrlComponent
   localFileUri <- HI.value localFileComponent
   inputSource <- HS.value inputSourceSelect
-  let youtubeValidation = youtubeUrlValidation youtubeUrlId urlString <#> \url -> WebURL (WURL url)
-      localFileValidation = nonEmptyValidation localFileId localFileUri <#> const LocalFile
+  let
+    youtubeValidation = youtubeUrlValidation youtubeUrlId urlString <#> \url -> WebURL (WURL url)
+    localFileValidation = nonEmptyValidation localFileId localFileUri <#> const LocalFile
   pure $ case inputSource of
     "youtubeUrl" -> youtubeValidation
     "localFile" -> localFileValidation
