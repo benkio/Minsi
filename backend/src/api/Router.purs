@@ -8,7 +8,8 @@ import Controller.ErrorHandlers (generalErrorHandler)
 import Controller.StatusController (statusController)
 import Controller.UploadController (uploadController)
 import InMemoryDB (Store)
-import Node.Express.App (App, post)
+import Middleware.MulterUpload (multerUploadMiddleware)
+import Node.Express.App (App, post, useAtExternal)
 import Node.Express.Handler (Handler)
 import Node.Express.Response (setResponseHeader)
 
@@ -17,6 +18,7 @@ router store = do
   post "/checkDependencies" (controllerLogic (checkDependenciesController store))
   post "/compute" (controllerLogic (computeController store))
   post "/status" (controllerLogic (statusController store))
+  useAtExternal "/upload" multerUploadMiddleware
   post "/upload" (controllerLogic (uploadController store))
 
 defaultResponseSettings :: Handler
