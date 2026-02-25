@@ -1,32 +1,34 @@
 module Handlers.ErrorHandlers where
 
-import Effect.Console (log)
+import Components.HtmlComponents (loadDiv)
 import Components.HtmlIds (minsiLogId, minsiErrorModalContentId, minsiErrorModalId)
 import Components.Modal (showModal)
-import Prelude
-import Components.HtmlComponents (loadDiv)
 import Components.Window (getDocument, raiseErrorAlert)
-import Effect (Effect)
-import Effect.Timer (setTimeout)
-import Effect.Exception (Error, message)
-import Control.Monad.Error.Class (catchError)
+import Control.Monad.Error.Class (catchError, class MonadError)
 import Data.Either (Either(..))
-import Web.HTML.HTMLDivElement (toNode)
-import Web.DOM.Node (appendChild, removeChild, setTextContent)
-import Web.DOM.Document (createElement)
-import Web.DOM.Element (toNode) as E
-import Web.HTML.HTMLUListElement as ULH
-import Web.HTML.HTMLLIElement as LIH
-import Web.HTML (window)
-import Web.HTML.Window (document)
-import Web.HTML.HTMLDocument (toDocument)
+import Data.Maybe (Maybe(..))
 import Data.String (split)
 import Data.String.Pattern (Pattern(..))
 import Data.Traversable (traverse)
-import Data.Maybe (Maybe(..))
+import Effect (Effect)
+import Effect.Class (liftEffect, class MonadEffect)
+import Effect.Console (log)
+import Effect.Exception (Error, message)
+import Effect.Timer (setTimeout)
 import Main.MinsiErrors (MinsiError(..), isCriticalError, throwMinsiError)
+import Prelude
+import Web.DOM.Document (createElement)
+import Web.DOM.Element (toNode) as E
+import Web.DOM.Node (appendChild, removeChild, setTextContent)
+import Web.HTML (window)
+import Web.HTML.HTMLDivElement (toNode)
+import Web.HTML.HTMLDocument (toDocument)
+import Web.HTML.HTMLLIElement as LIH
+import Web.HTML.HTMLUListElement as ULH
+import Web.HTML.Window (document)
 
-genericErrorsHandler :: Effect Unit -> Effect Unit
+-- | Runs an action and handles errors in both Effect and Aff using MonadError + MonadEffect.
+genericErrorsHandler :: forall m. MonadError Error m => MonadEffect m => m Unit -> m Unit
 genericErrorsHandler p =
   catchError p
     ( \e ->
@@ -34,13 +36,14 @@ genericErrorsHandler p =
           errorMessage = message e
           handleError =
             if isCriticalError e then
-              showMinsiErrorDialog errorMessage
+              liftEffect (showMinsiErrorDialog errorMessage)
             else
-              writeToMinsiLog errorMessage
+              liftEffect (writeToMinsiLog errorMessage)
         in
-          log errorMessage *> catchError handleError (const (raiseErrorAlert errorMessage))
+          liftEffect (log errorMessage) *> catchError handleError (const (liftEffect (raiseErrorAlert errorMessage)))
     )
 
+-- | Handles Either result (e.g. from runAff_ callback). Stays in Effect.
 genericErrorsHandlerEither :: forall a. Either Error a -> Effect Unit
 genericErrorsHandlerEither (Right _) = pure unit
 genericErrorsHandlerEither (Left e) =

@@ -71,7 +71,7 @@ applyButtonEventListener _ = genericErrorsHandler $ do
     finally (liftEffect (finallyHandlers components state)) (applyButtonLogic state localFileInput)
 
 applyButtonLogic :: State -> HI.HTMLInputElement -> Aff Unit
-applyButtonLogic state localFileInput = do
+applyButtonLogic state localFileInput = genericErrorsHandler $ do
   let uploadLocalFile = (unwrap state).uploadLocalFile
       filename = (unwrap state).filename
       source = (unwrap state).source
@@ -80,7 +80,7 @@ applyButtonLogic state localFileInput = do
   waitForStatus filename
 
 uploadLocalFileLogic :: Source -> String -> HI.HTMLInputElement -> Aff Unit
-uploadLocalFileLogic (LocalFile file) filename localFileInput = do
+uploadLocalFileLogic (LocalFile file) filename localFileInput = genericErrorsHandler $ do
   let fileName = name file
   let fileExt = fromCharArray $ dropWhile (_ /= '.') (toCharArray fileName)
       fullFileName = filename <> fileExt
