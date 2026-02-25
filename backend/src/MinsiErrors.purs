@@ -1,4 +1,4 @@
-module MinsiError where
+module MinsiErrors where
 
 import Prelude
 

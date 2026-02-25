@@ -6,16 +6,20 @@ import Data.Time.Duration (Milliseconds(..))
 import Data.URL (URL, toString)
 import Node.Path (FilePath)
 import Yoga.JSON (class WriteForeign, writeImpl)
+import Web.File.File (File)
 
 -------------------------------------------------------------------------------
 --                    Copy Pasted between Frontend↔Backend                   --
 -------------------------------------------------------------------------------
 
 newtype WURL = WURL URL
-data Source = LocalFile | WebURL WURL
+data Source = LocalFile File | WebURL WURL
 
 derive instance Eq WURL
-derive instance Eq Source
+instance Eq Source where
+  eq (LocalFile _) (LocalFile _) = true
+  eq (WebURL a) (WebURL b) = eq a b
+  eq _ _ = false
 
 newtype State = State
   { cutVideo :: DurationRange
@@ -89,8 +93,19 @@ instance WriteForeign WURL where
   writeImpl (WURL url) = writeImpl (toString url)
 
 instance WriteForeign Source where
-  writeImpl LocalFile = writeImpl "LocalFile"
+  writeImpl (LocalFile _) = writeImpl "LocalFile"
   writeImpl (WebURL w) = writeImpl w
+
+instance Show Source where
+  show (LocalFile _) = "LocalFile"
+  show (WebURL w) = "WebURL " <> show w
+
+instance Show WURL where
+  show (WURL url) = toString url
+
+isLocalFile :: Source -> Boolean
+isLocalFile (LocalFile _) = true
+isLocalFile (WebURL _) = false
 
 derive newtype instance writeState :: WriteForeign State
 derive instance Newtype State _

@@ -2,27 +2,24 @@ module Handlers.ApplyButtonHandler where
 
 import Prelude
 
-import Components.HTMLElement (showElementHideOther)
 import Components.HTMLDivElement (addClass, removeClass)
+import Components.HTMLElement (showElementHideOther)
 import Components.HTMLMediaElement (setMediaSrcAndLoad)
 import Components.HTMLTableElement (getRows, getStartInput)
-import Components.HTMLTemplateElement (getRow)
 import Components.HTMLTableRowElement (getEndInput)
+import Components.HTMLTemplateElement (getRow)
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlVisualElements(..))
 import Components.HtmlIds (loadingModalId, videoSourceId)
 import Components.Modal (hideModal, showModal)
-
 import Constants (mp4, gif, mp3)
 import Control.Monad.Rec.Class (Step(..), tailRecM)
-import Data.Array (cons)
+import Data.Array (cons, dropWhile)
 import Data.DateTime.Instant (unInstant)
-
-import Data.Maybe (maybe)
 import Data.Newtype (unwrap)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Traversable (traverse)
 import Data.Tuple (fst, snd)
-
+import Data.String.CodeUnits (fromCharArray, toCharArray)
 import Effect (Effect)
 import Effect.Aff (Aff, delay, runAff_, finally)
 import Effect.Class (liftEffect)
@@ -30,17 +27,14 @@ import Effect.Console (log)
 import Effect.Now (now)
 import Endpoints.Compute (callCompute)
 import Endpoints.Status (callStatus)
+import Endpoints.Upload (callUpload)
 import Handlers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.ProcessStatus (ProcessStatus(..))
-import Model.State.State (State(..), DurationRange(..))
+import Model.State.State (DurationRange(..), State(..), Source(..), isLocalFile)
 import Model.State.StateFromHtml (getCurrentState)
-
-import Web.DOM.DOMTokenList as DOMTokenList
-import Web.DOM.DocumentFragment as DF
 import Web.DOM.Element (toEventTarget)
 import Web.DOM.Element as Element
-import Web.DOM.ParentNode (firstElementChild)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
 import Web.HTML (window)
@@ -48,17 +42,15 @@ import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLAudioElement (HTMLAudioElement)
 import Web.HTML.HTMLAudioElement as HA
 import Web.HTML.HTMLButtonElement as HB
-import Web.HTML.HTMLDivElement as HTMLDivElement
 import Web.HTML.HTMLInputElement as HI
-import Web.HTML.HTMLMediaElement (HTMLMediaElement, load, pause, setSrc)
 import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.HTMLTableElement as HT
-import Web.HTML.HTMLTableRowElement as HR
 import Web.HTML.HTMLTemplateElement as HTP
 import Web.HTML.HTMLVideoElement (HTMLVideoElement)
 import Web.HTML.HTMLVideoElement as HV
 import Web.HTML.Location (setHash)
 import Web.HTML.Window (location)
+import Web.File.File (name)
 
 setApplyButtonHandler :: HB.HTMLButtonElement -> Effect Unit
 setApplyButtonHandler applyButton = genericErrorsHandler $ do
@@ -72,11 +64,28 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   stateComponents <- getCurrentState
   let state = fst stateComponents
   let components = snd stateComponents
-  let filename = (unwrap state).filename
+  let localFileInput = (unwrap components.htmlInputs).localFile
   showModal loadingModalId
   runAff_
     (\result -> genericErrorsHandlerEither result) $
-    finally (liftEffect (finallyHandlers components state)) (void (callCompute state) *> waitForStatus filename)
+    finally (liftEffect (finallyHandlers components state)) (applyButtonLogic state localFileInput)
+
+applyButtonLogic :: State -> HI.HTMLInputElement -> Aff Unit
+applyButtonLogic state localFileInput = do
+  let uploadLocalFile = (unwrap state).uploadLocalFile
+      filename = (unwrap state).filename
+      source = (unwrap state).source
+  when (uploadLocalFile && isLocalFile source) (uploadLocalFileLogic source filename localFileInput)
+  void (callCompute state)
+  waitForStatus filename
+
+uploadLocalFileLogic :: Source -> String -> HI.HTMLInputElement -> Aff Unit
+uploadLocalFileLogic (LocalFile file) filename localFileInput = do
+  let fileName = name file
+  let fileExt = fromCharArray $ dropWhile (_ /= '.') (toCharArray fileName)
+  void $ callUpload file (filename <> fileExt)
+  liftEffect $ HI.setChecked false localFileInput
+uploadLocalFileLogic x _ _ = liftEffect $ throwMinsiError (InvalidInput "StateSource" ("Expected LocalFile, got " <> show x))
 
 finallyHandlers :: HtmlComponents -> State -> Effect Unit
 finallyHandlers components state = do

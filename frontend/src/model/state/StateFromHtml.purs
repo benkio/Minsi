@@ -9,7 +9,7 @@ import Conversion.String (capitalize)
 import Data.Array (length, (!!))
 import Data.Either (either)
 import Data.Int (fromString, toNumber)
-import Data.Maybe (fromJust, fromMaybe)
+import Data.Maybe (fromJust, fromMaybe, Maybe(..))
 import Data.String.Common (trim, toUpper)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Tuple (Tuple(..))
@@ -23,7 +23,6 @@ import Model.ValidationErrors (ValidationErrors, toMap, fromSingleton)
 import Parse.Font (parseFontAndColor, parsePosition)
 import Partial.Unsafe (unsafePartial)
 import Validations.CutVideoValidation (cutVideoValidation)
-import Validations.NonEmptyValidation (nonEmptyValidation)
 import Validations.OutputFilenameValidation (outputFilenameValidation, normalizeOutputFilename)
 import Validations.YoutubeValidation (youtubeUrlValidation)
 import Web.DOM.HTMLCollection as HC
@@ -32,6 +31,7 @@ import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLSelectElement (HTMLSelectElement)
 import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.HTMLTableRowElement as HTR
+import Web.File.FileList (item)
 
 getCurrentState :: Effect (Tuple State HtmlComponents)
 getCurrentState = do
@@ -91,15 +91,17 @@ cutVideoFromHtmlRange cutStart cutEnd = do
 sourceFromHTMLInput :: HTMLSelectElement -> HTMLInputElement -> HTMLInputElement -> Effect (V ValidationErrors Source)
 sourceFromHTMLInput inputSourceSelect youtubeUrlComponent localFileComponent = do
   urlString <- HI.value youtubeUrlComponent
-  localFileUri <- HI.value localFileComponent
   inputSource <- HS.value inputSourceSelect
   let
     youtubeValidation = youtubeUrlValidation youtubeUrlId urlString <#> \url -> WebURL (WURL url)
-    localFileValidation = nonEmptyValidation localFileId localFileUri <#> const LocalFile
-  pure $ case inputSource of
-    "youtubeUrl" -> youtubeValidation
-    "localFile" -> localFileValidation
-    v -> invalid (fromSingleton inputSourceId ("Unrecognized value: " <> v))
+  case inputSource of
+    "youtubeUrl" -> pure youtubeValidation
+    "localFile" -> do
+      filesMaybe <- HI.files localFileComponent
+      case filesMaybe >>= item 0 of
+        Nothing -> pure $ invalid (fromSingleton localFileId "No file selected")
+        Just file -> pure $ pure (LocalFile file)
+    v -> pure $ invalid (fromSingleton inputSourceId ("Unrecognized value: " <> v))
 
 loadSubtitleFromRow :: Int -> HTR.HTMLTableRowElement -> Effect Subtitle
 loadSubtitleFromRow index row = do
