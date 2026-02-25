@@ -116,7 +116,7 @@ localFileEventListener _ = genericErrorsHandler $ do
            maybe
              (pure unit)
              (\file -> do
-                 blobUrl <- createObjectURL file
+                 blobUrl <- createObjectURL (toBlob file)
                  setSrc blobUrl (HV.toHTMLMediaElement video)
              ) (fileListMaybe >>= item 0)
       )

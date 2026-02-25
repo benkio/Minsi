@@ -15,6 +15,7 @@ package:
     - foreign-object
     - functions
     - integers
+    - js-fetch
     - js-timers
     - maybe
     - monad-loops
