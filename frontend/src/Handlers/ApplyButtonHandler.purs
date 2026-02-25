@@ -83,7 +83,10 @@ uploadLocalFileLogic :: Source -> String -> HI.HTMLInputElement -> Aff Unit
 uploadLocalFileLogic (LocalFile file) filename localFileInput = do
   let fileName = name file
   let fileExt = fromCharArray $ dropWhile (_ /= '.') (toCharArray fileName)
-  void $ callUpload file (filename <> fileExt)
+      fullFileName = filename <> fileExt
+  liftEffect $ log $ "Upload Local File " <> fullFileName
+  void $ callUpload file fullFileName
+  liftEffect $ log $ "Set localFileInput to False"
   liftEffect $ HI.setChecked false localFileInput
 uploadLocalFileLogic x _ _ = liftEffect $ throwMinsiError (InvalidInput "StateSource" ("Expected LocalFile, got " <> show x))
 
