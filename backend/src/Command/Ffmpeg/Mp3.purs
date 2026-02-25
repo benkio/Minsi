@@ -7,7 +7,7 @@ import Constants (mp3, mp4)
 
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
-import MinsiError (MinsiError(..))
+import MinsiErrors (MinsiError(..))
 import Node.Library.Execa (ExecaResult)
 import Node.Path (FilePath)
 
