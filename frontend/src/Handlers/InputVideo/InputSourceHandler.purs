@@ -5,7 +5,7 @@ import Prelude
 import Components.HTMLElement (addClassToElement, removeClassFromElement)
 import Effect (Effect)
 import Handlers.ErrorHandlers (genericErrorsHandler)
-import Main.MinsiError (MinsiError(..), throwMinsiError)
+import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Web.DOM.Element (toEventTarget)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)

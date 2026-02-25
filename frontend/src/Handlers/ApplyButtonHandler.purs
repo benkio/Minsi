@@ -3,7 +3,10 @@ module Handlers.ApplyButtonHandler where
 import Prelude
 
 import Components.HTMLElement (showElementHideOther)
+import Components.HTMLDivElement (addClass, removeClass)
+import Components.HTMLMediaElement (setMediaSrcAndLoad)
 import Components.HTMLTableElement (getRows, getStartInput)
+import Components.HTMLTemplateElement (getRow)
 import Components.HTMLTableRowElement (getEndInput)
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlVisualElements(..))
 import Components.HtmlIds (loadingModalId, videoSourceId)
@@ -28,7 +31,7 @@ import Effect.Now (now)
 import Endpoints.Compute (callCompute)
 import Endpoints.Status (callStatus)
 import Handlers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
-import Main.MinsiError (MinsiError(..), throwMinsiError)
+import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.ProcessStatus (ProcessStatus(..))
 import Model.State.State (State(..), DurationRange(..))
 import Model.State.StateFromHtml (getCurrentState)
@@ -128,32 +131,12 @@ setResultAudioSrcAndVisibility filePathNoCache resultVideo resultAudio = do
   setMediaSrcAndLoad filePathNoCache (HA.toHTMLMediaElement resultAudio)
   showElementHideOther (HA.toElement resultAudio) (HV.toElement resultVideo)
 
-setMediaSrcAndLoad :: String -> HTMLMediaElement -> Effect Unit
-setMediaSrcAndLoad url media = do
-  pause media
-  setSrc url media
-  load media
-
 showHiddenElements :: HtmlVisualElements -> Boolean -> Effect Unit
 showHiddenElements (HtmlVisualElements { videoSourceRow, videoRow, subtitlesRow, playbackPositionResultRow }) reverseLoop = do
   removeClass "d-none" videoSourceRow
   removeClass "d-none" videoRow
   if reverseLoop then addClass "d-none" subtitlesRow else removeClass "d-none" subtitlesRow
   removeClass "d-none" playbackPositionResultRow
-
-removeClass :: String -> HTMLDivElement.HTMLDivElement -> Effect Unit
-removeClass className div = do
-  let element = HTMLDivElement.toElement div
-  classList <- Element.classList element
-  containsClassName <- DOMTokenList.contains classList className
-  when containsClassName $ DOMTokenList.remove classList className
-
-addClass :: String -> HTMLDivElement.HTMLDivElement -> Effect Unit
-addClass className div = do
-  let element = HTMLDivElement.toElement div
-  classList <- Element.classList element
-  containsClassName <- DOMTokenList.contains classList className
-  unless containsClassName $ DOMTokenList.remove classList className
 
 scrollToVideoSource :: Effect Unit
 scrollToVideoSource = do
@@ -175,10 +158,3 @@ setSubtitleTableMaxValues (State { cutVideo: DurationRange { start: Milliseconds
     )
     (cons subtitleRow rows)
   log $ "Set max values for all subtitle inputs to " <> show durationSeconds <> " millis"
-
-getRow :: HTP.HTMLTemplateElement -> Effect HR.HTMLTableRowElement
-getRow subtitleTemplateElement = do
-  fragment <- HTP.content subtitleTemplateElement
-  firstEl <- firstElementChild (DF.toParentNode fragment)
-  maybe (throwMinsiError (HTMLElementNotFound "subtitleRowTemplate")) pure
-    (firstEl >>= HR.fromElement)

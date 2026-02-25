@@ -3,7 +3,7 @@ module Main.CheckDependencies where
 import Prelude
 import Data.Foldable (null)
 import Effect.Aff (Aff)
-import Main.MinsiError (MinsiError(..), throwMinsiError)
+import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Effect.Class (liftEffect)
 import Endpoints.CheckDependencies (callCheckDependencies, MissingDependenciesResponse)
 

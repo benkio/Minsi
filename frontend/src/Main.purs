@@ -43,7 +43,7 @@ FE:
     - ✅ The cut is changed
     - ✅ filename is changed.
     - ✅ localfile is changed
-    It starts as true
+    ✅ It starts as true
   - in compute.
     - localfile is selected and the upload is true. Send it. Put the upload to false
     - localfile is selected. don't send the youtubeUrl

@@ -7,7 +7,7 @@ import Data.String (joinWith)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
 import Fetch (Response)
-import Main.MinsiError (MinsiError(..), throwMinsiError)
+import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Prelude
 import Yoga.JSON (class ReadForeign, readJSON)
 

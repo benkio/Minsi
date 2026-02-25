@@ -4,7 +4,7 @@ import Components.HtmlIds (cutEndId, cutStartId)
 import Data.Validation.Semigroup (validation)
 import Effect (Effect)
 import Handlers.ErrorHandlers (genericErrorsHandler)
-import Main.MinsiError (MinsiError(..), throwMinsiError)
+import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.ValidationErrors (toMap)
 import Prelude
 import Validations.CutVideoValidation (cutVideoValidation)

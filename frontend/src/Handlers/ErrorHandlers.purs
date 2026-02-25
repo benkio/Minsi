@@ -24,7 +24,7 @@ import Data.String (split)
 import Data.String.Pattern (Pattern(..))
 import Data.Traversable (traverse)
 import Data.Maybe (Maybe(..))
-import Main.MinsiError (MinsiError(..), isCriticalError, throwMinsiError)
+import Main.MinsiErrors (MinsiError(..), isCriticalError, throwMinsiError)
 
 genericErrorsHandler :: Effect Unit -> Effect Unit
 genericErrorsHandler p =

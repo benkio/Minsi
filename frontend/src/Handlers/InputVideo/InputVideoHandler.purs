@@ -17,7 +17,7 @@ import Handlers.InputVideo.CutButtonsHandlers (initializeCutInputs, setCutStartI
 import Handlers.InputVideo.Foreign (destroyIFramePlayer, embedIFrameVideo)
 import Handlers.InputVideo.PlaybackPositionHandler (updatePlaybackPosition)
 import Handlers.InputVideo.YoutubeUrlExtraction (extractYoutubeVideoId, extractYoutubeVideoStartTime)
-import Main.MinsiError (MinsiError(..), throwMinsiError)
+import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.ValidationErrors (fromSingleton)
 import Validations.YoutubeValidation (youtubeUrlValidation)
 import Web.DOM.Element (fromEventTarget, toEventTarget)

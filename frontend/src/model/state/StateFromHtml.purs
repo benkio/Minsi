@@ -17,7 +17,7 @@ import Data.Validation.Semigroup (V, invalid, toEither, validation)
 import Effect (Effect)
 import HTMLInputElement as HTMLInputElement
 import HTMLTableCellElement (valueFromInputTableCell, valueFromSelectTableCell, valueFromTextAreaTableCell)
-import Main.MinsiError (MinsiError(..), throwMinsiError)
+import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.State.State (State(..), DurationRange(..), WURL(..), Source(..), Subtitle(..))
 import Model.ValidationErrors (ValidationErrors, toMap, fromSingleton)
 import Parse.Font (parseFontAndColor, parsePosition)
