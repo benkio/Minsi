@@ -35,3 +35,21 @@ program = do
 - cut start/end
 - set start/end subtitle
 -}
+
+{-
+FE:
+  - Send the filename+file extension as well using form data
+    - Add a boolean in state to signal the need to upload the file, when:
+    - The cut is changed
+    - filename is changed.
+    - file name is changed
+    It starts as true
+  - in compute.
+    - localfile is selected and the upload is true. Send it
+    - localfile is selected. don't send the youtubeUrl
+
+BE:
+    - Upload: Normalize and Save/Overwrite the file
+    - Compute w/ empty youtubeUrl: skip download, cut the file with
+    ffmpeg, then gif, mp3 as usual
+-}
