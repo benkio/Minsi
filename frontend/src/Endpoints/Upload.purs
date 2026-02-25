@@ -15,7 +15,10 @@ import Web.File.File (File)
 
 foreign import data FormData :: Type
 
+-- FFI returns a 0-arg function (Effect FormData). Do not change to sync + pure: the
+-- compiler may then pass the FormData into Sync and the runtime will throw.
 foreign import fileToFormData :: File -> String -> Effect FormData
+
 foreign import formDataToRequestBody :: FormData -> RequestBody
 
 instance ToRequestBody FormData where

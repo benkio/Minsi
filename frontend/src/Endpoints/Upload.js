@@ -1,17 +1,17 @@
 "use strict";
 
-export const fileToFormData = function (file, filename) {
-  return function () {
-    console.log(`[fileToformdata] create FormData`);
-    var fd = new FormData();
-    console.log(`[fileToformdata] append file`);
-    fd.append("file", file, filename);
-    console.log(`[fileToformdata] return`);
-    return fd;
+// PureScript calls this as fileToFormData(file)(filename), so we must be curried:
+// file -> filename -> (() -> FormData). The innermost 0-arg function is the Effect thunk.
+export const fileToFormData = function (file) {
+  return function (filename) {
+    return function () {
+      var fd = new FormData();
+      fd.append("file", file, filename);
+      return fd;
+    };
   };
 };
 
 export const formDataToRequestBody = function (fd) {
-  console.log(`[formDataToRequestBody] return`);
   return fd;
 };
