@@ -48,7 +48,7 @@ FE DONE:
     - ✅ localfile is selected and the upload is true. Send it. Put the upload to false
 
 BE:
-    - Upload: Normalize and Save/Overwrite the file
-    - Compute w/ empty youtubeUrl: skip download, cut the file with
+    - ✅ Upload: Save/Overwrite the file
+    - downloadVideo with LocalFile: skip download, cut the file with
     ffmpeg, then gif, mp3 as usual
 -}
