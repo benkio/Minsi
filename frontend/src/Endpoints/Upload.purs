@@ -38,6 +38,6 @@ callUpload file filename = do
     { method: POST
     , body: formData
     }
-  liftEffect $ log $ "[Upload] Validate the reponse"
+  liftEffect $ log $ "[Upload] Validate the response"
   _ <- liftEffect $ validateResponse response
   pure response.status

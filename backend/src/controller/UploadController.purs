@@ -4,31 +4,37 @@ import Prelude
 
 import Data.Maybe (Maybe(..))
 import Data.Nullable (Nullable, toMaybe)
+import Data.Tuple (Tuple(..))
+import Constants (rawOutput)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
-import Foreign (Foreign)
 import InMemoryDB (Store)
+import Node.Buffer (Buffer)
 import Node.Express.Handler (Handler, HandlerM(..))
-import Node.Express.Request (getBody')
 import Node.Express.Response (end, sendJson, setStatus)
 import Node.Express.Types (Request)
-import Yoga.JSON (unsafeStringify)
+import Node.FS.Sync (writeFile)
 
-foreign import _getUploadedFile :: Request -> Nullable Foreign
+foreign import _getUploadedFileOriginalName :: Request -> Nullable String
+foreign import _getUploadedFileBuffer :: Request -> Nullable Buffer
 
 -- | Get the uploaded file from the request (set by multer). Use after multer middleware.
-getUploadedFile :: HandlerM (Maybe Foreign)
-getUploadedFile = HandlerM \req _ _ -> pure $ toMaybe $ _getUploadedFile req
+getUploadedFile :: HandlerM (Maybe (Tuple String Buffer))
+getUploadedFile = HandlerM \req _ _ -> pure $ do
+  originalName <- toMaybe $ _getUploadedFileOriginalName req
+  buffer <- toMaybe $ _getUploadedFileBuffer req
+  pure $ Tuple originalName buffer
 
 uploadController :: Store -> Handler
 uploadController _store = do
   liftEffect $ log "[Upload Controller] Received a Request"
-  bodyForeign <- getBody'
-  liftEffect $ log $ "[Upload Controller] body (raw): " <> unsafeStringify bodyForeign
-  fileMaybe <- getUploadedFile
-  case fileMaybe of
-    Just file -> do
-      liftEffect $ log $ "[Upload Controller] uploaded file: " <> unsafeStringify file
+  fileBufferMaybe <- getUploadedFile
+  case fileBufferMaybe of
+    Just (Tuple filename buffer) -> do
+      liftEffect $ log $ "[Upload Controller] uploaded file " <> filename
+      outputFilename <- liftEffect $ rawOutput filename
+      liftEffect $ log $ "[Upload Controller] Write file to " <> outputFilename
+      liftEffect $ writeFile outputFilename buffer
       setStatus 200
       sendJson { received: true, message: "File uploaded" }
       end

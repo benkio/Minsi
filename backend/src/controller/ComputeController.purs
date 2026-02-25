@@ -86,7 +86,6 @@ runComputePipeline mayOldState state@(State { source, filename, cutVideo: Durati
     void $ exceptTMultiple "Gif Creation" $ makeGif state
     pure unit
 
-
 cutDownloadRequired :: Maybe State -> State -> Boolean
 cutDownloadRequired Nothing _ = true
 cutDownloadRequired (Just (State { source: oldSource, cutVideo: oldCutVideo })) (State { source: newSource, cutVideo: newCutVideo }) =

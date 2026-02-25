@@ -1,2 +1,2 @@
-export const _getUploadedFile = (req) => req.file ?? null;
-
+export const _getUploadedFileOriginalName = (req) => req.file.originalname ?? null;
+export const _getUploadedFileBuffer = (req) => req.file.buffer ?? null;
