@@ -14,7 +14,7 @@ import Web.File.File (File)
 
 foreign import data FormData :: Type
 
-foreign import fileToFormData :: File -> Effect FormData
+foreign import fileToFormData :: File -> String -> Effect FormData
 foreign import formDataToRequestBody :: FormData -> RequestBody
 
 instance ToRequestBody FormData where
@@ -24,9 +24,9 @@ uploadEndpoint :: String
 uploadEndpoint = backendUrl <> "upload"
 
 -- Replicates: FormData from file, then fetch POST with body formData
-callUpload :: File -> Aff Int
-callUpload file = do
-  formData <- liftEffect $ fileToFormData file
+callUpload :: File -> String -> Aff Int
+callUpload file filename = do
+  formData <- liftEffect $ fileToFormData file filename
   response <- fetch uploadEndpoint
     { method: POST
     , body: formData

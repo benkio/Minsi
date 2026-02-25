@@ -35,6 +35,7 @@ import Components.HtmlIds
   , subtitleRow
   , keyboardShortcutsButtonId
   , localFileId
+  , uploadLocalFileId
   )
 import Components.Window (getDocument)
 import Control.Monad.Error.Class (catchError)
@@ -70,6 +71,7 @@ newtype HtmlInputs = HtmlInputs
   , cutEnd :: HTMLInputElement
   , youtubeUrl :: HTMLInputElement
   , localFile :: HTMLInputElement
+  , uploadLocalFile :: HTMLInputElement
   , filename :: HTMLInputElement
   , reverseLoop :: HTMLInputElement
   , artist :: HTMLInputElement
@@ -152,6 +154,7 @@ loadHtmlInputs doc = do
   rangeTuple <- loadCutRange doc
   youtubeUrl <- loadInput youtubeUrlId doc
   localFile <- loadInput localFileId doc
+  uploadLocalFile <- loadInput uploadLocalFileId doc
   filename <- loadInput outputFilenameId doc
   reverseLoop <- loadInput reverseLoopGifId doc
   artist <- loadInput artistId doc
@@ -174,6 +177,7 @@ loadHtmlInputs doc = do
         , cutEnd: snd rangeTuple
         , youtubeUrl: youtubeUrl
         , localFile: localFile
+        , uploadLocalFile: uploadLocalFile
         , filename: filename
         , reverseLoop: reverseLoop
         , artist: artist

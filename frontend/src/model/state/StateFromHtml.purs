@@ -47,6 +47,7 @@ fromHtmlInputs
       , cutEnd
       , youtubeUrl: youtubeUrlInput
       , localFile: localFileInput
+      , uploadLocalFile: uploadLocalFileInput
       , inputSource: inputSourceSelect
       , filename: filenameInput
       , reverseLoop: reverseLoopInput
@@ -59,6 +60,7 @@ fromHtmlInputs
   sourceV <- sourceFromHTMLInput inputSourceSelect youtubeUrlInput localFileInput
   filenameV <- HI.value filenameInput <#> outputFilenameValidation outputFilenameId
   reverseLoopValue <- checked reverseLoopInput
+  uploadLocalFileValue <- checked uploadLocalFileInput
   artistV <- HTMLInputElement.nonEmptyFromHtmlInput artistInput artistId
   titleV <- HTMLInputElement.nonEmptyFromHtmlInput titleInput titleId
   subtitles <- loadSubtitlesFromTable loadSubtitleFromRow subtitleTable
@@ -74,6 +76,7 @@ fromHtmlInputs
         , source: source
         , filename: normalizeOutputFilename filename
         , reverseLoop: reverseLoopValue
+        , uploadLocalFile: uploadLocalFileValue
         , artist: capitalize artist
         , title: capitalize title
         , subtitles: subtitles

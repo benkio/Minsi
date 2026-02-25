@@ -107,3 +107,6 @@ keyboardShortcutsButtonId = "keyboardShortcutsButton"
 
 inputSourceId :: String
 inputSourceId = "inputSource"
+
+uploadLocalFileId :: String
+uploadLocalFileId = "uploadLocalFile"

@@ -30,6 +30,7 @@ newtype State = State
   , source :: Source
   , filename :: FilePath
   , reverseLoop :: Boolean
+  , uploadLocalFile :: Boolean
   , artist :: String
   , title :: String
   , subtitles :: Array Subtitle
