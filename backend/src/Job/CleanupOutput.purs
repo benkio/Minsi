@@ -36,7 +36,7 @@ tryDeleteIfOld currentMs maxAgeMs filePath =
   apathize $ liftEffect do
     s <- stat filePath
     let (Milliseconds fileMs) = birthtimeMs s
-    if isFile s && (currentMs - fileMs) > maxAgeMs then log ("[CleanupOutput] Delete (older than 1h): " <> filePath) *> rm filePath
+    if isFile s && (currentMs - fileMs) > maxAgeMs && filePath /= ".gitignore" then log ("[CleanupOutput] Delete (older than 1h): " <> filePath) *> rm filePath
     else pure unit
 
 -- | Run the cleanup job in the background: every hour, delete files in
