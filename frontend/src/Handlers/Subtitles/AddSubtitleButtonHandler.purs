@@ -60,8 +60,8 @@ cloneFirstRow firstRow subtitleTable = do
   firstRowEndInput <- getEndInput firstRow
   endValue <- valueAsNumber firstRowEndInput
   clonedRowStartInput <- getStartInput clonedRow
-  setValue (show endValue) clonedRowStartInput
-  let newEndValue = endValue + 1.0
+  setValue (show (endValue + 100.0)) clonedRowStartInput
+  let newEndValue = endValue + 101.0
   clonedRowEndInput <- getEndInput clonedRow
   setValue (show newEndValue) clonedRowEndInput
   insertBefore clonedRowNode (HTR.toNode firstRow) (HTS.toNode tbody)
