@@ -3,7 +3,7 @@ module HTMLTableCellElement where
 import Data.Int (floor)
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
-import Main.MinsiError (MinsiError(..), throwMinsiError)
+import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Prelude (bind, identity, pure, show, ($), (<#>), (<>), (>>=), (>>>))
 import Web.DOM.Element (Element, toParentNode)
 import Web.DOM.ParentNode (QuerySelector(..), querySelector)

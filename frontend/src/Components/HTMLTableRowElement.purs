@@ -4,7 +4,7 @@ import Data.Array (drop, head)
 import Prelude
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
-import Main.MinsiError (MinsiError(..), throwMinsiError)
+import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Web.DOM.Element (toParentNode)
 import Web.DOM.HTMLCollection as HC
 import Web.DOM.ParentNode (QuerySelector(..), querySelector)

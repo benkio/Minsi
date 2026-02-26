@@ -1,6 +1,6 @@
 module Handlers.InputVideo.PlaybackPositionHandler where
 
-import Conversion.Time (formatToFirstFour)
+import Conversion.Time (formatToMaxSixDigits)
 import Effect (Effect)
 import Handlers.InputVideo.Foreign (getPlayerCurrentTime, isPlayerReady)
 import Prelude
@@ -11,4 +11,4 @@ updatePlaybackPosition :: HSP.HTMLSpanElement -> Effect Unit
 updatePlaybackPosition playbackPosition = do
   playerReady <- isPlayerReady
   currentTime <- getPlayerCurrentTime
-  when playerReady $ setTextContent (formatToFirstFour currentTime) (HSP.toNode playbackPosition)
+  when playerReady $ setTextContent (formatToMaxSixDigits currentTime) (HSP.toNode playbackPosition)

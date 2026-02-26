@@ -2,24 +2,24 @@ module Handlers.ApplyButtonHandler where
 
 import Prelude
 
+import Components.HTMLDivElement (addClass, removeClass)
 import Components.HTMLElement (showElementHideOther)
+import Components.HTMLMediaElement (setMediaSrcAndLoad)
 import Components.HTMLTableElement (getRows, getStartInput)
 import Components.HTMLTableRowElement (getEndInput)
+import Components.HTMLTemplateElement (getRow)
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlVisualElements(..))
 import Components.HtmlIds (loadingModalId, videoSourceId)
 import Components.Modal (hideModal, showModal)
-
 import Constants (mp4, gif, mp3)
 import Control.Monad.Rec.Class (Step(..), tailRecM)
-import Data.Array (cons)
+import Data.Array (cons, dropWhile)
 import Data.DateTime.Instant (unInstant)
-
-import Data.Maybe (maybe)
 import Data.Newtype (unwrap)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Traversable (traverse)
 import Data.Tuple (fst, snd)
-
+import Data.String.CodeUnits (fromCharArray, toCharArray)
 import Effect (Effect)
 import Effect.Aff (Aff, delay, runAff_, finally)
 import Effect.Class (liftEffect)
@@ -27,17 +27,14 @@ import Effect.Console (log)
 import Effect.Now (now)
 import Endpoints.Compute (callCompute)
 import Endpoints.Status (callStatus)
+import Endpoints.Upload (callUpload)
 import Handlers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
-import Main.MinsiError (MinsiError(..), throwMinsiError)
+import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.ProcessStatus (ProcessStatus(..))
-import Model.State.State (State(..), DurationRange(..))
+import Model.State.State (DurationRange(..), State(..), Source(..), isLocalFile)
 import Model.State.StateFromHtml (getCurrentState)
-
-import Web.DOM.DOMTokenList as DOMTokenList
-import Web.DOM.DocumentFragment as DF
 import Web.DOM.Element (toEventTarget)
 import Web.DOM.Element as Element
-import Web.DOM.ParentNode (firstElementChild)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
 import Web.HTML (window)
@@ -45,17 +42,15 @@ import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLAudioElement (HTMLAudioElement)
 import Web.HTML.HTMLAudioElement as HA
 import Web.HTML.HTMLButtonElement as HB
-import Web.HTML.HTMLDivElement as HTMLDivElement
 import Web.HTML.HTMLInputElement as HI
-import Web.HTML.HTMLMediaElement (HTMLMediaElement, load, pause, setSrc)
 import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.HTMLTableElement as HT
-import Web.HTML.HTMLTableRowElement as HR
 import Web.HTML.HTMLTemplateElement as HTP
 import Web.HTML.HTMLVideoElement (HTMLVideoElement)
 import Web.HTML.HTMLVideoElement as HV
 import Web.HTML.Location (setHash)
 import Web.HTML.Window (location)
+import Web.File.File (name)
 
 setApplyButtonHandler :: HB.HTMLButtonElement -> Effect Unit
 setApplyButtonHandler applyButton = genericErrorsHandler $ do
@@ -69,11 +64,36 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   stateComponents <- getCurrentState
   let state = fst stateComponents
   let components = snd stateComponents
-  let filename = (unwrap state).filename
+  let uploadLocalFileInput = (unwrap components.htmlInputs).uploadLocalFile
   showModal loadingModalId
   runAff_
     (\result -> genericErrorsHandlerEither result) $
-    finally (liftEffect (finallyHandlers components state)) (void (callCompute state) *> waitForStatus filename)
+    finally (liftEffect (finallyHandlers components state)) (applyButtonLogic state uploadLocalFileInput)
+
+applyButtonLogic :: State -> HI.HTMLInputElement -> Aff Unit
+applyButtonLogic state uploadLocalFileInput = genericErrorsHandler $ do
+  let
+    uploadLocalFile = (unwrap state).uploadLocalFile
+    filename = (unwrap state).filename
+    source = (unwrap state).source
+  when (uploadLocalFile && isLocalFile source)
+    ( uploadLocalFileLogic source filename uploadLocalFileInput
+        *> waitForStatus filename LocalFileUploaded
+    )
+  void (callCompute state)
+  waitForStatus filename Succeed
+
+uploadLocalFileLogic :: Source -> String -> HI.HTMLInputElement -> Aff Unit
+uploadLocalFileLogic (LocalFile file) filename uploadLocalFileInput = genericErrorsHandler $ do
+  let diskFilename = name file
+  let
+    diskFileExt = fromCharArray $ dropWhile (_ /= '.') (toCharArray diskFilename)
+    fullFileName = filename <> diskFileExt
+  liftEffect $ log $ "[ApplyButtonHandler] Upload Local File " <> fullFileName
+  void $ callUpload file fullFileName
+  liftEffect $ log $ "[ApplyButtonHandler] Set uploadLocalFileInput to False"
+  liftEffect $ HI.setChecked false uploadLocalFileInput
+uploadLocalFileLogic x _ _ = liftEffect $ throwMinsiError (InvalidInput "StateSource" ("Expected LocalFile, got " <> show x))
 
 finallyHandlers :: HtmlComponents -> State -> Effect Unit
 finallyHandlers components state = do
@@ -92,15 +112,15 @@ finallyHandlers components state = do
   let HtmlInputs { subtitleTable, subtitleRow } = components.htmlInputs
   setSubtitleTableMaxValues state subtitleTable subtitleRow
 
-waitForStatus :: String -> Aff Unit
-waitForStatus filename = tailRecM pollStatus unit
+waitForStatus :: String -> ProcessStatus -> Aff Unit
+waitForStatus filename target = tailRecM pollStatus unit
   where
   pollStatus _ = do
     response <- callStatus filename
     case response.status of
-      Pending -> delay (Milliseconds 500.0) $> Loop unit
-      Succeed -> pure $ Done unit
       (Failed error) -> liftEffect $ throwMinsiError (ComputeFailed ("Video download failed: " <> error))
+      status | status == target -> pure $ Done unit
+      _ -> delay (Milliseconds 500.0) $> Loop unit
 
 setResultMediaSrc :: String -> HS.HTMLSelectElement -> HTMLVideoElement -> HTMLAudioElement -> Effect Unit
 setResultMediaSrc filename videoSource resultVideo resultAudio = do
@@ -128,32 +148,12 @@ setResultAudioSrcAndVisibility filePathNoCache resultVideo resultAudio = do
   setMediaSrcAndLoad filePathNoCache (HA.toHTMLMediaElement resultAudio)
   showElementHideOther (HA.toElement resultAudio) (HV.toElement resultVideo)
 
-setMediaSrcAndLoad :: String -> HTMLMediaElement -> Effect Unit
-setMediaSrcAndLoad url media = do
-  pause media
-  setSrc url media
-  load media
-
 showHiddenElements :: HtmlVisualElements -> Boolean -> Effect Unit
 showHiddenElements (HtmlVisualElements { videoSourceRow, videoRow, subtitlesRow, playbackPositionResultRow }) reverseLoop = do
   removeClass "d-none" videoSourceRow
   removeClass "d-none" videoRow
   if reverseLoop then addClass "d-none" subtitlesRow else removeClass "d-none" subtitlesRow
   removeClass "d-none" playbackPositionResultRow
-
-removeClass :: String -> HTMLDivElement.HTMLDivElement -> Effect Unit
-removeClass className div = do
-  let element = HTMLDivElement.toElement div
-  classList <- Element.classList element
-  containsClassName <- DOMTokenList.contains classList className
-  when containsClassName $ DOMTokenList.remove classList className
-
-addClass :: String -> HTMLDivElement.HTMLDivElement -> Effect Unit
-addClass className div = do
-  let element = HTMLDivElement.toElement div
-  classList <- Element.classList element
-  containsClassName <- DOMTokenList.contains classList className
-  unless containsClassName $ DOMTokenList.remove classList className
 
 scrollToVideoSource :: Effect Unit
 scrollToVideoSource = do
@@ -175,10 +175,3 @@ setSubtitleTableMaxValues (State { cutVideo: DurationRange { start: Milliseconds
     )
     (cons subtitleRow rows)
   log $ "Set max values for all subtitle inputs to " <> show durationSeconds <> " millis"
-
-getRow :: HTP.HTMLTemplateElement -> Effect HR.HTMLTableRowElement
-getRow subtitleTemplateElement = do
-  fragment <- HTP.content subtitleTemplateElement
-  firstEl <- firstElementChild (DF.toParentNode fragment)
-  maybe (throwMinsiError (HTMLElementNotFound "subtitleRowTemplate")) pure
-    (firstEl >>= HR.fromElement)

@@ -1,10 +1,12 @@
 module Controller.ComputeController where
 
+import Prelude
+
 import Command.Ffmpeg.Gif (makeGif)
 import Command.Ffmpeg.Mp3 (extractMp3)
 import Command.Ffmpeg.Video (normalizeVideo)
 import Command.Id3v2 (addId3Tags)
-import Command.Ytdlp (downloadVideo)
+import Command.Ytdlp (downloadOrCutVideo)
 import Control.Monad.Error.Class (catchError)
 import Control.Monad.Except (ExceptT(..), runExcept, runExceptT, lift)
 import Data.Array (fromFoldable)
@@ -17,15 +19,14 @@ import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
 import Effect.Exception (message)
-import InMemoryDB (Store, insert, lookup)
+import InMemoryDB (Store, insert, lookupProcessStatus)
 import Model.ProcessStatus (ProcessStatus(..), isFinished)
-import Model.State (State(..), DurationRange(..), validateState)
+import Model.State (DurationRange(..), State(..), validateState)
 import Node.ChildProcess.Types (Exit(..))
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody)
 import Node.Express.Response (sendJson, setStatus, end)
 import Node.Library.Execa (ExecaResult)
-import Prelude
 
 data ComputeResponse
   = InvalidInput (Array String)
@@ -54,30 +55,30 @@ computeController store = do
 computeResponse :: Store -> Either (Array String) State -> Effect ComputeResponse
 computeResponse _ (Left errors) = pure (InvalidInput errors)
 computeResponse store (Right state@(State { filename })) = do
-  m <- lookup filename store
+  m <- lookupProcessStatus filename store
   case m of
     Just { processStatus } | not (isFinished processStatus) -> pure PendingComputation
-    Just { state: oldState } -> pure (Success (Just oldState) state)
+    Just { state: oldState } -> pure (Success oldState state)
     _ -> pure (Success Nothing state)
 
 compute :: Maybe State -> State -> Store -> Effect Unit
 compute mayOldState state@(State { filename }) store = do
-  insert filename state Pending store
+  insert filename (Just state) Pending store
   log "Starting video download in background..."
   launchAff_ $ do
     result <- runComputePipeline mayOldState state
     processResult <- case result of
       Right _ -> pure Succeed
       Left e -> liftEffect (log ("error during compute: " <> e)) *> pure (Failed e)
-    liftEffect $ insert filename state processResult store
+    liftEffect $ insert filename (Just state) processResult store
   log "Video download launched, returning HTTP response"
 
 runComputePipeline :: Maybe State -> State -> Aff (Either String Unit)
-runComputePipeline mayOldState state@(State { youtubeUrl, filename, cutVideo: DurationRange { start, end }, artist, title }) =
+runComputePipeline mayOldState state@(State { source, filename, cutVideo: DurationRange { start, end }, artist, title }) =
   runExceptT do
     when (cutDownloadRequired mayOldState state)
       ( do
-          void $ exceptTStep "Video download" $ downloadVideo youtubeUrl filename start end
+          void $ exceptTStep "Video download" $ downloadOrCutVideo source filename start end
           void $ exceptTStep "Video Normalization" $ normalizeVideo filename
       )
     void $ exceptTStep "MP3 extraction" $ extractMp3 filename
@@ -87,8 +88,8 @@ runComputePipeline mayOldState state@(State { youtubeUrl, filename, cutVideo: Du
 
 cutDownloadRequired :: Maybe State -> State -> Boolean
 cutDownloadRequired Nothing _ = true
-cutDownloadRequired (Just (State { youtubeUrl: oldYoutubeurl, cutVideo: oldCutVideo })) (State { youtubeUrl: newYoutubeurl, cutVideo: newCutVideo }) =
-  oldYoutubeurl /= newYoutubeurl || oldCutVideo /= newCutVideo
+cutDownloadRequired (Just (State { source: oldSource, cutVideo: oldCutVideo })) (State { source: newSource, cutVideo: newCutVideo }) =
+  oldSource /= newSource || oldCutVideo /= newCutVideo
 
 exceptTMultiple :: String -> Aff (Array ExecaResult) -> ExceptT String Aff Unit
 exceptTMultiple label affs = do

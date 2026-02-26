@@ -35,8 +35,11 @@ import Components.HtmlIds
   , subtitleRow
   , keyboardShortcutsButtonId
   , localFileId
+  , uploadLocalFileId
   )
+import Components.Window (getDocument)
 import Control.Monad.Error.Class (catchError)
+import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
 import Data.Tuple (Tuple(..), fst, snd)
 import Effect (Effect)
@@ -68,6 +71,7 @@ newtype HtmlInputs = HtmlInputs
   , cutEnd :: HTMLInputElement
   , youtubeUrl :: HTMLInputElement
   , localFile :: HTMLInputElement
+  , uploadLocalFile :: HTMLInputElement
   , filename :: HTMLInputElement
   , reverseLoop :: HTMLInputElement
   , artist :: HTMLInputElement
@@ -87,8 +91,23 @@ newtype HtmlInputs = HtmlInputs
   }
 
 data ResultPreview
-  = ResultPreviewDiv HTMLDivElement
+  = ResultPreviewVideo HTMLVideoElement
   | ResultPreviewIframe HTMLIFrameElement
+
+isResultPreviewIframe :: ResultPreview -> Boolean
+isResultPreviewIframe = case _ of
+  ResultPreviewIframe _ -> true
+  ResultPreviewVideo _ -> false
+
+resultPreviewToMaybeIframe :: ResultPreview -> Maybe HTMLIFrameElement
+resultPreviewToMaybeIframe = case _ of
+  ResultPreviewIframe iframe -> Just iframe
+  ResultPreviewVideo _ -> Nothing
+
+resultPreviewToMaybeVideo :: ResultPreview -> Maybe HTMLVideoElement
+resultPreviewToMaybeVideo = case _ of
+  ResultPreviewVideo video -> Just video
+  ResultPreviewIframe _ -> Nothing
 
 newtype HtmlOutputs = HtmlOutputs
   { resultPreview :: ResultPreview
@@ -118,8 +137,9 @@ type HtmlComponents =
   , htmlVisualElements :: HtmlVisualElements
   }
 
-loadComponents :: NonElementParentNode -> Effect HtmlComponents
-loadComponents doc = do
+loadComponents :: Effect HtmlComponents
+loadComponents = do
+  doc <- getDocument
   inputs <- loadHtmlInputs doc
   outputs <- loadHtmlOutputs doc
   visualElements <- loadHtmlVisualElements doc
@@ -134,6 +154,7 @@ loadHtmlInputs doc = do
   rangeTuple <- loadCutRange doc
   youtubeUrl <- loadInput youtubeUrlId doc
   localFile <- loadInput localFileId doc
+  uploadLocalFile <- loadInput uploadLocalFileId doc
   filename <- loadInput outputFilenameId doc
   reverseLoop <- loadInput reverseLoopGifId doc
   artist <- loadInput artistId doc
@@ -156,6 +177,7 @@ loadHtmlInputs doc = do
         , cutEnd: snd rangeTuple
         , youtubeUrl: youtubeUrl
         , localFile: localFile
+        , uploadLocalFile: uploadLocalFile
         , filename: filename
         , reverseLoop: reverseLoop
         , artist: artist
@@ -254,8 +276,8 @@ loadResultPreview :: NonElementParentNode -> Effect ResultPreview
 loadResultPreview doc = do
   catchError
     ( do
-        div <- loadDiv resultPreviewId doc
-        pure (ResultPreviewDiv div)
+        video <- loadVideo resultPreviewId doc
+        pure (ResultPreviewVideo video)
     )
     ( \_ -> do
         iframe <- loadHtmlElement resultPreviewId IF.fromElement doc

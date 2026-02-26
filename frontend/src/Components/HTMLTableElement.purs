@@ -6,7 +6,7 @@ import Data.Array (catMaybes, head, last)
 import Data.Maybe (maybe)
 import Data.TraversableWithIndex (traverseWithIndex)
 import Effect (Effect)
-import Main.MinsiError (MinsiError(..), throwMinsiError)
+import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.State.State (Subtitle)
 import Web.DOM.Element (toParentNode)
 import Web.DOM.HTMLCollection as HC

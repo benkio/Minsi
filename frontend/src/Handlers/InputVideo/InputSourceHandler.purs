@@ -5,7 +5,7 @@ import Prelude
 import Components.HTMLElement (addClassToElement, removeClassFromElement)
 import Effect (Effect)
 import Handlers.ErrorHandlers (genericErrorsHandler)
-import Main.MinsiError (MinsiError(..), throwMinsiError)
+import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Web.DOM.Element (toEventTarget)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
@@ -13,8 +13,8 @@ import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLSelectElement as HS
 
-setInputsourcehandler :: HS.HTMLSelectElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> Effect Unit
-setInputsourcehandler inputSource youtubeUrl localFile = genericErrorsHandler $ do
+setInputSourceHandler :: HS.HTMLSelectElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> Effect Unit
+setInputSourceHandler inputSource youtubeUrl localFile = genericErrorsHandler $ do
   inputSourceEvL <- eventListener (inputSourceEventListener inputSource youtubeUrl localFile)
   addEventListener E.change inputSourceEvL false inputSourceEventTarget
   where

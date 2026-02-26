@@ -20,6 +20,7 @@
             "foreign-object",
             "functions",
             "integers",
+            "js-fetch",
             "js-timers",
             "maybe",
             "monad-loops",
@@ -40,6 +41,7 @@
             "validation",
             "web-dom",
             "web-events",
+            "web-file",
             "web-html",
             "web-uievents",
             "yoga-json"

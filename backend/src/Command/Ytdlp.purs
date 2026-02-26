@@ -3,20 +3,22 @@ module Command.Ytdlp where
 import Prelude
 
 import Command.Command (runCommand)
-import Effect.Console (log)
-import Constants (mp4)
+import Command.Ffmpeg.Video (cutAndConvertUploadedVideo)
+import Constants (mp4, uploaded)
 import Control.Monad.Error.Class (catchError)
 import Conversion.Time (millisecondsToSecondsString)
 import Data.Array (uncons)
 import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Milliseconds)
 import Data.URL (toString)
-import Effect.Aff (Aff, apathize)
+import Effect.Aff (Aff, apathize, finally)
 import Effect.Class (liftEffect)
-import MinsiError (MinsiError(..), throwMinsiError)
-import Model.State (WURL(..))
+import Effect.Console (log)
+import MinsiErrors (MinsiError(..), throwMinsiError)
+import Model.State (Source(..), WURL(..))
 import Node.ChildProcess.Types (Exit(..))
 import Node.FS.Aff (rm)
+import Node.FS.Sync (exists)
 import Node.Library.Execa (ExecaProcess, ExecaResult)
 
 ytdlpSupportedBrowserCookies :: Array String
@@ -44,8 +46,15 @@ getYtdlpOutputUrl cookie (WURL url) filepath start end =
     else
       [ "-f", "\"best[ext=mp4]\"", "--force-overwrite", "--download-sections", show ("*" <> start <> "-" <> end), "-o", show filepath, "--cookies-from-browser", cookie, show urlString ]
 
-downloadVideo :: WURL -> String -> Milliseconds -> Milliseconds -> Aff ExecaResult
-downloadVideo youtubeUri filename start end = do
+downloadOrCutVideo :: Source -> String -> Milliseconds -> Milliseconds -> Aff ExecaResult
+downloadOrCutVideo LocalFile filename start end = do
+  uploadedFilepath <- liftEffect $ uploaded filename
+  filepath <- liftEffect $ mp4 filename
+  liftEffect $ unlessM (exists uploadedFilepath) (throwMinsiError (FfmpegVideoError ("🚫 Error: Expected " <> show uploadedFilepath <> " but not was found. Retry the `compute` and the upload")))
+  liftEffect $ log ("[Ytdlp] Cut " <> show uploadedFilepath <> " To " <> show filepath)
+  finally (rm uploadedFilepath) (cutAndConvertUploadedVideo uploadedFilepath filename start end)
+
+downloadOrCutVideo (WebURL youtubeUri) filename start end = do
   filepath <- liftEffect $ mp4 filename
   liftEffect $ log ("[Ytdlp] Delete " <> show filepath)
   apathize (rm filepath)

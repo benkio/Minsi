@@ -1,4 +1,4 @@
-module Main.MinsiError where
+module Main.MinsiErrors where
 
 import Prelude
 import Effect (Effect)

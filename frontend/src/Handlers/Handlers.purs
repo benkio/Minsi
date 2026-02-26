@@ -2,14 +2,13 @@ module Handlers.Handlers where
 
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlOutputs(..))
 import Components.HtmlIds (keyboardShortcutsModalId)
-import Data.Either (Either(..))
 import Effect (Effect)
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CopyTranscriptButtonHandler (setCopyTranscriptButtonHandler)
 import Handlers.CutRangeHandler (CutRangeTargets(..), setCutRangeHandlers)
 import Handlers.DownloadAllButtonHandler (setDownloadAllButtonHandler)
-import Handlers.InputVideo.InputSourceHandler (setInputsourcehandler)
-import Handlers.InputVideo.YoutubeVideoHandler (setVideoHandlers, VideoEventTargets(..))
+import Handlers.InputVideo.InputSourceHandler (setInputSourceHandler)
+import Handlers.InputVideo.InputVideoHandler (setVideoHandlers, VideoEventTargets(..))
 import Handlers.KeyboardHandler (KeyboardHandlerTargets(..), setKeyboardHandlers)
 import Handlers.ResultVideo.Handler (ResultVideoEventTargets(..), setResultVideoHandlers)
 import Handlers.ResultVideo.VideoSourceHandler (setVideoSourceHandler)
@@ -29,6 +28,7 @@ setupEventHandlers
       , cutEnd
       , youtubeUrl
       , localFile
+      , uploadLocalFile
       , filename
       , setCutStartButton
       , setCutEndButton
@@ -57,16 +57,16 @@ setupEventHandlers
     ( CRET
         { cutStart: cutStart
         , cutEnd: cutEnd
+        , uploadLocalFile: uploadLocalFile
         }
     )
   setVideoHandlers
     ( VET
-        { cutStart: cutStart
-        , cutEnd: cutEnd
-        , playbackPositionYoutube: playbackPositionYoutube
+        { playbackPositionYoutube: playbackPositionYoutube
         , setCutStartButton: setCutStartButton
         , setCutEndButton: setCutEndButton
-        , source: Right youtubeUrl -- TODO: set the one selected
+        , youtubeUrl: youtubeUrl
+        , localFile: localFile
         }
     )
   setResultVideoHandlers
@@ -98,7 +98,7 @@ setupEventHandlers
         }
     )
   setVideoSourceHandler videoSource resultVideo resultAudio
-  setInputsourcehandler inputSource youtubeUrl localFile
+  setInputSourceHandler inputSource youtubeUrl localFile
   setDownloadAllButtonHandler downloadAllButton
   setCopyTranscriptButtonHandler copyTranscriptButton
   setTextInputValidationHandlers
@@ -108,4 +108,3 @@ setupEventHandlers
         , title
         }
     )
--- TODO: Add handler to load the video tag with the local file

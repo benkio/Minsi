@@ -49,7 +49,7 @@ nonWhitespaceASCIIChar = do
 
 instance Arbitrary DecimalNumber where
   arbitrary = do
-    whole <- chooseInt 0 9999
+    whole <- chooseInt 0 99999
     frac <- chooseInt 0 9999
     let n = toNumber whole + (toNumber frac / 10000.0)
     pure (DecimalNumber n)

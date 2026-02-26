@@ -3,7 +3,6 @@ module Main where
 import Prelude
 
 import Components.HtmlComponents (loadComponents)
-import Components.Window (getDocument)
 import Effect (Effect)
 import Effect.Aff (runAff_)
 import Effect.Console (log)
@@ -17,8 +16,7 @@ main = genericErrorsHandler program
 program :: Effect Unit
 program = do
   runAff_ genericErrorsHandlerEither checkDependecies
-  doc <- getDocument
-  htmlComponents <- loadComponents doc
+  htmlComponents <- loadComponents
   log "Components correctly loaded"
   setupEventHandlers htmlComponents
   log "Setup Handlers Done"
@@ -30,7 +28,6 @@ program = do
 - Add health check and add a step in CI to: build the docker image, run it, test the healthcheck endpoint
 - Make minsilog red when there's an error
 ------Additions---------------
-- Enable the usage of local file
 - Button to Export client compute payload (maybe directly the curl command)
 - Option to compute from payload
 -----keyboard shortcut for----

@@ -7,7 +7,7 @@ import Data.Either (either)
 import Data.Maybe (maybe)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
-import InMemoryDB (Store, lookup)
+import InMemoryDB (Store, lookupProcessStatus)
 import Model.ProcessStatus (ProcessStatus)
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody)
@@ -26,7 +26,7 @@ badRequest errors = do
 
 handleStatus :: Store -> { filename :: String } -> Handler
 handleStatus store body = do
-  maybeStatus <- liftEffect $ lookup body.filename store
+  maybeStatus <- liftEffect $ lookupProcessStatus body.filename store
   maybe notFound (respondWithStatus <<< _.processStatus) maybeStatus
 
 notFound :: Handler

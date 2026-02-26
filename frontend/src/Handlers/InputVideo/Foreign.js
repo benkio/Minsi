@@ -1,5 +1,5 @@
 let player;
-export const embedVideo = function (embedVideoConfig) {
+export const embedIFrameVideo = function (embedVideoConfig) {
   return function () {
     // Check if player already exists
     if (typeof player !== "undefined" && player !== null) {
@@ -22,6 +22,7 @@ export const embedVideo = function (embedVideoConfig) {
 
       // Player exists and video ID is different, load new video using loadVideoById
       try {
+        console.log("Create YT Player");
         player.loadVideoById({
           videoId: embedVideoConfig.videoId,
           startSeconds: embedVideoConfig.startTime,
@@ -53,7 +54,7 @@ export const embedVideo = function (embedVideoConfig) {
     }
   };
 };
-export const getPlayerCurrentTime = () => {
+export const getIFramePlayerCurrentTime = () => {
   if (typeof player !== "undefined" && player !== null) {
     try {
       if (
@@ -69,7 +70,7 @@ export const getPlayerCurrentTime = () => {
   return 0;
 };
 
-export const getVideoDuration = () => {
+export const getIFrameVideoDuration = () => {
   if (typeof player !== "undefined" && player !== null) {
     try {
       // Check if getDuration method exists and player is ready
@@ -87,7 +88,7 @@ export const getVideoDuration = () => {
   return 100; // Default fallback
 };
 
-export const isPlayerReady = () => {
+export const isIFramePlayerReady = () => {
   // Check if player exists
   if (typeof player === "undefined" || player === null) {
     return false;
@@ -116,4 +117,17 @@ export const isPlayerReady = () => {
 
   // Return true only if all checks pass
   return hasGetDuration && hasGetCurrentTime && isReady;
+};
+
+export const destroyIFramePlayer = function () {
+  if (typeof player !== "undefined" && player !== null) {
+    try {
+      if (player.destroy && typeof player.destroy === "function") {
+        player.destroy();
+      }
+    } catch (e) {
+      console.error("Error destroying YT player:", e);
+    }
+    player = null;
+  }
 };
