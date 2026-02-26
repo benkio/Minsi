@@ -19,7 +19,7 @@ import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
 import Effect.Exception (message)
-import InMemoryDB (Store, insert, lookup)
+import InMemoryDB (Store, insert, lookupProcessStatus)
 import Model.ProcessStatus (ProcessStatus(..), isFinished)
 import Model.State (DurationRange(..), State(..), validateState)
 import Node.ChildProcess.Types (Exit(..))
@@ -55,22 +55,22 @@ computeController store = do
 computeResponse :: Store -> Either (Array String) State -> Effect ComputeResponse
 computeResponse _ (Left errors) = pure (InvalidInput errors)
 computeResponse store (Right state@(State { filename })) = do
-  m <- lookup filename store
+  m <- lookupProcessStatus filename store
   case m of
     Just { processStatus } | not (isFinished processStatus) -> pure PendingComputation
-    Just { state: oldState } -> pure (Success (Just oldState) state)
+    Just { state: oldState } -> pure (Success oldState state)
     _ -> pure (Success Nothing state)
 
 compute :: Maybe State -> State -> Store -> Effect Unit
 compute mayOldState state@(State { filename }) store = do
-  insert filename state Pending store
+  insert filename (Just state) Pending store
   log "Starting video download in background..."
   launchAff_ $ do
     result <- runComputePipeline mayOldState state
     processResult <- case result of
       Right _ -> pure Succeed
       Left e -> liftEffect (log ("error during compute: " <> e)) *> pure (Failed e)
-    liftEffect $ insert filename state processResult store
+    liftEffect $ insert filename (Just state) processResult store
   log "Video download launched, returning HTTP response"
 
 runComputePipeline :: Maybe State -> State -> Aff (Either String Unit)

@@ -7,7 +7,7 @@ import Constants (mp4, tempVideo)
 import Conversion.Time (millisecondsToSecondsString)
 import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Milliseconds)
-import Effect.Aff (Aff, finally)
+import Effect.Aff (Aff, apathize, finally)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
 import MinsiErrors (MinsiError(..))
@@ -46,10 +46,10 @@ cutAndConvertUploadedVideo :: FilePath -> String -> Milliseconds -> Milliseconds
 cutAndConvertUploadedVideo uploadedFilepath filename start end = do
   filepathMp4 <- liftEffect $ mp4 filename
   liftEffect $ log $ "[Command/Video] Execute Command, delete source video: " <> show filepathMp4
-  liftEffect $ rm filepathMp4
+  apathize $ liftEffect $ rm filepathMp4
   liftEffect $ log $ "[Command/Video] Execute Command, Cut & Convert:" <> show uploadedFilepath <> " into " <> filepathMp4
   let args = cutAndConvertUpladedVideoArgs uploadedFilepath filepathMp4 startStr endStr
-  process <- finally (liftEffect $ rm uploadedFilepath) (runCommand args FfmpegVideoError "ffmpeg")
+  process <- runCommand args FfmpegVideoError "ffmpeg"
   process.getResult
   where
   startStr = millisecondsToSecondsString start (Just '.')
@@ -57,4 +57,4 @@ cutAndConvertUploadedVideo uploadedFilepath filename start end = do
 
 cutAndConvertUpladedVideoArgs :: FilePath -> FilePath -> String -> String -> Array String
 cutAndConvertUpladedVideoArgs uploaded mp4 start end =
-  [ "-hide_banner", "-loglevel", "warning", "-i", show uploaded, "-c:v", "libx264", "-c:a", "aac", "-ss", start, "-t", end, show mp4 ]
+  [ "-hide_banner", "-loglevel", "warning", "-i", uploaded, "-c:v", "libx264", "-c:a", "aac", "-ss", start, "-t", end, mp4 ]

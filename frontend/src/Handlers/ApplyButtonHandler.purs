@@ -77,8 +77,9 @@ applyButtonLogic state localFileInput = genericErrorsHandler $ do
     filename = (unwrap state).filename
     source = (unwrap state).source
   when (uploadLocalFile && isLocalFile source) (uploadLocalFileLogic source filename localFileInput)
+  waitForStatus filename LocalFileUploaded
   void (callCompute state)
-  waitForStatus filename
+  waitForStatus filename Succeed
 
 uploadLocalFileLogic :: Source -> String -> HI.HTMLInputElement -> Aff Unit
 uploadLocalFileLogic (LocalFile file) filename localFileInput = genericErrorsHandler $ do
@@ -109,15 +110,15 @@ finallyHandlers components state = do
   let HtmlInputs { subtitleTable, subtitleRow } = components.htmlInputs
   setSubtitleTableMaxValues state subtitleTable subtitleRow
 
-waitForStatus :: String -> Aff Unit
-waitForStatus filename = tailRecM pollStatus unit
+waitForStatus :: String -> ProcessStatus -> Aff Unit
+waitForStatus filename target = tailRecM pollStatus unit
   where
   pollStatus _ = do
     response <- callStatus filename
     case response.status of
-      Pending -> delay (Milliseconds 500.0) $> Loop unit
-      Succeed -> pure $ Done unit
       (Failed error) -> liftEffect $ throwMinsiError (ComputeFailed ("Video download failed: " <> error))
+      status | status == target -> pure $ Done unit
+      _ -> delay (Milliseconds 500.0) $> Loop unit
 
 setResultMediaSrc :: String -> HS.HTMLSelectElement -> HTMLVideoElement -> HTMLAudioElement -> Effect Unit
 setResultMediaSrc filename videoSource resultVideo resultAudio = do

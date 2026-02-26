@@ -5,6 +5,7 @@ import Prelude
 import Components.HTMLTableElement (loadSubtitlesFromTable)
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), loadComponents)
 import Components.HtmlIds (youtubeUrlId, outputFilenameId, artistId, titleId, cutStartId, localFileId, inputSourceId)
+import Conversion.OutputFilename (normalizeOutputFilename)
 import Conversion.String (capitalize)
 import Data.Array (length, (!!))
 import Data.Either (either)
@@ -17,16 +18,16 @@ import Data.Validation.Semigroup (V, andThen, invalid, toEither, validation)
 import Effect (Effect)
 import HTMLInputElement as HTMLInputElement
 import HTMLTableCellElement (valueFromInputTableCell, valueFromSelectTableCell, valueFromTextAreaTableCell)
+import Handers.ErrorHandlers (genericErrorsHandler)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.State.State (State(..), DurationRange(..), WURL(..), Source(..), Subtitle(..))
 import Model.ValidationErrors (ValidationErrors, toMap, fromSingleton)
 import Parse.Font (parseFontAndColor, parsePosition)
 import Partial.Unsafe (unsafePartial)
 import Validations.DurationRangeValidation (durationRangeValidation)
-import Validations.YoutubeValidation (youtubeUrlValidation)
-import Conversion.OutputFilename (normalizeOutputFilename)
 import Validations.LetterNumberSpaceValidation (letterNumberSpaceValidation)
 import Validations.LetterNumberUnderscoreValidation (letterNumberUnderscoreValidation)
+import Validations.YoutubeValidation (youtubeUrlValidation)
 import Web.DOM.HTMLCollection as HC
 import Web.File.FileList (item)
 import Web.HTML.HTMLInputElement (HTMLInputElement, valueAsNumber, checked)
@@ -36,7 +37,7 @@ import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.HTMLTableRowElement as HTR
 
 getCurrentState :: Effect (Tuple State HtmlComponents)
-getCurrentState = do
+getCurrentState = genericErrorsHandler $ do
   components <- loadComponents
   stateV <- fromHtmlInputs components.htmlInputs
   state <- (either (throwMinsiError <<< InvalidInputs <<< toMap) pure <<< toEither) stateV

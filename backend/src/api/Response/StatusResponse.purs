@@ -1,10 +1,12 @@
 module Response.StatusResponse where
 
-import Model.ProcessStatus (ProcessStatus)
+import Model.ProcessStatus (ProcessStatus(..))
 import Prelude
 
 type StatusResponse = { status :: String }
 
 buildResponse :: ProcessStatus -> StatusResponse
+buildResponse (Failed _) = { status: "Failed" }
+buildResponse (LocalFileUploaded _) = { status: "LocalFileUploaded" }
 buildResponse status =
   { status: show status }
