@@ -82,10 +82,10 @@ applyButtonLogic state localFileInput = genericErrorsHandler $ do
 
 uploadLocalFileLogic :: Source -> String -> HI.HTMLInputElement -> Aff Unit
 uploadLocalFileLogic (LocalFile file) filename localFileInput = genericErrorsHandler $ do
-  let fileName = name file
+  let diskFilename = name file
   let
-    fileExt = fromCharArray $ dropWhile (_ /= '.') (toCharArray fileName)
-    fullFileName = filename <> "_upload" <> fileExt
+    diskFileExt = fromCharArray $ dropWhile (_ /= '.') (toCharArray diskFilename)
+    fullFileName = filename <> diskFileExt
   liftEffect $ log $ "Upload Local File " <> fullFileName
   void $ callUpload file fullFileName
   liftEffect $ log $ "Set localFileInput to False"
