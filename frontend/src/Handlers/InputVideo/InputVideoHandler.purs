@@ -115,6 +115,7 @@ localFileEventListener _ = genericErrorsHandler $ do
           ( \file -> do
               blobUrl <- createObjectURL (toBlob file)
               setSrc blobUrl (HV.toHTMLMediaElement video)
+              log "[InputVideoHandler] set the uploadLocalFile to true"
               setChecked true uploadLocalFileInput
           )
           (fileListMaybe >>= item 0)

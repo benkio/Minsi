@@ -1,6 +1,6 @@
 module Model.ProcessStatus where
 
-import Data.Maybe (Maybe(..), maybe)
+import Data.Maybe (maybe)
 import Data.String.CodeUnits (stripPrefix)
 import Data.String.Pattern (Pattern(..))
 import Foreign (ForeignError(..), fail)
@@ -29,4 +29,7 @@ instance ReadForeign ProcessStatus where
       "Succeed" -> pure Succeed
       "LocalFileUploaded" -> pure LocalFileUploaded
       "Failed" -> pure (Failed "")
-      x -> fail $ TypeMismatch "ProcessStatus" $ "Invalid ProcessStatus: " <> x
+      x -> maybe
+        (fail $ TypeMismatch "ProcessStatus" $ "Invalid ProcessStatus: " <> x)
+        (pure <<< Failed)
+        (stripPrefix (Pattern "Failed: ") x)

@@ -64,33 +64,35 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   stateComponents <- getCurrentState
   let state = fst stateComponents
   let components = snd stateComponents
-  let localFileInput = (unwrap components.htmlInputs).localFile
+  let uploadLocalFileInput = (unwrap components.htmlInputs).uploadLocalFile
   showModal loadingModalId
   runAff_
     (\result -> genericErrorsHandlerEither result) $
-    finally (liftEffect (finallyHandlers components state)) (applyButtonLogic state localFileInput)
+    finally (liftEffect (finallyHandlers components state)) (applyButtonLogic state uploadLocalFileInput)
 
 applyButtonLogic :: State -> HI.HTMLInputElement -> Aff Unit
-applyButtonLogic state localFileInput = genericErrorsHandler $ do
+applyButtonLogic state uploadLocalFileInput = genericErrorsHandler $ do
   let
     uploadLocalFile = (unwrap state).uploadLocalFile
     filename = (unwrap state).filename
     source = (unwrap state).source
-  when (uploadLocalFile && isLocalFile source) (uploadLocalFileLogic source filename localFileInput)
-  waitForStatus filename LocalFileUploaded
+  when (uploadLocalFile && isLocalFile source)
+    ( uploadLocalFileLogic source filename uploadLocalFileInput
+        *> waitForStatus filename LocalFileUploaded
+    )
   void (callCompute state)
   waitForStatus filename Succeed
 
 uploadLocalFileLogic :: Source -> String -> HI.HTMLInputElement -> Aff Unit
-uploadLocalFileLogic (LocalFile file) filename localFileInput = genericErrorsHandler $ do
+uploadLocalFileLogic (LocalFile file) filename uploadLocalFileInput = genericErrorsHandler $ do
   let diskFilename = name file
   let
     diskFileExt = fromCharArray $ dropWhile (_ /= '.') (toCharArray diskFilename)
     fullFileName = filename <> diskFileExt
-  liftEffect $ log $ "Upload Local File " <> fullFileName
+  liftEffect $ log $ "[ApplyButtonHandler] Upload Local File " <> fullFileName
   void $ callUpload file fullFileName
-  liftEffect $ log $ "Set localFileInput to False"
-  liftEffect $ HI.setChecked false localFileInput
+  liftEffect $ log $ "[ApplyButtonHandler] Set uploadLocalFileInput to False"
+  liftEffect $ HI.setChecked false uploadLocalFileInput
 uploadLocalFileLogic x _ _ = liftEffect $ throwMinsiError (InvalidInput "StateSource" ("Expected LocalFile, got " <> show x))
 
 finallyHandlers :: HtmlComponents -> State -> Effect Unit

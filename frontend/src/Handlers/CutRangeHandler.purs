@@ -3,6 +3,7 @@ module Handlers.CutRangeHandler where
 import Components.HtmlIds (cutEndId, cutStartId)
 import Data.Validation.Semigroup (validation)
 import Effect (Effect)
+import Effect.Console (log)
 import Handlers.ErrorHandlers (genericErrorsHandler)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.ValidationErrors (toMap)
@@ -38,7 +39,7 @@ rangeToNumberListenerStart cutStart cutEnd uploadLocalFile _ = genericErrorsHand
   end <- valueAsNumber cutEnd
   validation
     (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
-    (\_ -> HI.setChecked true uploadLocalFile)
+    (\_ -> log "[CutRangeHandler] set the uploadLocalFile to true" *> HI.setChecked true uploadLocalFile)
     (durationRangeValidation cutStartId start end)
 
 -- When end range changes, update end number input if durationRangeValidation is satisfied
@@ -48,5 +49,5 @@ rangeToNumberListenerEnd cutStart cutEnd uploadLocalFile _ = genericErrorsHandle
   end <- valueAsNumber cutEnd
   validation
     (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
-    (\_ -> HI.setChecked true uploadLocalFile)
+    (\_ -> log "[CutRangeHandler] set the uploadLocalFile to true" *> HI.setChecked true uploadLocalFile)
     (durationRangeValidation cutEndId start end)

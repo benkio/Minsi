@@ -11,7 +11,7 @@ import Data.Array (uncons)
 import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Milliseconds)
 import Data.URL (toString)
-import Effect.Aff (Aff, apathize)
+import Effect.Aff (Aff, apathize, finally)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
 import MinsiErrors (MinsiError(..), throwMinsiError)
@@ -52,7 +52,7 @@ downloadOrCutVideo LocalFile filename start end = do
   filepath <- liftEffect $ mp4 filename
   liftEffect $ unlessM (exists uploadedFilepath) (throwMinsiError (FfmpegVideoError ("🚫 Error: Expected " <> show uploadedFilepath <> " but not was found. Retry the `compute` and the upload")))
   liftEffect $ log ("[Ytdlp] Cut " <> show uploadedFilepath <> " To " <> show filepath)
-  cutAndConvertUploadedVideo uploadedFilepath filename start end
+  finally (rm uploadedFilepath) (cutAndConvertUploadedVideo uploadedFilepath filename start end)
 
 downloadOrCutVideo (WebURL youtubeUri) filename start end = do
   filepath <- liftEffect $ mp4 filename

@@ -5,8 +5,9 @@ import Prelude
 import Constants (outputPath)
 import Data.DateTime.Instant (unInstant)
 import Data.Foldable (traverse_)
-import Data.Traversable (traverse)
+import Data.String.Utils (endsWith)
 import Data.Time.Duration (Milliseconds(..))
+import Data.Traversable (traverse)
 import Effect (Effect)
 import Effect.Aff (Aff, delay, launchAff_, apathize, catchError)
 import Effect.Class (liftEffect)
@@ -36,7 +37,7 @@ tryDeleteIfOld currentMs maxAgeMs filePath =
   apathize $ liftEffect do
     s <- stat filePath
     let (Milliseconds fileMs) = birthtimeMs s
-    if isFile s && (currentMs - fileMs) > maxAgeMs && filePath /= ".gitignore" then log ("[CleanupOutput] Delete (older than 1h): " <> filePath) *> rm filePath
+    if isFile s && (currentMs - fileMs) > maxAgeMs && endsWith ".gitignore" filePath then log ("[CleanupOutput] Delete (older than 1h): " <> filePath) *> rm filePath
     else pure unit
 
 -- | Run the cleanup job in the background: every hour, delete files in

@@ -8,6 +8,7 @@ import Data.Maybe (maybe)
 import Data.Newtype (unwrap)
 import Data.Validation.Semigroup (andThen, validation)
 import Effect (Effect)
+import Effect.Console (log)
 import Handlers.ErrorHandlers (genericErrorsHandler)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.ArtistPrefix (prefixForArtist)
@@ -48,7 +49,7 @@ outputFilenameChangeListener _ = genericErrorsHandler $ do
   v <- value outputFilename
   validation
     (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
-    (\_ -> HI.setChecked true uploadLocalFile)
+    (\_ -> log "[TextInputValidationHandler] set the uploadLocalFile to true" *> HI.setChecked true uploadLocalFile)
     (letterNumberUnderscoreValidation outputFilenameId v)
 
 -- | On artist change: if artist matches a known value, set output filename to that prefix; then validate non-empty.

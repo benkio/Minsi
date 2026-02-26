@@ -5,7 +5,7 @@ import Prelude
 import Effect (Effect)
 import Effect.Timer (setInterval)
 import Handlers.ErrorHandlers (genericErrorsHandler)
-import Conversion.Time (formatToFirstFour)
+import Conversion.Time (formatToMaxSixDigits)
 import Web.DOM.Node (setTextContent)
 import Web.HTML.HTMLMediaElement (currentTime)
 import Web.HTML.HTMLSpanElement as HSP
@@ -24,4 +24,4 @@ setResultVideoHandlers (RVET { playbackPositionResultVideo, resultVideo }) = gen
 updatePlaybackPosition :: HSP.HTMLSpanElement -> HTMLVideoElement -> Effect Unit
 updatePlaybackPosition playbackPositionResultVideo resultVideo = do
   currentTimeValue <- currentTime (toHTMLMediaElement resultVideo)
-  setTextContent (formatToFirstFour currentTimeValue) (HSP.toNode playbackPositionResultVideo)
+  setTextContent (formatToMaxSixDigits currentTimeValue) (HSP.toNode playbackPositionResultVideo)

@@ -18,7 +18,6 @@ import Data.Validation.Semigroup (V, andThen, invalid, toEither, validation)
 import Effect (Effect)
 import HTMLInputElement as HTMLInputElement
 import HTMLTableCellElement (valueFromInputTableCell, valueFromSelectTableCell, valueFromTextAreaTableCell)
-import Handers.ErrorHandlers (genericErrorsHandler)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.State.State (State(..), DurationRange(..), WURL(..), Source(..), Subtitle(..))
 import Model.ValidationErrors (ValidationErrors, toMap, fromSingleton)
@@ -37,7 +36,7 @@ import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.HTMLTableRowElement as HTR
 
 getCurrentState :: Effect (Tuple State HtmlComponents)
-getCurrentState = genericErrorsHandler $ do
+getCurrentState = do
   components <- loadComponents
   stateV <- fromHtmlInputs components.htmlInputs
   state <- (either (throwMinsiError <<< InvalidInputs <<< toMap) pure <<< toEither) stateV
