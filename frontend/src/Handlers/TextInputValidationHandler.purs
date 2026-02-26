@@ -6,14 +6,15 @@ import Components.HtmlComponents (loadComponents)
 import Components.HtmlIds (artistId, outputFilenameId, titleId)
 import Data.Maybe (maybe)
 import Data.Newtype (unwrap)
-import Data.Validation.Semigroup (validation)
+import Data.Validation.Semigroup (andThen, validation)
 import Effect (Effect)
 import Handlers.ErrorHandlers (genericErrorsHandler)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.ArtistPrefix (prefixForArtist)
 import Model.ValidationErrors (toMap)
+import Validations.LetterNumberSpaceValidation (letterNumberSpaceValidation)
+import Validations.LetterNumberUnderscoreValidation (letterNumberUnderscoreValidation)
 import Validations.NonEmptyValidation (nonEmptyValidation)
-import Validations.OutputFilenameValidation (outputFilenameValidation)
 import Web.DOM.Element (toEventTarget)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
@@ -48,7 +49,7 @@ outputFilenameChangeListener _ = genericErrorsHandler $ do
   validation
     (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
     (\_ -> HI.setChecked true uploadLocalFile)
-    (outputFilenameValidation outputFilenameId v)
+    (letterNumberUnderscoreValidation outputFilenameId v)
 
 -- | On artist change: if artist matches a known value, set output filename to that prefix; then validate non-empty.
 artistChangeListener :: Event -> Effect Unit
@@ -62,7 +63,7 @@ artistChangeListener _ = genericErrorsHandler $ do
   validation
     (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
     (\_ -> pure unit)
-    (nonEmptyValidation artistId v)
+    (nonEmptyValidation artistId v `andThen` (letterNumberSpaceValidation artistId))
 
 titleChangeListener :: Event -> Effect Unit
 titleChangeListener _ = genericErrorsHandler $ do
@@ -72,4 +73,4 @@ titleChangeListener _ = genericErrorsHandler $ do
   validation
     (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
     (\_ -> pure unit)
-    (nonEmptyValidation titleId v)
+    (nonEmptyValidation titleId v `andThen` (letterNumberSpaceValidation titleId))

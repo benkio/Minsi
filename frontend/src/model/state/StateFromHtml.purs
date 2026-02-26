@@ -13,7 +13,7 @@ import Data.Maybe (fromJust, fromMaybe, Maybe(..))
 import Data.String.Common (trim, toUpper)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Tuple (Tuple(..))
-import Data.Validation.Semigroup (V, invalid, toEither, validation)
+import Data.Validation.Semigroup (V, andThen, invalid, toEither, validation)
 import Effect (Effect)
 import HTMLInputElement as HTMLInputElement
 import HTMLTableCellElement (valueFromInputTableCell, valueFromSelectTableCell, valueFromTextAreaTableCell)
@@ -22,16 +22,18 @@ import Model.State.State (State(..), DurationRange(..), WURL(..), Source(..), Su
 import Model.ValidationErrors (ValidationErrors, toMap, fromSingleton)
 import Parse.Font (parseFontAndColor, parsePosition)
 import Partial.Unsafe (unsafePartial)
-import Validations.CutVideoValidation (cutVideoValidation)
-import Validations.OutputFilenameValidation (outputFilenameValidation, normalizeOutputFilename)
+import Validations.DurationRangeValidation (durationRangeValidation)
 import Validations.YoutubeValidation (youtubeUrlValidation)
+import Conversion.OutputFilename (normalizeOutputFilename)
+import Validations.LetterNumberSpaceValidation (letterNumberSpaceValidation)
+import Validations.LetterNumberUnderscoreValidation (letterNumberUnderscoreValidation)
 import Web.DOM.HTMLCollection as HC
+import Web.File.FileList (item)
 import Web.HTML.HTMLInputElement (HTMLInputElement, valueAsNumber, checked)
 import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLSelectElement (HTMLSelectElement)
 import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.HTMLTableRowElement as HTR
-import Web.File.FileList (item)
 
 getCurrentState :: Effect (Tuple State HtmlComponents)
 getCurrentState = do
@@ -58,11 +60,11 @@ fromHtmlInputs
   ) = do
   cutVideoV <- cutVideoFromHtmlRange cutStart cutEnd
   sourceV <- sourceFromHTMLInput inputSourceSelect youtubeUrlInput localFileInput
-  filenameV <- HI.value filenameInput <#> outputFilenameValidation outputFilenameId
+  filenameV <- HI.value filenameInput <#> letterNumberUnderscoreValidation outputFilenameId
   reverseLoopValue <- checked reverseLoopInput
   uploadLocalFileValue <- checked uploadLocalFileInput
-  artistV <- HTMLInputElement.nonEmptyFromHtmlInput artistInput artistId
-  titleV <- HTMLInputElement.nonEmptyFromHtmlInput titleInput titleId
+  artistV <- HTMLInputElement.nonEmptyFromHtmlInput artistInput artistId <#> (_ `andThen` letterNumberSpaceValidation artistId)
+  titleV <- HTMLInputElement.nonEmptyFromHtmlInput titleInput titleId <#> (_ `andThen` letterNumberSpaceValidation titleId)
   subtitles <- loadSubtitlesFromTable loadSubtitleFromRow subtitleTable
   pure $ ado
     cutVideo <- cutVideoV
@@ -86,7 +88,7 @@ cutVideoFromHtmlRange :: HTMLInputElement -> HTMLInputElement -> Effect (V Valid
 cutVideoFromHtmlRange cutStart cutEnd = do
   start <- valueAsNumber cutStart
   end <- valueAsNumber cutEnd
-  pure $ cutVideoValidation cutStartId start end
+  pure $ durationRangeValidation cutStartId start end
 
 sourceFromHTMLInput :: HTMLSelectElement -> HTMLInputElement -> HTMLInputElement -> Effect (V ValidationErrors Source)
 sourceFromHTMLInput inputSourceSelect youtubeUrlComponent localFileComponent = do
@@ -138,4 +140,4 @@ loadSubtitleFromRow index row = do
           , screenPosition: parsePosition positionValue
           }
       )
-      (cutVideoValidation ("[Subtitle row " <> show index <> "]") (toNumber startValue) (toNumber endValue))
+      (durationRangeValidation ("[Subtitle row " <> show index <> "]") (toNumber startValue) (toNumber endValue))

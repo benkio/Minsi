@@ -7,7 +7,7 @@ import Handlers.ErrorHandlers (genericErrorsHandler)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.ValidationErrors (toMap)
 import Prelude
-import Validations.CutVideoValidation (cutVideoValidation)
+import Validations.DurationRangeValidation (durationRangeValidation)
 import Web.DOM.Element (toEventTarget)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
@@ -31,7 +31,7 @@ setCutRangeHandlers (CRET { cutStart, cutEnd, uploadLocalFile }) = genericErrors
   addEventListener E.change cutEndEvL false (toEventTarget (HI.toElement cutEnd))
   pure unit
 
--- When start range changes, update start number input if cutVideoValidation is satisfied
+-- When start range changes, update start number input if durationRangeValidation is satisfied
 rangeToNumberListenerStart :: HI.HTMLInputElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
 rangeToNumberListenerStart cutStart cutEnd uploadLocalFile _ = genericErrorsHandler $ do
   start <- valueAsNumber cutStart
@@ -39,9 +39,9 @@ rangeToNumberListenerStart cutStart cutEnd uploadLocalFile _ = genericErrorsHand
   validation
     (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
     (\_ -> HI.setChecked true uploadLocalFile)
-    (cutVideoValidation cutStartId start end)
+    (durationRangeValidation cutStartId start end)
 
--- When end range changes, update end number input if cutVideoValidation is satisfied
+-- When end range changes, update end number input if durationRangeValidation is satisfied
 rangeToNumberListenerEnd :: HI.HTMLInputElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
 rangeToNumberListenerEnd cutStart cutEnd uploadLocalFile _ = genericErrorsHandler $ do
   start <- valueAsNumber cutStart
@@ -49,4 +49,4 @@ rangeToNumberListenerEnd cutStart cutEnd uploadLocalFile _ = genericErrorsHandle
   validation
     (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
     (\_ -> HI.setChecked true uploadLocalFile)
-    (cutVideoValidation cutEndId start end)
+    (durationRangeValidation cutEndId start end)
