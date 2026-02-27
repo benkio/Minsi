@@ -36,9 +36,8 @@ setResultMediaSrc filename videoSource resultVideo resultAudio = do
   let filePathNoCache = path <> "?t=" <> show m
   Element.removeAttribute "src" (HV.toElement resultVideo)
   Element.removeAttribute "src" (HA.toElement resultAudio)
-  if isVideoSource selectedVideoSourceValue
-    then setResultVideoSrcAndVisibility filePathNoCache resultVideo resultAudio
-    else setResultAudioSrcAndVisibility filePathNoCache resultVideo resultAudio
+  if isVideoSource selectedVideoSourceValue then setResultVideoSrcAndVisibility filePathNoCache resultVideo resultAudio
+  else setResultAudioSrcAndVisibility filePathNoCache resultVideo resultAudio
 
 setResultVideoSrcAndVisibility :: String -> HTMLVideoElement -> HTMLAudioElement -> Effect Unit
 setResultVideoSrcAndVisibility filePathNoCache resultVideo resultAudio = do

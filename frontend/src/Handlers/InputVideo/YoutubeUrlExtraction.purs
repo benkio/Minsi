@@ -39,8 +39,10 @@ parseUnit str unit =
 
 parseYouTubeT :: String -> Maybe Int
 parseYouTubeT raw =
-  let str = toLower raw
-  in maybe (parseDuration str) Just (fromString str)
+  let
+    str = toLower raw
+  in
+    maybe (parseDuration str) Just (fromString str)
   where
   parseDuration str =
     let
