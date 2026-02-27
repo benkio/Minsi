@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -37,13 +39,35 @@ jobs:
         working-directory: frontend
         run: npm update --save
 
-      - name: Update spago package set and lock (backend)
-        working-directory: backend
-        run: spago upgrade && spago install
+      - name: Update spago package set
+        run: |
+          CURRENT_TAG=$(grep -oP 'psc-[0-9.]+-[0-9]+' backend/spago.yaml | head -1)
+          COMPILER_PREFIX=$(echo "$CURRENT_TAG" | grep -oP 'psc-[0-9.]+(?=-)')
+          echo "Current tag: $CURRENT_TAG"
+          echo "Compiler prefix: $COMPILER_PREFIX"
 
-      - name: Update spago package set and lock (frontend)
-        working-directory: frontend
-        run: spago upgrade && spago install
+          LATEST_TAG=$(curl -s "https://api.github.com/repos/purescript/package-sets/git/refs/tags" \
+            | jq -r '.[].ref' \
+            | sed 's|refs/tags/||' \
+            | grep "^${COMPILER_PREFIX}-" \
+            | sort -V \
+            | tail -1)
+          echo "Latest tag: $LATEST_TAG"
+
+          if [ "$CURRENT_TAG" = "$LATEST_TAG" ]; then
+            echo "Package set already up to date"
+          else
+            NEW_URL="https://raw.githubusercontent.com/purescript/package-sets/${LATEST_TAG}/packages.json"
+            OLD_URL="https://raw.githubusercontent.com/purescript/package-sets/${CURRENT_TAG}/packages.json"
+            sed -i "s|${OLD_URL}|${NEW_URL}|" backend/spago.yaml frontend/spago.yaml
+            echo "Updated package set: $CURRENT_TAG -> $LATEST_TAG"
+          fi
+
+      - name: Regenerate spago lock files
+        run: |
+          rm -f backend/spago.lock frontend/spago.lock
+          cd backend && spago install && cd ..
+          cd frontend && spago install && cd ..
 
       - name: Check for changes
         id: changes
@@ -54,33 +78,45 @@ jobs:
             echo "has_changes=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Create branch and PR
+      - name: Compute branch and title
         if: steps.changes.outputs.has_changes == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        id: meta
         run: |
-          BRANCH="chore/update-dependencies-$(date +%Y%m%d)"
-          git checkout -b "$BRANCH"
-          git add -A
-          git commit -m "$(cat <<'EOF'
-          chore: update project dependencies
+          echo "branch=chore/update-dependencies-$(date +%Y%m%d)" >> "$GITHUB_OUTPUT"
+          echo "title_date=$(date +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
 
-          Automated weekly dependency update.
-          EOF
-          )"
-          git push -u origin "$BRANCH"
-          gh pr create \
-            --title "chore: update dependencies $(date +%Y-%m-%d)" \
-            --body "Automated weekly dependency update." \
-            --base main
+      - name: Create Pull Request
+        if: steps.changes.outputs.has_changes == 'true'
+        id: cpr
+        uses: peter-evans/create-pull-request@v8
+        with:
+          # If your repo disables PR creation with GITHUB_TOKEN, set a PAT as DEPENDENCY_UPDATE_TOKEN.
+          token: ${{ secrets.DEPENDENCY_UPDATE_TOKEN != '' && secrets.DEPENDENCY_UPDATE_TOKEN || secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update project dependencies"
+          committer: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+          author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+          branch: ${{ steps.meta.outputs.branch }}
+          title: "chore: update dependencies ${{ steps.meta.outputs.title_date }}"
+          body: "Automated weekly dependency update."
+          base: main
+
+      - name: Delete remote branch on failure
+        if: failure() && steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.DEPENDENCY_UPDATE_TOKEN != '' && secrets.DEPENDENCY_UPDATE_TOKEN || secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.meta.outputs.branch }}
+        run: |
+          set -euo pipefail
+          echo "Attempting to delete remote branch: ${BRANCH}"
+          gh api -X DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/${BRANCH}" || true
 
       - name: Wait for CI and merge
-        if: steps.changes.outputs.has_changes == 'true'
+        if: steps.changes.outputs.has_changes == 'true' && steps.cpr.outputs.pull-request-number != ''
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.DEPENDENCY_UPDATE_TOKEN != '' && secrets.DEPENDENCY_UPDATE_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
-          BRANCH="chore/update-dependencies-$(date +%Y%m%d)"
-          PR_NUMBER=$(gh pr view "$BRANCH" --json number -q .number)
+          set -euo pipefail
+          PR_NUMBER="${{ steps.cpr.outputs.pull-request-number }}"
           echo "Waiting for CI checks on PR #${PR_NUMBER}..."
           if gh pr checks "$PR_NUMBER" --watch --fail-fast; then
             echo "CI passed, merging PR #${PR_NUMBER}"
