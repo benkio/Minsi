@@ -1,6 +1,6 @@
 module Handlers.CutRangeHandler where
 
-import Components.HtmlIds (cutEndId, cutStartId)
+import Components.HtmlIdAndClasses (cutEndId, cutStartId)
 import Data.Validation.Semigroup (validation)
 import Effect (Effect)
 import Effect.Console (log)

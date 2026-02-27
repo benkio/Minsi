@@ -3,7 +3,7 @@ module Handlers.ApplyButtonHandler where
 import Prelude
 
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..))
-import Components.HtmlIds (loadingModalId, videoSourceId)
+import Components.HtmlIdAndClasses (loadingModalId, videoSourceId)
 import Components.HtmlVisualElements (showHiddenElements)
 import Components.Modal (hideModal, showModal)
 import Components.Window (scrollToElement)

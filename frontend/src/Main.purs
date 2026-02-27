@@ -25,7 +25,6 @@ program = do
 {-
 -------Bugs-------------------
 ------Improvements------------
-- Make minsilog red when there's an error
 ------Additions---------------
 - Button to Export client compute payload (maybe directly the curl command)
 - Option to compute from payload

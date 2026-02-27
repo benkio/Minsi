@@ -22,6 +22,12 @@ spec = do
     it "accepts letters numbers and spaces" $
       isValid (letterNumberSpaceValidation "id" "Artist 42") `shouldEqual` true
 
+    it "accepts Italian accented letters" $
+      isValid (letterNumberSpaceValidation "id" "Alessandro Barbèro") `shouldEqual` true
+
+    it "accepts uppercase Italian accents" $
+      isValid (letterNumberSpaceValidation "id" "È un test") `shouldEqual` true
+
     it "rejects underscores" $
       isValid (letterNumberSpaceValidation "id" "my_name") `shouldEqual` false
 

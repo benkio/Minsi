@@ -1,7 +1,7 @@
 module Handlers.Handlers where
 
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlOutputs(..))
-import Components.HtmlIds (keyboardShortcutsModalId)
+import Components.HtmlIdAndClasses (keyboardShortcutsModalId)
 import Effect (Effect)
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CopyTranscriptButtonHandler (setCopyTranscriptButtonHandler)

@@ -4,7 +4,7 @@ import Prelude
 
 import Components.HTMLTableElement (loadSubtitlesFromTable)
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), loadComponents)
-import Components.HtmlIds (youtubeUrlId, outputFilenameId, artistId, titleId, cutStartId, localFileId, inputSourceId)
+import Components.HtmlIdAndClasses (youtubeUrlId, outputFilenameId, artistId, titleId, cutStartId, localFileId, inputSourceId)
 import Conversion.OutputFilename (normalizeOutputFilename)
 import Conversion.String (capitalize)
 import Data.Array (length, (!!))
@@ -25,7 +25,7 @@ import Parse.Font (parseFontAndColor, parsePosition)
 import Partial.Unsafe (unsafePartial)
 import Validations.DurationRangeValidation (durationRangeValidation)
 import Validations.LetterNumberSpaceValidation (letterNumberSpaceValidation)
-import Validations.LetterNumberUnderscoreValidation (letterNumberUnderscoreValidation)
+import Validations.OutputFilenameValidation (outputFilenameValidation)
 import Validations.YoutubeValidation (youtubeUrlValidation)
 import Web.DOM.HTMLCollection as HC
 import Web.File.FileList (item)
@@ -60,7 +60,7 @@ fromHtmlInputs
   ) = do
   cutVideoV <- cutVideoFromHtmlRange cutStart cutEnd
   sourceV <- sourceFromHTMLInput inputSourceSelect youtubeUrlInput localFileInput
-  filenameV <- HI.value filenameInput <#> letterNumberUnderscoreValidation outputFilenameId
+  filenameV <- HI.value filenameInput <#> outputFilenameValidation outputFilenameId
   reverseLoopValue <- checked reverseLoopInput
   uploadLocalFileValue <- checked uploadLocalFileInput
   artistV <- HTMLInputElement.nonEmptyFromHtmlInput artistInput artistId <#> (_ `andThen` letterNumberSpaceValidation artistId)

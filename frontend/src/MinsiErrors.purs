@@ -48,7 +48,7 @@ minsiErrorName (ComputeFailed _) = "ComputeFailed"
 
 isCriticalError :: Error -> Boolean
 isCriticalError e = case name e of
-  "HTMLElementNotFound" -> false
+  "HTMLElementNotFound" -> true
   "MissingDependenciesError" -> true
   "InvalidInput" -> false
   "InvalidInputs" -> false

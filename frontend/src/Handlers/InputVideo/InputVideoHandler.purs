@@ -3,7 +3,7 @@ module Handlers.InputVideo.InputVideoHandler where
 import Prelude
 
 import Components.HtmlComponents (loadComponents, resultPreviewToMaybeIframe, resultPreviewToMaybeVideo)
-import Components.HtmlIds (resultPreviewId, youtubeUrlId)
+import Components.HtmlIdAndClasses (resultPreviewId, youtubeUrlId)
 import Data.Foldable (foldl)
 import Data.Maybe (Maybe, maybe)
 import Data.Newtype (unwrap)

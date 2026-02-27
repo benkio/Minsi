@@ -1,7 +1,9 @@
 module Handlers.ErrorHandlers where
 
+import Components.HTMLCollection (swapClasses)
+import Components.HTMLComponentsLoader (loadHtmlElementClass)
 import Components.HtmlComponents (loadDiv)
-import Components.HtmlIds (minsiLogId, minsiErrorModalContentId, minsiErrorModalId)
+import Components.HtmlIdAndClasses (minsiLogId, minsiLogTitleId, minsiLogBoxClass, minsiErrorModalContentId, minsiErrorModalId)
 import Components.Modal (showModal)
 import Components.Window (getDocument, raiseErrorAlert)
 import Control.Monad.Error.Class (catchError, class MonadError)
@@ -21,7 +23,7 @@ import Web.DOM.Document (createElement)
 import Web.DOM.Element (toNode) as E
 import Web.DOM.Node (appendChild, removeChild, setTextContent)
 import Web.HTML (window)
-import Web.HTML.HTMLDivElement (toNode)
+import Web.HTML.HTMLDivElement (toElement, toNode)
 import Web.HTML.HTMLDocument (toDocument)
 import Web.HTML.HTMLLIElement as LIH
 import Web.HTML.HTMLUListElement as ULH
@@ -63,12 +65,19 @@ writeToMinsiLog :: String -> Effect Unit
 writeToMinsiLog errorMessage = do
   doc <- getDocument
   minsiLog <- loadDiv minsiLogId doc
+  minsiLogTitle <- loadDiv minsiLogTitleId doc
+  logBoxElements <- loadHtmlElementClass minsiLogBoxClass doc
   errorList <- createErrorList errorMessage
   let minsiLogNode = toNode minsiLog
+  let minsiLogTitleNode = E.toNode (toElement minsiLogTitle)
   let errorListNode = E.toNode (ULH.toElement errorList)
   appendChild errorListNode minsiLogNode
+  swapClasses "border-success" "border-danger" logBoxElements
+  setTextContent "\x1F63E MINSI LOG \x1F63E" minsiLogTitleNode
   void $ setTimeout 5000 do
     removeChild errorListNode minsiLogNode
+    swapClasses "border-danger" "border-success" logBoxElements
+    setTextContent "\x1F63A MINSI LOG \x1F63A" minsiLogTitleNode
 
 showMinsiErrorDialog :: String -> Effect Unit
 showMinsiErrorDialog errorMessage = do
