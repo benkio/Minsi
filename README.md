@@ -4,6 +4,9 @@
 
 A web application to download YouTube videos and produce customized clips: **video** (MP4), **MP3** audio, and **GIF** (with optional subtitles), with best-possible quality.
 
+**PROJECT IN MAINTENANCE MODE**
+I don't plan to develop new features on this for now. Just fix bugs and keep it working
+
 ## Project structure
 
 - **[Frontend](./frontend/README.md)** — PureScript UI (Bootstrap, YouTube embed)
@@ -45,7 +48,8 @@ You also need **Impact** and **Arial Black** fonts installed if you use subtitle
    - Open **http://localhost:8080** in your browser.
    - See **[Instructions](http://localhost:8080/instructions.html)** for how to get video, MP3, and GIF from a YouTube URL.
 
-Output files are written to **`public/output/`** (e.g. `filename.mp4`, `filename.mp3`, `filenameGif.mp4`).
+Output files are written to **`public/output/`** (e.g. `rphjb_Hello.mp4`, `rphjb_Hello.mp3`, `rphjb_HelloGif.mp4`).
+The output filename must follow the format `prefix_Name`: 1–5 lowercase letters, an underscore, then a capitalized name with letters and numbers.
 
 ## Running with Docker
 
@@ -77,15 +81,24 @@ The image is built for **linux/amd64**. On **ARM** (e.g. Apple Silicon) it runs 
 
 ## Publish Docker Image
 
-- Build the image
-```
-docker build -t benkio/minsi:latest .
-```
+A GitHub Actions workflow (**Publish Docker Image**) can build and push the image to Docker Hub.
+Trigger it manually from the Actions tab, specifying a tag (defaults to `latest`).
+It requires `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` repository secrets.
 
-- Push the image
-```
+To publish manually instead:
+
+```bash
+docker build -t benkio/minsi:latest .
 docker push benkio/minsi:latest
 ```
+
+## CI & Automation
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| **CI** (`ci.yml`) | Every push | Builds, formats, and tests both backend and frontend. Also builds and smoke-tests the Docker image. |
+| **Publish Docker Image** (`publish.yml`) | Manual (`workflow_dispatch`) | Builds and pushes the Docker image to Docker Hub. |
+| **Update Dependencies** (`update-dependencies.yml`) | Weekly (Monday 09:00 UTC) or manual | Updates npm and spago dependencies, opens a PR, and auto-merges if CI passes. |
 
 ## Bundle for Node
 

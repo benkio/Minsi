@@ -54,17 +54,21 @@
                 </p>
               </div>
 
-              <h5 class="mt-4 mb-2">1. Paste the YouTube URL</h5>
+              <h5 class="mt-4 mb-2">1. Paste a YouTube URL or upload a local file</h5>
               <p class="text-muted small mb-3">
                 In the main area, paste a YouTube watch URL (e.g.
                 <code>https://www.youtube.com/watch?v=…</code>). The preview
                 loads so you can scrub and set the exact clip.
+                Alternatively, select <strong>Local File</strong> as the source
+                and upload a video file from your computer. Check
+                <strong>local file will be uploaded</strong> in the left panel
+                if the uploaded file needs to be cut to the specified time range.
               </p>
 
               <h5 class="mt-4 mb-2">2. Set output and metadata (left panel)</h5>
               <ul class="small mb-3">
-                <li><strong>Output Filename</strong> — base name for all files (e.g. <code>myclip</code> → <code>myclip.mp4</code>, <code>myclip.mp3</code>, <code>myclipGif.mp4</code>).</li>
-                <li><strong>Artist</strong> and <strong>Title</strong> — used for the MP3’s ID3 tags.</li>
+                <li><strong>Output Filename</strong> — must follow the format <code>prefix_Name</code>: 1–5 lowercase letters, an underscore, then a capitalized name with letters and numbers (e.g. <code>rphjb_Hello</code> → <code>rphjb_Hello.mp4</code>, <code>rphjb_Hello.mp3</code>, <code>rphjb_HelloGif.mp4</code>). The prefix is set automatically when a known artist is selected.</li>
+                <li><strong>Artist</strong> and <strong>Title</strong> — used for the MP3’s ID3 tags. Letters, numbers, spaces, and Italian accented characters (àèéìòù) are allowed.</li>
                 <li><strong>Reverse / Loop GIF</strong> — optional, for the GIF output.</li>
               </ul>
 
@@ -153,7 +157,7 @@
 
               <hr class="my-4" />
               <p class="text-muted small mb-2">
-                <strong>Validation:</strong> The app checks that the YouTube URL is non-empty, the clip range is valid (end &gt; start + 100 ms), and subtitle times (if any) fall within the clip. Errors appear in the <strong>Minsi Log</strong> (left panel) or in a modal for critical failures.
+                <strong>Validation:</strong> The app checks that the YouTube URL is non-empty, the output filename follows the <code>prefix_Name</code> format, artist and title contain only allowed characters, the clip range is valid (end &gt; start + 100 ms), and subtitle times (if any) fall within the clip. Errors appear in the <strong>Minsi Log</strong> (left panel) or in a modal for critical failures.
               </p>
               <p class="text-muted small mb-0">
                 If the app reports missing dependencies (e.g. yt-dlp, ffmpeg),
