@@ -2,7 +2,7 @@ module Model.State where
 
 import Prelude
 import Data.Array (null)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (maybe)
 import Data.Time.Duration (Milliseconds(..))
 import Node.Path (FilePath)
 import Data.Foldable (traverse_)
@@ -99,17 +99,13 @@ derive newtype instance ReadForeign State
 instance ReadForeign WURL where
   readImpl f = do
     s <- readImpl f
-    case fromString s of
-      Nothing -> fail $ TypeMismatch "URL" $ "Invalid URL: " <> s
-      Just url -> pure (WURL url)
+    maybe (fail $ TypeMismatch "URL" $ "Invalid URL: " <> s) (pure <<< WURL) (fromString s)
 
 instance ReadForeign Source where
   readImpl f = do
     s <- readImpl f
     if s == "LocalFile" then pure LocalFile
-    else case fromString s of
-      Nothing -> fail $ TypeMismatch "Source" $ "Invalid Source: " <> s
-      Just url -> pure (WebURL (WURL url))
+    else maybe (fail $ TypeMismatch "Source" $ "Invalid Source: " <> s) (pure <<< WebURL <<< WURL) (fromString s)
 
 instance Decode State where
   decode = readImpl

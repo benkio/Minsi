@@ -3,11 +3,11 @@ module Controller.UploadController where
 import Prelude
 
 import Constants (rawOutput)
-import Data.Array (dropWhile, takeWhile)
-import Data.Maybe (Maybe(..))
+import Conversion.Filename (extractBaseName, extractFileExt, buildUploadedFilename)
+import Effect (Effect)
+import Data.Maybe (Maybe(..), maybe)
 import Data.Nullable (Nullable, toMaybe)
-import Data.String.CodeUnits (fromCharArray, toCharArray)
-import Data.Tuple (Tuple(..))
+import Data.Tuple (Tuple(..), fst, snd)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
 import InMemoryDB (Store, insert)
@@ -32,24 +32,30 @@ uploadController :: Store -> Handler
 uploadController store = do
   liftEffect $ log "[Upload Controller] Received a Request"
   fileBufferMaybe <- getUploadedFile
-  case fileBufferMaybe of
-    Just (Tuple fullFilename buffer) -> do
-      -- TODO: validation on filename (check validation regex on frontend)
-      let
-        fileExt = fromCharArray $ dropWhile (_ /= '.') (toCharArray fullFilename)
-        filename = fromCharArray $ takeWhile (_ /= '.') (toCharArray fullFilename)
-        uploadedFilename = filename <> "_uploaded" <> fileExt
-      liftEffect $ log $ "[Upload Controller] uploaded file " <> fullFilename
-      outputFilename <- liftEffect $ rawOutput uploadedFilename
-      liftEffect $ log $ "[Upload Controller] Write file to " <> outputFilename
-      liftEffect $ writeFile outputFilename buffer
-      liftEffect $ log $ "[Upload Controller] Save path to Db for: " <> filename
-      liftEffect $ insert filename Nothing (LocalFileUploaded outputFilename) store
-      setStatus 200
-      sendJson { received: true, message: "File uploaded" }
-      end
-    Nothing -> do
-      liftEffect $ log "[Upload Controller] no file in request (expect multipart/form-data with field 'file')"
-      setStatus 400
-      sendJson { received: false, error: "No file in request" }
-      end
+  maybe noFileResponse (handleUpload store) fileBufferMaybe
+
+noFileResponse :: Handler
+noFileResponse = do
+  liftEffect $ log "[Upload Controller] no file in request (expect multipart/form-data with field 'file')"
+  setStatus 400 *> sendJson { received: false, error: "No file in request" } *> end
+
+handleUpload :: Store -> Tuple String Buffer -> Handler
+handleUpload store fileAndBuffer = do
+  liftEffect $ saveUploadedFile store fullFilename buffer
+  setStatus 200 *> sendJson { received: true, message: "File uploaded" } *> end
+  where
+  fullFilename = fst fileAndBuffer
+  buffer = snd fileAndBuffer
+
+saveUploadedFile :: Store -> String -> Buffer -> Effect Unit
+saveUploadedFile store fullFilename buffer = do
+  let
+    fileExt = extractFileExt fullFilename
+    filename = extractBaseName fullFilename
+    uploadedFilename = buildUploadedFilename filename fileExt
+  log $ "[Upload Controller] uploaded file " <> fullFilename
+  outputFilename <- rawOutput uploadedFilename
+  log $ "[Upload Controller] Write file to " <> outputFilename
+  writeFile outputFilename buffer
+  log $ "[Upload Controller] Save path to Db for: " <> filename
+  insert filename Nothing (LocalFileUploaded outputFilename) store

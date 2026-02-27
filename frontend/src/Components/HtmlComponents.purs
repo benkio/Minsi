@@ -1,7 +1,7 @@
 module Components.HtmlComponents where
 
-import Components.HTMLComponentsLoader (loadHtmlElement)
-import Components.HtmlIds
+import Components.HTMLComponentsLoader (loadHtmlElementClass, loadHtmlElementId)
+import Components.HtmlIdAndClasses
   ( addSubtitleId
   , applyId
   , artistId
@@ -36,6 +36,8 @@ import Components.HtmlIds
   , keyboardShortcutsButtonId
   , localFileId
   , uploadLocalFileId
+  , minsiLogBoxClass
+  , minsiLogTitleId
   )
 import Components.Window (getDocument)
 import Control.Monad.Error.Class (catchError)
@@ -44,6 +46,7 @@ import Data.Newtype (class Newtype)
 import Data.Tuple (Tuple(..), fst, snd)
 import Effect (Effect)
 import Prelude (bind, pure)
+import Web.DOM.HTMLCollection (HTMLCollection)
 import Web.DOM.NonElementParentNode (NonElementParentNode)
 import Web.HTML.HTMLAudioElement (HTMLAudioElement)
 import Web.HTML.HTMLAudioElement as HA
@@ -112,6 +115,7 @@ resultPreviewToMaybeVideo = case _ of
 newtype HtmlOutputs = HtmlOutputs
   { resultPreview :: ResultPreview
   , minsiLog :: HTMLDivElement
+  , minsiLogTitle :: HTMLDivElement
   , playbackPositionYoutube :: HTMLSpanElement
   , playbackPositionResultVideo :: HTMLSpanElement
   , loadingModal :: HTMLDivElement
@@ -129,6 +133,7 @@ data HtmlVisualElements = HtmlVisualElements
   , videoRow :: HTMLDivElement
   , subtitlesRow :: HTMLDivElement
   , playbackPositionResultRow :: HTMLDivElement
+  , minsiLogBox :: HTMLCollection
   }
 
 type HtmlComponents =
@@ -201,6 +206,7 @@ loadHtmlOutputs :: NonElementParentNode -> Effect HtmlOutputs
 loadHtmlOutputs doc = do
   resultPreview <- loadResultPreview doc
   minsiLog <- loadDiv minsiLogId doc
+  minsiLogTitle <- loadDiv minsiLogTitleId doc
   playbackPositionYoutube <- loadSpan playbackPositionYoutubeId doc
   playbackPositionResultVideo <- loadSpan playbackPositionResultVideoId doc
   loadingModal <- loadDiv loadingModalId doc
@@ -212,6 +218,7 @@ loadHtmlOutputs doc = do
     ( HtmlOutputs
         { resultPreview: resultPreview
         , minsiLog: minsiLog
+        , minsiLogTitle: minsiLogTitle
         , playbackPositionYoutube: playbackPositionYoutube
         , playbackPositionResultVideo: playbackPositionResultVideo
         , loadingModal: loadingModal
@@ -228,49 +235,51 @@ loadHtmlVisualElements doc = do
   videoRow <- loadDiv videoRowId doc
   subtitlesRow <- loadDiv subtitlesRowId doc
   playbackPositionResultRow <- loadDiv playbackPositionResultRowId doc
+  minsiLogBox <- loadHtmlElementClass minsiLogBoxClass doc
   pure
     ( HtmlVisualElements
         { videoSourceRow: videoSourceRow
         , videoRow: videoRow
         , subtitlesRow: subtitlesRow
         , playbackPositionResultRow: playbackPositionResultRow
+        , minsiLogBox: minsiLogBox
         }
     )
 
 -- Load Single Elements ---------------------------------------------------
 
 loadInput :: String -> NonElementParentNode -> Effect HTMLInputElement
-loadInput id = loadHtmlElement id HI.fromElement
+loadInput id = loadHtmlElementId id HI.fromElement
 
 loadButton :: String -> NonElementParentNode -> Effect HTMLButtonElement
-loadButton id = loadHtmlElement id HB.fromElement
+loadButton id = loadHtmlElementId id HB.fromElement
 
 loadCutRange :: NonElementParentNode -> Effect (Tuple HTMLInputElement HTMLInputElement)
 loadCutRange doc = do
-  cutStart <- loadHtmlElement cutStartId HI.fromElement doc
-  cutEnd <- loadHtmlElement cutEndId HI.fromElement doc
+  cutStart <- loadHtmlElementId cutStartId HI.fromElement doc
+  cutEnd <- loadHtmlElementId cutEndId HI.fromElement doc
   pure (Tuple cutStart cutEnd)
 
 loadDiv :: String -> NonElementParentNode -> Effect HTMLDivElement
-loadDiv id = loadHtmlElement id HD.fromElement
+loadDiv id = loadHtmlElementId id HD.fromElement
 
 loadSelect :: String -> NonElementParentNode -> Effect HTMLSelectElement
-loadSelect id = loadHtmlElement id HS.fromElement
+loadSelect id = loadHtmlElementId id HS.fromElement
 
 loadSpan :: String -> NonElementParentNode -> Effect HTMLSpanElement
-loadSpan id = loadHtmlElement id HSP.fromElement
+loadSpan id = loadHtmlElementId id HSP.fromElement
 
 loadTable :: String -> NonElementParentNode -> Effect HTMLTableElement
-loadTable id = loadHtmlElement id HT.fromElement
+loadTable id = loadHtmlElementId id HT.fromElement
 
 loadVideo :: String -> NonElementParentNode -> Effect HTMLVideoElement
-loadVideo id = loadHtmlElement id HV.fromElement
+loadVideo id = loadHtmlElementId id HV.fromElement
 
 loadAudio :: String -> NonElementParentNode -> Effect HTMLAudioElement
-loadAudio id = loadHtmlElement id HA.fromElement
+loadAudio id = loadHtmlElementId id HA.fromElement
 
 loadTemplate :: String -> NonElementParentNode -> Effect HTMLTemplateElement
-loadTemplate id = loadHtmlElement id HTP.fromElement
+loadTemplate id = loadHtmlElementId id HTP.fromElement
 
 loadResultPreview :: NonElementParentNode -> Effect ResultPreview
 loadResultPreview doc = do
@@ -280,6 +289,6 @@ loadResultPreview doc = do
         pure (ResultPreviewVideo video)
     )
     ( \_ -> do
-        iframe <- loadHtmlElement resultPreviewId IF.fromElement doc
+        iframe <- loadHtmlElementId resultPreviewId IF.fromElement doc
         pure (ResultPreviewIframe iframe)
     )

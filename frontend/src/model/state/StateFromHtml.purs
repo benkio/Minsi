@@ -4,13 +4,13 @@ import Prelude
 
 import Components.HTMLTableElement (loadSubtitlesFromTable)
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), loadComponents)
-import Components.HtmlIds (youtubeUrlId, outputFilenameId, artistId, titleId, cutStartId, localFileId, inputSourceId)
+import Components.HtmlIdAndClasses (youtubeUrlId, outputFilenameId, artistId, titleId, cutStartId, localFileId, inputSourceId)
 import Conversion.OutputFilename (normalizeOutputFilename)
 import Conversion.String (capitalize)
 import Data.Array (length, (!!))
 import Data.Either (either)
 import Data.Int (fromString, toNumber)
-import Data.Maybe (fromJust, fromMaybe, Maybe(..))
+import Data.Maybe (fromJust, fromMaybe, maybe)
 import Data.String.Common (trim, toUpper)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Tuple (Tuple(..))
@@ -25,7 +25,7 @@ import Parse.Font (parseFontAndColor, parsePosition)
 import Partial.Unsafe (unsafePartial)
 import Validations.DurationRangeValidation (durationRangeValidation)
 import Validations.LetterNumberSpaceValidation (letterNumberSpaceValidation)
-import Validations.LetterNumberUnderscoreValidation (letterNumberUnderscoreValidation)
+import Validations.OutputFilenameValidation (outputFilenameValidation)
 import Validations.YoutubeValidation (youtubeUrlValidation)
 import Web.DOM.HTMLCollection as HC
 import Web.File.FileList (item)
@@ -60,7 +60,7 @@ fromHtmlInputs
   ) = do
   cutVideoV <- cutVideoFromHtmlRange cutStart cutEnd
   sourceV <- sourceFromHTMLInput inputSourceSelect youtubeUrlInput localFileInput
-  filenameV <- HI.value filenameInput <#> letterNumberUnderscoreValidation outputFilenameId
+  filenameV <- HI.value filenameInput <#> outputFilenameValidation outputFilenameId
   reverseLoopValue <- checked reverseLoopInput
   uploadLocalFileValue <- checked uploadLocalFileInput
   artistV <- HTMLInputElement.nonEmptyFromHtmlInput artistInput artistId <#> (_ `andThen` letterNumberSpaceValidation artistId)
@@ -100,9 +100,10 @@ sourceFromHTMLInput inputSourceSelect youtubeUrlComponent localFileComponent = d
     "youtubeUrl" -> pure youtubeValidation
     "localFile" -> do
       filesMaybe <- HI.files localFileComponent
-      case filesMaybe >>= item 0 of
-        Nothing -> pure $ invalid (fromSingleton localFileId "No file selected")
-        Just file -> pure $ pure (LocalFile file)
+      pure $ maybe
+        (invalid (fromSingleton localFileId "No file selected"))
+        (pure <<< LocalFile)
+        (filesMaybe >>= item 0)
     v -> pure $ invalid (fromSingleton inputSourceId ("Unrecognized value: " <> v))
 
 loadSubtitleFromRow :: Int -> HTR.HTMLTableRowElement -> Effect Subtitle

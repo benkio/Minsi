@@ -3,7 +3,7 @@ module Handlers.ResultVideo.VideoSourceHandler where
 import Data.Newtype (unwrap)
 import Data.Tuple (fst)
 import Effect (Effect)
-import Handlers.ApplyButtonHandler (setResultMediaSrc)
+import Handlers.ResultVideo.MediaSrc (setResultMediaSrc)
 import Handlers.ErrorHandlers (genericErrorsHandler)
 import Model.State.StateFromHtml (getCurrentState)
 import Prelude

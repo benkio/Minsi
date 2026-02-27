@@ -1,4 +1,4 @@
-module Components.HtmlIds where
+module Components.HtmlIdAndClasses where
 
 outputFilenameId :: String
 outputFilenameId = "outputFilename"
@@ -110,3 +110,9 @@ inputSourceId = "inputSource"
 
 uploadLocalFileId :: String
 uploadLocalFileId = "uploadLocalFile"
+
+minsiLogBoxClass :: String
+minsiLogBoxClass = "minsiLogBox"
+
+minsiLogTitleId :: String
+minsiLogTitleId = "minsiLogTitle"

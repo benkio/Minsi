@@ -8,7 +8,7 @@ import Constants (mp4, uploaded)
 import Control.Monad.Error.Class (catchError)
 import Conversion.Time (millisecondsToSecondsString)
 import Data.Array (uncons)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), maybe)
 import Data.Time.Duration (Milliseconds)
 import Data.URL (toString)
 import Effect.Aff (Aff, apathize, finally)
@@ -48,15 +48,21 @@ getYtdlpOutputUrl cookie (WURL url) filepath start end =
 
 downloadOrCutVideo :: Source -> String -> Milliseconds -> Milliseconds -> Aff ExecaResult
 downloadOrCutVideo LocalFile filename start end = do
-  uploadedFilepath <- liftEffect $ uploaded filename
-  filepath <- liftEffect $ mp4 filename
-  liftEffect $ unlessM (exists uploadedFilepath) (throwMinsiError (FfmpegVideoError ("🚫 Error: Expected " <> show uploadedFilepath <> " but not was found. Retry the `compute` and the upload")))
-  liftEffect $ log ("[Ytdlp] Cut " <> show uploadedFilepath <> " To " <> show filepath)
+  uploadedFilepath <- liftEffect $ validateAndResolveLocalFile filename
   finally (rm uploadedFilepath) (cutAndConvertUploadedVideo uploadedFilepath filename start end)
+  where
+  validateAndResolveLocalFile fn = do
+    up <- uploaded fn
+    fp <- mp4 fn
+    unlessM (exists up) (throwMinsiError (FfmpegVideoError ("🚫 Error: Expected " <> show up <> " but not was found. Retry the `compute` and the upload")))
+    log ("[Ytdlp] Cut " <> show up <> " To " <> show fp)
+    pure up
 
 downloadOrCutVideo (WebURL youtubeUri) filename start end = do
-  filepath <- liftEffect $ mp4 filename
-  liftEffect $ log ("[Ytdlp] Delete " <> show filepath)
+  filepath <- liftEffect do
+    fp <- mp4 filename
+    log ("[Ytdlp] Delete " <> show fp)
+    pure fp
   apathize (rm filepath)
   tryCookies ytdlpSupportedBrowserCookies youtubeUri filepath
   where
@@ -65,14 +71,16 @@ downloadOrCutVideo (WebURL youtubeUri) filename start end = do
 
   tryCookies :: Array String -> WURL -> String -> Aff ExecaResult
   tryCookies cookies url filepath =
-    case uncons cookies of
-      Just { head: c, tail: cs } ->
-        catchError
-          ( getYtdlpOutputUrl c url filepath startStr endStr
-              >>= _.getResult
-              >>= \r -> case r.exit of
-                Normally 0 -> pure r
-                _ -> liftEffect $ throwMinsiError (YtdlpError r.message)
-          )
-          (\_ -> tryCookies cs url filepath)
-      Nothing -> liftEffect $ throwMinsiError (YtdlpError "All yt-dlp cookie attempts failed")
+    maybe
+      (liftEffect $ throwMinsiError (YtdlpError "All yt-dlp cookie attempts failed"))
+      ( \{ head: c, tail: cs } ->
+          catchError
+            ( getYtdlpOutputUrl c url filepath startStr endStr
+                >>= _.getResult
+                >>= \r -> case r.exit of
+                  Normally 0 -> pure r
+                  _ -> liftEffect $ throwMinsiError (YtdlpError r.message)
+            )
+            (\_ -> tryCookies cs url filepath)
+      )
+      (uncons cookies)

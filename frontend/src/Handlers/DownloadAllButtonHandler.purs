@@ -27,7 +27,7 @@ downloadAllButtonEventListener _ = do
   runAff_ genericErrorsHandlerEither (downloadAll filename)
 
 downloadAll :: String -> Aff Unit
-downloadAll filename = do
-  liftEffect (triggerDownloadLink filename "mp4")
-  liftEffect (triggerDownloadLink filename "gif")
-  liftEffect (triggerDownloadLink filename "mp3")
+downloadAll filename = liftEffect do
+  triggerDownloadLink filename "mp4"
+  triggerDownloadLink filename "gif"
+  triggerDownloadLink filename "mp3"

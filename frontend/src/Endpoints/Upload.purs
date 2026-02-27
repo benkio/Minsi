@@ -30,14 +30,19 @@ uploadEndpoint = backendUrl <> "upload"
 -- Replicates: FormData from file, then fetch POST with body formData
 callUpload :: File -> String -> Aff Int
 callUpload file filename = do
-  liftEffect $ log $ "[Upload] upload " <> filename
-  liftEffect $ log $ "[Upload] Create formData"
-  formData <- liftEffect $ fileToFormData file filename
-  liftEffect $ log $ "[Upload] FormData Created. Call the endpoint"
+  formData <- liftEffect $ prepareUpload file filename
   response <- fetch uploadEndpoint
     { method: POST
     , body: formData
     }
-  liftEffect $ log $ "[Upload] Validate the response"
-  _ <- liftEffect $ validateResponse response
+  liftEffect do
+    log "[Upload] Validate the response"
+    void $ validateResponse response
   pure response.status
+  where
+  prepareUpload f fn = do
+    log $ "[Upload] upload " <> fn
+    log "[Upload] Create formData"
+    fd <- fileToFormData f fn
+    log "[Upload] FormData Created. Call the endpoint"
+    pure fd

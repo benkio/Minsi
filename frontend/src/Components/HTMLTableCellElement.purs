@@ -44,9 +44,7 @@ getInputValueFromCell cell = do
   let parentNode = toParentNode element
   elementMaybe <- querySelector (QuerySelector "input") parentNode
   let inputMaybe = elementMaybe >>= HI.fromElement
-  case inputMaybe of
-    Nothing -> pure Nothing
-    Just input -> valueAsNumber input <#> floor >>> Just
+  maybe (pure Nothing) (\input -> valueAsNumber input <#> floor >>> Just) inputMaybe
 
 getTextAreaValueFromCell :: HTC.HTMLTableCellElement -> Effect String
 getTextAreaValueFromCell cell = do
@@ -54,9 +52,7 @@ getTextAreaValueFromCell cell = do
   let parentNode = toParentNode element
   elementMaybe <- querySelector (QuerySelector "textarea") parentNode
   let textareaMaybe = elementMaybe >>= HTA.fromElement
-  case textareaMaybe of
-    Nothing -> pure ""
-    Just textarea -> HTA.value textarea
+  maybe (pure "") HTA.value textareaMaybe
 
 getSelectValueFromCell :: HTC.HTMLTableCellElement -> Effect String
 getSelectValueFromCell cell = do
@@ -64,6 +60,4 @@ getSelectValueFromCell cell = do
   let parentNode = toParentNode element
   elementMaybe <- querySelector (QuerySelector "select") parentNode
   let selectMaybe = elementMaybe >>= HS.fromElement
-  case selectMaybe of
-    Nothing -> pure ""
-    Just select -> HS.value select
+  maybe (pure "") HS.value selectMaybe

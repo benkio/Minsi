@@ -13,9 +13,7 @@ import Node.Path (FilePath)
 
 extractMp3 :: FilePath -> Aff ExecaResult
 extractMp3 filename = do
-  filepathMp3 <- liftEffect $ mp3 filename
-  filepathMp4 <- liftEffect $ mp4 filename
-  let args = extractMp3CommandArgs filepathMp3 filepathMp4
+  args <- liftEffect $ extractMp3CommandArgs <$> mp3 filename <*> mp4 filename
   process <- runCommand args FfmpegMp3Error "ffmpeg"
   process.getResult
 

@@ -25,8 +25,6 @@ program = do
 {-
 -------Bugs-------------------
 ------Improvements------------
-- Add health check and add a step in CI to: build the docker image, run it, test the healthcheck endpoint
-- Make minsilog red when there's an error
 ------Additions---------------
 - Button to Export client compute payload (maybe directly the curl command)
 - Option to compute from payload

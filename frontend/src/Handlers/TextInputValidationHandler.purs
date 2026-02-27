@@ -3,7 +3,7 @@ module Handlers.TextInputValidationHandler where
 import Prelude
 
 import Components.HtmlComponents (loadComponents)
-import Components.HtmlIds (artistId, outputFilenameId, titleId)
+import Components.HtmlIdAndClasses (artistId, outputFilenameId, titleId)
 import Data.Maybe (maybe)
 import Data.Newtype (unwrap)
 import Data.Validation.Semigroup (andThen, validation)
@@ -14,7 +14,7 @@ import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.ArtistPrefix (prefixForArtist)
 import Model.ValidationErrors (toMap)
 import Validations.LetterNumberSpaceValidation (letterNumberSpaceValidation)
-import Validations.LetterNumberUnderscoreValidation (letterNumberUnderscoreValidation)
+import Validations.OutputFilenameValidation (outputFilenameValidation)
 import Validations.NonEmptyValidation (nonEmptyValidation)
 import Web.DOM.Element (toEventTarget)
 import Web.Event.EventTarget (addEventListener, eventListener)
@@ -50,7 +50,7 @@ outputFilenameChangeListener _ = genericErrorsHandler $ do
   validation
     (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
     (\_ -> log "[TextInputValidationHandler] set the uploadLocalFile to true" *> HI.setChecked true uploadLocalFile)
-    (letterNumberUnderscoreValidation outputFilenameId v)
+    (outputFilenameValidation outputFilenameId v)
 
 -- | On artist change: if artist matches a known value, set output filename to that prefix; then validate non-empty.
 artistChangeListener :: Event -> Effect Unit
