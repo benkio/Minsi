@@ -88,8 +88,7 @@ jobs:
       - name: Create Pull Request
         if: steps.changes.outputs.has_changes == 'true'
         id: cpr
-        continue-on-error: true
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           # If your repo disables PR creation with GITHUB_TOKEN, set a PAT as DEPENDENCY_UPDATE_TOKEN.
           token: ${{ secrets.DEPENDENCY_UPDATE_TOKEN != '' && secrets.DEPENDENCY_UPDATE_TOKEN || secrets.GITHUB_TOKEN }}
@@ -100,6 +99,16 @@ jobs:
           title: "chore: update dependencies ${{ steps.meta.outputs.title_date }}"
           body: "Automated weekly dependency update."
           base: main
+
+      - name: Delete remote branch on failure
+        if: failure() && steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.DEPENDENCY_UPDATE_TOKEN != '' && secrets.DEPENDENCY_UPDATE_TOKEN || secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.meta.outputs.branch }}
+        run: |
+          set -euo pipefail
+          echo "Attempting to delete remote branch: ${BRANCH}"
+          gh api -X DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/${BRANCH}" || true
 
       - name: Wait for CI and merge
         if: steps.changes.outputs.has_changes == 'true' && steps.cpr.outputs.pull-request-number != ''
