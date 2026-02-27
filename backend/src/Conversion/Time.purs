@@ -2,11 +2,10 @@ module Conversion.Time where
 
 import Prelude
 
-import Data.Array (replicate, span, take, tail)
 import Data.Foldable (intercalate)
 import Data.Int (floor)
-import Data.Maybe (Maybe(..), maybe)
-import Data.String.CodeUnits (fromCharArray, singleton, toCharArray)
+import Data.Maybe (Maybe(..))
+import Data.String.CodeUnits (singleton)
 import Data.Time.Duration (Milliseconds(..))
 import Text.Printf (formatInt)
 

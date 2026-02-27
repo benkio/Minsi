@@ -1,6 +1,6 @@
 module Test.CheckDependencies.FontCheckSpec where
 
-import CheckDependencies.FontCheck (searchFont, searchFontInDir, checkFileMatch)
+import CheckDependencies.FontCheck (checkFileMatch, searchFont)
 import Effect.Class (liftEffect)
 import Prelude
 import Test.Main (isNotCI)

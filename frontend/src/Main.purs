@@ -20,15 +20,3 @@ program = do
   log "Components correctly loaded"
   setupEventHandlers htmlComponents
   log "Setup Handlers Done"
-
--- TODOs --------------------------------
-{-
--------Bugs-------------------
-------Improvements------------
-------Additions---------------
-- Button to Export client compute payload (maybe directly the curl command)
-- Option to compute from payload
------keyboard shortcut for----
-- cut start/end
-- set start/end subtitle
--}

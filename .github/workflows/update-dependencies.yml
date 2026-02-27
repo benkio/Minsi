@@ -1,0 +1,91 @@
+name: Update Dependencies
+
+on:
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    name: Update and PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup PureScript
+        uses: purescript-contrib/setup-purescript@main
+        with:
+          purescript: "latest"
+          purs-tidy: "latest"
+          spago: "unstable"
+
+      - name: Update npm dependencies (backend)
+        working-directory: backend
+        run: npm update --save
+
+      - name: Update npm dependencies (frontend)
+        working-directory: frontend
+        run: npm update --save
+
+      - name: Update spago package set and lock (backend)
+        working-directory: backend
+        run: spago upgrade && spago install
+
+      - name: Update spago package set and lock (frontend)
+        working-directory: frontend
+        run: spago upgrade && spago install
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create branch and PR
+        if: steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="chore/update-dependencies-$(date +%Y%m%d)"
+          git checkout -b "$BRANCH"
+          git add -A
+          git commit -m "$(cat <<'EOF'
+          chore: update project dependencies
+
+          Automated weekly dependency update.
+          EOF
+          )"
+          git push -u origin "$BRANCH"
+          gh pr create \
+            --title "chore: update dependencies $(date +%Y-%m-%d)" \
+            --body "Automated weekly dependency update." \
+            --base main
+
+      - name: Wait for CI and merge
+        if: steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="chore/update-dependencies-$(date +%Y%m%d)"
+          PR_NUMBER=$(gh pr view "$BRANCH" --json number -q .number)
+          echo "Waiting for CI checks on PR #${PR_NUMBER}..."
+          if gh pr checks "$PR_NUMBER" --watch --fail-fast; then
+            echo "CI passed, merging PR #${PR_NUMBER}"
+            gh pr merge "$PR_NUMBER" --squash --delete-branch
+          else
+            echo "CI failed, PR #${PR_NUMBER} left open for manual review"
+            exit 1
+          fi

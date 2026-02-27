@@ -2,7 +2,7 @@ module Components.HTMLTableRowElement where
 
 import Data.Array (drop, head)
 import Prelude
-import Data.Maybe (Maybe(..), maybe)
+import Data.Maybe (maybe)
 import Effect (Effect)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Web.DOM.Element (toParentNode)
