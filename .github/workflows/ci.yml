@@ -87,3 +87,44 @@ jobs:
       - name: Test frontend
         working-directory: frontend
         run: spago test
+
+  docker:
+    name: Docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t minsi .
+
+      - name: Run Docker container
+        run: docker run -d --name minsi -p 8080:8080 minsi
+
+      - name: Wait for server to be ready
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf -o /dev/null http://localhost:8080/checkDependencies -X POST; then
+              echo "Server is ready"
+              exit 0
+            fi
+            echo "Waiting for server... ($i/30)"
+            sleep 2
+          done
+          echo "Server did not start in time"
+          docker logs minsi
+          exit 1
+
+      - name: Call CheckDependencies endpoint
+        run: |
+          HTTP_STATUS=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST http://localhost:8080/checkDependencies)
+          echo "HTTP status: $HTTP_STATUS"
+          cat /tmp/response.txt
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "CheckDependencies failed with status $HTTP_STATUS"
+            exit 1
+          fi
+
+      - name: Stop Docker container
+        if: always()
+        run: docker rm -f minsi
