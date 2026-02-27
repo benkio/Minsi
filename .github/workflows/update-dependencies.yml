@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -76,35 +78,36 @@ jobs:
             echo "has_changes=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Create branch and PR
+      - name: Compute branch and title
         if: steps.changes.outputs.has_changes == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        id: meta
         run: |
-          BRANCH="chore/update-dependencies-$(date +%Y%m%d)"
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$BRANCH"
-          git add -A
-          git commit -m "$(cat <<'EOF'
-          chore: update project dependencies
+          echo "branch=chore/update-dependencies-$(date +%Y%m%d)" >> "$GITHUB_OUTPUT"
+          echo "title_date=$(date +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
 
-          Automated weekly dependency update.
-          EOF
-          )"
-          git push -u origin "$BRANCH"
-          gh pr create \
-            --title "chore: update dependencies $(date +%Y-%m-%d)" \
-            --body "Automated weekly dependency update." \
-            --base main
+      - name: Create Pull Request
+        if: steps.changes.outputs.has_changes == 'true'
+        id: cpr
+        continue-on-error: true
+        uses: peter-evans/create-pull-request@v7
+        with:
+          # If your repo disables PR creation with GITHUB_TOKEN, set a PAT as DEPENDENCY_UPDATE_TOKEN.
+          token: ${{ secrets.DEPENDENCY_UPDATE_TOKEN != '' && secrets.DEPENDENCY_UPDATE_TOKEN || secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update project dependencies"
+          committer: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+          author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+          branch: ${{ steps.meta.outputs.branch }}
+          title: "chore: update dependencies ${{ steps.meta.outputs.title_date }}"
+          body: "Automated weekly dependency update."
+          base: main
 
       - name: Wait for CI and merge
-        if: steps.changes.outputs.has_changes == 'true'
+        if: steps.changes.outputs.has_changes == 'true' && steps.cpr.outputs.pull-request-number != ''
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.DEPENDENCY_UPDATE_TOKEN != '' && secrets.DEPENDENCY_UPDATE_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
-          BRANCH="chore/update-dependencies-$(date +%Y%m%d)"
-          PR_NUMBER=$(gh pr view "$BRANCH" --json number -q .number)
+          set -euo pipefail
+          PR_NUMBER="${{ steps.cpr.outputs.pull-request-number }}"
           echo "Waiting for CI checks on PR #${PR_NUMBER}..."
           if gh pr checks "$PR_NUMBER" --watch --fail-fast; then
             echo "CI passed, merging PR #${PR_NUMBER}"
