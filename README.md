@@ -4,6 +4,9 @@
 
 A web application to download YouTube videos and produce customized clips: **video** (MP4), **MP3** audio, and **GIF** (with optional subtitles), with best-possible quality.
 
+**PROJECT IN MAINTENANCE MODE**
+I don't plan to develop new features on this for now. Just fix bugs and keep it working
+
 ## Project structure
 
 - **[Frontend](./frontend/README.md)** — PureScript UI (Bootstrap, YouTube embed)
