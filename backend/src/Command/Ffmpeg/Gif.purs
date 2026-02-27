@@ -28,13 +28,17 @@ makeGif (State { filename, subtitles, reverseLoop })
 
 makePlainGif :: FilePath -> Aff ExecaResult
 makePlainGif filename = do
-  filepathMp4 <- liftEffect $ mp4 filename
-  filepathGif <- liftEffect $ gif filename
-  liftEffect $ log ("[Gif] Delete " <> show filepathGif)
+  { filepathMp4, filepathGif } <- liftEffect $ resolvePlainGifPaths filename
   apathize (liftEffect $ rm filepathGif)
   let args = addFfmpegPlainGifArgs filepathMp4 filepathGif
   process <- runCommand args FfmpegGifError "ffmpeg"
   process.getResult
+  where
+  resolvePlainGifPaths fn = do
+    p <- mp4 fn
+    g <- gif fn
+    log ("[Gif] Delete " <> show g)
+    pure { filepathMp4: p, filepathGif: g }
 
 addFfmpegPlainGifArgs :: FilePath -> FilePath -> Array String
 addFfmpegPlainGifArgs mp4 gif =
@@ -42,18 +46,19 @@ addFfmpegPlainGifArgs mp4 gif =
 
 makeSubtitleGif :: FilePath -> Array Subtitle -> Aff ExecaResult
 makeSubtitleGif filename subtitles = do
-  filepathMp4 <- liftEffect $ mp4 filename
-  filepathGif <- liftEffect $ gif filename
-  filepathSrt <- liftEffect $ srt filename
-  liftEffect $ log ("[Gif] Delete " <> show filepathGif)
+  { filepathMp4, filepathGif, filepathSrt } <- liftEffect $ resolveSubtitleGifPaths filename
   apathize (liftEffect $ rm filepathGif)
-
-  let subtitleContent = makeSrtsString subtitles
-  liftEffect $ writeSrtFile filename subtitleContent
-
+  liftEffect $ writeSrtFile filename (makeSrtsString subtitles)
   let args = addFfmpegSubtitleGifArgs filepathMp4 filepathGif filepathSrt
   process <- runCommand args FfmpegGifError "ffmpeg"
   process.getResult
+  where
+  resolveSubtitleGifPaths fn = do
+    p <- mp4 fn
+    g <- gif fn
+    s <- srt fn
+    log ("[Gif] Delete " <> show g)
+    pure { filepathMp4: p, filepathGif: g, filepathSrt: s }
 
 addFfmpegSubtitleGifArgs :: FilePath -> FilePath -> FilePath -> Array String
 addFfmpegSubtitleGifArgs mp4 gif srt =
@@ -66,20 +71,15 @@ addFfmpegSubtitleGifArgs mp4 gif srt =
 
 makeReverseGif :: FilePath -> Aff (Array ExecaResult)
 makeReverseGif filename = do
-  filepathGif <- liftEffect $ gif filename
-  filepathReversed <- liftEffect $ reversed filename
-
+  { filepathGif, filepathReversed } <- liftEffect $ { filepathGif: _, filepathReversed: _ } <$> gif filename <*> reversed filename
   plainGif <- makePlainGif filename
   reversedGif <- makeReverseSingleGif filename
   merge <- mergeVideos filename filepathGif filepathReversed
-
   pure [ plainGif, reversedGif, merge ]
 
 makeReverseSingleGif :: FilePath -> Aff ExecaResult
 makeReverseSingleGif filename = do
-  filepathReversed <- liftEffect $ reversed filename
-  filepathGif <- liftEffect $ gif filename
-  let args = addFfmpegReverseGifArgs filepathGif filepathReversed
+  args <- liftEffect $ addFfmpegReverseGifArgs <$> gif filename <*> reversed filename
   process <- runCommand args FfmpegGifError "ffmpeg"
   process.getResult
 
@@ -89,23 +89,26 @@ addFfmpegReverseGifArgs filepathGif filepathReversed =
 
 mergeVideos :: FilePath -> FilePath -> FilePath -> Aff ExecaResult
 mergeVideos filename filepathGif filepathReversed = do
-  filepathTxt <- liftEffect $ txt filename
-  filepathReversedFull <- liftEffect $ reversedFull filename
-  liftEffect $ writeMergeTxt filename [ filepathGif, filepathReversed ]
-  let args = addFfmpegMergeVideosArgs filepathTxt filepathReversedFull
+  args <- liftEffect $ prepareMerge filename filepathGif filepathReversed
   process <- runCommand args FfmpegGifError "ffmpeg"
   process.getResult
+  where
+  prepareMerge fn gifPath reversedPath = do
+    filepathTxt <- txt fn
+    filepathReversedFull <- reversedFull fn
+    writeMergeTxt fn [ gifPath, reversedPath ]
+    pure $ addFfmpegMergeVideosArgs filepathTxt filepathReversedFull
 
 addFfmpegMergeVideosArgs :: FilePath -> FilePath -> Array String
 addFfmpegMergeVideosArgs filepathTxt filepathReversedFull =
   [ "-hide_banner", "-loglevel", "warning", "-f", "concat", "-safe", "0", "-i", show filepathTxt, "-c", "copy", show filepathReversedFull ]
 
 reverseGifCleanup :: String -> Aff Unit
-reverseGifCleanup filename = liftEffect $ do
-  filepathGif <- liftEffect $ gif filename
-  filepathTxt <- liftEffect $ txt filename
-  filepathReversed <- liftEffect $ reversed filename
-  filepathReversedFull <- liftEffect $ reversedFull filename
+reverseGifCleanup filename = liftEffect do
+  filepathGif <- gif filename
+  filepathTxt <- txt filename
+  filepathReversed <- reversed filename
+  filepathReversedFull <- reversedFull filename
   let filesToDelete = [ filepathGif, filepathReversed, filepathTxt ]
   log $ "Execute Command, delete multiple files:" <> show filesToDelete
   traverse_ rm filesToDelete

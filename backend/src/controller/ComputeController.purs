@@ -2,31 +2,27 @@ module Controller.ComputeController where
 
 import Prelude
 
+import Command.ExecaHelpers (exceptTMultiple, exceptTStep)
 import Command.Ffmpeg.Gif (makeGif)
 import Command.Ffmpeg.Mp3 (extractMp3)
 import Command.Ffmpeg.Video (normalizeVideo)
 import Command.Id3v2 (addId3Tags)
 import Command.Ytdlp (downloadOrCutVideo)
-import Control.Monad.Error.Class (catchError)
-import Control.Monad.Except (ExceptT(..), runExcept, runExceptT, lift)
+import Control.Monad.Except (runExcept, runExceptT)
 import Data.Array (fromFoldable)
 import Data.Bifunctor (lmap)
-import Data.Either (Either(..))
-import Data.Maybe (Maybe(..))
-import Data.Traversable (traverse_)
+import Data.Either (Either, either)
+import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
-import Effect.Exception (message)
 import InMemoryDB (Store, insert, lookupProcessStatus)
 import Model.ProcessStatus (ProcessStatus(..), isFinished)
 import Model.State (DurationRange(..), State(..), validateState)
-import Node.ChildProcess.Types (Exit(..))
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody)
 import Node.Express.Response (sendJson, setStatus, end)
-import Node.Library.Execa (ExecaResult)
 
 data ComputeResponse
   = InvalidInput (Array String)
@@ -53,13 +49,16 @@ computeController store = do
       liftEffect (compute mayOldState state store) *> setStatus 200 *> end
 
 computeResponse :: Store -> Either (Array String) State -> Effect ComputeResponse
-computeResponse _ (Left errors) = pure (InvalidInput errors)
-computeResponse store (Right state@(State { filename })) = do
-  m <- lookupProcessStatus filename store
-  case m of
-    Just { processStatus } | not (isFinished processStatus) -> pure PendingComputation
-    Just { state: oldState } -> pure (Success oldState state)
-    _ -> pure (Success Nothing state)
+computeResponse store =
+  either
+    (pure <<< InvalidInput)
+    ( \state@(State { filename }) -> do
+        m <- lookupProcessStatus filename store
+        pure $ maybe
+          (Success Nothing state)
+          (\rec -> if not (isFinished rec.processStatus) then PendingComputation else Success rec.state state)
+          m
+    )
 
 compute :: Maybe State -> State -> Store -> Effect Unit
 compute mayOldState state@(State { filename }) store = do
@@ -67,11 +66,15 @@ compute mayOldState state@(State { filename }) store = do
   log "Starting video download in background..."
   launchAff_ $ do
     result <- runComputePipeline mayOldState state
-    processResult <- case result of
-      Right _ -> pure Succeed
-      Left e -> liftEffect (log ("error during compute: " <> e)) *> pure (Failed e)
-    liftEffect $ insert filename (Just state) processResult store
+    liftEffect $ saveComputeResult result
   log "Video download launched, returning HTTP response"
+  where
+  saveComputeResult result = do
+    processResult <- either
+      (\e -> log ("error during compute: " <> e) *> pure (Failed e))
+      (\_ -> pure Succeed)
+      result
+    insert filename (Just state) processResult store
 
 runComputePipeline :: Maybe State -> State -> Aff (Either String Unit)
 runComputePipeline mayOldState state@(State { source, filename, cutVideo: DurationRange { start, end }, artist, title }) =
@@ -87,31 +90,8 @@ runComputePipeline mayOldState state@(State { source, filename, cutVideo: Durati
     pure unit
 
 cutDownloadRequired :: Maybe State -> State -> Boolean
-cutDownloadRequired Nothing _ = true
-cutDownloadRequired (Just (State { source: oldSource, cutVideo: oldCutVideo })) (State { source: newSource, cutVideo: newCutVideo }) =
-  oldSource /= newSource || oldCutVideo /= newCutVideo
+cutDownloadRequired mayOldState (State { source: newSource, cutVideo: newCutVideo }) =
+  maybe true
+    (\(State { source: oldSource, cutVideo: oldCutVideo }) -> oldSource /= newSource || oldCutVideo /= newCutVideo)
+    mayOldState
 
-exceptTMultiple :: String -> Aff (Array ExecaResult) -> ExceptT String Aff Unit
-exceptTMultiple label affs = do
-  steps <- lift affs
-  traverse_ (checkExecaResult label) steps
-
-execaResultToEither :: String -> ExecaResult -> Either String Unit
-execaResultToEither label r =
-  if isSuccessExit r.exit then Right unit else Left (label <> " failed. Command: " <> command <> " - stderr: " <> error)
-  where
-  error = r.stderr
-  command = r.escapedCommand
-
-checkExecaResult :: String -> ExecaResult -> ExceptT String Aff Unit
-checkExecaResult label r = ExceptT $ pure $ execaResultToEither label r
-
-exceptTStep :: String -> Aff ExecaResult -> ExceptT String Aff Unit
-exceptTStep label aff =
-  ExceptT $
-    (aff >>= \r -> pure $ execaResultToEither label r)
-      `catchError` (\e -> pure $ Left (label <> ": " <> message e))
-
-isSuccessExit :: Exit -> Boolean
-isSuccessExit (Normally 0) = true
-isSuccessExit _ = false

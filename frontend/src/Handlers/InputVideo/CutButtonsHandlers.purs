@@ -33,14 +33,17 @@ setCutEndInputButtonEvL _ = genericErrorsHandler $ do
 
 initializeCutInputs :: Int -> Effect Unit
 initializeCutInputs startTime = launchAff_ $ do
-  components <- liftEffect $ loadComponents
-  let
-    cutStart = (unwrap components.htmlInputs).cutStart
-    cutEnd = (unwrap components.htmlInputs).cutEnd
+  components <- liftEffect loadComponents
   whileM_ (liftEffect (not <$> isPlayerReady)) (delay (Milliseconds 500.0))
   durationSeconds <- liftEffect getVideoDuration
-  let durationMs = durationSeconds * 1000.0
-  let startTimeMs = toNumber startTime * 1000.0
-  liftEffect $ HI.setMax (show (floor durationMs)) cutStart
-  liftEffect $ HI.setValue (show (floor startTimeMs)) cutStart
-  liftEffect $ HI.setMax (show (floor durationMs)) cutEnd
+  liftEffect $ setCutInputValues components durationSeconds
+  where
+  setCutInputValues components durationSeconds = do
+    let
+      cutStart = (unwrap components.htmlInputs).cutStart
+      cutEnd = (unwrap components.htmlInputs).cutEnd
+      durationMs = durationSeconds * 1000.0
+      startTimeMs = toNumber startTime * 1000.0
+    HI.setMax (show (floor durationMs)) cutStart
+    HI.setValue (show (floor startTimeMs)) cutStart
+    HI.setMax (show (floor durationMs)) cutEnd

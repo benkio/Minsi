@@ -7,7 +7,7 @@ import Control.Monad.Loops (iterateUntilM)
 import Control.Monad.Trans.Class (lift)
 import Control.Monad.Maybe.Trans (MaybeT(..), runMaybeT)
 import Data.Foldable (traverse_)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Effect (Effect)
 import Effect.Console (log)
 import Handlers.ErrorHandlers (genericErrorsHandler)
@@ -78,6 +78,4 @@ removeRowFromDom tableRow = do
 removeFirstSubtitleRow :: HT.HTMLTableElement -> Effect Unit
 removeFirstSubtitleRow subtitleTable = do
   rows <- getRows subtitleTable
-  case head rows of
-    Just row -> runMaybeT (removeRowFromDom row) *> pure unit
-    Nothing -> pure unit
+  maybe (pure unit) (\row -> runMaybeT (removeRowFromDom row) *> pure unit) (head rows)

@@ -24,13 +24,16 @@ cleanupOutputFolder maxAge =
   catchError run \_ -> liftEffect $ log "[CleanupOutput] Output directory not found or not readable, skipping."
   where
   run = do
-    dir <- liftEffect outputPath
-    entries <- liftEffect $ readdir dir
-    currentInstant <- liftEffect now
+    { currentMs, maxAgeMs, filePaths } <- liftEffect resolveCleanupContext
+    traverse_ (tryDeleteIfOld currentMs maxAgeMs) filePaths
+  resolveCleanupContext = do
+    dir <- outputPath
+    entries <- readdir dir
+    currentInstant <- now
     let (Milliseconds currentMs) = unInstant currentInstant
     let maxAgeMs = case maxAge of Milliseconds n -> n
-    filePaths <- liftEffect $ traverse (\name -> resolve [ dir ] name) entries
-    traverse_ (tryDeleteIfOld currentMs maxAgeMs) filePaths
+    filePaths <- traverse (\name -> resolve [ dir ] name) entries
+    pure { currentMs, maxAgeMs, filePaths }
 
 tryDeleteIfOld :: Number -> Number -> FilePath -> Aff Unit
 tryDeleteIfOld currentMs maxAgeMs filePath =

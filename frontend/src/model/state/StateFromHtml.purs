@@ -10,7 +10,7 @@ import Conversion.String (capitalize)
 import Data.Array (length, (!!))
 import Data.Either (either)
 import Data.Int (fromString, toNumber)
-import Data.Maybe (fromJust, fromMaybe, Maybe(..))
+import Data.Maybe (fromJust, fromMaybe, maybe)
 import Data.String.Common (trim, toUpper)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Tuple (Tuple(..))
@@ -100,9 +100,10 @@ sourceFromHTMLInput inputSourceSelect youtubeUrlComponent localFileComponent = d
     "youtubeUrl" -> pure youtubeValidation
     "localFile" -> do
       filesMaybe <- HI.files localFileComponent
-      case filesMaybe >>= item 0 of
-        Nothing -> pure $ invalid (fromSingleton localFileId "No file selected")
-        Just file -> pure $ pure (LocalFile file)
+      pure $ maybe
+        (invalid (fromSingleton localFileId "No file selected"))
+        (pure <<< LocalFile)
+        (filesMaybe >>= item 0)
     v -> pure $ invalid (fromSingleton inputSourceId ("Unrecognized value: " <> v))
 
 loadSubtitleFromRow :: Int -> HTR.HTMLTableRowElement -> Effect Subtitle

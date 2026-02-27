@@ -4,7 +4,7 @@ import Prelude
 
 import Components.HTMLTableElement (getFirstRow, getStartInput, getTBody)
 import Components.HTMLTableRowElement (getEndInput)
-import Data.Either (Either(..))
+import Data.Either (either)
 import Data.Maybe (maybe)
 import Effect (Effect)
 import Effect.Console (log)
@@ -38,9 +38,10 @@ addSubtitleButtonEventListener :: HT.HTMLTableElement -> HTP.HTMLTemplateElement
 addSubtitleButtonEventListener subtitleTable subtitleRowTemplate _ = genericErrorsHandler $ do
   log "Add subtitle button clicked"
   eitherFirstRow <- try $ getFirstRow subtitleTable
-  case eitherFirstRow of
-    Left _ -> addNewRow subtitleTable subtitleRowTemplate
-    Right firstRow -> cloneFirstRow firstRow subtitleTable
+  either
+    (const $ addNewRow subtitleTable subtitleRowTemplate)
+    (\firstRow -> cloneFirstRow firstRow subtitleTable)
+    eitherFirstRow
 
 addNewRow :: HT.HTMLTableElement -> HTP.HTMLTemplateElement -> Effect Unit
 addNewRow subtitleTable subtitleRowTemplate = do

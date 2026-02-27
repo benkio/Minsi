@@ -5,7 +5,8 @@ import Web.DOM.NonElementParentNode (NonElementParentNode)
 import Effect (Effect)
 import Web.HTML (window)
 import Web.HTML.HTMLDocument (toNonElementParentNode)
-import Web.HTML.Window (alert, document)
+import Web.HTML.Location (setHash)
+import Web.HTML.Window (alert, document, location)
 
 getDocument :: Effect NonElementParentNode
 getDocument = do
@@ -20,3 +21,9 @@ raiseErrorAlert msg =
 """ <> msg
     )
     w
+
+scrollToElement :: String -> Effect Unit
+scrollToElement elementId = do
+  w <- window
+  loc <- location w
+  setHash ("#" <> elementId) loc
