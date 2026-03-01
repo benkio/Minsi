@@ -85,8 +85,8 @@ Useful commands:
 
 ### Updating the image
 
-When a newer `benkio/minsi:latest` is published, the app will show a small banner at the top linking here.
-The banner is driven by a simple backend check comparing `backend/src/Config.purs` `currentVersion` with the latest GitHub tag from `https://api.github.com/repos/benkio/minsi/tags`.
+When a newer `benkio/minsi:latest` is published, the app will show a blocking dialog at the top linking here.
+The banner is dialog by a simple backend check comparing `backend/src/Config.purs` `currentVersion` with the latest GitHub tag from `https://api.github.com/repos/benkio/minsi/tags`.
 
 Pull the new image:
 
