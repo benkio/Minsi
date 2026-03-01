@@ -30,7 +30,8 @@ logOutgoingPost route status =
 
 respondJsonPost :: forall a. String -> Int -> a -> Handler
 respondJsonPost route status body =
-  let bodyStr = truncate 2000 (_stringify body)
+  let
+    bodyStr = truncate 2000 (_stringify body)
   in
     liftEffect (log $ "[HTTP] <-- POST " <> route <> " " <> show status <> " body=" <> bodyStr)
       *> setStatus status

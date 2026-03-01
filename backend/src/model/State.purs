@@ -162,4 +162,4 @@ validateRange (DurationRange { start: (Milliseconds start), end: (Milliseconds e
 
 validateSubtitleValue :: String -> Either (Array String) Unit
 validateSubtitleValue v =
-  if length v > 30 then Left [ "State Validation: subtitle too long. > 30 chars"] else Right unit
+  if length v > 30 then Left [ "State Validation: subtitle too long. > 30 chars" ] else Right unit
