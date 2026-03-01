@@ -7,8 +7,8 @@ import Data.String (joinWith)
 import Data.Map (Map, toUnfoldable)
 import Data.Tuple (Tuple(..))
 
-data ErrorSeverity =
-  Fatal
+data ErrorSeverity
+  = Fatal
   | Critical
   | Standard
 
