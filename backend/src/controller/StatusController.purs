@@ -2,6 +2,7 @@ module Controller.StatusController where
 
 import Prelude
 
+import Api.HttpLog (respondJsonPost)
 import Control.Monad.Except (runExcept)
 import Data.Either (either)
 import Data.Maybe (maybe)
@@ -11,7 +12,6 @@ import InMemoryDB (Store, lookupProcessStatus)
 import Model.ProcessStatus (ProcessStatus)
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody)
-import Node.Express.Response (sendJson, setStatus, end)
 import Response.StatusResponse (buildResponse)
 
 statusController :: Store -> Handler
@@ -22,7 +22,7 @@ statusController store = do
 badRequest :: forall a. Show a => a -> Handler
 badRequest errors = do
   liftEffect $ log ("Failed to parse request body: " <> show errors)
-  setStatus 400 *> sendJson { error: "Bad Request" } *> end
+  respondJsonPost "/status" 400 { error: "Bad Request" }
 
 handleStatus :: Store -> { filename :: String } -> Handler
 handleStatus store body = do
@@ -30,8 +30,8 @@ handleStatus store body = do
   maybe notFound (respondWithStatus <<< _.processStatus) maybeStatus
 
 notFound :: Handler
-notFound = setStatus 404 *> sendJson { error: "Not found" } *> end
+notFound = respondJsonPost "/status" 404 { error: "Not found" }
 
 respondWithStatus :: ProcessStatus -> Handler
 respondWithStatus status =
-  setStatus 200 *> sendJson (buildResponse status) *> end
+  respondJsonPost "/status" 200 (buildResponse status)

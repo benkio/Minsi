@@ -5,14 +5,14 @@ import Effect.Class (liftEffect)
 import Effect.Console (log)
 import Effect.Exception (message)
 import Control.Monad.Error.Class (catchError)
+import Api.HttpLog (respondJsonPost)
 import Node.Express.Handler (Handler)
-import Node.Express.Response (setStatus, sendJson, end)
 
-generalErrorHandler :: Handler -> Handler
-generalErrorHandler handler =
+generalErrorHandler :: String -> Handler -> Handler
+generalErrorHandler route handler =
   catchError handler
     ( \e -> do
         let errorMessage = message e
         liftEffect $ log errorMessage
-        setStatus 500 *> sendJson { error: errorMessage } *> end
+        respondJsonPost route 500 { error: errorMessage }
     )

@@ -48,7 +48,7 @@ setKeyboardHandlers targets = genericErrorsHandler $ do
   addEventListener EClick.click shortcutsClickEvL false (toEventTarget (HB.toElement (keyboardShortcutsButton targets)))
   where
   keyboardShortcutsButton (KHT { keyboardShortcutsButton: b }) = b
-  showShortcutsModal (KHT { keyboardShortcutsModalId: id }) = showModal id
+  showShortcutsModal (KHT { keyboardShortcutsModalId: id }) = showModal id true
 
 keyboardEventListener :: KeyboardHandlerTargets -> Event -> Effect Unit
 keyboardEventListener targets ev = genericErrorsHandler $ maybe (pure unit) (handleKeyboardEvent targets) (fromEvent ev)
@@ -71,7 +71,7 @@ handleKeyboardEvent (KHT { resultVideo, keyboardShortcutsModalId, subtitleTable,
   whenNotEditable (keyValue == " ") (toggleResultVideoPlayback resultVideo)
   whenNotEditable (keyValue == "ArrowLeft") (skipResultVideoBackward resultVideo)
   whenNotEditable (keyValue == "ArrowRight") (skipResultVideoForward resultVideo)
-  whenNotEditable (keyValue == "?") (showModal keyboardShortcutsModalId *> stop)
+  whenNotEditable (keyValue == "?") (showModal keyboardShortcutsModalId true *> stop)
   where
   isCtrl = ctrlKey keyboardEvent
   isMeta = metaKey keyboardEvent

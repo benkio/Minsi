@@ -13,10 +13,10 @@ import Data.Int (fromString, toNumber)
 import Data.Maybe (fromJust, fromMaybe, maybe)
 import Data.String.Common (trim, toUpper)
 import Data.Time.Duration (Milliseconds(..))
+import Data.Traversable (traverse)
 import Data.Tuple (Tuple(..))
 import Data.Validation.Semigroup (V, andThen, invalid, toEither, validation)
 import Effect (Effect)
-import HTMLInputElement as HTMLInputElement
 import HTMLTableCellElement (valueFromInputTableCell, valueFromSelectTableCell, valueFromTextAreaTableCell)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.State.State (State(..), DurationRange(..), WURL(..), Source(..), Subtitle(..))
@@ -25,6 +25,8 @@ import Parse.Font (parseFontAndColor, parsePosition)
 import Partial.Unsafe (unsafePartial)
 import Validations.DurationRangeValidation (durationRangeValidation)
 import Validations.LetterNumberSpaceValidation (letterNumberSpaceValidation)
+import Validations.MaxCharatersValidation (maxCharsValidation)
+import Validations.NonEmptyValidation (nonEmptyValidation)
 import Validations.OutputFilenameValidation (outputFilenameValidation)
 import Validations.YoutubeValidation (youtubeUrlValidation)
 import Web.DOM.HTMLCollection as HC
@@ -63,15 +65,16 @@ fromHtmlInputs
   filenameV <- HI.value filenameInput <#> outputFilenameValidation outputFilenameId
   reverseLoopValue <- checked reverseLoopInput
   uploadLocalFileValue <- checked uploadLocalFileInput
-  artistV <- HTMLInputElement.nonEmptyFromHtmlInput artistInput artistId <#> (_ `andThen` letterNumberSpaceValidation artistId)
-  titleV <- HTMLInputElement.nonEmptyFromHtmlInput titleInput titleId <#> (_ `andThen` letterNumberSpaceValidation titleId)
-  subtitles <- loadSubtitlesFromTable loadSubtitleFromRow subtitleTable
+  artistV <- HI.value artistInput <#> nonEmptyValidation artistId <#> (_ `andThen` letterNumberSpaceValidation artistId)
+  titleV <- HI.value titleInput <#> nonEmptyValidation titleId <#> (_ `andThen` letterNumberSpaceValidation titleId)
+  subtitlesV <- loadSubtitlesFromTable loadSubtitleFromRow subtitleTable <#> \subs -> traverse (\(sub@(Subtitle { value })) -> maxCharsValidation 30 "SubtitleRow" value <#> const sub) subs
   pure $ ado
     cutVideo <- cutVideoV
     source <- sourceV
     filename <- filenameV
     artist <- artistV
     title <- titleV
+    subtitles <- subtitlesV
     in
       State
         { cutVideo: cutVideo

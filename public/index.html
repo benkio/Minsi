@@ -305,7 +305,7 @@
                         End
                       </button>
                     </th>
-                    <th>Value</th>
+                    <th>Value (Max 30 chars)</th>
                     <th style="width: 7em">Font & Color</th>
                     <th style="width: 5em">Size</th>
                     <th style="width: 7em">Position</th>
@@ -386,6 +386,30 @@
         </td>
       </tr>
     </template>
+
+    <!-- Blocking Modal (blocking, non-closable) -->
+    <div
+      class="modal fade"
+      id="blockingModal"
+      tabindex="-1"
+      aria-labelledby="blockingModalTitle"
+      aria-hidden="true"
+      data-bs-backdrop="static"
+      data-bs-keyboard="false"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-warning">
+          <div class="modal-header border-warning">
+            <h5 class="modal-title" id="blockingModalTitle">
+              🚫 FATAL ERROR 🚫
+            </h5>
+          </div>
+          <div class="modal-body">
+            <div class="mb-2" id="blockingModalBody"></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Loading Modal -->
     <div

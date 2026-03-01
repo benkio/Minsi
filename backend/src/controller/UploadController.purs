@@ -2,6 +2,7 @@ module Controller.UploadController where
 
 import Prelude
 
+import Api.HttpLog (respondJsonPost)
 import Constants (rawOutput)
 import Conversion.Filename (extractBaseName, extractFileExt, buildUploadedFilename)
 import Effect (Effect)
@@ -14,7 +15,6 @@ import InMemoryDB (Store, insert)
 import Model.ProcessStatus (ProcessStatus(..))
 import Node.Buffer (Buffer)
 import Node.Express.Handler (Handler, HandlerM(..))
-import Node.Express.Response (end, sendJson, setStatus)
 import Node.Express.Types (Request)
 import Node.FS.Sync (writeFile)
 
@@ -37,12 +37,12 @@ uploadController store = do
 noFileResponse :: Handler
 noFileResponse = do
   liftEffect $ log "[Upload Controller] no file in request (expect multipart/form-data with field 'file')"
-  setStatus 400 *> sendJson { received: false, error: "No file in request" } *> end
+  respondJsonPost "/upload" 400 { received: false, error: "No file in request" }
 
 handleUpload :: Store -> Tuple String Buffer -> Handler
 handleUpload store fileAndBuffer = do
   liftEffect $ saveUploadedFile store fullFilename buffer
-  setStatus 200 *> sendJson { received: true, message: "File uploaded" } *> end
+  respondJsonPost "/upload" 200 { received: true, message: "File uploaded" }
   where
   fullFilename = fst fileAndBuffer
   buffer = snd fileAndBuffer

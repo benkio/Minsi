@@ -54,30 +54,61 @@ The output filename must follow the format `prefix_Name`: 1–5 lowercase letter
 ## Running with Docker
 
 The project includes a multi-stage **Dockerfile** that builds the frontend and backend and runs the app with only the required runtime dependencies (Node, ffmpeg, yt-dlp, id3v2, fonts).
-The docker image is published on dockerhub: https://hub.docker.com/r/benkio/minsi
-Pull the latest version with: `docker pull benkio/minsi:latest`
 
-**Build the image** (from project root):
+The Docker image is published on Docker Hub: [benkio/minsi](https://hub.docker.com/r/benkio/minsi).
+
+### From scratch (new machine with Docker installed)
+
+Pull the image:
 
 ```bash
-docker build -t benkio/minsi:latest .
+docker pull benkio/minsi:latest
 ```
 
-**Run the container** (publish port 8080 so the app is reachable from your host):
+Run the container (publish port 8080 so the app is reachable from your host):
 
 ```bash
-docker run -d -p 8080:8080 benkio/minsi:latest
+docker run -d --name minsi-app -p 8080:8080 benkio/minsi:latest
 ```
 
 Then open **http://localhost:8080** in your browser.
 
-- **Run in background:** The `-d` flag runs the container detached. Omit it to see server logs in the terminal.
-- **Name the container:** Add `--name minsi-app` to make it easier to stop or inspect:
-  `docker stop minsi-app` and `docker logs -f minsi-app`.
-- **Host on a different port:** Use e.g. `-p 3000:8080` to access the app at http://localhost:3000.
-
 The image is built for **linux/amd64**. On **ARM** (e.g. Apple Silicon) it runs via emulation. To avoid the platform warning, run with:
-`docker run --platform linux/amd64 -d -p 8080:8080 minsi:latest`.
+`docker run --platform linux/amd64 -d --name minsi-app -p 8080:8080 benkio/minsi:latest`.
+
+Useful commands:
+
+- **See logs:** `docker logs -f minsi-app`
+- **Stop:** `docker stop minsi-app`
+- **Remove:** `docker rm minsi-app`
+- **Run on a different port:** `docker run -d --name minsi-app -p 3000:8080 benkio/minsi:latest` → open `http://localhost:3000`
+
+### Updating the image
+
+When a newer `benkio/minsi:latest` is published, the app will show a small banner at the top linking here.
+The banner is driven by a simple backend check comparing `backend/src/Config.purs` `currentVersion` with the latest GitHub tag from `https://api.github.com/repos/benkio/minsi/tags`.
+
+Pull the new image:
+
+```bash
+docker pull benkio/minsi:latest
+```
+
+Recreate the container so it uses the new image:
+
+```bash
+docker stop minsi-app
+docker rm minsi-app
+docker run -d --name minsi-app -p 8080:8080 benkio/minsi:latest
+```
+
+### Build the image locally (optional)
+
+From the project root:
+
+```bash
+docker build -t benkio/minsi:latest .
+```
 
 ## Publish Docker Image
 

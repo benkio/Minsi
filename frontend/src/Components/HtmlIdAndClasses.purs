@@ -116,3 +116,15 @@ minsiLogBoxClass = "minsiLogBox"
 
 minsiLogTitleId :: String
 minsiLogTitleId = "minsiLogTitle"
+
+blockingModalId :: String
+blockingModalId = "blockingModal"
+
+blockingModalTitleId :: String
+blockingModalTitleId = "blockingModalTitle"
+
+blockingModalBodyId :: String
+blockingModalBodyId = "blockingModalBody"
+
+blockingModalActionId :: String
+blockingModalActionId = "blockingModalAction"

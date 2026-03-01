@@ -3,6 +3,7 @@ module Model.State where
 import Prelude
 import Data.Array (null)
 import Data.Maybe (maybe)
+import Data.String (length)
 import Data.Time.Duration (Milliseconds(..))
 import Node.Path (FilePath)
 import Data.Foldable (traverse_)
@@ -151,11 +152,14 @@ validateState state@(State ({ cutVideo: durationRange, subtitles, reverseLoop })
 
 validateSubtitles :: Array Subtitle -> Boolean -> Either (Array String) Unit
 validateSubtitles subtitles reverseLoop = do
-  _ <- traverse_ (\(Subtitle { videoPosition }) -> validateRange videoPosition) subtitles
-  if reverseLoop && (not <<< null) subtitles then Left [ "ReverseLoop and subtitles not supported" ]
-  else Right unit
+  _ <- traverse_ (\(Subtitle { videoPosition, value }) -> validateRange videoPosition *> validateSubtitleValue value) subtitles
+  if reverseLoop && (not <<< null) subtitles then Left [ "ReverseLoop and subtitles not supported" ] else Right unit
 
 validateRange :: DurationRange -> Either (Array String) Unit
 validateRange (DurationRange { start: (Milliseconds start), end: (Milliseconds end) })
   | start < end - 100.0 = Right unit
   | otherwise = Left [ "State Validation: range start >= end - 100" ]
+
+validateSubtitleValue :: String -> Either (Array String) Unit
+validateSubtitleValue v =
+  if length v > 30 then Left [ "State Validation: subtitle too long. > 30 chars" ] else Right unit
