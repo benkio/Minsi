@@ -46,7 +46,7 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   let state = fst stateComponents
   let components = snd stateComponents
   let uploadLocalFileInput = (unwrap components.htmlInputs).uploadLocalFile
-  showModal loadingModalId
+  showModal loadingModalId true
   runAff_
     (\result -> genericErrorsHandlerEither result) $
     finally (liftEffect (finallyHandlers components state)) (applyButtonLogic state uploadLocalFileInput)

@@ -2,6 +2,7 @@ module Main.CheckUpdates where
 
 import Prelude
 
+import Components.HtmlIdAndClasses (blockingModalId)
 import Components.Modal (showModal, setBlockingModalBody, setBlockingModalAction)
 import Data.Maybe (Maybe(..))
 import Effect.Aff (Aff)
@@ -20,6 +21,6 @@ checkUpdates = do
       else
         "Your version of Minsi is out of date. Please update to the latest version to continue using the software. (current: " <> currentVersion <> ", latest: " <> latestVersion <> ")"
     setBlockingModalAction (Just { label: "How to update", href: docsUrl })
-    showModal "blockingModal"
+    showModal blockingModalId false
 
   pure updateAvailable

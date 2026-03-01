@@ -10,7 +10,7 @@ import Web.DOM.DOMTokenList as DOMTokenList
 import Web.DOM.Element as Element
 import Web.DOM.Node (setTextContent)
 
-foreign import showModal :: String -> Effect Unit
+foreign import showModal :: String -> Boolean -> Effect Unit
 foreign import hideModal :: String -> Effect Unit
 
 setBlockingModalBody :: String -> Effect Unit

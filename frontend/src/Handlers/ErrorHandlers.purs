@@ -87,7 +87,7 @@ showMinsiErrorDialog errorMessage = do
   let minsiErrorModalContentNode = toNode minsiErrorModalContent
   let errorListNode = E.toNode (ULH.toElement errorList)
   appendChild errorListNode minsiErrorModalContentNode
-  showModal minsiErrorModalId
+  showModal minsiErrorModalId true
 
 createErrorList :: String -> Effect ULH.HTMLUListElement
 createErrorList errorMessage = do
