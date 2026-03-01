@@ -2,6 +2,7 @@ module Controller.ComputeController where
 
 import Prelude
 
+import Api.HttpLog (respondEmptyPost, respondJsonPost)
 import Command.ExecaHelpers (exceptTMultiple, exceptTStep)
 import Command.Ffmpeg.Gif (makeGif)
 import Command.Ffmpeg.Mp3 (extractMp3)
@@ -22,7 +23,6 @@ import Model.ProcessStatus (ProcessStatus(..), isFinished)
 import Model.State (DurationRange(..), State(..), validateState)
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody)
-import Node.Express.Response (sendJson, setStatus, end)
 
 data ComputeResponse
   = InvalidInput (Array String)
@@ -37,16 +37,12 @@ computeController store = do
   case response of
     InvalidInput errors ->
       liftEffect (log ("Failed to parse state: " <> show errors))
-        *> setStatus 400
-        *> sendJson { error: "Bad Request: Failed to parse state" }
-        *> end
+        *> respondJsonPost "/compute" 400 { error: "Bad Request: Failed to parse state" }
     PendingComputation ->
       liftEffect (log "Pending Computation")
-        *> setStatus 500
-        *> sendJson { error: "Pending Computation" }
-        *> end
+        *> respondJsonPost "/compute" 500 { error: "Pending Computation" }
     Success mayOldState state ->
-      liftEffect (compute mayOldState state store) *> setStatus 200 *> end
+      liftEffect (compute mayOldState state store) *> respondEmptyPost "/compute" 200
 
 computeResponse :: Store -> Either (Array String) State -> Effect ComputeResponse
 computeResponse store =

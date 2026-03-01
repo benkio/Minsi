@@ -2,6 +2,7 @@ module Controller.UpdateCheckController where
 
 import Prelude
 
+import Api.HttpLog (respondJsonPost)
 import Config (currentVersion, docsUrl)
 import Control.Monad.Except (ExceptT, runExceptT, throwError)
 import Data.Array (head)
@@ -15,7 +16,6 @@ import Node.Buffer (toString)
 import Node.ChildProcess (execSync)
 import Node.Encoding (Encoding(..))
 import Node.Express.Handler (Handler)
-import Node.Express.Response (end, sendJson, setStatus)
 import Yoga.JSON (readJSON)
 
 type UpdateCheckResponse =
@@ -51,24 +51,20 @@ updateCheckController _store = do
   eLatest <- liftEffect fetchLatestGitHubTag
   case eLatest of
     Left _err -> do
-      setStatus 200
-        *> sendJson
-          ( { updateAvailable: false
-            , docsUrl
-            , currentVersion
-            , latestVersion: "unknown"
-            } :: UpdateCheckResponse
-          )
-        *> end
+      respondJsonPost "/updateCheck" 200
+        ( { updateAvailable: false
+          , docsUrl
+          , currentVersion
+          , latestVersion: "unknown"
+          } :: UpdateCheckResponse
+        )
     Right latestVersion -> do
       let updateAvailable = latestVersion /= currentVersion
-      setStatus 200
-        *> sendJson
-          ( { updateAvailable
-            , docsUrl
-            , currentVersion
-            , latestVersion
-            } :: UpdateCheckResponse
-          )
-        *> end
+      respondJsonPost "/updateCheck" 200
+        ( { updateAvailable
+          , docsUrl
+          , currentVersion
+          , latestVersion
+          } :: UpdateCheckResponse
+        )
 
