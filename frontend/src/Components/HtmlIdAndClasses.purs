@@ -117,5 +117,14 @@ minsiLogBoxClass = "minsiLogBox"
 minsiLogTitleId :: String
 minsiLogTitleId = "minsiLogTitle"
 
-updateRequiredModalId :: String
-updateRequiredModalId = "updateRequiredModal"
+blockingModalId :: String
+blockingModalId = "blockingModal"
+
+blockingModalTitleId :: String
+blockingModalTitleId = "blockingModalTitle"
+
+blockingModalBodyId :: String
+blockingModalBodyId = "blockingModalBody"
+
+blockingModalActionId :: String
+blockingModalActionId = "blockingModalAction"

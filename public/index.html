@@ -387,12 +387,12 @@
       </tr>
     </template>
 
-    <!-- Update Required Modal (blocking, non-closable) -->
+    <!-- Blocking Modal (blocking, non-closable) -->
     <div
       class="modal fade"
-      id="updateRequiredModal"
+      id="blockingModal"
       tabindex="-1"
-      aria-labelledby="updateRequiredModalLabel"
+      aria-labelledby="blockingModalTitle"
       aria-hidden="true"
       data-bs-backdrop="static"
       data-bs-keyboard="false"
@@ -400,22 +400,20 @@
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-warning">
           <div class="modal-header border-warning">
-            <h5 class="modal-title" id="updateRequiredModalLabel">
-              Update required
+            <h5 class="modal-title" id="blockingModalTitle">
+              🚫 FATAL ERROR 🚫
             </h5>
           </div>
           <div class="modal-body">
-            <p class="mb-2">
-              Your version of Minsi is out of date. Please update to the latest
-              version to continue using the software.
-            </p>
+            <p class="mb-2" id="blockingModalBody"></p>
             <a
-              class="btn btn-warning"
-              href="https://github.com/benkio/minsi#updating-the-image"
+              id="blockingModalAction"
+              class="btn btn-warning d-none"
+              href="#"
               target="_blank"
               rel="noopener noreferrer"
             >
-              How to update
+              Action
             </a>
           </div>
         </div>

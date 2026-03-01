@@ -10,17 +10,6 @@ export function showModal(id) {
   };
 }
 
-export function showBlockingModal(id) {
-  return function () {
-    const el = document.getElementById(id);
-    const modal = bootstrap.Modal.getOrCreateInstance(el, {
-      backdrop: "static",
-      keyboard: false,
-    });
-    modal.show();
-  };
-}
-
 export function hideModal(id) {
   return function () {
     const el = document.getElementById(id);
