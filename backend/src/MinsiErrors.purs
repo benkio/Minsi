@@ -8,6 +8,7 @@ import Effect.Exception (error, throwException)
 
 data MinsiError
   = DependencyError String
+  | UpdateError String
   | YtdlpError String
   | FfmpegVideoError String
   | FfmpegGifError String
@@ -21,6 +22,7 @@ instance Show MinsiError where
   show (FfmpegGifError s) = "🚫 Ffmpeg gif error: " <> s
   show (Id3v2Error s) = "🚫 Id3v2 error: " <> s
   show (DependencyError s) = "🚫 Error while checking dependencies: " <> s
+  show (UpdateError s) = "🚫 Error while checking updates: " <> s
 
 throwMinsiError :: forall a. MinsiError -> Effect a
 throwMinsiError e = do

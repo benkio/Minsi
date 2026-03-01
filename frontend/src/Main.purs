@@ -9,6 +9,7 @@ import Effect.Console (log)
 import Handlers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
 import Handlers.Handlers (setupEventHandlers)
 import Main.CheckDependencies (checkDependecies)
+import Main.CheckUpdates (checkUpdates)
 
 main :: Effect Unit
 main = genericErrorsHandler program
@@ -18,5 +19,6 @@ program = do
   runAff_ genericErrorsHandlerEither checkDependecies
   htmlComponents <- loadComponents
   log "Components correctly loaded"
+  runAff_ genericErrorsHandlerEither (checkUpdates htmlComponents.htmlVisualElements)
   setupEventHandlers htmlComponents
   log "Setup Handlers Done"

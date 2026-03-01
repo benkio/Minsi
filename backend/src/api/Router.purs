@@ -6,6 +6,7 @@ import Controller.CheckDependenciesController (checkDependenciesController)
 import Controller.ComputeController (computeController)
 import Controller.ErrorHandlers (generalErrorHandler)
 import Controller.StatusController (statusController)
+import Controller.UpdateCheckController (updateCheckController)
 import Controller.UploadController (uploadController)
 import InMemoryDB (Store)
 import Middleware.MulterUpload (multerUploadMiddleware)
@@ -18,6 +19,7 @@ router store = do
   post "/checkDependencies" (controllerLogic (checkDependenciesController store))
   post "/compute" (controllerLogic (computeController store))
   post "/status" (controllerLogic (statusController store))
+  post "/updateCheck" (controllerLogic (updateCheckController store))
   useAtExternal "/upload" multerUploadMiddleware
   post "/upload" (controllerLogic (uploadController store))
 

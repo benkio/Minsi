@@ -116,3 +116,6 @@ minsiLogBoxClass = "minsiLogBox"
 
 minsiLogTitleId :: String
 minsiLogTitleId = "minsiLogTitle"
+
+updateAvailableBannerId :: String
+updateAvailableBannerId = "updateAvailableBanner"
