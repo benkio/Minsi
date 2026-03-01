@@ -2,14 +2,27 @@ module Api.HttpLog where
 
 import Prelude
 
+import Data.String.CodeUnits as SCU
 import Effect.Class (liftEffect)
 import Effect.Console (log)
-import Node.Express.Handler (Handler)
+import Foreign (Foreign)
+import Node.Express.Handler (Handler, HandlerM(..))
 import Node.Express.Response (end, sendJson, setStatus)
+import Node.Express.Types (Request)
+
+foreign import _getReqBody :: Request -> Foreign
+foreign import _stringify :: forall a. a -> String
+
+truncate :: Int -> String -> String
+truncate n s =
+  if SCU.length s > n then SCU.take n s <> "...(truncated)" else s
 
 logIncomingPost :: String -> Handler
 logIncomingPost route =
-  liftEffect $ log $ "[HTTP] --> POST " <> route
+  HandlerM \req _ _ -> do
+    let bodyStr = truncate 2000 (_stringify (_getReqBody req))
+    liftEffect $ log $ "[HTTP] --> POST " <> route <> " body=" <> bodyStr
+    pure unit
 
 logOutgoingPost :: String -> Int -> Handler
 logOutgoingPost route status =
@@ -17,7 +30,12 @@ logOutgoingPost route status =
 
 respondJsonPost :: forall a. String -> Int -> a -> Handler
 respondJsonPost route status body =
-  logOutgoingPost route status *> setStatus status *> sendJson body *> end
+  let bodyStr = truncate 2000 (_stringify body)
+  in
+    liftEffect (log $ "[HTTP] <-- POST " <> route <> " " <> show status <> " body=" <> bodyStr)
+      *> setStatus status
+      *> sendJson body
+      *> end
 
 respondEmptyPost :: String -> Int -> Handler
 respondEmptyPost route status =
