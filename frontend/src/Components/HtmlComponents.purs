@@ -38,7 +38,6 @@ import Components.HtmlIdAndClasses
   , uploadLocalFileId
   , minsiLogBoxClass
   , minsiLogTitleId
-  , updateAvailableBannerId
   )
 import Components.Window (getDocument)
 import Control.Monad.Error.Class (catchError)
@@ -135,7 +134,6 @@ data HtmlVisualElements = HtmlVisualElements
   , subtitlesRow :: HTMLDivElement
   , playbackPositionResultRow :: HTMLDivElement
   , minsiLogBox :: HTMLCollection
-  , updateAvailableBanner :: HTMLDivElement
   }
 
 type HtmlComponents =
@@ -238,7 +236,6 @@ loadHtmlVisualElements doc = do
   subtitlesRow <- loadDiv subtitlesRowId doc
   playbackPositionResultRow <- loadDiv playbackPositionResultRowId doc
   minsiLogBox <- loadHtmlElementClass minsiLogBoxClass doc
-  updateAvailableBanner <- loadDiv updateAvailableBannerId doc
   pure
     ( HtmlVisualElements
         { videoSourceRow: videoSourceRow
@@ -246,7 +243,6 @@ loadHtmlVisualElements doc = do
         , subtitlesRow: subtitlesRow
         , playbackPositionResultRow: playbackPositionResultRow
         , minsiLogBox: minsiLogBox
-        , updateAvailableBanner: updateAvailableBanner
         }
     )
 

@@ -5,3 +5,4 @@ import Prelude
 
 foreign import showModal :: String -> Effect Unit
 foreign import hideModal :: String -> Effect Unit
+foreign import showBlockingModal :: String -> Effect Unit

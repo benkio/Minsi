@@ -16,9 +16,9 @@ main = genericErrorsHandler program
 
 program :: Effect Unit
 program = do
+  runAff_ genericErrorsHandlerEither checkUpdates
   runAff_ genericErrorsHandlerEither checkDependecies
   htmlComponents <- loadComponents
   log "Components correctly loaded"
-  runAff_ genericErrorsHandlerEither (checkUpdates htmlComponents.htmlVisualElements)
   setupEventHandlers htmlComponents
   log "Setup Handlers Done"

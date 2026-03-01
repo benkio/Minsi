@@ -47,20 +47,6 @@
               ⌨️ Shortcuts
             </button>
           </p>
-          <div
-            id="updateAvailableBanner"
-            class="alert alert-warning py-2 px-3 mt-3 d-none"
-            role="alert"
-            style="max-width: 720px; margin: 0 auto"
-          >
-            A newer version is available.
-            <a
-              href="https://github.com/benkio/minsi#updating-the-image"
-              target="_blank"
-              rel="noopener noreferrer"
-              >How to update</a
-            >.
-          </div>
         </div>
       </div>
 
@@ -400,6 +386,41 @@
         </td>
       </tr>
     </template>
+
+    <!-- Update Required Modal (blocking, non-closable) -->
+    <div
+      class="modal fade"
+      id="updateRequiredModal"
+      tabindex="-1"
+      aria-labelledby="updateRequiredModalLabel"
+      aria-hidden="true"
+      data-bs-backdrop="static"
+      data-bs-keyboard="false"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-warning">
+          <div class="modal-header border-warning">
+            <h5 class="modal-title" id="updateRequiredModalLabel">
+              Update required
+            </h5>
+          </div>
+          <div class="modal-body">
+            <p class="mb-2">
+              Your version of Minsi is out of date. Please update to the latest
+              version to continue using the software.
+            </p>
+            <a
+              class="btn btn-warning"
+              href="https://github.com/benkio/minsi#updating-the-image"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              How to update
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Loading Modal -->
     <div
