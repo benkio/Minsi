@@ -3,7 +3,7 @@ module Controller.UpdateCheckController where
 import Prelude
 
 import Api.HttpLog (respondJsonPost)
-import Config (currentVersion, docsUrl)
+import Config (currentVersion)
 import Control.Monad.Except (ExceptT, runExceptT, throwError)
 import Data.Array (head)
 import Data.Either (Either(..), either)
@@ -20,7 +20,6 @@ import Yoga.JSON (readJSON)
 
 type UpdateCheckResponse =
   { updateAvailable :: Boolean
-  , docsUrl :: String
   , currentVersion :: String
   , latestVersion :: String
   }
@@ -53,7 +52,6 @@ updateCheckController _store = do
     Left _err -> do
       respondJsonPost "/updateCheck" 200
         ( { updateAvailable: false
-          , docsUrl
           , currentVersion
           , latestVersion: "unknown"
           } :: UpdateCheckResponse
@@ -62,9 +60,7 @@ updateCheckController _store = do
       let updateAvailable = latestVersion /= currentVersion
       respondJsonPost "/updateCheck" 200
         ( { updateAvailable
-          , docsUrl
           , currentVersion
           , latestVersion
           } :: UpdateCheckResponse
         )
-

@@ -9,7 +9,6 @@ import Main.Config (backendUrl)
 
 type UpdateCheckResponse =
   { updateAvailable :: Boolean
-  , docsUrl :: String
   , currentVersion :: String
   , latestVersion :: String
   }
@@ -21,4 +20,3 @@ callUpdateCheck :: Aff UpdateCheckResponse
 callUpdateCheck = do
   response <- fetch updateCheckEndpoint { method: POST }
   decodeJsonResponse "updateCheck" response
-

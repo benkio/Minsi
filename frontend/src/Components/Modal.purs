@@ -1,35 +1,21 @@
 module Components.Modal where
 
 import Components.HTMLComponentsLoader (loadHtmlElementId)
-import Components.HtmlIdAndClasses (blockingModalActionId, blockingModalBodyId)
+import Components.HtmlIdAndClasses (blockingModalBodyId)
 import Components.Window (getDocument)
-import Data.Maybe (Maybe(..), isJust)
 import Effect (Effect)
 import Prelude
-import Web.DOM.DOMTokenList as DOMTokenList
-import Web.DOM.Element as Element
-import Web.DOM.Node (setTextContent)
+import Web.DOM.Node (appendChild, setTextContent)
+import Web.HTML.HTMLElement (HTMLElement)
+import Web.HTML.HTMLElement as HE
 
 foreign import showModal :: String -> Boolean -> Effect Unit
 foreign import hideModal :: String -> Effect Unit
 
-setBlockingModalBody :: String -> Effect Unit
-setBlockingModalBody bodyText = do
+setBlockingModalBody :: HTMLElement -> Effect Unit
+setBlockingModalBody bodyEl = do
   doc <- getDocument
-  bodyEl <- loadHtmlElementId blockingModalBodyId Just doc
-  setTextContent bodyText (Element.toNode bodyEl)
-
-setBlockingModalAction :: Maybe { label :: String, href :: String } -> Effect Unit
-setBlockingModalAction action = do
-  doc <- getDocument
-  actionEl <- loadHtmlElementId blockingModalActionId Just doc
-  let shouldShow = isJust action
-  cls <- Element.classList actionEl
-  if shouldShow then DOMTokenList.remove cls "d-none" else DOMTokenList.add cls "d-none"
-  case action of
-    Nothing -> do
-      setTextContent "" (Element.toNode actionEl)
-      Element.setAttribute "href" "#" actionEl
-    Just { label, href } -> do
-      setTextContent label (Element.toNode actionEl)
-      Element.setAttribute "href" href actionEl
+  container <- loadHtmlElementId blockingModalBodyId HE.fromElement doc
+  let containerNode = HE.toNode container
+  setTextContent "" containerNode
+  void $ appendChild (HE.toNode bodyEl) containerNode

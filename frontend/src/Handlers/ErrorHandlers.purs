@@ -1,10 +1,12 @@
 module Handlers.ErrorHandlers where
 
+import Prelude
+
 import Components.HTMLCollection (swapClasses)
 import Components.HTMLComponentsLoader (loadHtmlElementClass)
 import Components.HtmlComponents (loadDiv)
-import Components.HtmlIdAndClasses (minsiLogId, minsiLogTitleId, minsiLogBoxClass, minsiErrorModalContentId, minsiErrorModalId)
-import Components.Modal (showModal)
+import Components.HtmlIdAndClasses (blockingModalId, minsiErrorModalContentId, minsiErrorModalId, minsiLogBoxClass, minsiLogId, minsiLogTitleId)
+import Components.Modal (setBlockingModalBody, showModal)
 import Components.Window (getDocument, raiseErrorAlert)
 import Control.Monad.Error.Class (catchError, class MonadError)
 import Data.Either (Either, either)
@@ -17,8 +19,7 @@ import Effect.Class (liftEffect, class MonadEffect)
 import Effect.Console (log)
 import Effect.Exception (Error, message)
 import Effect.Timer (setTimeout)
-import Main.MinsiErrors (MinsiError(..), isCriticalError, throwMinsiError)
-import Prelude
+import Main.MinsiErrors (ErrorSeverity(..), MinsiError(..), getErrorSeverity, throwMinsiError)
 import Web.DOM.Document (createElement)
 import Web.DOM.Element (toNode) as E
 import Web.DOM.Node (appendChild, removeChild, setTextContent)
@@ -26,8 +27,10 @@ import Web.HTML (window)
 import Web.HTML.HTMLDivElement (toElement, toNode)
 import Web.HTML.HTMLDocument (toDocument)
 import Web.HTML.HTMLLIElement as LIH
+import Web.HTML.HTMLParagraphElement as HP
 import Web.HTML.HTMLUListElement as ULH
 import Web.HTML.Window (document)
+import Web.HTML.HTMLDivElement as HD
 
 -- | Runs an action and handles errors in both Effect and Aff using MonadError + MonadEffect.
 genericErrorsHandler :: forall m. MonadError Error m => MonadEffect m => m Unit -> m Unit
@@ -37,10 +40,10 @@ genericErrorsHandler p =
         let
           errorMessage = message e
           handleError =
-            if isCriticalError e then
-              liftEffect (showMinsiErrorDialog errorMessage)
-            else
-              liftEffect (writeToMinsiLog errorMessage)
+            case getErrorSeverity e of
+              Fatal -> liftEffect (showMinsiBlockingErrorDialog errorMessage)
+              Critical -> liftEffect (showMinsiErrorDialog errorMessage)
+              Standard -> liftEffect (writeToMinsiLog errorMessage)
         in
           liftEffect (log errorMessage) *> catchError handleError (const (liftEffect (raiseErrorAlert errorMessage)))
     )
@@ -52,10 +55,10 @@ genericErrorsHandlerEither = either
       let
         errorMessage = message e
         handleError =
-          if isCriticalError e then
-            showMinsiErrorDialog errorMessage
-          else
-            writeToMinsiLog errorMessage
+          case getErrorSeverity e of
+            Fatal -> liftEffect (showMinsiBlockingErrorDialog errorMessage)
+            Critical -> liftEffect (showMinsiErrorDialog errorMessage)
+            Standard -> liftEffect (writeToMinsiLog errorMessage)
       in
         log errorMessage *> catchError handleError (const (raiseErrorAlert errorMessage))
   )
@@ -108,3 +111,29 @@ createErrorList errorMessage = do
     )
     errorLines
   pure ulElement
+
+createErrorParagraphsDiv :: String -> Effect HD.HTMLDivElement
+createErrorParagraphsDiv errorMessage = do
+  let errorLines = split (Pattern "<br>") errorMessage
+  w <- window
+  htmlDoc <- document w
+  doc <- pure $ toDocument htmlDoc
+  divRaw <- createElement "div" doc
+  divEl <- maybe (throwMinsiError (HTMLElementNotFound "div")) pure (HD.fromElement divRaw)
+  let divNode = E.toNode (HD.toElement divEl)
+  _ <- traverse
+    ( \line -> do
+        pRaw <- createElement "p" doc
+        pEl <- maybe (throwMinsiError (HTMLElementNotFound "p")) pure (HP.fromElement pRaw)
+        let pNode = E.toNode (HP.toElement pEl)
+        setTextContent line pNode
+        appendChild pNode divNode
+    )
+    errorLines
+  pure divEl
+
+showMinsiBlockingErrorDialog :: String -> Effect Unit
+showMinsiBlockingErrorDialog errorMessage = do
+  divEl <- createErrorParagraphsDiv errorMessage
+  setBlockingModalBody (HD.toHTMLElement divEl)
+  showModal blockingModalId false

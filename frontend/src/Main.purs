@@ -17,13 +17,8 @@ main = genericErrorsHandler program
 
 program :: Effect Unit
 program = do
-  runAff_ genericErrorsHandlerEither do
-    htmlComponents <- liftEffect loadComponents
-    liftEffect $ log "Components correctly loaded"
-    updateAvailable <- checkUpdates
-    if updateAvailable then
-      liftEffect $ log "Update available! Exit"
-    else do
-      checkDependecies
-      liftEffect $ setupEventHandlers htmlComponents
-      liftEffect $ log "Setup Handlers Done"
+  runAff_ genericErrorsHandlerEither (checkUpdates *> checkDependecies)
+  htmlComponents <- liftEffect loadComponents
+  log "Components correctly loaded"
+  setupEventHandlers htmlComponents
+  log "Setup Handlers Done"
