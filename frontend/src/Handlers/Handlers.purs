@@ -87,7 +87,7 @@ setupEventHandlers
         , keyboardShortcutsButton
         }
     )
-  setAddSubtitleButtonHandler addSubtitleButton subtitleTable subtitleRow
+  setAddSubtitleButtonHandler addSubtitleButton subtitleTable subtitleRow resultVideo
   setRemoveSubtitleButtonHandler subtitleTable
   setSubtitleTimeButtonsHandlers
     ( STBT

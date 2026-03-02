@@ -1,0 +1,69 @@
+name: Publish Docker Image (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: "Image tag (e.g. latest, v1.0.0)"
+        required: true
+        type: string
+      image:
+        description: "Docker image name (e.g. benkio/minsi)"
+        required: false
+        default: "benkio/minsi"
+        type: string
+      source:
+        description: "Image source: build (build from repo) or artifact (load from uploaded tar)"
+        required: false
+        default: "build"
+        type: string
+      artifact_name:
+        description: "Artifact name containing /tmp/minsi-image.tar (only for source=artifact)"
+        required: false
+        default: "minsi-docker-image"
+        type: string
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
+
+jobs:
+  publish:
+    name: Build/Load and Push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        if: inputs.source == 'build'
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Download Docker image artifact
+        if: inputs.source == 'artifact'
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: /tmp
+
+      - name: Load Docker image from artifact
+        if: inputs.source == 'artifact'
+        run: docker load -i /tmp/minsi-image.tar
+
+      - name: Tag and push loaded Docker image
+        if: inputs.source == 'artifact'
+        run: |
+          docker tag minsi:ci ${{ inputs.image }}:${{ inputs.tag }}
+          docker push ${{ inputs.image }}:${{ inputs.tag }}
+
+      - name: Build and push Docker image
+        if: inputs.source == 'build'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ inputs.image }}:${{ inputs.tag }}

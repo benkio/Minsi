@@ -63,12 +63,6 @@ jobs:
             echo "Updated package set: $CURRENT_TAG -> $LATEST_TAG"
           fi
 
-      - name: Regenerate spago lock files
-        run: |
-          rm -f backend/spago.lock frontend/spago.lock
-          cd backend && spago install && cd ..
-          cd frontend && spago install && cd ..
-
       - name: Check for changes
         id: changes
         run: |
