@@ -9,7 +9,7 @@ export const helmet = helmetPkg({
       "style-src": ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
       "connect-src": ["'self'", "https://cdn.jsdelivr.net", "https://www.youtube.com", "https://s.ytimg.com", "https://i.ytimg.com"],
       "frame-src": ["'self'", "https://www.youtube.com"],
-      "img-src": ["'self'", "data:", "https://i.ytimg.com"],
+        "img-src": ["'self'", "data:", "https://i.ytimg.com", "https://i.gifer.com"],
       "media-src": ["'self'", "blob:"],
     },
   },
