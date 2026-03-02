@@ -59,7 +59,8 @@ cloneFirstRow :: HTR.HTMLTableRowElement -> HT.HTMLTableElement -> HV.HTMLVideoE
 cloneFirstRow firstRow subtitleTable resultVideo = do
   tbody <- getTBody subtitleTable
   clonedRowNode <- deepClone (HTR.toNode firstRow)
-  endValue <- currentTime (HV.toHTMLMediaElement resultVideo)
+  endValueSeconds <- currentTime (HV.toHTMLMediaElement resultVideo)
+  let endValue = endValueSeconds * 1000.0
   clonedRow <- maybe (throwMinsiError (HTMLElementNotFound "ClonedRow")) pure (fromNode clonedRowNode >>= HTR.fromElement)
   setEndInput endValue firstRow
   clonedRowStartInput <- getStartInput clonedRow

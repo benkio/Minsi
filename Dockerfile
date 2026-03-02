@@ -39,11 +39,18 @@ RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib" > /etc/apt/so
     echo "deb http://security.debian.org/ bookworm-security main contrib" >> /etc/apt/sources.list.d/bookworm.list && \
     apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
+    libc6 \
     ttf-mscorefonts-installer \
     id3v2 \
     curl \
     ca-certificates \
-    && curl -sSL -o /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux \
+    && arch="$(dpkg --print-architecture)" \
+    && case "$arch" in \
+      amd64) ytdlp_asset="yt-dlp_linux" ;; \
+      arm64) ytdlp_asset="yt-dlp_linux_aarch64" ;; \
+      *) echo "Unsupported architecture for yt-dlp: $arch" >&2; exit 1 ;; \
+    esac \
+    && curl -sSL -o /usr/local/bin/yt-dlp "https://github.com/yt-dlp/yt-dlp/releases/latest/download/${ytdlp_asset}" \
     && chmod +x /usr/local/bin/yt-dlp \
     && fc-cache -f \
     && rm -rf /var/lib/apt/lists/*
