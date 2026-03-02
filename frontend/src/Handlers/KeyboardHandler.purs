@@ -66,7 +66,7 @@ handleKeyboardEvent (KHT { resultVideo, keyboardShortcutsModalId, subtitleTable,
   let stop = preventDefault ev
   let whenNotEditable cond act = when (cond && not (isTargetEditableElement keyboardEvent)) (act *> stop)
   when (keyValue == "Enter" && (isCtrl || isMeta)) (applyButtonEventListener ev *> stop)
-  when (keyValue == "+") (addSubtitleButtonEventListener subtitleTable subtitleRow (toEvent keyboardEvent) *> stop)
+  when (keyValue == "+") (addSubtitleButtonEventListener subtitleTable subtitleRow resultVideo (toEvent keyboardEvent) *> stop)
   when (keyValue == "-") (removeFirstSubtitleRow subtitleTable *> stop)
   whenNotEditable (keyValue == " ") (toggleResultVideoPlayback resultVideo)
   whenNotEditable (keyValue == "ArrowLeft") (skipResultVideoBackward resultVideo)
