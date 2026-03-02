@@ -18,6 +18,7 @@ import Components.HtmlIdAndClasses
   , resultAudioId
   , resultVideoId
   , reverseLoopGifId
+  , sortSubtitlesId
   , setCutEndButton
   , setCutStartButton
   , setSubtitleEndButtonId
@@ -88,6 +89,7 @@ newtype HtmlInputs = HtmlInputs
   , setCutStartButton :: HTMLButtonElement
   , subtitleTable :: HTMLTableElement
   , addSubtitleButton :: HTMLButtonElement
+  , sortSubtitlesButton :: HTMLButtonElement
   , setSubtitleStartButton :: HTMLButtonElement
   , setSubtitleEndButton :: HTMLButtonElement
   , subtitleRow :: HTMLTemplateElement
@@ -173,6 +175,7 @@ loadHtmlInputs doc = do
   setCutEndButton <- loadButton setCutEndButton doc
   subtitleTable <- loadTable subtitleTableId doc
   addSubtitleButton <- loadButton addSubtitleId doc
+  sortSubtitlesButton <- loadButton sortSubtitlesId doc
   setSubtitleStartButton <- loadButton setSubtitleStartButtonId doc
   setSubtitleEndButton <- loadButton setSubtitleEndButtonId doc
   subtitleRow <- loadTemplate subtitleRow doc
@@ -196,6 +199,7 @@ loadHtmlInputs doc = do
         , setCutEndButton: setCutEndButton
         , subtitleTable: subtitleTable
         , addSubtitleButton: addSubtitleButton
+        , sortSubtitlesButton: sortSubtitlesButton
         , setSubtitleStartButton: setSubtitleStartButton
         , setSubtitleEndButton: setSubtitleEndButton
         , subtitleRow: subtitleRow

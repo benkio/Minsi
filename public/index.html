@@ -310,13 +310,24 @@
                     <th style="width: 5em">Size</th>
                     <th style="width: 7em">Position</th>
                     <th style="width: 1em" class="text-center">
-                      <button
-                        id="addSubtitleButton"
-                        type="button"
-                        class="btn btn-sm btn-outline-primary"
-                      >
-                        ➕
-                      </button>
+                      <div class="d-flex justify-content-center gap-1">
+                        <button
+                          id="addSubtitleButton"
+                          type="button"
+                          class="btn btn-sm btn-outline-primary"
+                          title="Add subtitle row"
+                        >
+                          ➕
+                        </button>
+                        <button
+                          id="sortSubtitlesButton"
+                          type="button"
+                          class="btn btn-sm btn-outline-secondary"
+                          title="Sort subtitles"
+                        >
+                          ⇅
+                        </button>
+                      </div>
                     </th>
                   </tr>
                 </thead>
@@ -347,7 +358,7 @@
           />
         </td>
         <td>
-          <textarea class="form-control form-control-sm" rows="2"></textarea>
+          <textarea class="form-control form-control-sm" rows="1" maxlength=30></textarea>
         </td>
         <td>
           <select class="form-select form-select-sm">
