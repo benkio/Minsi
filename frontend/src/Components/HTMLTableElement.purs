@@ -4,11 +4,13 @@ import Prelude
 
 import Data.Array (catMaybes, head, last)
 import Data.Maybe (maybe)
+import Data.Traversable (traverse_)
 import Data.TraversableWithIndex (traverseWithIndex)
 import Effect (Effect)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.State.State (Subtitle)
 import Web.DOM.Element (toParentNode)
+import Web.DOM.Node (appendChild, removeChild)
 import Web.DOM.HTMLCollection as HC
 import Web.DOM.ParentNode (QuerySelector(..), querySelector)
 import Web.HTML.HTMLInputElement (HTMLInputElement)
@@ -33,6 +35,14 @@ getRows table = do
   rows <- HTS.rows tbody
   rowArray <- HC.toArray rows
   pure $ catMaybes $ map HTR.fromElement rowArray
+
+-- | Set table's body to the list of array rows
+setRows :: Array HTR.HTMLTableRowElement -> HT.HTMLTableElement -> Effect Unit
+setRows rows table = do
+  tbody <- getTBody table
+  existingRows <- getRows table
+  traverse_ (\row -> removeChild (HTR.toNode row) (HTS.toNode tbody)) existingRows
+  traverse_ (\row -> appendChild (HTR.toNode row) (HTS.toNode tbody)) rows
 
 -- | Get the first row from a table
 getFirstRow :: HT.HTMLTableElement -> Effect HTR.HTMLTableRowElement

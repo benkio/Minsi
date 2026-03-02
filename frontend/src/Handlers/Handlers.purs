@@ -14,6 +14,7 @@ import Handlers.ResultVideo.Handler (ResultVideoEventTargets(..), setResultVideo
 import Handlers.ResultVideo.VideoSourceHandler (setVideoSourceHandler)
 import Handlers.Subtitles.AddSubtitleButtonHandler (setAddSubtitleButtonHandler)
 import Handlers.Subtitles.RemoveSubtitleButtonHandler (setRemoveSubtitleButtonHandler)
+import Handlers.Subtitles.SortSubtitlesButtonHandler (setSortSubtitlesButtonHandler)
 import Handlers.Subtitles.SubtitleTimeButtonsHandler (SubtitleTimeButtonsTargets(..), setSubtitleTimeButtonsHandlers)
 import Handlers.TextInputValidationHandler (TextInputValidationTargets(..), setTextInputValidationHandlers)
 import Prelude
@@ -40,6 +41,7 @@ setupEventHandlers
       , subtitleTable
       , subtitleRow
       , addSubtitleButton
+      , sortSubtitlesButton
       , setSubtitleStartButton
       , setSubtitleEndButton
       , artist
@@ -88,6 +90,7 @@ setupEventHandlers
         }
     )
   setAddSubtitleButtonHandler addSubtitleButton subtitleTable subtitleRow resultVideo
+  setSortSubtitlesButtonHandler sortSubtitlesButton subtitleTable
   setRemoveSubtitleButtonHandler subtitleTable
   setSubtitleTimeButtonsHandlers
     ( STBT

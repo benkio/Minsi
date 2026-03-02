@@ -36,6 +36,9 @@ applyId = "applyButton"
 addSubtitleId :: String
 addSubtitleId = "addSubtitleButton"
 
+sortSubtitlesId :: String
+sortSubtitlesId = "sortSubtitlesButton"
+
 videoSourceId :: String
 videoSourceId = "videoSource"
 
