@@ -1,3 +1,5 @@
 **/.spec-results
+**/spago.lock
+**/.DS_Store
 **/*psc-ide-server*
 .psc-ide-port
