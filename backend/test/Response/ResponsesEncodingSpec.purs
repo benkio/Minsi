@@ -14,9 +14,8 @@ spec = do
   describe "Response JSON encoding" do
     it "encodes StatusResponse" do
       let json = writeJSON (StatusResponse.buildResponse Succeed)
-      json `shouldEqual` """{"status":"Succeed"}"""
+      json `shouldEqual` """{"status":"Succeed","description":""}"""
 
     it "encodes CheckDependenciesResponse" do
       let json = writeJSON (CheckDependenciesResponse.buildResponse [ "ffmpeg", "yt-dlp" ])
       json `shouldEqual` """{"missedDependencies":["ffmpeg","yt-dlp"]}"""
-

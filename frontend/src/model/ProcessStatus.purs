@@ -19,17 +19,4 @@ instance Show ProcessStatus where
   show Pending = "Pending"
   show Succeed = "Succeed"
   show LocalFileUploaded = "LocalFileUploaded"
-  show (Failed e) = "Failed: " <> e
-
-instance ReadForeign ProcessStatus where
-  readImpl f = do
-    s <- readImpl f
-    case s of
-      "Pending" -> pure Pending
-      "Succeed" -> pure Succeed
-      "LocalFileUploaded" -> pure LocalFileUploaded
-      "Failed" -> pure (Failed "")
-      x -> maybe
-        (fail $ TypeMismatch "ProcessStatus" $ "Invalid ProcessStatus: " <> x)
-        (pure <<< Failed)
-        (stripPrefix (Pattern "Failed: ") x)
+  show (Failed _) = "Failed"

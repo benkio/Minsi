@@ -6,10 +6,9 @@ import Effect.Aff (Aff)
 import Endpoints.ResponseParser (decodeJsonResponse)
 import Fetch (Method(..), fetch)
 import Main.Config (backendUrl)
-import Model.ProcessStatus (ProcessStatus)
 import Yoga.JSON (writeJSON)
 
-type StatusResponse = { status :: ProcessStatus }
+type StatusResponse = { status :: String, description :: String }
 
 statusEndpoint :: String
 statusEndpoint = backendUrl <> "status"

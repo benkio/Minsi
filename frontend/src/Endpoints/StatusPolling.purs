@@ -8,7 +8,7 @@ import Effect.Aff (Aff, delay)
 import Effect.Class (liftEffect)
 import Endpoints.Status (callStatus)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
-import Model.ProcessStatus (ProcessStatus(..))
+import Model.ProcessStatus (ProcessStatus)
 
 waitForStatus :: String -> ProcessStatus -> Aff Unit
 waitForStatus filename target = tailRecM pollStatus unit
@@ -16,6 +16,6 @@ waitForStatus filename target = tailRecM pollStatus unit
   pollStatus _ = do
     response <- callStatus filename
     case response.status of
-      (Failed error) -> liftEffect $ throwMinsiError (ComputeFailed ("Video download failed: " <> error))
-      status | status == target -> pure $ Done unit
+      "Failed" -> liftEffect $ throwMinsiError (ComputeFailed ("Video download failed: " <> response.description))
+      status | status == (show target) -> pure $ Done unit
       _ -> delay (Milliseconds 500.0) $> Loop unit
