@@ -100,16 +100,16 @@
               </div>
 
               <div class="form-check mb-4">
-                  <input
-                      class="form-check-input"
-                      type="checkbox"
-                      id="uploadLocalFile"
-                      checked
-                      disabled
-                  />
-                  <label class="form-check-label" for="uploadLocalFile">
-                    local file will be uploaded
-                  </label>
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="uploadLocalFile"
+                  checked
+                  disabled
+                />
+                <label class="form-check-label" for="uploadLocalFile">
+                  local file will be uploaded
+                </label>
               </div>
 
               <div class="row">
@@ -156,10 +156,12 @@
             </div>
           </div>
 
-          <div class="card bg-black border border-success text-success minsiLogBox">
+          <div
+            class="card bg-black border border-success text-success minsiLogBox"
+          >
             <div
-                class="card-header bg-black border-success fw-bold font-monospace text-center py-2 minsiLogBox"
-                id="minsiLogTitle"
+              class="card-header bg-black border-success fw-bold font-monospace text-center py-2 minsiLogBox"
+              id="minsiLogTitle"
             >
               😺 MINSI LOG 😺
             </div>
@@ -358,7 +360,11 @@
           />
         </td>
         <td>
-          <textarea class="form-control form-control-sm" rows="1" maxlength=30></textarea>
+          <textarea
+            class="form-control form-control-sm"
+            rows="1"
+            maxlength="30"
+          ></textarea>
         </td>
         <td>
           <select class="form-select form-select-sm">
@@ -401,9 +407,9 @@
     <!-- Blocking Modal (blocking, non-closable) -->
     <div
       class="modal fade"
-      id="blockingModal"
+      id="minsiBlockingModal"
       tabindex="-1"
-      aria-labelledby="blockingModalTitle"
+      aria-labelledby="minsiBlockingModalTitle"
       aria-hidden="true"
       data-bs-backdrop="static"
       data-bs-keyboard="false"
@@ -411,12 +417,24 @@
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-warning">
           <div class="modal-header border-warning">
-            <h5 class="modal-title" id="blockingModalTitle">
-              🚫 FATAL ERROR 🚫
-            </h5>
+            <div class="row align-items-center flex-nowrap g-2 w-100 m-0">
+              <div class="col-auto px-0">
+                <img src="imgs/AH.png" class="rounded" alt="Fatal error icon (left)" />
+              </div>
+
+              <div class="col text-center">
+                <h5 class="modal-title mb-0 text-truncate" id="minsiBlockingModalTitle">
+                    卐 🚫 FATAL ERROR 🚫 ☭
+                </h5>
+              </div>
+
+              <div class="col-auto px-0">
+                <img src="imgs/JS.png" class="rounded" alt="Fatal error icon (right)" />
+              </div>
+            </div>
           </div>
           <div class="modal-body">
-            <div class="mb-2" id="blockingModalBody"></div>
+            <div class="mb-2" id="minsiBlockingModalBody"></div>
           </div>
         </div>
       </div>
@@ -434,11 +452,11 @@
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-center p-4">
           <div class="modal-body">
-              <img
-                  src="https://i.gifer.com/Du4e.gif"
-                  alt="Loading..."
-                  class="mx-auto "
-              >
+            <img
+              src="https://i.gifer.com/Du4e.gif"
+              alt="Loading..."
+              class="mx-auto"
+            />
             <div>Cutting the Video, please wait…</div>
           </div>
         </div>
@@ -515,15 +533,40 @@
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-danger">
           <div class="modal-header border-danger">
-            <h5 class="modal-title text-danger" id="minsiErrorModalLabel">
-              Critical Error
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
+            <div class="row align-items-center flex-nowrap g-2 w-100 m-0">
+              <div class="col-auto px-0">
+                <img
+                  src="imgs/BM.png"
+                  class="rounded"
+                  alt="Error icon (left)"
+                />
+              </div>
+
+              <div class="col text-center">
+                <h5
+                  class="modal-title text-danger mb-0 text-truncate"
+                  id="minsiErrorModalLabel"
+                >
+                    卐 🚫 Critical Error 🚫 ☭
+                </h5>
+              </div>
+
+              <div class="col-auto px-0">
+                <div class="d-flex align-items-center justify-content-end gap-2">
+                  <img
+                    src="imgs/MZ.png"
+                    class="rounded"
+                    alt="Error icon (right)"
+                  />
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="modal-body">
             <div id="minsiErrorModalContent" class="font-monospace small"></div>

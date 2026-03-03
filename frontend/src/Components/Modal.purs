@@ -1,7 +1,7 @@
 module Components.Modal where
 
 import Components.HTMLComponentsLoader (loadHtmlElementId)
-import Components.HtmlIdAndClasses (blockingModalBodyId)
+import Components.HtmlIdAndClasses (minsiBlockingModalBodyId)
 import Components.Window (getDocument)
 import Effect (Effect)
 import Prelude
@@ -15,7 +15,7 @@ foreign import hideModal :: String -> Effect Unit
 setBlockingModalBody :: HTMLElement -> Effect Unit
 setBlockingModalBody bodyEl = do
   doc <- getDocument
-  container <- loadHtmlElementId blockingModalBodyId HE.fromElement doc
+  container <- loadHtmlElementId minsiBlockingModalBodyId HE.fromElement doc
   let containerNode = HE.toNode container
   setTextContent "" containerNode
   void $ appendChild (HE.toNode bodyEl) containerNode

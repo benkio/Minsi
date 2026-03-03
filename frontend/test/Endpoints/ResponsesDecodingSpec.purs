@@ -28,7 +28,7 @@ spec = do
         res = (readJSON json :: Either _ StatusResponse)
       case res of
         Left err -> fail $ "Expected StatusResponse(Pending) to decode, but got error: " <> show err
-        Right { status , description } -> do
+        Right { status, description } -> do
           status `shouldEqual` "Pending"
           description `shouldEqual` "some description"
 

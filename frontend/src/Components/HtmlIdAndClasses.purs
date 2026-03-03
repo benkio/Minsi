@@ -120,14 +120,14 @@ minsiLogBoxClass = "minsiLogBox"
 minsiLogTitleId :: String
 minsiLogTitleId = "minsiLogTitle"
 
-blockingModalId :: String
-blockingModalId = "blockingModal"
+minsiBlockingModalId :: String
+minsiBlockingModalId = "minsiBlockingModal"
 
-blockingModalTitleId :: String
-blockingModalTitleId = "blockingModalTitle"
+minsiBlockingModalTitleId :: String
+minsiBlockingModalTitleId = "minsiBlockingModalTitle"
 
-blockingModalBodyId :: String
-blockingModalBodyId = "blockingModalBody"
+minsiBlockingModalBodyId :: String
+minsiBlockingModalBodyId = "minsiBlockingModalBody"
 
-blockingModalActionId :: String
-blockingModalActionId = "blockingModalAction"
+minsiBlockingModalActionId :: String
+minsiBlockingModalActionId = "minsiBlockingModalAction"

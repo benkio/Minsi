@@ -5,7 +5,7 @@ import Prelude
 import Components.HTMLCollection (swapClasses)
 import Components.HTMLComponentsLoader (loadHtmlElementClass)
 import Components.HtmlComponents (loadDiv)
-import Components.HtmlIdAndClasses (blockingModalId, minsiErrorModalContentId, minsiErrorModalId, minsiLogBoxClass, minsiLogId, minsiLogTitleId)
+import Components.HtmlIdAndClasses (minsiBlockingModalId, minsiErrorModalContentId, minsiErrorModalId, minsiLogBoxClass, minsiLogId, minsiLogTitleId)
 import Components.Modal (setBlockingModalBody, showModal)
 import Components.Window (getDocument, raiseErrorAlert)
 import Control.Monad.Error.Class (catchError, class MonadError)
@@ -136,4 +136,4 @@ showMinsiBlockingErrorDialog :: String -> Effect Unit
 showMinsiBlockingErrorDialog errorMessage = do
   divEl <- createErrorParagraphsDiv errorMessage
   setBlockingModalBody (HD.toHTMLElement divEl)
-  showModal blockingModalId false
+  showModal minsiBlockingModalId false
