@@ -24,37 +24,30 @@ spec = do
 
     it "decodes StatusResponse.status = Pending" do
       let
-        json = """{ "status": "Pending" }"""
+        json = """{ "status": "Pending", "description": "some description"  }"""
         res = (readJSON json :: Either _ StatusResponse)
       case res of
         Left err -> fail $ "Expected StatusResponse(Pending) to decode, but got error: " <> show err
-        Right { status } ->
-          status `shouldEqual` Pending
+        Right { status, description } -> do
+          status `shouldEqual` "Pending"
+          description `shouldEqual` "some description"
 
     it "decodes StatusResponse.status = Succeed" do
       let
-        json = """{ "status": "Succeed" }"""
+        json = """{ "status": "Succeed", "description": "some description"  }"""
         res = (readJSON json :: Either _ StatusResponse)
       case res of
         Left err -> fail $ "Expected StatusResponse(Succeed) to decode, but got error: " <> show err
-        Right { status } ->
-          status `shouldEqual` Succeed
+        Right { status, description } -> do
+          status `shouldEqual` "Succeed"
+          description `shouldEqual` "some description"
 
     it "decodes StatusResponse.status = Failed" do
       let
-        json = """{ "status": "Failed: " }"""
+        json = """{ "status": "Failed", "description": "some description"   }"""
         res = (readJSON json :: Either _ StatusResponse)
       case res of
         Left err -> fail $ "Expected StatusResponse(Failed) to decode, but got error: " <> show err
-        Right { status } ->
-          status `shouldEqual` Failed ""
-
-    it "decodes StatusResponse.status = Failed with error message" do
-      let
-        json = """{ "status": "Failed: video processing error" }"""
-        res = (readJSON json :: Either _ StatusResponse)
-      case res of
-        Left err -> fail $ "Expected StatusResponse(Failed with message) to decode, but got error: " <> show err
-        Right { status } ->
-          status `shouldEqual` Failed "video processing error"
-
+        Right { status, description } -> do
+          status `shouldEqual` "Failed"
+          description `shouldEqual` "some description"
