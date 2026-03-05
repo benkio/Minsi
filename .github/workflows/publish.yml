@@ -11,7 +11,7 @@ on:
 jobs:
   publish:
     name: Build and Push
-    uses: ./.github/workflows/publish-docker-image.yml
+    uses: benkio/minsi/.github/workflows/publish-docker-image.yml@main
     with:
       source: build
       tag: ${{ inputs.tag }}
