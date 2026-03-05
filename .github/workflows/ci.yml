@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - "**"
-  pull_request:
-    branches:
-      - "**"
 
 jobs:
   backend:
@@ -102,35 +99,38 @@ jobs:
         run: docker build -t minsi:ci .
 
       - name: Run Docker container
-        run: docker run -d --name minsi -p 8080:8080 minsi:ci
+        run: docker run -d --name minsi -p 8080:8080 --network host minsi:ci
 
       - name: Wait for server to be ready
         run: |
-          for i in $(seq 1 30); do
-            if curl -sf -o /dev/null http://localhost:8080/checkDependencies -X POST; then
-              echo "Server is ready"
+          echo "Waiting for server to become ready..."
+          for i in $(seq 1 60); do
+            if curl -sf -o /dev/null -w "%{http_code}" http://localhost:8080/checkDependencies -X POST 2>/dev/null | grep -q 200; then
+              echo "✓ Server is ready"
               exit 0
             fi
-            echo "Waiting for server... ($i/30)"
-            sleep 2
+            echo "Attempt $i/60 - Server not ready yet, waiting..."
+            sleep 1
           done
-          echo "Server did not start in time"
-          docker logs minsi
+          echo "✗ Server did not start in time"
+          docker logs minsi || true
+          docker ps -a || true
           exit 1
 
       - name: Call CheckDependencies endpoint
         run: |
           HTTP_STATUS=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST http://localhost:8080/checkDependencies)
           echo "HTTP status: $HTTP_STATUS"
-          cat /tmp/response.txt
+          cat /tmp/response.txt || echo "No response body"
           if [ "$HTTP_STATUS" -ne 200 ]; then
-            echo "CheckDependencies failed with status $HTTP_STATUS"
+            echo "✗ CheckDependencies failed with status $HTTP_STATUS"
             exit 1
           fi
+          echo "✓ CheckDependencies endpoint responding correctly"
 
       - name: Save Docker image (for optional publish)
         if: github.ref == 'refs/heads/main'
-        run: docker save minsi:ci -o /tmp/minsi-image.tar
+        run: docker save minsi:ci -o /tmp/minsi-image.tar && ls -lh /tmp/minsi-image.tar
 
       - name: Upload Docker image artifact
         if: github.ref == 'refs/heads/main'
@@ -138,10 +138,11 @@ jobs:
         with:
           name: minsi-docker-image
           path: /tmp/minsi-image.tar
+          if-no-files-found: warn
 
       - name: Stop Docker container
         if: always()
-        run: docker rm -f minsi
+        run: docker rm -f minsi || true
 
   publish_approval:
     name: Publish Docker image?
