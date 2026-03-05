@@ -1,10 +1,9 @@
+---
 name: CI
-
 on:
   push:
     branches:
       - "**"
-
 jobs:
   backend:
     name: Backend
@@ -12,20 +11,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
+          cache: npm
           cache-dependency-path: backend/package-lock.json
-
       - name: Setup PureScript
         uses: purescript-contrib/setup-purescript@main
         with:
-          purescript: "latest"
-          purs-tidy: "latest"
-          spago: "unstable"
+          purescript: latest
+          purs-tidy: latest
+          spago: unstable
       - name: Cache PureScript dependencies (backend)
         uses: actions/cache@v4
         with:
@@ -33,41 +30,33 @@ jobs:
           path: |
             backend/.spago
             backend/output
-
       - name: Install backend dependencies
         run: npm ci --prefix backend
-
       - name: Check Formatting
         working-directory: backend
         run: purs-tidy check "src/**/*.purs" && purs-tidy check "test/**/*.purs"
-
       - name: Build backend
         working-directory: backend
         run: spago build
-
       - name: Test backend
         working-directory: backend
         run: spago test
-
   frontend:
     name: Frontend
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-
       - name: Setup PureScript
         uses: purescript-contrib/setup-purescript@main
         with:
-          purescript: "latest"
-          purs-tidy: "latest"
-          spago: "unstable"
-
+          purescript: latest
+          purs-tidy: latest
+          spago: unstable
       - name: Cache PureScript dependencies (frontend)
         uses: actions/cache@v4
         with:
@@ -75,35 +64,29 @@ jobs:
           path: |
             frontend/.spago
             frontend/output
-
       - name: Check Formatting
         working-directory: frontend
         run: purs-tidy check "src/**/*.purs" && purs-tidy check "test/**/*.purs"
-
       - name: Build frontend
         working-directory: frontend
         run: spago build
-
       - name: Test frontend
         working-directory: frontend
         run: spago test
-
   docker:
     name: Docker
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Build Docker image
         run: docker build -t minsi:ci .
-
       - name: Run Docker container
         run: docker run -d --name minsi -p 8080:8080 --network host minsi:ci
-
       - name: Wait for server to be ready
-        run: |
+        run: >
           echo "Waiting for server to become ready..."
+
           for i in $(seq 1 60); do
             if curl -sf -o /dev/null -w "%{http_code}" http://localhost:8080/checkDependencies -X POST 2>/dev/null | grep -q 200; then
               echo "✓ Server is ready"
@@ -112,26 +95,32 @@ jobs:
             echo "Attempt $i/60 - Server not ready yet, waiting..."
             sleep 1
           done
-          echo "✗ Server did not start in time"
-          docker logs minsi || true
-          docker ps -a || true
-          exit 1
 
+          echo "✗ Server did not start in time"
+
+          docker logs minsi || true
+
+          docker ps -a || true
+
+          exit 1
       - name: Call CheckDependencies endpoint
-        run: |
-          HTTP_STATUS=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST http://localhost:8080/checkDependencies)
+        run: >
+          HTTP_STATUS=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST
+          http://localhost:8080/checkDependencies)
+
           echo "HTTP status: $HTTP_STATUS"
+
           cat /tmp/response.txt || echo "No response body"
+
           if [ "$HTTP_STATUS" -ne 200 ]; then
             echo "✗ CheckDependencies failed with status $HTTP_STATUS"
             exit 1
           fi
-          echo "✓ CheckDependencies endpoint responding correctly"
 
+          echo "✓ CheckDependencies endpoint responding correctly"
       - name: Save Docker image (for optional publish)
         if: github.ref == 'refs/heads/main'
         run: docker save minsi:ci -o /tmp/minsi-image.tar && ls -lh /tmp/minsi-image.tar
-
       - name: Upload Docker image artifact
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
@@ -139,25 +128,26 @@ jobs:
           name: minsi-docker-image
           path: /tmp/minsi-image.tar
           if-no-files-found: warn
-
       - name: Stop Docker container
         if: always()
         run: docker rm -f minsi || true
-
   publish_approval:
     name: Publish Docker image?
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    needs: [backend, frontend, docker]
+    needs:
+      - backend
+      - frontend
+      - docker
     environment: dockerhub-publish
     steps:
       - name: Await approval
         run: echo "Publishing approved. Proceeding to publish job."
-
   publish_docker_image:
     name: Publish Docker image
     if: github.ref == 'refs/heads/main'
-    needs: [publish_approval]
+    needs:
+      - publish_approval
     uses: benkio/minsi/.github/workflows/publish-docker-image.yml@main
     with:
       source: artifact
