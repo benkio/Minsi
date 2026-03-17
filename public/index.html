@@ -46,6 +46,14 @@
             >
               ⌨️ Shortcuts
             </button>
+            <button
+              type="button"
+              id="resetButton"
+              class="btn btn-danger btn-sm ms-1"
+              title="Clear in-memory jobs and status"
+            >
+              Reset
+            </button>
           </p>
         </div>
       </div>
@@ -78,9 +86,9 @@
 
               <div class="mb-3">
                 <label for="outputFilename" class="form-label">
-                  Output Filename - format: <i>prefix_CamelCaseValue</i>
+                  Output Filename - format: <i>prefix_CamelCaseValue</i> (Max 50 Chars)
                 </label>
-                <input type="text" class="form-control" id="outputFilename" />
+                <input type="text" class="form-control" id="outputFilename" maxlength=50/>
               </div>
 
               <div class="mb-3">
