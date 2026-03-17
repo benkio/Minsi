@@ -9,6 +9,7 @@ import Handlers.CutRangeHandler (CutRangeTargets(..), setCutRangeHandlers)
 import Handlers.DownloadAllButtonHandler (setDownloadAllButtonHandler)
 import Handlers.InputVideo.InputSourceHandler (setInputSourceHandler)
 import Handlers.InputVideo.InputVideoHandler (setVideoHandlers, VideoEventTargets(..))
+import Handlers.ResetButtonHandler (setResetButtonHandler)
 import Handlers.KeyboardHandler (KeyboardHandlerTargets(..), setKeyboardHandlers)
 import Handlers.ResultVideo.Handler (ResultVideoEventTargets(..), setResultVideoHandlers)
 import Handlers.ResultVideo.VideoSourceHandler (setVideoSourceHandler)
@@ -53,6 +54,7 @@ setupEventHandlers
       , resultVideo
       , resultAudio
       , keyboardShortcutsButton
+      , resetButton
       }
   } = do
   setCutRangeHandlers
@@ -104,6 +106,7 @@ setupEventHandlers
   setInputSourceHandler inputSource youtubeUrl localFile
   setDownloadAllButtonHandler downloadAllButton
   setCopyTranscriptButtonHandler copyTranscriptButton
+  setResetButtonHandler resetButton
   setTextInputValidationHandlers
     ( TIVT
         { outputFilename: filename

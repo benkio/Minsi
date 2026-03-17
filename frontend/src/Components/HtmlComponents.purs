@@ -35,6 +35,7 @@ import Components.HtmlIdAndClasses
   , youtubeUrlId
   , subtitleRow
   , keyboardShortcutsButtonId
+  , resetButtonId
   , localFileId
   , uploadLocalFileId
   , minsiLogBoxClass
@@ -125,6 +126,7 @@ newtype HtmlOutputs = HtmlOutputs
   , resultVideo :: HTMLVideoElement
   , resultAudio :: HTMLAudioElement
   , keyboardShortcutsButton :: HTMLButtonElement
+  , resetButton :: HTMLButtonElement
   }
 
 derive instance Newtype HtmlOutputs _
@@ -218,6 +220,7 @@ loadHtmlOutputs doc = do
   resultVideo <- loadVideo resultVideoId doc
   resultAudio <- loadAudio resultAudioId doc
   keyboardShortcutsButton <- loadButton keyboardShortcutsButtonId doc
+  resetButton <- loadButton resetButtonId doc
   pure
     ( HtmlOutputs
         { resultPreview: resultPreview
@@ -230,6 +233,7 @@ loadHtmlOutputs doc = do
         , resultVideo: resultVideo
         , resultAudio: resultAudio
         , keyboardShortcutsButton: keyboardShortcutsButton
+  , resetButton: resetButton
         }
     )
 

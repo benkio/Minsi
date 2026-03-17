@@ -21,6 +21,9 @@ insert :: Filename -> Maybe State -> ProcessStatus -> Store -> Effect Unit
 insert file state processStatus store =
   Ref.modify_ (Map.insert file { state, processStatus }) store
 
+clearStore :: Store -> Effect Unit
+clearStore store = Ref.write Map.empty store
+
 lookupProcessStatus :: Filename -> Store -> Effect (Maybe StateProcessStatus)
 lookupProcessStatus filename store =
   Map.lookup filename <$> Ref.read store

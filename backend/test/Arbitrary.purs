@@ -13,7 +13,6 @@ import Model.State (DurationRange(..))
 import Test.QuickCheck.Arbitrary (class Arbitrary, arbitrary)
 import Test.QuickCheck.Gen (Gen, choose, suchThat, arrayOf1, chooseInt)
 
-
 data Range = Range Number Number
 
 instance Arbitrary Range where

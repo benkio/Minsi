@@ -6,6 +6,7 @@ import Api.HttpLog (logIncomingPost)
 import Controller.CheckDependenciesController (checkDependenciesController)
 import Controller.ComputeController (computeController)
 import Controller.ErrorHandlers (generalErrorHandler)
+import Controller.ResetController (resetController)
 import Controller.StatusController (statusController)
 import Controller.UpdateCheckController (updateCheckController)
 import Controller.UploadController (uploadController)
@@ -21,6 +22,7 @@ router store = do
   post "/compute" (controllerLogic "/compute" (computeController store))
   post "/status" (controllerLogic "/status" (statusController store))
   post "/updateCheck" (controllerLogic "/updateCheck" (updateCheckController store))
+  post "/reset" (controllerLogic "/reset" (resetController store))
   useAtExternal "/upload" multerUploadMiddleware
   post "/upload" (controllerLogic "/upload" (uploadController store))
 
