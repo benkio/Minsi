@@ -233,7 +233,7 @@ loadHtmlOutputs doc = do
         , resultVideo: resultVideo
         , resultAudio: resultAudio
         , keyboardShortcutsButton: keyboardShortcutsButton
-  , resetButton: resetButton
+        , resetButton: resetButton
         }
     )
 
