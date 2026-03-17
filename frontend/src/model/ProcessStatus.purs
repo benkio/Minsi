@@ -1,11 +1,6 @@
 module Model.ProcessStatus where
 
-import Data.Maybe (maybe)
-import Data.String.CodeUnits (stripPrefix)
-import Data.String.Pattern (Pattern(..))
-import Foreign (ForeignError(..), fail)
 import Prelude
-import Yoga.JSON (class ReadForeign, readImpl)
 
 data ProcessStatus
   = Pending

@@ -5,7 +5,6 @@ import Prelude
 import Data.Either (Either(..))
 import Endpoints.CheckDependencies (MissingDependenciesResponse)
 import Endpoints.Status (StatusResponse)
-import Model.ProcessStatus (ProcessStatus(..))
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (fail, shouldEqual)
 import Yoga.JSON (readJSON)
