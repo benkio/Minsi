@@ -145,9 +145,10 @@ instance Ord Subtitle where
     compare str1 str2
 
 validateState :: State -> Either (Array String) State
-validateState state@(State ({ cutVideo: durationRange, subtitles, reverseLoop })) = do
+validateState state@(State ({ filename, cutVideo: durationRange, subtitles, reverseLoop })) = do
   _ <- validateRange durationRange
   _ <- validateSubtitles subtitles reverseLoop
+  _ <- validateFilename filename
   pure state
 
 validateSubtitles :: Array Subtitle -> Boolean -> Either (Array String) Unit
@@ -163,3 +164,8 @@ validateRange (DurationRange { start: (Milliseconds start), end: (Milliseconds e
 validateSubtitleValue :: String -> Either (Array String) Unit
 validateSubtitleValue v =
   if length v > 30 then Left [ "State Validation: subtitle too long. > 30 chars" ] else Right unit
+
+validateFilename :: String -> Either (Array String) Unit
+validateFilename v -- TODO: should check for the prefix
+  | length v > 50 = Left [ "State Validation: filename too long. > 50 chars" ]
+  | otherwise = Right unit

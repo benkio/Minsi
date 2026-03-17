@@ -1,11 +1,18 @@
 module Test.Arbitrary where
 
-import Data.Array.NonEmpty as NEA
-import Data.Time.Duration (Milliseconds(..))
-import Model.State (DurationRange(..))
 import Prelude
+
+import Data.Array as Array
+import Data.Array.NonEmpty as NEA
+import Data.Char (fromCharCode)
+import Data.Maybe (Maybe(..))
+import Data.String.CodeUnits (fromCharArray)
+import Data.Time.Duration (Milliseconds(..))
+import Data.Traversable (traverse)
+import Model.State (DurationRange(..))
 import Test.QuickCheck.Arbitrary (class Arbitrary, arbitrary)
-import Test.QuickCheck.Gen (choose, suchThat, arrayOf1)
+import Test.QuickCheck.Gen (Gen, choose, suchThat, arrayOf1, chooseInt)
+
 
 data Range = Range Number Number
 
@@ -56,3 +63,22 @@ instance Arbitrary NonEmptyInvalidDurationRanges where
     nea <- arrayOf1 arbitrary
     pure $ NonEmptyInvalidDurationRanges (map (\(InvalidDurationRange r) -> r) (NEA.toArray nea))
 
+newtype LongerThanNCharacters = LongerThanNCharacters { n :: Int, value :: String }
+
+instance Arbitrary LongerThanNCharacters where
+  arbitrary = do
+    n <- chooseInt 0 50
+    extra <- chooseInt 1 20
+    let len = n + 50 + extra
+    s <- replicateChar len
+    pure $ LongerThanNCharacters { n, value: s }
+
+replicateChar :: Int -> Gen String
+replicateChar len = fromCharArray <$> traverse (const randomAsciiChar) (Array.replicate len unit)
+
+randomAsciiChar :: Gen Char
+randomAsciiChar = do
+  c <- fromCharCode <$> chooseInt 32 126
+  case c of
+    Just ch -> pure ch
+    Nothing -> randomAsciiChar

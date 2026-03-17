@@ -1,6 +1,7 @@
 module Validations.OutputFilenameValidation where
 
 import Data.Bifunctor (lmap)
+import Data.String (length)
 import Data.String.Regex (Regex, test, regex)
 import Data.String.Regex.Flags (noFlags)
 import Data.Validation.Semigroup (V(..), andThen, invalid)
@@ -15,5 +16,14 @@ outputFilenameRegexValidation id = V $ lmap (\x -> fromSingleton id x) (regex ou
 
 outputFilenameValidation :: String -> String -> V ValidationErrors String
 outputFilenameValidation id v =
-  andThen (outputFilenameRegexValidation id)
-    (\r -> if test r v then pure v else invalid (fromSingleton id "Format must be: prefix_Name (1-5 lowercase letters, underscore, then capitalized letters/numbers)"))
+  (outputFilenameRegexValidation id)
+    `andThen`
+      ( \r ->
+          if test r v then pure v
+          else invalid (fromSingleton id "Format must be: prefix_Name (1-5 lowercase letters, underscore, then capitalized letters/numbers)")
+      )
+    `andThen`
+      ( \x ->
+          if length x <= 50 then pure v
+          else invalid (fromSingleton id ("Length must be max 50 chars. Got: " <> show (length x)))
+      )

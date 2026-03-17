@@ -48,3 +48,6 @@ spec = do
 
     it "rejects underscore only" $
       isValid (outputFilenameValidation "id" "_") `shouldEqual` false
+
+    it "rejects too long filenames" $
+      isValid (outputFilenameValidation "id" "abc_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") `shouldEqual` false
