@@ -108,6 +108,9 @@ instance ReadForeign Source where
     if s == "LocalFile" then pure LocalFile
     else maybe (fail $ TypeMismatch "Source" $ "Invalid Source: " <> s) (pure <<< WebURL <<< WURL) (fromString s)
 
+instance Decode Source where
+  decode = readImpl
+
 instance Decode State where
   decode = readImpl
 
