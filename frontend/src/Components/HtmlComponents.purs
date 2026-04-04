@@ -32,6 +32,7 @@ import Components.HtmlIdAndClasses
   , videoSourceRowId
   , downloadAllButtonId
   , copyTranscriptButtonId
+  , downloadFullButtonId
   , youtubeUrlId
   , subtitleRow
   , keyboardShortcutsButtonId
@@ -75,6 +76,7 @@ newtype HtmlInputs = HtmlInputs
   { cutStart :: HTMLInputElement
   , cutEnd :: HTMLInputElement
   , youtubeUrl :: HTMLInputElement
+  , downloadFullButton :: HTMLButtonElement
   , localFile :: HTMLInputElement
   , uploadLocalFile :: HTMLInputElement
   , filename :: HTMLInputElement
@@ -162,6 +164,7 @@ loadHtmlInputs :: NonElementParentNode -> Effect HtmlInputs
 loadHtmlInputs doc = do
   rangeTuple <- loadCutRange doc
   youtubeUrl <- loadInput youtubeUrlId doc
+  downloadFullButton <- loadButton downloadFullButtonId doc
   localFile <- loadInput localFileId doc
   uploadLocalFile <- loadInput uploadLocalFileId doc
   filename <- loadInput outputFilenameId doc
@@ -186,6 +189,7 @@ loadHtmlInputs doc = do
         { cutStart: fst rangeTuple
         , cutEnd: snd rangeTuple
         , youtubeUrl: youtubeUrl
+        , downloadFullButton: downloadFullButton
         , localFile: localFile
         , uploadLocalFile: uploadLocalFile
         , filename: filename
