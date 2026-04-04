@@ -38,7 +38,7 @@ import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.HTMLTableRowElement as HTR
 
 getCurrentState :: Effect (Tuple State HtmlComponents)
-getCurrentState = do
+getCurrentState = genericErrorsHandler $ do
   components <- loadComponents
   stateV <- fromHtmlInputs components.htmlInputs
   state <- (either (throwMinsiError <<< InvalidInputs <<< toMap) pure <<< toEither) stateV
@@ -110,7 +110,7 @@ sourceFromHTMLInput inputSourceSelect youtubeUrlComponent localFileComponent = d
     v -> pure $ invalid (fromSingleton inputSourceId ("Unrecognized value: " <> v))
 
 loadSubtitleFromRow :: Int -> HTR.HTMLTableRowElement -> Effect Subtitle
-loadSubtitleFromRow index row = do
+loadSubtitleFromRow index row = genericErrorsHandler $ do
   cells <- HTR.cells row
   cellArray <- HC.toArray cells
   if length cellArray /= 7 then throwMinsiError (HTMLElementNotFound ("[Subtitle row " <> show index <> "]: Unexpected number of columns" <> (show (length cellArray))))
