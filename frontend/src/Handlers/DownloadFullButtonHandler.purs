@@ -2,9 +2,16 @@ module Handlers.DownloadFullButtonHandler where
 
 import Prelude
 
+import Components.HtmlIdAndClasses (loadingModalId)
+import Components.Modal (hideModal, showModal)
+import Data.Newtype (unwrap)
+import Data.Tuple (fst)
 import Effect (Effect)
-import Effect.Console (log)
-import Handlers.ErrorHandlers (genericErrorsHandler)
+import Effect.Aff (runAff_, finally)
+import Effect.Class (liftEffect)
+import Endpoints.Download (callDownload)
+import Handlers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
+import Model.State.StateFromHtml (getCurrentState)
 import Web.DOM.Element (toEventTarget)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
@@ -18,4 +25,7 @@ setDownloadFullButtonHandler downloadFullButton = genericErrorsHandler $ do
 
 downloadFullButtonEventListener :: Event -> Effect Unit
 downloadFullButtonEventListener _ = do
-  log "Download Full button clicked"
+  stateTuple <- getCurrentState
+  let source = (unwrap (fst stateTuple)).source
+  showModal loadingModalId true
+  runAff_ genericErrorsHandlerEither $ finally (liftEffect $ hideModal loadingModalId) (callDownload source)
