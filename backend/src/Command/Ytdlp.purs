@@ -84,3 +84,8 @@ downloadOrCutVideo (WebURL youtubeUri) filename start end = do
             (\_ -> tryCookies cs url filepath)
       )
       (uncons cookies)
+
+-- TODO: Implement
+-- downloadFull :: Source -> Aff ExecaResult
+-- downloadFull LocalFile = ???
+-- downloadFull (WebURL youtubeUri) = ???

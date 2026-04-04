@@ -8,13 +8,15 @@ import Data.Time.Duration (Milliseconds(..))
 import Node.Path (FilePath)
 import Data.Foldable (traverse_)
 import Foreign.Generic.Class (class Decode)
-import Data.URL (URL, fromString)
+import Data.URL (URL, fromString, toString)
 import Yoga.JSON
   ( class ReadForeign
   , readImpl
   )
 import Foreign (fail, ForeignError(TypeMismatch))
 import Data.Either (Either(..))
+import Data.Validation.Semigroup (isValid)
+import Validations.YoutubeValidation (youtubeUrlValidation)
 
 -------------------------------------------------------------------------------
 --                    Copy Pasted between Frontend↔Backend                   --
@@ -148,10 +150,11 @@ instance Ord Subtitle where
     compare str1 str2
 
 validateState :: State -> Either (Array String) State
-validateState state@(State ({ filename, cutVideo: durationRange, subtitles, reverseLoop })) = do
+validateState state@(State ({ source, filename, cutVideo: durationRange, subtitles, reverseLoop })) = do
   _ <- validateRange durationRange
   _ <- validateSubtitles subtitles reverseLoop
   _ <- validateFilename filename
+  _ <- validateSource source
   pure state
 
 validateSubtitles :: Array Subtitle -> Boolean -> Either (Array String) Unit
@@ -172,3 +175,8 @@ validateFilename :: String -> Either (Array String) Unit
 validateFilename v -- TODO: should check for the prefix
   | length v > 50 = Left [ "State Validation: filename too long. > 50 chars" ]
   | otherwise = Right unit
+
+validateSource :: Source -> Either (Array String) Unit
+validateSource LocalFile = Right unit
+validateSource (WebURL (WURL url)) =
+  if isValid (youtubeUrlValidation "source" (toString url)) then Right unit else Left [ "State Validation: source must be a valid YouTube URL" ]

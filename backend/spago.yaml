@@ -35,6 +35,7 @@ package:
     - transformers
     - tuples
     - url-immutable
+    - validation
     - yoga-json
   name: minsi-backend
 workspace:
