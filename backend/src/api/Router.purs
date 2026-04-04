@@ -22,7 +22,7 @@ router store = do
   post "/checkDependencies" (controllerLogic "/checkDependencies" (checkDependenciesController store))
   post "/compute" (controllerLogic "/compute" (computeController store))
   post "/status" (controllerLogic "/status" (statusController store))
-  post "/download" (controllerLogic "/download" (downloadController store))
+  post "/download" (defaultResponseSettings *> logIncomingPost "/download" *> downloadController store)
   post "/updateCheck" (controllerLogic "/updateCheck" (updateCheckController store))
   post "/reset" (controllerLogic "/reset" (resetController store))
   useAtExternal "/upload" multerUploadMiddleware
