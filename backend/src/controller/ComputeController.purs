@@ -77,7 +77,7 @@ runComputePipeline mayOldState state@(State { source, filename, cutVideo: Durati
   runExceptT do
     when (cutDownloadRequired mayOldState state)
       ( do
-          void $ exceptTStep "Video download" $ downloadOrCutVideo source filename start end
+          void $ exceptTStep "Video download" $ downloadOrCutVideo source filename (Just start) (Just end)
           void $ exceptTStep "Video Normalization" $ normalizeVideo filename
       )
     void $ exceptTStep "MP3 extraction" $ extractMp3 filename

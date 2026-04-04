@@ -5,6 +5,7 @@ import Data.Array (null)
 import Data.Maybe (maybe)
 import Data.String (length)
 import Data.Time.Duration (Milliseconds(..))
+import Data.Newtype (class Newtype)
 import Node.Path (FilePath)
 import Data.Foldable (traverse_)
 import Foreign.Generic.Class (class Decode)
@@ -23,6 +24,7 @@ import Validations.YoutubeValidation (youtubeUrlValidation)
 -------------------------------------------------------------------------------
 
 newtype WURL = WURL URL
+derive instance newtypeWURL :: Newtype WURL _
 data Source = LocalFile | WebURL WURL
 
 derive instance Eq WURL

@@ -35,21 +35,26 @@ ytdlpSupportedBrowserCookies =
   , "whale"
   ]
 
-getYtdlpOutputUrl :: String -> WURL -> String -> String -> String -> Aff ExecaProcess
-getYtdlpOutputUrl cookie (WURL url) filepath start end =
-  runCommand args YtdlpError "yt-dlp"
+getYtdlpOutputUrl :: String -> WURL -> String -> Maybe String -> Maybe String -> Aff ExecaProcess
+getYtdlpOutputUrl cookie (WURL url) filepath maybeStart maybeEnd =
+    runCommand args YtdlpError "yt-dlp"
   where
-  urlString = toString url
-  args =
-    if cookie == "" then
-      [ "-f", "\"best[ext=mp4]\"", "--force-overwrite", "--download-sections", show ("*" <> start <> "-" <> end), "-o", show filepath, show urlString ]
-    else
-      [ "-f", "\"best[ext=mp4]\"", "--force-overwrite", "--download-sections", show ("*" <> start <> "-" <> end), "-o", show filepath, "--cookies-from-browser", cookie, show urlString ]
+    urlString = toString url
+    maybeRangeArg = do
+      start <- maybeStart
+      end <- maybeEnd
+      pure [ "--download-sections", show ("*" <> start <> "-" <> end) ]
+    rangeArgs = maybe [] identity maybeRangeArg
+    args =
+      if cookie == "" then
+        [ "-f", "\"best[ext=mp4]\"", "--force-overwrite"] <> rangeArgs <> [ "-o", show filepath, show urlString ]
+      else
+        [ "-f", "\"best[ext=mp4]\"", "--force-overwrite"] <> rangeArgs <> [ "-o", show filepath, "--cookies-from-browser", cookie, show urlString ]
 
-downloadOrCutVideo :: Source -> String -> Milliseconds -> Milliseconds -> Aff ExecaResult
-downloadOrCutVideo LocalFile filename start end = do
+downloadOrCutVideo :: Source -> String -> Maybe Milliseconds -> Maybe Milliseconds -> Aff ExecaResult
+downloadOrCutVideo LocalFile filename maybeStart maybeEnd = do
   uploadedFilepath <- liftEffect $ validateAndResolveLocalFile filename
-  finally (rm uploadedFilepath) (cutAndConvertUploadedVideo uploadedFilepath filename start end)
+  finally (rm uploadedFilepath) (cutAndConvertUploadedVideo uploadedFilepath filename maybeStart maybeEnd)
   where
   validateAndResolveLocalFile fn = do
     up <- uploaded fn
@@ -58,7 +63,7 @@ downloadOrCutVideo LocalFile filename start end = do
     log ("[Ytdlp] Cut " <> show up <> " To " <> show fp)
     pure up
 
-downloadOrCutVideo (WebURL youtubeUri) filename start end = do
+downloadOrCutVideo (WebURL youtubeUri) filename maybeStart maybeEnd = do
   filepath <- liftEffect do
     fp <- mp4 filename
     log ("[Ytdlp] Delete " <> show fp)
@@ -66,8 +71,8 @@ downloadOrCutVideo (WebURL youtubeUri) filename start end = do
   apathize (rm filepath)
   tryCookies ytdlpSupportedBrowserCookies youtubeUri filepath
   where
-  startStr = millisecondsToSecondsString start (Just '.')
-  endStr = millisecondsToSecondsString end (Just '.')
+  maybeStartStr = millisecondsToSecondsString <$> maybeStart <*> pure (Just '.')
+  maybeEndStr = millisecondsToSecondsString <$> maybeEnd <*> pure (Just '.')
 
   tryCookies :: Array String -> WURL -> String -> Aff ExecaResult
   tryCookies cookies url filepath =
@@ -75,7 +80,7 @@ downloadOrCutVideo (WebURL youtubeUri) filename start end = do
       (liftEffect $ throwMinsiError (YtdlpError "All yt-dlp cookie attempts failed"))
       ( \{ head: c, tail: cs } ->
           catchError
-            ( getYtdlpOutputUrl c url filepath startStr endStr
+            ( getYtdlpOutputUrl c url filepath maybeStartStr maybeEndStr
                 >>= _.getResult
                 >>= \r -> case r.exit of
                   Normally 0 -> pure r
@@ -84,8 +89,3 @@ downloadOrCutVideo (WebURL youtubeUri) filename start end = do
             (\_ -> tryCookies cs url filepath)
       )
       (uncons cookies)
-
--- TODO: Implement
--- downloadFull :: Source -> Aff ExecaResult
--- downloadFull LocalFile = ???
--- downloadFull (WebURL youtubeUri) = ???

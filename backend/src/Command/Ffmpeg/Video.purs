@@ -5,7 +5,7 @@ import Prelude
 import Command.Command (runCommand)
 import Constants (mp4, tempVideo)
 import Conversion.Time (millisecondsToSecondsString)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), maybe)
 import Data.Time.Duration (Milliseconds)
 import Effect.Aff (Aff, apathize, finally)
 import Effect.Class (liftEffect)
@@ -40,8 +40,8 @@ normaliseVideoCleanup filename = liftEffect do
 
 -- Uploaded ---------------------------------------------------------------
 
-cutAndConvertUploadedVideo :: FilePath -> String -> Milliseconds -> Milliseconds -> Aff ExecaResult
-cutAndConvertUploadedVideo uploadedFilepath filename start end = do
+cutAndConvertUploadedVideo :: FilePath -> String -> Maybe Milliseconds -> Maybe Milliseconds -> Aff ExecaResult
+cutAndConvertUploadedVideo uploadedFilepath filename maybeStart maybeEnd = do
   filepathMp4 <- liftEffect $ mp4 filename
   apathize $ liftEffect $ rm filepathMp4
   liftEffect $ log $ "[Command/Video] Execute Command, Cut & Convert:" <> show uploadedFilepath <> " into " <> filepathMp4
@@ -49,9 +49,12 @@ cutAndConvertUploadedVideo uploadedFilepath filename start end = do
   process <- runCommand args FfmpegVideoError "ffmpeg"
   process.getResult
   where
-  startStr = millisecondsToSecondsString start (Just '.')
-  endStr = millisecondsToSecondsString end (Just '.')
+  startStr = millisecondsToSecondsString <$> maybeStart <*> pure (Just '.')
+  endStr = millisecondsToSecondsString <$> maybeEnd <*> pure (Just '.')
 
-cutAndConvertUpladedVideoArgs :: FilePath -> FilePath -> String -> String -> Array String
-cutAndConvertUpladedVideoArgs uploaded mp4 start end =
-  [ "-hide_banner", "-loglevel", "warning", "-i", uploaded, "-c:v", "libx264", "-c:a", "aac", "-ss", start, "-t", end, mp4 ]
+cutAndConvertUpladedVideoArgs :: FilePath -> FilePath -> Maybe String -> Maybe String -> Array String
+cutAndConvertUpladedVideoArgs uploaded mp4 maybeStartStr maybeEndStr =
+  [ "-hide_banner", "-loglevel", "warning", "-i", uploaded, "-c:v", "libx264", "-c:a", "aac" ]
+  <> maybe [] (\s -> [ "-ss", s ]) maybeStartStr
+  <> maybe [] (\s -> [ "-t", s ]) maybeEndStr
+  <> [ mp4 ]
