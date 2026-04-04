@@ -2,7 +2,7 @@ module Endpoints.Download where
 
 import Constants (fromType, suggestedDownloadName)
 import Main.Config (backendUrl)
-import Data.Maybe (maybe)
+import Data.Maybe (fromMaybe, maybe)
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
@@ -11,7 +11,9 @@ import Unsafe.Coerce (unsafeCoerce)
 import Fetch (Method(..), fetch)
 import Endpoints.ResponseParser (validateResponse)
 import Model.DownloadRequest (DownloadRequest)
-import Model.State.State (Source)
+import Main.MinsiErrors (MinsiError(..), throwMinsiError)
+import Model.State.State (Source(..), WURL(..))
+import Handlers.InputVideo.YoutubeUrlExtraction (extractYoutubeVideoId)
 import Web.DOM.Document (createElement)
 import Web.DOM.Element (toNode)
 import Web.DOM.Node (appendChild, removeChild)
@@ -29,8 +31,9 @@ downloadEndpoint :: String
 downloadEndpoint = backendUrl <> "download"
 
 callDownload :: Source -> Aff Unit
-callDownload source = do
-  let request = ({ source } :: DownloadRequest)
+callDownload (WebURL (WURL u)) = do
+  let request = ({ source: (WebURL (WURL u)) } :: DownloadRequest)
+      maybeVideoId = extractYoutubeVideoId u
   response <- fetch downloadEndpoint
     { method: POST
     , body: writeJSON request
@@ -38,7 +41,9 @@ callDownload source = do
     }
   _ <- liftEffect $ validateResponse response
   blob <- response.blob
-  liftEffect $ triggerDownloadFromBlob "temp.txt" blob
+  liftEffect $ triggerDownloadFromBlob (fromMaybe "temp.txt" maybeVideoId) blob
+callDownload (LocalFile _) = do
+  liftEffect $ throwMinsiError (InvalidInput "downloadFull" "Download Full supports URL sources only. Use Download All for local file results.")
 
 triggerDownloadFromBlob :: String -> Blob -> Effect Unit
 triggerDownloadFromBlob filename blob = do

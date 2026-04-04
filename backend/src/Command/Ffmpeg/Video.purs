@@ -6,7 +6,7 @@ import Command.Command (runCommand)
 import Constants (mp4, tempVideo)
 import Conversion.Time (millisecondsToSecondsString)
 import Data.Maybe (Maybe(..), maybe)
-import Data.Time.Duration (Milliseconds)
+import Data.Time.Duration (Milliseconds(..))
 import Effect.Aff (Aff, apathize, finally)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
@@ -45,12 +45,16 @@ cutAndConvertUploadedVideo uploadedFilepath filename maybeStart maybeEnd = do
   filepathMp4 <- liftEffect $ mp4 filename
   apathize $ liftEffect $ rm filepathMp4
   liftEffect $ log $ "[Command/Video] Execute Command, Cut & Convert:" <> show uploadedFilepath <> " into " <> filepathMp4
-  let args = cutAndConvertUpladedVideoArgs uploadedFilepath filepathMp4 startStr endStr
+  let args = cutAndConvertUpladedVideoArgs uploadedFilepath filepathMp4 startStr durationStr
   process <- runCommand args FfmpegVideoError "ffmpeg"
   process.getResult
   where
   startStr = millisecondsToSecondsString <$> maybeStart <*> pure (Just '.')
-  endStr = millisecondsToSecondsString <$> maybeEnd <*> pure (Just '.')
+  durationStr = millisecondsToSecondsString <$> maybeDuration <*> pure (Just '.')
+  maybeDuration = do
+    (Milliseconds start) <- maybeStart
+    (Milliseconds end) <- maybeEnd
+    pure $ Milliseconds (end - start)
 
 cutAndConvertUpladedVideoArgs :: FilePath -> FilePath -> Maybe String -> Maybe String -> Array String
 cutAndConvertUpladedVideoArgs uploaded mp4 maybeStartStr maybeEndStr =
