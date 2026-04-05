@@ -13,7 +13,7 @@ import Controller.UpdateCheckController (updateCheckController)
 import Controller.UploadController (uploadController)
 import InMemoryDB (Store)
 import Middleware.MulterUpload (multerUploadMiddleware)
-import Node.Express.App (App, post, useAtExternal)
+import Node.Express.App (App, get, post, useAtExternal)
 import Node.Express.Handler (Handler)
 import Node.Express.Response (setResponseHeader)
 
@@ -22,7 +22,7 @@ router store = do
   post "/checkDependencies" (controllerLogic "/checkDependencies" (checkDependenciesController store))
   post "/compute" (controllerLogic "/compute" (computeController store))
   post "/status" (controllerLogic "/status" (statusController store))
-  post "/download" (defaultResponseSettings *> logIncomingPost "/download" *> downloadController store)
+  get "/download/:videoId" (controllerLogic "/download" (downloadController store))
   post "/updateCheck" (controllerLogic "/updateCheck" (updateCheckController store))
   post "/reset" (controllerLogic "/reset" (resetController store))
   useAtExternal "/upload" multerUploadMiddleware

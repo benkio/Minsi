@@ -1,72 +1,50 @@
 module Endpoints.Download where
 
 import Constants (fromType, suggestedDownloadName)
+import Handlers.InputVideo.YoutubeUrlExtraction (extractYoutubeVideoId)
 import Main.Config (backendUrl)
-import Data.Maybe (fromMaybe, maybe)
+import Main.MinsiErrors (MinsiError(..), throwMinsiError)
+import Model.State.State (Source(..), WURL(..))
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
 import Prelude
 import Unsafe.Coerce (unsafeCoerce)
-import Fetch (Method(..), fetch)
-import Endpoints.ResponseParser (validateResponse)
-import Model.DownloadRequest (DownloadRequest)
-import Main.MinsiErrors (MinsiError(..), throwMinsiError)
-import Model.State.State (Source(..), WURL(..))
-import Handlers.InputVideo.YoutubeUrlExtraction (extractYoutubeVideoId)
 import Web.DOM.Document (createElement)
 import Web.DOM.Element (toNode)
 import Web.DOM.Node (appendChild, removeChild)
-import Web.File.Url (createObjectURL, revokeObjectURL)
 import Web.HTML (window)
 import Web.HTML.HTMLAnchorElement as HA
 import Web.HTML.HTMLDocument (body, toDocument)
-import Web.HTML.HTMLElement (click, toElement) as HE
 import Web.HTML.HTMLHyperlinkElementUtils (setHref)
+import Web.HTML.HTMLElement as HE
 import Web.HTML.Window (document)
-import Web.File.Blob (Blob)
-import Yoga.JSON (writeJSON)
 
 downloadEndpoint :: String
 downloadEndpoint = backendUrl <> "download"
 
 callDownload :: Source -> Aff Unit
 callDownload (WebURL (WURL u)) = do
-  let request = ({ source: (WebURL (WURL u)) } :: DownloadRequest)
-      maybeVideoId = extractYoutubeVideoId u
-  response <- fetch downloadEndpoint
-    { method: POST
-    , body: writeJSON request
-    , headers: { "Content-Type": "application/json" }
-    }
-  _ <- liftEffect $ validateResponse response
-  blob <- response.blob
-  liftEffect $ triggerDownloadFromBlob (fromMaybe "temp.txt" maybeVideoId) blob
+  let maybeVideoId = extractYoutubeVideoId u
+  case maybeVideoId of
+    Just videoId -> liftEffect $ triggerDownloadFromUrl (downloadEndpoint <> "/" <> videoId) (videoId <> ".mp4")
+    Nothing -> liftEffect $ throwMinsiError (InvalidInput "downloadFull" "Could not extract a YouTube video id from the input URL.")
 callDownload (LocalFile _) = do
   liftEffect $ throwMinsiError (InvalidInput "downloadFull" "Download Full supports URL sources only. Use Download All for local file results.")
 
-triggerDownloadFromBlob :: String -> Blob -> Effect Unit
-triggerDownloadFromBlob filename blob = do
-  blobUrl <- createObjectURL blob
+triggerDownloadFromUrl :: String -> String -> Effect Unit
+triggerDownloadFromUrl downloadUrl filename = do
   w <- window
   htmlDoc <- document w
   doc <- pure (toDocument htmlDoc)
   el <- createElement (unsafeCoerce "a") doc
-  maybe (revokeObjectURL blobUrl) (go htmlDoc blobUrl) (HA.fromElement el)
+  maybe (pure unit) (go doc downloadUrl filename) (HA.fromElement el)
   where
-  go doc' blobUrl' anchor = do
-    setHref blobUrl' (HA.toHTMLHyperlinkElementUtils anchor)
-    HA.setDownload filename anchor
+  go doc' href name anchor = do
+    setHref href (HA.toHTMLHyperlinkElementUtils anchor)
+    HA.setDownload name anchor
     mBody <- body doc'
-    maybe (pure unit) (appendAndClick blobUrl' anchor) mBody
-
-  appendAndClick blobUrl'' anchor b = do
-    let anchorNode = HA.toNode anchor
-    let bodyNode = toNode (HE.toElement b)
-    appendChild anchorNode bodyNode
-    HE.click (HA.toHTMLElement anchor)
-    removeChild anchorNode bodyNode
-    revokeObjectURL blobUrl''
+    maybe (pure unit) (appendAndClick anchor) mBody
 
 triggerDownload :: String -> String -> Aff Unit
 triggerDownload filename filetype = liftEffect (triggerDownloadLink filename filetype)
@@ -87,9 +65,11 @@ triggerDownloadLink filename filetype = do
     HA.setDownload suggestedName anchor
     mBody <- body doc'
     maybe (pure unit) (appendAndClick anchor) mBody
-  appendAndClick anchor b = do
-    let anchorNode = HA.toNode anchor
-    let bodyNode = toNode (HE.toElement b)
-    appendChild anchorNode bodyNode
-    HE.click (HA.toHTMLElement anchor)
-    removeChild anchorNode bodyNode
+
+appendAndClick :: HA.HTMLAnchorElement -> HE.HTMLElement -> Effect Unit
+appendAndClick anchor b = do
+  let anchorNode = HA.toNode anchor
+  let bodyNode = toNode (HE.toElement b)
+  appendChild anchorNode bodyNode
+  HE.click (HA.toHTMLElement anchor)
+  removeChild anchorNode bodyNode
