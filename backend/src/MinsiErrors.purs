@@ -14,6 +14,7 @@ data MinsiError
   | FfmpegGifError String
   | FfmpegMp3Error String
   | Id3v2Error String
+  | InvalidInputError String
 
 instance Show MinsiError where
   show (YtdlpError s) = "🚫 Ytdlp error: " <> s
@@ -23,6 +24,7 @@ instance Show MinsiError where
   show (Id3v2Error s) = "🚫 Id3v2 error: " <> s
   show (DependencyError s) = "🚫 Error while checking dependencies: " <> s
   show (UpdateError s) = "🚫 Error while checking updates: " <> s
+  show (InvalidInputError s) = "🚫 Error while checking updates: " <> s
 
 throwMinsiError :: forall a. MinsiError -> Effect a
 throwMinsiError e = do

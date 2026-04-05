@@ -21,6 +21,9 @@ cutEndId = "cutEnd"
 youtubeUrlId :: String
 youtubeUrlId = "youtubeUrl"
 
+downloadFullButtonId :: String
+downloadFullButtonId = "downloadFullButton"
+
 localFileId :: String
 localFileId = "localFile"
 

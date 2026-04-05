@@ -7,6 +7,7 @@ import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CopyTranscriptButtonHandler (setCopyTranscriptButtonHandler)
 import Handlers.CutRangeHandler (CutRangeTargets(..), setCutRangeHandlers)
 import Handlers.DownloadAllButtonHandler (setDownloadAllButtonHandler)
+import Handlers.DownloadFullButtonHandler (setDownloadFullButtonHandler)
 import Handlers.InputVideo.InputSourceHandler (setInputSourceHandler)
 import Handlers.InputVideo.InputVideoHandler (setVideoHandlers, VideoEventTargets(..))
 import Handlers.ResetButtonHandler (setResetButtonHandler)
@@ -29,6 +30,7 @@ setupEventHandlers
       { cutStart
       , cutEnd
       , youtubeUrl
+      , downloadFullButton
       , localFile
       , uploadLocalFile
       , filename
@@ -103,7 +105,8 @@ setupEventHandlers
         }
     )
   setVideoSourceHandler videoSource resultVideo resultAudio
-  setInputSourceHandler inputSource youtubeUrl localFile
+  setInputSourceHandler inputSource youtubeUrl localFile downloadFullButton
+  setDownloadFullButtonHandler downloadFullButton
   setDownloadAllButtonHandler downloadAllButton
   setCopyTranscriptButtonHandler copyTranscriptButton
   setResetButtonHandler resetButton

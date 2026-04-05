@@ -6,9 +6,11 @@ import Api.HttpLog (respondEmptyPost, respondJsonPost)
 import Command.ExecaHelpers (exceptTMultiple, exceptTStep)
 import Command.Ffmpeg.Gif (makeGif)
 import Command.Ffmpeg.Mp3 (extractMp3)
-import Command.Ffmpeg.Video (normalizeVideo)
+import Command.Ffmpeg.Video (FfmpegInput(..), cutVideo, normalizeVideo)
 import Command.Id3v2 (addId3Tags)
-import Command.Ytdlp (downloadOrCutVideo)
+import Command.Ytdlp (YtdlpDownloadResult(..), YtdlpInput(..), ytdlpDownload)
+import Constants (uploaded)
+import MinsiErrors (MinsiError(..), throwMinsiError)
 import Control.Monad.Except (runExcept, runExceptT)
 import Data.Array (fromFoldable)
 import Data.Bifunctor (lmap)
@@ -20,7 +22,7 @@ import Effect.Class (liftEffect)
 import Effect.Console (log)
 import InMemoryDB (Store, insert, lookupProcessStatus)
 import Model.ProcessStatus (ProcessStatus(..), isFinished)
-import Model.State (DurationRange(..), State(..), validateState)
+import Model.State (DurationRange(..), Source(..), State(..), WURL(..), validateState)
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody)
 
@@ -77,7 +79,14 @@ runComputePipeline mayOldState state@(State { source, filename, cutVideo: Durati
   runExceptT do
     when (cutDownloadRequired mayOldState state)
       ( do
-          void $ exceptTStep "Video download" $ downloadOrCutVideo source filename start end
+          case source of
+            (WebURL (WURL url)) -> do
+              void $ exceptTStep "Video download" do
+                result <- ytdlpDownload (YtdlpInput { url, filename, maybeStart: Just start, maybeEnd: Just end, streaming: false })
+                case result of
+                  YtdlpDownloadResult execaResult -> pure execaResult
+                  YtdlpDownloadProcess _ -> liftEffect $ throwMinsiError (YtdlpError "Streaming download is not implemented yet")
+            LocalFile -> void $ exceptTStep "Video download" $ (liftEffect $ uploaded filename) >>= \fn -> cutVideo (FfmpegInput { input: fn, filename, maybeStart: Just start, maybeEnd: Just end })
           void $ exceptTStep "Video Normalization" $ normalizeVideo filename
       )
     void $ exceptTStep "MP3 extraction" $ extractMp3 filename
@@ -90,4 +99,3 @@ cutDownloadRequired mayOldState (State { source: newSource, cutVideo: newCutVide
   maybe true
     (\(State { source: oldSource, cutVideo: oldCutVideo }) -> oldSource /= newSource || oldCutVideo /= newCutVideo)
     mayOldState
-
