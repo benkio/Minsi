@@ -4,8 +4,9 @@ import Prelude
 
 import Api.HttpLog (respondJsonPost)
 import Command.ExecaHelpers (exceptTStep)
-import Command.Ytdlp (YtdlpInput(..), ytdlpDownload)
+import Command.Ytdlp (YtdlpDownloadResult(..), YtdlpInput(..), ytdlpDownload)
 import Constants (mp4)
+import MinsiErrors (MinsiError(..), throwMinsiError)
 import Control.Monad.Except (runExcept, runExceptT)
 import Data.Bifunctor (lmap)
 import Data.Either (Either(..), either)
@@ -64,7 +65,11 @@ runDownloadJob :: WURL -> String -> Aff (Either String Unit)
 runDownloadJob (WURL url) filename =
   runExceptT
     $ exceptTStep "Video download"
-    $ ytdlpDownload (YtdlpInput { url: url, filename, maybeStart: Nothing, maybeEnd: Nothing })
+    $ do
+      result <- ytdlpDownload (YtdlpInput { url: url, filename, maybeStart: Nothing, maybeEnd: Nothing, streaming: false })
+      case result of
+        YtdlpDownloadResult execaResult -> pure execaResult
+        YtdlpDownloadProcess _ -> liftEffect $ throwMinsiError (YtdlpError "Streaming download is not implemented yet")
 
 validateDownloadBody :: DownloadRequest -> Either String { url :: WURL, videoId :: String }
 validateDownloadBody request = do

@@ -23,7 +23,12 @@ newtype YtdlpInput = YtdlpInput
   , filename :: String
   , maybeStart :: Maybe Milliseconds
   , maybeEnd :: Maybe Milliseconds
+  , streaming :: Boolean
   }
+
+data YtdlpDownloadResult
+  = YtdlpDownloadResult ExecaResult
+  | YtdlpDownloadProcess ExecaProcess
 
 ytdlpSupportedBrowserCookies :: Array String
 ytdlpSupportedBrowserCookies =
@@ -56,8 +61,8 @@ getYtdlpOutputUrl cookie (YtdlpInput { url: url, filename: filename, maybeStart:
     else
       [ "-f", "\"best[ext=mp4]\"", "--force-overwrite" ] <> rangeArgs <> [ "-o", show filepath, "--cookies-from-browser", cookie, show urlString ]
 
-ytdlpDownload :: YtdlpInput -> Aff ExecaResult
-ytdlpDownload input@(YtdlpInput { filename }) = do
+ytdlpDownload :: YtdlpInput -> Aff YtdlpDownloadResult
+ytdlpDownload input@(YtdlpInput { filename, streaming }) = do
   filepath <- liftEffect do
     fp <- mp4 filename
     log ("[Ytdlp] Delete " <> show fp)
@@ -66,18 +71,27 @@ ytdlpDownload input@(YtdlpInput { filename }) = do
   tryCookies ytdlpSupportedBrowserCookies
   where
 
-  tryCookies :: Array String -> Aff ExecaResult
+  tryCookies :: Array String -> Aff YtdlpDownloadResult
   tryCookies cookies =
     maybe
       (liftEffect $ throwMinsiError (YtdlpError "All yt-dlp cookie attempts failed"))
       ( \{ head: c, tail: cs } ->
           catchError
-            ( getYtdlpOutputUrl c input
-                >>= _.getResult
-                >>= \r -> case r.exit of
-                  Normally 0 -> pure r
-                  _ -> liftEffect $ throwMinsiError (YtdlpError r.message)
+            ( if streaming then streamingDownload c input
+              else syncDownload c input
             )
             (\_ -> tryCookies cs)
       )
       (uncons cookies)
+
+syncDownload :: String -> YtdlpInput -> Aff YtdlpDownloadResult
+syncDownload cookie input = do
+  result <- getYtdlpOutputUrl cookie input >>= _.getResult
+  case result.exit of
+    Normally 0 -> pure $ YtdlpDownloadResult result
+    _ -> liftEffect $ throwMinsiError (YtdlpError result.message)
+
+streamingDownload :: String -> YtdlpInput -> Aff YtdlpDownloadResult
+streamingDownload cookie input = do
+  process <- getYtdlpOutputUrl cookie input
+  pure $ YtdlpDownloadProcess process
