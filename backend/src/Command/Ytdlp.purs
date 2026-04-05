@@ -103,13 +103,6 @@ streamingDownload cookie input = do
     Right _ -> liftEffect $ log "[Yt-dlp] ✅ Stream spawned successfully"
   liftEffect $ log "[Yt-dlp] ⏳ Wait 1s to check stream health"
   delay (Milliseconds 1000.0)
-  isConnected <- process.connected
-  liftEffect $ log $ "[Yt-dlp] Check process is connected: " <> show isConnected
-  -- when (not isConnected) do
-  --   result <- process.getResult
-  --   case result.exit of
-  --     Normally 0 -> liftEffect $ log "[Yt-dlp] ✅ stream not connected but exited normally"
-  --     _ -> liftEffect $ throwMinsiError (YtdlpError ("[Yt-dlp] 🚫 Process failed before stream started: " <> result.message <> " " <> result.shortMessage))
   _ <-
     liftEffect $
       maybe
