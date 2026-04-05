@@ -59,6 +59,6 @@ cutAndConvertUploadedVideo uploadedFilepath filename maybeStart maybeEnd = do
 cutAndConvertUpladedVideoArgs :: FilePath -> FilePath -> Maybe String -> Maybe String -> Array String
 cutAndConvertUpladedVideoArgs uploaded mp4 maybeStartStr maybeEndStr =
   [ "-hide_banner", "-loglevel", "warning", "-i", uploaded, "-c:v", "libx264", "-c:a", "aac" ]
-  <> maybe [] (\s -> [ "-ss", s ]) maybeStartStr
-  <> maybe [] (\s -> [ "-t", s ]) maybeEndStr
-  <> [ mp4 ]
+    <> maybe [] (\s -> [ "-ss", s ]) maybeStartStr
+    <> maybe [] (\s -> [ "-t", s ]) maybeEndStr
+    <> [ mp4 ]

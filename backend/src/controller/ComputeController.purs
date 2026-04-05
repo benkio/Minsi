@@ -8,7 +8,7 @@ import Command.Ffmpeg.Gif (makeGif)
 import Command.Ffmpeg.Mp3 (extractMp3)
 import Command.Ffmpeg.Video (normalizeVideo)
 import Command.Id3v2 (addId3Tags)
-import Command.Ytdlp (downloadOrCutVideo)
+import Command.Ytdlp (YtdlpInput(..), downloadOrCutVideo)
 import Control.Monad.Except (runExcept, runExceptT)
 import Data.Array (fromFoldable)
 import Data.Bifunctor (lmap)
@@ -77,7 +77,7 @@ runComputePipeline mayOldState state@(State { source, filename, cutVideo: Durati
   runExceptT do
     when (cutDownloadRequired mayOldState state)
       ( do
-          void $ exceptTStep "Video download" $ downloadOrCutVideo source filename (Just start) (Just end)
+          void $ exceptTStep "Video download" $ downloadOrCutVideo (YtdlpInput { source, filename, maybeStart: Just start, maybeEnd: Just end })
           void $ exceptTStep "Video Normalization" $ normalizeVideo filename
       )
     void $ exceptTStep "MP3 extraction" $ extractMp3 filename
@@ -90,4 +90,3 @@ cutDownloadRequired mayOldState (State { source: newSource, cutVideo: newCutVide
   maybe true
     (\(State { source: oldSource, cutVideo: oldCutVideo }) -> oldSource /= newSource || oldCutVideo /= newCutVideo)
     mayOldState
-

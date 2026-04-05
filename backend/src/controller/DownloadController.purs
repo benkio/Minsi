@@ -4,7 +4,7 @@ import Prelude
 
 import Api.HttpLog (respondJsonPost)
 import Command.ExecaHelpers (exceptTStep)
-import Command.Ytdlp (downloadOrCutVideo)
+import Command.Ytdlp (YtdlpInput(..), downloadOrCutVideo)
 import Constants (mp4)
 import Control.Monad.Except (runExcept, runExceptT)
 import Data.Bifunctor (lmap)
@@ -50,7 +50,7 @@ handleDownload { url, videoId } = do
         headersAlreadySent <- headersSent
         liftEffect $ log $ "[Download Controller] headersSent before download: " <> show headersAlreadySent
         downloadExt filepath (DownloadFileName (videoId <> ".mp4")) defaultDownloadOptions
-          ( \err -> log ("[Download controller] Download file transfer failed: " <> show err) )
+          (\err -> log ("[Download controller] Download file transfer failed: " <> show err))
         headersAfterDownload <- headersSent
         liftEffect $ log $ "[Download Controller] headersSent after download call: " <> show headersAfterDownload
         when (not headersAfterDownload) do
@@ -62,7 +62,7 @@ handleDownload { url, videoId } = do
 
 runDownloadJob :: Source -> String -> Aff (Either String Unit)
 runDownloadJob source filename =
-  runExceptT $ exceptTStep "Video download" $ downloadOrCutVideo source filename Nothing Nothing
+  runExceptT $ exceptTStep "Video download" $ downloadOrCutVideo (YtdlpInput { source, filename, maybeStart: Nothing, maybeEnd: Nothing })
 
 validateDownloadBody :: DownloadRequest -> Either String { url :: WURL, videoId :: String }
 validateDownloadBody request = do

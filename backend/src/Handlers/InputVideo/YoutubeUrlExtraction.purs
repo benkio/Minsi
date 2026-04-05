@@ -44,11 +44,11 @@ parseYouTubeT raw =
   in
     maybe (parseDuration str) Just (fromString str)
   where
-    parseDuration str =
-      let
-        h = parseUnit str "h"
-        m = parseUnit str "m"
-        s = parseUnit str "s"
-        total = h * 3600 + m * 60 + s
-      in
-        if total > 0 then Just total else Nothing
+  parseDuration str =
+    let
+      h = parseUnit str "h"
+      m = parseUnit str "m"
+      s = parseUnit str "s"
+      total = h * 3600 + m * 60 + s
+    in
+      if total > 0 then Just total else Nothing

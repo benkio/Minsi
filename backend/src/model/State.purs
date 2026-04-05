@@ -24,6 +24,7 @@ import Validations.YoutubeValidation (youtubeUrlValidation)
 -------------------------------------------------------------------------------
 
 newtype WURL = WURL URL
+
 derive instance newtypeWURL :: Newtype WURL _
 data Source = LocalFile | WebURL WURL
 
