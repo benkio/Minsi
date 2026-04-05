@@ -3,73 +3,97 @@ module Controller.DownloadController where
 import Prelude
 
 import Api.HttpLog (respondJsonPost)
-import Command.ExecaHelpers (exceptTStep)
 import Command.Ytdlp (YtdlpDownloadResult(..), YtdlpInput(..), ytdlpDownload)
-import Constants (mp4)
-import MinsiErrors (MinsiError(..), throwMinsiError)
 import Control.Monad.Except (runExcept, runExceptT)
+import Node.ChildProcess.Types (Exit(..))
 import Data.Bifunctor (lmap)
-import Data.Either (Either(..), either)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Either (Either(..))
+import Data.Maybe (Maybe(..), fromMaybe, maybe)
+import Data.Nullable (toMaybe)
 import Data.Newtype (unwrap)
 import Data.URL (toString)
 import Data.Validation.Semigroup (isValid)
-import Effect.Aff (Aff, Milliseconds(..), delay)
+import Effect.Aff (Aff, makeAff, nonCanceler)
 import Effect.Aff.Class (liftAff)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
 import Handlers.InputVideo.YoutubeUrlExtraction (extractYoutubeVideoId)
 import InMemoryDB (Store)
+import MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.DownloadRequest (DownloadRequest)
 import Model.State (Source(..), WURL(..))
-import Node.Express.Handler (Handler)
+import Node.Express.Handler (Handler, HandlerM(..), runHandlerM)
 import Node.Express.Request (getBody)
-import Node.Express.Response (downloadExt, defaultDownloadOptions, headersSent)
-import Node.Express.Types (DownloadFileName(..))
-import Node.FS.Sync (exists)
+import Node.Express.Types (Request, Response)
+import Node.Express.Response (setAttachment, setStatus)
+import Node.Library.Execa (ExecaProcess)
+import Node.Stream as Stream
+import Effect.Uncurried (mkEffectFn1, runEffectFn3)
+import Unsafe.Coerce (unsafeCoerce)
 import Validations.YoutubeValidation (youtubeUrlValidation)
 
 downloadController :: Store -> Handler
 downloadController _store = do
   bodyResult <- getBody
   let parseResult = lmap show (runExcept bodyResult) >>= validateDownloadBody
-  either downloadBadRequest handleDownload parseResult
+  case parseResult of
+    Left err -> downloadBadRequest err
+    Right downloadInfo -> handleDownload downloadInfo
 
 handleDownload :: { url :: WURL, videoId :: String } -> Handler
-handleDownload { url, videoId } = do
-  filepath <- liftEffect $ mp4 videoId
-  runResult <- liftAff (runDownloadJob url videoId)
-  case runResult of
-    Left err -> do
-      liftEffect $ log ("[Download Controller] Download failed: " <> err)
-      respondJsonPost "/download" 500 { error: "Download failed: " <> err }
-    Right _ -> do
-      liftAff $ delay (Milliseconds 500.0)
-      fileReady <- liftEffect $ exists filepath
-      if fileReady then do
-        liftEffect $ log $ "[Download Controller] Sending back: " <> filepath
-        headersAlreadySent <- headersSent
-        liftEffect $ log $ "[Download Controller] headersSent before download: " <> show headersAlreadySent
-        downloadExt filepath (DownloadFileName (videoId <> ".mp4")) defaultDownloadOptions
-          (\err -> log ("[Download controller] Download file transfer failed: " <> show err))
-        headersAfterDownload <- headersSent
-        liftEffect $ log $ "[Download Controller] headersSent after download call: " <> show headersAfterDownload
-        when (not headersAfterDownload) do
-          liftAff $ delay (Milliseconds 800.0)
-          headersAfterWait <- headersSent
-          liftEffect $ log $ "[Download Controller] headersSent after wait: " <> show headersAfterWait
-      else
-        respondJsonPost "/download" 404 { error: "Downloaded file not found: " <> filepath }
+handleDownload { url, videoId } =
+  HandlerM \req resp _ -> do
+    runResult <- liftAff $ runDownloadJob url videoId
+    let runResponse :: Handler -> Aff Unit
+        runResponse handler = runHandlerM' handler req resp
+    case runResult of
+      Left err -> do
+        liftEffect $ log $ "[Download Controller] Download failed: " <> err
+        runResponse $ respondJsonPost "/download" 500 { error: "Download failed: " <> err }
+      Right process ->
+        streamDownloadResult runResponse (videoId <> ".mp4") resp process
 
-runDownloadJob :: WURL -> String -> Aff (Either String Unit)
+streamDownloadResult :: (Handler -> Aff Unit) -> String -> Response -> ExecaProcess -> Aff Unit
+streamDownloadResult runResponse outputName resp process =
+  maybe
+    ( do
+      liftEffect $ log "[Download Controller] Missing stdout stream for process."
+      runResponse $ respondJsonPost "/download" 500 { error: "Download failed: missing process output stream" }
+    )
+    (\{ stream } -> do
+      liftEffect $ log $ "[Download Controller] Set attachment " <> outputName <> " Set status 200"
+      runResponse $ setAttachment outputName
+      runResponse $ setStatus 200
+      liftEffect $ log $ "[Download Controller] Send Stream"
+      liftEffect $ Stream.pipe stream (unsafeCoerce resp)
+      liftEffect $ log $ "[Download Controller] Get Result on process"
+      result <- liftAff process.getResult
+      let finalMessage = case result.exit of
+            Normally 0 -> "[Download Controller] Stream finished: " <> outputName
+            _ -> "[Download Controller] Stream ended with error: " <> result.message
+      liftEffect $ log finalMessage
+    )
+    process.stdout
+
+runHandlerM' :: Handler -> Request -> Response -> Aff Unit
+runHandlerM' handler req resp =
+  makeAff \done ->
+    let nextFn = mkEffectFn1 \error ->
+          case toMaybe error of
+            Just err -> done (Left err)
+            Nothing -> done (Right unit)
+    in do
+      runEffectFn3 (runHandlerM handler) req resp nextFn
+      pure nonCanceler
+
+runDownloadJob :: WURL -> String -> Aff (Either String ExecaProcess)
 runDownloadJob (WURL url) filename =
-  runExceptT
-    $ exceptTStep "Video download"
-    $ do
-      result <- ytdlpDownload (YtdlpInput { url: url, filename, maybeStart: Nothing, maybeEnd: Nothing, streaming: false })
-      case result of
-        YtdlpDownloadResult execaResult -> pure execaResult
-        YtdlpDownloadProcess _ -> liftEffect $ throwMinsiError (YtdlpError "Streaming download is not implemented yet")
+  runExceptT do
+    result <- liftAff $ ytdlpDownload (YtdlpInput { url: url, filename, maybeStart: Nothing, maybeEnd: Nothing, streaming: true })
+    process <- case result of
+      YtdlpDownloadResult _ -> liftEffect $ throwMinsiError $ YtdlpError "Streaming download, expected ExecaProcess"
+      YtdlpDownloadProcess p -> pure p
+    pure process
 
 validateDownloadBody :: DownloadRequest -> Either String { url :: WURL, videoId :: String }
 validateDownloadBody request = do

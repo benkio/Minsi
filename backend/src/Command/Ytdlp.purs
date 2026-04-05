@@ -7,16 +7,18 @@ import Constants (mp4)
 import Control.Monad.Error.Class (catchError)
 import Conversion.Time (millisecondsToSecondsString)
 import Data.Array (uncons)
+import Data.Either (Either(..))
 import Data.Maybe (Maybe(..), maybe)
-import Data.Time.Duration (Milliseconds)
+import Data.Time.Duration (Milliseconds(..))
 import Data.URL (URL, toString)
-import Effect.Aff (Aff, apathize)
+import Effect.Aff (Aff, apathize, delay)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
 import MinsiErrors (MinsiError(..), throwMinsiError)
 import Node.ChildProcess.Types (Exit(..))
 import Node.FS.Aff (rm)
 import Node.Library.Execa (ExecaProcess, ExecaResult)
+import Node.Stream (errored)
 
 newtype YtdlpInput = YtdlpInput
   { url :: URL
@@ -45,7 +47,7 @@ ytdlpSupportedBrowserCookies =
   ]
 
 getYtdlpOutputUrl :: String -> YtdlpInput -> Aff ExecaProcess
-getYtdlpOutputUrl cookie (YtdlpInput { url: url, filename: filename, maybeStart: maybeStart, maybeEnd: maybeEnd }) = do
+getYtdlpOutputUrl cookie (YtdlpInput { url: url, filename: filename, maybeStart: maybeStart, maybeEnd: maybeEnd, streaming: streaming }) = do
   args <- liftEffect $ mp4 filename <#> buildArgs
   runCommand args YtdlpError "yt-dlp"
   where
@@ -55,11 +57,12 @@ getYtdlpOutputUrl cookie (YtdlpInput { url: url, filename: filename, maybeStart:
     end <- map (\end -> millisecondsToSecondsString end (Just '.')) maybeEnd
     pure [ "--download-sections", show ("*" <> start <> "-" <> end) ]
   rangeArgs = maybe [] identity maybeRangeArg
+  outputArgs filepath = if streaming then [ "-o", "-" ] else [ "-o", show filepath ]
   buildArgs filepath =
     if cookie == "" then
-      [ "-f", "\"best[ext=mp4]\"", "--force-overwrite" ] <> rangeArgs <> [ "-o", show filepath, show urlString ]
+      [ "-f", "\"best[ext=mp4]\"", "--force-overwrite" ] <> rangeArgs <> outputArgs filepath <> [ show urlString ]
     else
-      [ "-f", "\"best[ext=mp4]\"", "--force-overwrite" ] <> rangeArgs <> [ "-o", show filepath, "--cookies-from-browser", cookie, show urlString ]
+      [ "-f", "\"best[ext=mp4]\"", "--force-overwrite" ] <> rangeArgs <> outputArgs filepath <> [ "--cookies-from-browser", cookie, show urlString ]
 
 ytdlpDownload :: YtdlpInput -> Aff YtdlpDownloadResult
 ytdlpDownload input@(YtdlpInput { filename, streaming }) = do
@@ -94,4 +97,34 @@ syncDownload cookie input = do
 streamingDownload :: String -> YtdlpInput -> Aff YtdlpDownloadResult
 streamingDownload cookie input = do
   process <- getYtdlpOutputUrl cookie input
+  spawnedResult <- process.waitSpawned
+  case spawnedResult of
+    Left err -> liftEffect $ throwMinsiError (YtdlpError ("[Yt-dlp] 🚫 Stream spawned with Error: " <> show err))
+    Right _ -> liftEffect $ log "[Yt-dlp] ✅ Stream spawned successfully"
+  liftEffect $ log "[Yt-dlp] ⏳ Wait 1s to check stream health"
+  delay (Milliseconds 1000.0)
+  isConnected <- process.connected
+  liftEffect $ log $ "[Yt-dlp] Check process is connected: " <> show isConnected
+  -- when (not isConnected) do
+  --   result <- process.getResult
+  --   case result.exit of
+  --     Normally 0 -> liftEffect $ log "[Yt-dlp] ✅ stream not connected but exited normally"
+  --     _ -> liftEffect $ throwMinsiError (YtdlpError ("[Yt-dlp] 🚫 Process failed before stream started: " <> result.message <> " " <> result.shortMessage))
+  _ <-
+    liftEffect $
+      maybe
+        (pure unit)
+        ( \stdErr -> do
+            isErrored <- errored stdErr.stream
+            if isErrored then do
+              throwMinsiError (YtdlpError ("[Yt-dlp] 🚫 Error Standard Output: errored"))
+            else
+              log "[Yt-dlp] ✅ Error Standard output not errored"
+        )
+        process.stderr
+  liftEffect $
+    maybe
+      (throwMinsiError (YtdlpError "[Yt-dlp] 🚫 Missing stardard output stream for process"))
+      (const $ log "[Yt-dlp] ✅ Process has a standard ouput stream")
+      process.stdout
   pure $ YtdlpDownloadProcess process
