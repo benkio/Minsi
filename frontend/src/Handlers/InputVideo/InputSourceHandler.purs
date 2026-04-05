@@ -26,11 +26,13 @@ inputSourceEventListener inputSource youtubeUrl localFile downloadFullButton _ =
   selectedInputSourceValue <- HS.value inputSource
   case selectedInputSourceValue of
     "youtubeUrl" ->
-      addClassToElement "d-none" (HI.toElement localFile) *>
-        removeClassFromElement "d-none" (HI.toElement youtubeUrl) *>
-        removeClassFromElement "d-none" (HB.toElement downloadFullButton)
+      addClassToElement "d-none" (HI.toElement localFile)
+        *> removeClassFromElement "d-none" (HI.toElement youtubeUrl)
+        *>
+          removeClassFromElement "d-none" (HB.toElement downloadFullButton)
     "localFile" ->
-      addClassToElement "d-none" (HI.toElement youtubeUrl) *>
-        addClassToElement "d-none" (HB.toElement downloadFullButton) *>
-        removeClassFromElement "d-none" (HI.toElement localFile)
+      addClassToElement "d-none" (HI.toElement youtubeUrl)
+        *> addClassToElement "d-none" (HB.toElement downloadFullButton)
+        *>
+          removeClassFromElement "d-none" (HI.toElement localFile)
     x -> throwMinsiError (InvalidInput "inputSource" x)

@@ -91,9 +91,8 @@ runDownloadJob id =
   catchError
     ( do
         let videoUrlString = "https://www.youtube.com/watch?v=" <> id
-        if not (isValid (youtubeUrlValidation "videoId" videoUrlString))
-          then liftEffect $ throwMinsiError (InvalidInputError "Bad Request: source must be a valid YouTube URL")
-          else pure unit
+        if not (isValid (youtubeUrlValidation "videoId" videoUrlString)) then liftEffect $ throwMinsiError (InvalidInputError "Bad Request: source must be a valid YouTube URL")
+        else pure unit
         url <- maybe
           (liftEffect $ throwMinsiError (InvalidInputError ("[Download Controller] Can't build youtube url from id: " <> id)))
           pure
@@ -103,7 +102,7 @@ runDownloadJob id =
           YtdlpDownloadResult _ -> liftEffect $ throwMinsiError (YtdlpError "Streaming download, expected ExecaProcess")
           YtdlpDownloadProcess p -> pure (Right p)
     )
-    ( \err -> pure (Left $ message err) )
+    (\err -> pure (Left $ message err))
 
 downloadBadRequest :: String -> Handler
 downloadBadRequest errorMessage = do
