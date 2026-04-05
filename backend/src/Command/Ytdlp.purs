@@ -56,19 +56,8 @@ getYtdlpOutputUrl cookie (YtdlpInput { url: url, filename: filename, maybeStart:
     else
       [ "-f", "\"best[ext=mp4]\"", "--force-overwrite" ] <> rangeArgs <> [ "-o", show filepath, "--cookies-from-browser", cookie, show urlString ]
 
-downloadOrCutVideo :: YtdlpInput -> Aff ExecaResult
--- downloadOrCutVideo (YtdlpInput { source: LocalFile, filename, maybeStart, maybeEnd }) = do
---   uploadedFilepath <- liftEffect $ validateAndResolveLocalFile filename
---   finally (rm uploadedFilepath) (cutAndConvertUploadedVideo uploadedFilepath filename maybeStart maybeEnd)
---   where
---   validateAndResolveLocalFile fn = do
---     up <- uploaded fn
---     fp <- mp4 fn
---     unlessM (exists up) (throwMinsiError (FfmpegVideoError ("🚫 Error: Expected " <> show up <> " but not was found. Retry the `compute` and the upload")))
---     log ("[Ytdlp] Cut " <> show up <> " To " <> show fp)
---     pure up
-
-downloadOrCutVideo input@(YtdlpInput { filename }) = do
+ytdlpDownload :: YtdlpInput -> Aff ExecaResult
+ytdlpDownload input@(YtdlpInput { filename }) = do
   filepath <- liftEffect do
     fp <- mp4 filename
     log ("[Ytdlp] Delete " <> show fp)

@@ -8,7 +8,7 @@ import Command.Ffmpeg.Gif (makeGif)
 import Command.Ffmpeg.Mp3 (extractMp3)
 import Command.Ffmpeg.Video (FfmpegInput(..), cutVideo, normalizeVideo)
 import Command.Id3v2 (addId3Tags)
-import Command.Ytdlp (YtdlpInput(..), downloadOrCutVideo)
+import Command.Ytdlp (YtdlpInput(..), ytdlpDownload)
 import Constants (uploaded)
 import Control.Monad.Except (runExcept, runExceptT)
 import Data.Array (fromFoldable)
@@ -79,7 +79,7 @@ runComputePipeline mayOldState state@(State { source, filename, cutVideo: Durati
     when (cutDownloadRequired mayOldState state)
       ( do
           case source of
-            (WebURL (WURL url)) -> void $ exceptTStep "Video download" $ downloadOrCutVideo (YtdlpInput { url, filename, maybeStart: Just start, maybeEnd: Just end })
+            (WebURL (WURL url)) -> void $ exceptTStep "Video download" $ ytdlpDownload (YtdlpInput { url, filename, maybeStart: Just start, maybeEnd: Just end })
             LocalFile -> void $ exceptTStep "Video download" $ (liftEffect $ uploaded filename) >>= \fn -> cutVideo (FfmpegInput { input: fn, filename, maybeStart: Just start, maybeEnd: Just end })
           void $ exceptTStep "Video Normalization" $ normalizeVideo filename
       )

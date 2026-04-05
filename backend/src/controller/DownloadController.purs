@@ -4,7 +4,7 @@ import Prelude
 
 import Api.HttpLog (respondJsonPost)
 import Command.ExecaHelpers (exceptTStep)
-import Command.Ytdlp (YtdlpInput(..), downloadOrCutVideo)
+import Command.Ytdlp (YtdlpInput(..), ytdlpDownload)
 import Constants (mp4)
 import Control.Monad.Except (runExcept, runExceptT)
 import Data.Bifunctor (lmap)
@@ -64,7 +64,7 @@ runDownloadJob :: WURL -> String -> Aff (Either String Unit)
 runDownloadJob (WURL url) filename =
   runExceptT
     $ exceptTStep "Video download"
-    $ downloadOrCutVideo (YtdlpInput { url: url, filename, maybeStart: Nothing, maybeEnd: Nothing })
+    $ ytdlpDownload (YtdlpInput { url: url, filename, maybeStart: Nothing, maybeEnd: Nothing })
 
 validateDownloadBody :: DownloadRequest -> Either String { url :: WURL, videoId :: String }
 validateDownloadBody request = do
