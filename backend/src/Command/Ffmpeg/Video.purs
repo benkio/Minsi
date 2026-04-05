@@ -6,14 +6,26 @@ import Command.Command (runCommand)
 import Constants (mp4, tempVideo)
 import Conversion.Time (millisecondsToSecondsString)
 import Data.Maybe (Maybe(..), maybe)
+import Data.Newtype (class Newtype, unwrap)
 import Data.Time.Duration (Milliseconds(..))
+import Effect (Effect)
 import Effect.Aff (Aff, apathize, finally)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
-import MinsiErrors (MinsiError(..))
-import Node.FS.Sync (rm, rename)
+import MinsiErrors (MinsiError(..), throwMinsiError)
+import Node.FS.Aff (rm)
+import Node.FS.Sync as FSSync
 import Node.Library.Execa (ExecaResult)
 import Node.Path (FilePath)
+
+newtype FfmpegInput = FfmpegInput
+  { input :: FilePath
+  , filename :: String
+  , maybeStart :: Maybe Milliseconds
+  , maybeEnd :: Maybe Milliseconds
+  }
+
+derive instance newtypeFfmpegInput :: Newtype FfmpegInput _
 
 normalizeVideo :: FilePath -> Aff ExecaResult
 normalizeVideo filename = do
@@ -34,31 +46,45 @@ normaliseVideoCleanup filename = liftEffect do
   filepathMp4 <- mp4 filename
   filepathTempVideo <- tempVideo filename
   log $ "[Command/Video] Execute Command, delete source video: " <> show filepathMp4
-  rm filepathMp4
+  FSSync.rm filepathMp4
   log $ "[Command/Video] Execute Command, rename:" <> show filepathTempVideo <> " into " <> filepathMp4
-  rename filepathTempVideo filepathMp4
+  FSSync.rename filepathTempVideo filepathMp4
 
--- Uploaded ---------------------------------------------------------------
+-- Uploaded/Local ---------------------------------------------------------------
 
-cutAndConvertUploadedVideo :: FilePath -> String -> Maybe Milliseconds -> Maybe Milliseconds -> Aff ExecaResult
-cutAndConvertUploadedVideo uploadedFilepath filename maybeStart maybeEnd = do
+cutVideo :: FfmpegInput -> Aff ExecaResult
+cutVideo ffmpegInput = do
+  _ <- liftEffect $ validateAndResolveLocalFile ffmpegInput
+  finally (rm (unwrap ffmpegInput).input) (cutAndConvertUploadedVideo ffmpegInput)
+
+validateAndResolveLocalFile :: FfmpegInput -> Effect FilePath
+validateAndResolveLocalFile (FfmpegInput { input, filename }) = do
+  fp <- mp4 filename
+  fileExists <- FSSync.exists input
+  when (not fileExists) do
+    throwMinsiError (FfmpegVideoError ("🚫 Error: Expected " <> show input <> " but not was found. Retry the `compute` and the upload"))
+  log ("[Ytdlp] Cut " <> show input <> " To " <> show fp)
+  pure fp
+
+cutAndConvertUploadedVideo :: FfmpegInput -> Aff ExecaResult
+cutAndConvertUploadedVideo ffmpegInput@(FfmpegInput { input, filename }) = do
   filepathMp4 <- liftEffect $ mp4 filename
-  apathize $ liftEffect $ rm filepathMp4
-  liftEffect $ log $ "[Command/Video] Execute Command, Cut & Convert:" <> show uploadedFilepath <> " into " <> filepathMp4
-  let args = cutAndConvertUpladedVideoArgs uploadedFilepath filepathMp4 startStr durationStr
+  apathize $ rm filepathMp4
+  liftEffect $ log $ "[Command/Video] Execute Command, Cut & Convert:" <> show input <> " into " <> filepathMp4
+  let args = cutAndConvertUpladedVideoArgs filepathMp4 ffmpegInput
   process <- runCommand args FfmpegVideoError "ffmpeg"
   process.getResult
+
+cutAndConvertUpladedVideoArgs :: FilePath -> FfmpegInput -> Array String
+cutAndConvertUpladedVideoArgs output (FfmpegInput { input, maybeStart, maybeEnd }) =
+  [ "-hide_banner", "-loglevel", "warning", "-i", input, "-c:v", "libx264", "-c:a", "aac" ]
+    <> maybe [] (\s -> [ "-ss", s ]) maybeStartStr
+    <> maybe [] (\s -> [ "-t", s ]) maybeDurationStr
+    <> [ output ]
   where
-  startStr = millisecondsToSecondsString <$> maybeStart <*> pure (Just '.')
-  durationStr = millisecondsToSecondsString <$> maybeDuration <*> pure (Just '.')
+  maybeStartStr = map (\s -> millisecondsToSecondsString s (Just '.')) maybeStart
+  maybeDurationStr = map (\e -> millisecondsToSecondsString e (Just '.')) maybeDuration
   maybeDuration = do
     (Milliseconds start) <- maybeStart
     (Milliseconds end) <- maybeEnd
     pure $ Milliseconds (end - start)
-
-cutAndConvertUpladedVideoArgs :: FilePath -> FilePath -> Maybe String -> Maybe String -> Array String
-cutAndConvertUpladedVideoArgs uploaded mp4 maybeStartStr maybeEndStr =
-  [ "-hide_banner", "-loglevel", "warning", "-i", uploaded, "-c:v", "libx264", "-c:a", "aac" ]
-    <> maybe [] (\s -> [ "-ss", s ]) maybeStartStr
-    <> maybe [] (\s -> [ "-t", s ]) maybeEndStr
-    <> [ mp4 ]

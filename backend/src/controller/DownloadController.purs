@@ -20,7 +20,7 @@ import Effect.Console (log)
 import Handlers.InputVideo.YoutubeUrlExtraction (extractYoutubeVideoId)
 import InMemoryDB (Store)
 import Model.DownloadRequest (DownloadRequest)
-import Model.State (Source(..), WURL)
+import Model.State (Source(..), WURL(..))
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody)
 import Node.Express.Response (downloadExt, defaultDownloadOptions, headersSent)
@@ -37,7 +37,7 @@ downloadController _store = do
 handleDownload :: { url :: WURL, videoId :: String } -> Handler
 handleDownload { url, videoId } = do
   filepath <- liftEffect $ mp4 videoId
-  runResult <- liftAff (runDownloadJob (WebURL url) videoId)
+  runResult <- liftAff (runDownloadJob url videoId)
   case runResult of
     Left err -> do
       liftEffect $ log ("[Download Controller] Download failed: " <> err)
@@ -60,9 +60,11 @@ handleDownload { url, videoId } = do
       else
         respondJsonPost "/download" 404 { error: "Downloaded file not found: " <> filepath }
 
-runDownloadJob :: Source -> String -> Aff (Either String Unit)
-runDownloadJob source filename =
-  runExceptT $ exceptTStep "Video download" $ downloadOrCutVideo (YtdlpInput { source, filename, maybeStart: Nothing, maybeEnd: Nothing })
+runDownloadJob :: WURL -> String -> Aff (Either String Unit)
+runDownloadJob (WURL url) filename =
+  runExceptT
+    $ exceptTStep "Video download"
+    $ downloadOrCutVideo (YtdlpInput { url: url, filename, maybeStart: Nothing, maybeEnd: Nothing })
 
 validateDownloadBody :: DownloadRequest -> Either String { url :: WURL, videoId :: String }
 validateDownloadBody request = do
