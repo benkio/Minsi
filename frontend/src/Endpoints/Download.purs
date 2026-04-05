@@ -1,13 +1,14 @@
 module Endpoints.Download where
 
 import Constants (fromType, suggestedDownloadName)
+import Data.Maybe (Maybe(..), maybe)
+import Effect (Effect)
+import Effect.Aff (Aff)
+import Effect.Class (liftEffect)
 import Handlers.InputVideo.YoutubeUrlExtraction (extractYoutubeVideoId)
 import Main.Config (backendUrl)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.State.State (Source(..), WURL(..))
-import Effect (Effect)
-import Effect.Aff (Aff)
-import Effect.Class (liftEffect)
 import Prelude
 import Unsafe.Coerce (unsafeCoerce)
 import Web.DOM.Document (createElement)
@@ -16,8 +17,8 @@ import Web.DOM.Node (appendChild, removeChild)
 import Web.HTML (window)
 import Web.HTML.HTMLAnchorElement as HA
 import Web.HTML.HTMLDocument (body, toDocument)
-import Web.HTML.HTMLHyperlinkElementUtils (setHref)
 import Web.HTML.HTMLElement as HE
+import Web.HTML.HTMLHyperlinkElementUtils (setHref)
 import Web.HTML.Window (document)
 
 downloadEndpoint :: String
@@ -38,7 +39,7 @@ triggerDownloadFromUrl downloadUrl filename = do
   htmlDoc <- document w
   doc <- pure (toDocument htmlDoc)
   el <- createElement (unsafeCoerce "a") doc
-  maybe (pure unit) (go doc downloadUrl filename) (HA.fromElement el)
+  maybe (pure unit) (go htmlDoc downloadUrl filename) (HA.fromElement el)
   where
   go doc' href name anchor = do
     setHref href (HA.toHTMLHyperlinkElementUtils anchor)
