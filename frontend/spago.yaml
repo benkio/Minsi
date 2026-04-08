@@ -44,4 +44,4 @@ package:
 workspace:
   extraPackages: {}
   packageSet:
-    url: https://raw.githubusercontent.com/purescript/package-sets/psc-0.15.15-20260330/packages.json
+    url: https://raw.githubusercontent.com/purescript/package-sets/psc-0.15.15-20260406/packages.json
