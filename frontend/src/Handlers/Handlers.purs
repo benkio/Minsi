@@ -79,6 +79,8 @@ setupEventHandlers
     ( RVET
         { playbackPositionResultVideo: playbackPositionResultVideo
         , resultVideo: resultVideo
+        , resultAudio: resultAudio
+        , videoSource: videoSource
         }
     )
   setApplyButtonHandler applyButton
