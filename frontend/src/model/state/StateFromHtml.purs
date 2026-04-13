@@ -24,11 +24,11 @@ import Model.ValidationErrors (ValidationErrors, toMap, fromSingleton)
 import Parse.Font (parseFontAndColor, parsePosition)
 import Partial.Unsafe (unsafePartial)
 import Validations.DurationRangeValidation (durationRangeValidation)
-import Validations.LetterNumberSpaceValidation (letterNumberSpaceValidation)
 import Validations.MaxCharatersValidation (maxCharsValidation)
 import Validations.NonEmptyValidation (nonEmptyValidation)
 import Validations.OutputFilenameValidation (outputFilenameValidation)
 import Validations.YoutubeValidation (youtubeUrlValidation)
+import Validations.PrintableAsciiLatinValidation (printableAsciiLatinValidation)
 import Web.DOM.HTMLCollection as HC
 import Web.File.FileList (item)
 import Web.HTML.HTMLInputElement (HTMLInputElement, valueAsNumber, checked)
@@ -65,8 +65,8 @@ fromHtmlInputs
   filenameV <- HI.value filenameInput <#> outputFilenameValidation outputFilenameId
   reverseLoopValue <- checked reverseLoopInput
   uploadLocalFileValue <- checked uploadLocalFileInput
-  artistV <- HI.value artistInput <#> nonEmptyValidation artistId <#> (_ `andThen` letterNumberSpaceValidation artistId)
-  titleV <- HI.value titleInput <#> nonEmptyValidation titleId <#> (_ `andThen` letterNumberSpaceValidation titleId)
+  artistV <- HI.value artistInput <#> nonEmptyValidation artistId <#> (_ `andThen` printableAsciiLatinValidation artistId)
+  titleV <- HI.value titleInput <#> nonEmptyValidation titleId <#> (_ `andThen` printableAsciiLatinValidation titleId)
   subtitlesV <- loadSubtitlesFromTable loadSubtitleFromRow subtitleTable <#> \subs -> traverse (\(sub@(Subtitle { value })) -> maxCharsValidation 30 "SubtitleRow" value <#> const sub) subs
   pure $ ado
     cutVideo <- cutVideoV
