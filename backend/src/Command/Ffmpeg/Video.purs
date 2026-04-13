@@ -39,7 +39,19 @@ makeNormalizeVideo filename = do
 
 normalizeVideoArgs :: FilePath -> FilePath -> Array String
 normalizeVideoArgs mp4 tempVideo =
-  [ "-hide_banner", "-loglevel", "warning", "-i", show mp4, "-c:v", "libx264", "-c:a", "aac", show tempVideo ]
+  [ "-hide_banner"
+  , "-loglevel"
+  , "warning"
+  , "-i"
+  , show mp4
+  , "-c:v"
+  , "libx264"
+  , "-c:a"
+  , "aac"
+  , "-af"
+  , "\"loudnorm=I=-16:TP=-1.5:LRA=11\""
+  , show tempVideo
+  ]
 
 normaliseVideoCleanup :: String -> Aff Unit
 normaliseVideoCleanup filename = liftEffect do
