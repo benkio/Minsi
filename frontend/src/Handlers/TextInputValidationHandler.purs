@@ -13,9 +13,9 @@ import Handlers.ErrorHandlers (genericErrorsHandler)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.ArtistPrefix (prefixForArtist)
 import Model.ValidationErrors (toMap)
-import Validations.LetterNumberSpaceValidation (letterNumberSpaceValidation)
-import Validations.OutputFilenameValidation (outputFilenameValidation)
 import Validations.NonEmptyValidation (nonEmptyValidation)
+import Validations.OutputFilenameValidation (outputFilenameValidation)
+import Validations.PrintableAsciiLatinValidation (printableAsciiLatinValidation)
 import Web.DOM.Element (toEventTarget)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
@@ -64,7 +64,7 @@ artistChangeListener _ = genericErrorsHandler $ do
   validation
     (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
     (\_ -> pure unit)
-    (nonEmptyValidation artistId v `andThen` (letterNumberSpaceValidation artistId))
+    (nonEmptyValidation artistId v `andThen` (printableAsciiLatinValidation artistId))
 
 titleChangeListener :: Event -> Effect Unit
 titleChangeListener _ = genericErrorsHandler $ do
@@ -74,4 +74,4 @@ titleChangeListener _ = genericErrorsHandler $ do
   validation
     (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
     (\_ -> pure unit)
-    (nonEmptyValidation titleId v `andThen` (letterNumberSpaceValidation titleId))
+    (nonEmptyValidation titleId v `andThen` (printableAsciiLatinValidation titleId))
