@@ -7,6 +7,7 @@ import Components.HtmlIdAndClasses
   , artistId
   , cutEndId
   , cutStartId
+  , subtitleOffsetId
   , loadingModalId
   , minsiErrorModalId
   , minsiLogId
@@ -75,6 +76,7 @@ import Web.HTML.HTMLVideoElement as HV
 newtype HtmlInputs = HtmlInputs
   { cutStart :: HTMLInputElement
   , cutEnd :: HTMLInputElement
+  , subtitleOffset :: HTMLInputElement
   , youtubeUrl :: HTMLInputElement
   , downloadFullButton :: HTMLButtonElement
   , localFile :: HTMLInputElement
@@ -163,6 +165,7 @@ loadComponents = do
 loadHtmlInputs :: NonElementParentNode -> Effect HtmlInputs
 loadHtmlInputs doc = do
   rangeTuple <- loadCutRange doc
+  subtitleOffset <- loadInput subtitleOffsetId doc
   youtubeUrl <- loadInput youtubeUrlId doc
   downloadFullButton <- loadButton downloadFullButtonId doc
   localFile <- loadInput localFileId doc
@@ -188,6 +191,7 @@ loadHtmlInputs doc = do
     ( HtmlInputs
         { cutStart: fst rangeTuple
         , cutEnd: snd rangeTuple
+        , subtitleOffset: subtitleOffset
         , youtubeUrl: youtubeUrl
         , downloadFullButton: downloadFullButton
         , localFile: localFile

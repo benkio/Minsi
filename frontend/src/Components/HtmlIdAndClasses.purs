@@ -18,6 +18,9 @@ cutStartId = "cutStart"
 cutEndId :: String
 cutEndId = "cutEnd"
 
+subtitleOffsetId :: String
+subtitleOffsetId = "subtitleOffset"
+
 youtubeUrlId :: String
 youtubeUrlId = "youtubeUrl"
 

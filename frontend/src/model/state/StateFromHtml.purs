@@ -19,7 +19,7 @@ import Data.Validation.Semigroup (V, andThen, invalid, toEither, validation)
 import Effect (Effect)
 import HTMLTableCellElement (valueFromInputTableCell, valueFromSelectTableCell, valueFromTextAreaTableCell)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
-import Model.State.State (State(..), DurationRange(..), WURL(..), Source(..), Subtitle(..))
+import Model.State.State (State(..), DurationRange(..), WURL(..), Source(..), Subtitle(..), shiftSubtitle)
 import Model.ValidationErrors (ValidationErrors, toMap, fromSingleton)
 import Parse.Font (parseFontAndColor, parsePosition)
 import Partial.Unsafe (unsafePartial)
@@ -27,8 +27,8 @@ import Validations.DurationRangeValidation (durationRangeValidation)
 import Validations.MaxCharatersValidation (maxCharsValidation)
 import Validations.NonEmptyValidation (nonEmptyValidation)
 import Validations.OutputFilenameValidation (outputFilenameValidation)
-import Validations.YoutubeValidation (youtubeUrlValidation)
 import Validations.PrintableAsciiLatinValidation (printableAsciiLatinValidation)
+import Validations.YoutubeValidation (youtubeUrlValidation)
 import Web.DOM.HTMLCollection as HC
 import Web.File.FileList (item)
 import Web.HTML.HTMLInputElement (HTMLInputElement, valueAsNumber, checked)
@@ -57,6 +57,7 @@ fromHtmlInputs
       , reverseLoop: reverseLoopInput
       , artist: artistInput
       , title: titleInput
+      , subtitleOffset
       , subtitleTable
       }
   ) = do
@@ -67,6 +68,7 @@ fromHtmlInputs
   uploadLocalFileValue <- checked uploadLocalFileInput
   artistV <- HI.value artistInput <#> nonEmptyValidation artistId <#> (_ `andThen` printableAsciiLatinValidation artistId)
   titleV <- HI.value titleInput <#> nonEmptyValidation titleId <#> (_ `andThen` printableAsciiLatinValidation titleId)
+  subtitleOffsetValue <- valueAsNumber subtitleOffset
   subtitlesV <- loadSubtitlesFromTable loadSubtitleFromRow subtitleTable <#> \subs -> traverse (\(sub@(Subtitle { value })) -> maxCharsValidation 30 "SubtitleRow" value <#> const sub) subs
   pure $ ado
     cutVideo <- cutVideoV
@@ -75,6 +77,7 @@ fromHtmlInputs
     artist <- artistV
     title <- titleV
     subtitles <- subtitlesV
+    let subtitlesWithOffset = map (shiftSubtitle (Milliseconds subtitleOffsetValue)) subtitles
     in
       State
         { cutVideo: cutVideo
@@ -84,7 +87,7 @@ fromHtmlInputs
         , uploadLocalFile: uploadLocalFileValue
         , artist: capitalize artist
         , title: capitalize title
-        , subtitles: subtitles
+        , subtitles: subtitlesWithOffset
         }
 
 cutVideoFromHtmlRange :: HTMLInputElement -> HTMLInputElement -> Effect (V ValidationErrors DurationRange)
