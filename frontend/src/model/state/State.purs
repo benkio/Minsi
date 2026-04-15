@@ -78,20 +78,27 @@ instance Show Position where
   show Bottom = "Bottom"
 
 instance Show Subtitle where
-  show (Subtitle
-    { videoPosition
-    , value
-    , font
-    , fontSize
-    , color
-    , screenPosition
-    }) =
+  show
+    ( Subtitle
+        { videoPosition
+        , value
+        , font
+        , fontSize
+        , color
+        , screenPosition
+        }
+    ) =
     "Subtitle: " <> show videoPosition
-      <> ", value: " <> show value
-      <> ", font: " <> show font
-      <> ", fontSize: " <> show fontSize
-      <> ", color: " <> show color
-      <> ", screenPosition: " <> show screenPosition
+      <> ", value: "
+      <> show value
+      <> ", font: "
+      <> show font
+      <> ", fontSize: "
+      <> show fontSize
+      <> ", color: "
+      <> show color
+      <> ", screenPosition: "
+      <> show screenPosition
 
 instance Show Source where
   show (LocalFile _) = "LocalFile"
