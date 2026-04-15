@@ -64,36 +64,58 @@
         <div class="col-12 col-lg-3 sticky-left-lg">
           <div class="card shadow-sm mb-3 p-2">
             <div class="card-body">
-              <div class="mb-3">
-                <label for="artist" class="form-label"
-                  >Artist (Selectable From Dropbown - they set prefix)</label
+              <div class="row mb-3 align-items-center">
+                <label
+                  for="artist"
+                  class="col-3 px-0 col-form-label col-form-label-sm"
+                  >Artist</label
                 >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="artist"
-                  list="artists"
-                />
-                <datalist id="artists">
-                  <option value="Richard Philip Henry John Benson"></option>
-                  <option value="Omar Palermo"></option>
-                  <option value="Xah Lee"></option>
-                  <option value="Alessandro Barbero"></option>
-                  <option value="Germano Mosconi"></option>
-                  <option value="Pino Scotto"></option>
-                </datalist>
+                <div class="col-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="artist"
+                    list="artists"
+                  />
+                  <datalist id="artists">
+                    <option value="Richard Philip Henry John Benson"></option>
+                    <option value="Omar Palermo"></option>
+                    <option value="Xah Lee"></option>
+                    <option value="Alessandro Barbero"></option>
+                    <option value="Germano Mosconi"></option>
+                    <option value="Pino Scotto"></option>
+                  </datalist>
+                </div>
               </div>
 
-              <div class="mb-3">
-                <label for="outputFilename" class="form-label">
-                  Output Filename - format: <i>prefix_CamelCaseValue</i> (Max 50 Chars)
+              <div class="row mb-3 align-items-center">
+                <label
+                  for="outputFilename"
+                  class="col-3 px-0 col-form-label col-form-label-sm"
+                >
+                  Filename
                 </label>
-                <input type="text" class="form-control" id="outputFilename" maxlength=50/>
+                <div class="col-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="outputFilename"
+                    maxlength="50"
+                    placeholder="prefix_CamelCaseValue"
+                  />
+                </div>
               </div>
 
-              <div class="mb-3">
-                <label for="title" class="form-label">Title</label>
-                <input type="text" class="form-control" id="title" />
+              <div class="row mb-3 align-items-center">
+                <label
+                  for="title"
+                  class="col-3 px-0 col-form-label col-form-label-sm"
+                >
+                  Title
+                </label>
+                <div class="col-9">
+                  <input type="text" class="form-control" id="title" />
+                </div>
               </div>
 
               <div class="form-check mb-4">
@@ -149,6 +171,24 @@
                     value="100000"
                     step="50"
                   />
+                </div>
+                <div class="mb-4 col-12">
+                  <div class="row align-items-center">
+                    <label
+                      for="subtitleOffset"
+                      class="col-6 col-form-label col-form-label-sm"
+                    >
+                      Subtitle Offset (ms)
+                    </label>
+                    <div class="col-5">
+                      <input
+                        type="number"
+                        id="subtitleOffset"
+                        class="form-control form-control-sm"
+                        value="0"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 

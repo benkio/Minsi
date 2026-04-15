@@ -12,10 +12,11 @@ import Web.File.File (File)
 --                    Copy Pasted between Frontend↔Backend                   --
 -------------------------------------------------------------------------------
 
+-- Type Definitions -----------------------------------------------------------
+
 newtype WURL = WURL URL
 data Source = LocalFile File | WebURL WURL
 
-derive instance Eq WURL
 instance Eq Source where
   eq (LocalFile _) (LocalFile _) = true
   eq (WebURL a) (WebURL b) = eq a b
@@ -50,11 +51,16 @@ data Font = Impact | ArialBlack
 data Color = White | Black | LightGreen | LightOrange | Yellow
 data Position = Top | Bottom
 
+-- EQ Instances -----------------------------------------
+
+derive instance Eq WURL
 derive instance Eq Font
 derive instance Eq Color
 derive instance Eq Position
 derive newtype instance eqDurationRange :: Eq DurationRange
 derive newtype instance eqSubtitle :: Eq Subtitle
+
+-- Show Instances -----------------------
 
 instance Show Font where
   show Impact = "Impact"
@@ -70,6 +76,42 @@ instance Show Color where
 instance Show Position where
   show Top = "Top"
   show Bottom = "Bottom"
+
+instance Show Subtitle where
+  show
+    ( Subtitle
+        { videoPosition
+        , value
+        , font
+        , fontSize
+        , color
+        , screenPosition
+        }
+    ) =
+    "Subtitle: " <> show videoPosition
+      <> ", value: "
+      <> show value
+      <> ", font: "
+      <> show font
+      <> ", fontSize: "
+      <> show fontSize
+      <> ", color: "
+      <> show color
+      <> ", screenPosition: "
+      <> show screenPosition
+
+instance Show Source where
+  show (LocalFile _) = "LocalFile"
+  show (WebURL w) = "WebURL " <> show w
+
+instance Show WURL where
+  show (WURL url) = toString url
+
+instance Show DurationRange where
+  show (DurationRange { start: Milliseconds s, end: Milliseconds e }) =
+    "DurationRange: " <> show s <> " → " <> show e
+
+-- WriteForeign Instances -----------------------------------------------------
 
 instance WriteForeign Position where
   writeImpl Top = writeImpl "Top"
@@ -96,20 +138,26 @@ instance WriteForeign Source where
   writeImpl (LocalFile _) = writeImpl "LocalFile"
   writeImpl (WebURL w) = writeImpl w
 
-instance Show Source where
-  show (LocalFile _) = "LocalFile"
-  show (WebURL w) = "WebURL " <> show w
-
-instance Show WURL where
-  show (WURL url) = toString url
-
-isLocalFile :: Source -> Boolean
-isLocalFile (LocalFile _) = true
-isLocalFile (WebURL _) = false
-
 derive newtype instance writeState :: WriteForeign State
+
+-- Other Typeclass Instances --------------------------
+
 derive instance Newtype State _
 
 instance Ord Subtitle where
   compare (Subtitle { videoPosition: (DurationRange { start: Milliseconds str1 }) }) (Subtitle { videoPosition: (DurationRange { start: Milliseconds str2 }) }) =
     compare str1 str2
+
+-- Pure Functions ---------------------------------------------------------
+
+isLocalFile :: Source -> Boolean
+isLocalFile (LocalFile _) = true
+isLocalFile (WebURL _) = false
+
+shiftDurationRange :: Milliseconds -> DurationRange -> DurationRange
+shiftDurationRange (Milliseconds millis) (DurationRange { start: (Milliseconds s), end: (Milliseconds e) }) =
+  DurationRange { start: (Milliseconds (s + millis)), end: (Milliseconds (e + millis)) }
+
+shiftSubtitle :: Milliseconds -> Subtitle -> Subtitle
+shiftSubtitle millis (Subtitle { videoPosition, value, font, fontSize, color, screenPosition }) =
+  Subtitle { videoPosition: shiftDurationRange millis videoPosition, value, font, fontSize, color, screenPosition }
