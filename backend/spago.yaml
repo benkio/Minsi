@@ -41,4 +41,4 @@ package:
 workspace:
   extraPackages: {}
   packageSet:
-    url: https://raw.githubusercontent.com/purescript/package-sets//packages.json
+    url: https://raw.githubusercontent.com/purescript/package-sets/master/packages.json
