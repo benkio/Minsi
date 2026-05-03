@@ -7,6 +7,9 @@ import Data.Array (sortBy, reverse)
 import Data.Traversable (traverse)
 import Effect (Effect)
 import Effect.Console (log)
+import Components.HtmlComponents (loadComponents)
+import Components.HtmlComponents.Lenses (_sortSubtitlesButton, _subtitleTable)
+import Data.Lens (view)
 import Handlers.ErrorHandlers (genericErrorsHandler)
 import Web.DOM.Element (toEventTarget)
 import Web.Event.EventTarget (addEventListener, eventListener)
@@ -16,12 +19,15 @@ import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLTableElement as HT
 
-setSortSubtitlesButtonHandler :: HB.HTMLButtonElement -> HT.HTMLTableElement -> Effect Unit
-setSortSubtitlesButtonHandler sortSubtitlesButton subtitleTable = genericErrorsHandler do
+setSortSubtitlesButtonHandler :: Effect Unit
+setSortSubtitlesButtonHandler = genericErrorsHandler do
+  components <- loadComponents
+  let
+    sortSubtitlesButton = view _sortSubtitlesButton components
+    subtitleTable = view _subtitleTable components
+    sortSubtitlesButtonEventTarget = toEventTarget (HB.toElement sortSubtitlesButton)
   sortSubtitlesButtonEvL <- eventListener (sortSubtitlesButtonEventListener subtitleTable)
   addEventListener E.click sortSubtitlesButtonEvL false sortSubtitlesButtonEventTarget
-  where
-  sortSubtitlesButtonEventTarget = toEventTarget (HB.toElement sortSubtitlesButton)
 
 sortSubtitlesButtonEventListener :: HT.HTMLTableElement -> Event -> Effect Unit
 sortSubtitlesButtonEventListener table _ = genericErrorsHandler do

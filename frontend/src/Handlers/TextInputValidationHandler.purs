@@ -3,9 +3,10 @@ module Handlers.TextInputValidationHandler where
 import Prelude
 
 import Components.HtmlComponents (loadComponents)
+import Components.HtmlComponents.Lenses (_artist, _filename, _title, _uploadLocalFile)
 import Components.HtmlIdAndClasses (artistId, outputFilenameId, titleId)
+import Data.Lens (view)
 import Data.Maybe (maybe)
-import Data.Newtype (unwrap)
 import Data.Validation.Semigroup (andThen, validation)
 import Effect (Effect)
 import Effect.Console (log)
@@ -23,14 +24,13 @@ import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLInputElement (value)
 import Web.HTML.HTMLInputElement as HI
 
-data TextInputValidationTargets = TIVT
-  { outputFilename :: HI.HTMLInputElement
-  , artist :: HI.HTMLInputElement
-  , title :: HI.HTMLInputElement
-  }
-
-setTextInputValidationHandlers :: TextInputValidationTargets -> Effect Unit
-setTextInputValidationHandlers (TIVT { outputFilename, artist, title }) = do
+setTextInputValidationHandlers :: Effect Unit
+setTextInputValidationHandlers = do
+  components <- loadComponents
+  let
+    outputFilename = view _filename components
+    artist = view _artist components
+    title = view _title components
   outputFilenameEvL <- eventListener outputFilenameChangeListener
   artistEvL <- eventListener artistChangeListener
   titleEvL <- eventListener titleChangeListener
@@ -44,8 +44,8 @@ outputFilenameChangeListener :: Event -> Effect Unit
 outputFilenameChangeListener _ = genericErrorsHandler $ do
   components <- loadComponents
   let
-    outputFilename = (unwrap components.htmlInputs).filename
-    uploadLocalFile = (unwrap components.htmlInputs).uploadLocalFile
+    outputFilename = view _filename components
+    uploadLocalFile = view _uploadLocalFile components
   v <- value outputFilename
   validation
     (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
@@ -57,8 +57,8 @@ artistChangeListener :: Event -> Effect Unit
 artistChangeListener _ = genericErrorsHandler $ do
   components <- loadComponents
   let
-    outputFilename = (unwrap components.htmlInputs).filename
-    artist = (unwrap components.htmlInputs).artist
+    outputFilename = view _filename components
+    artist = view _artist components
   v <- value artist
   maybe (pure unit) (\prefix -> HI.setValue prefix outputFilename) (prefixForArtist v)
   validation
@@ -69,7 +69,7 @@ artistChangeListener _ = genericErrorsHandler $ do
 titleChangeListener :: Event -> Effect Unit
 titleChangeListener _ = genericErrorsHandler $ do
   components <- loadComponents
-  let title = (unwrap components.htmlInputs).title
+  let title = view _title components
   v <- value title
   validation
     (\errs -> throwMinsiError (InvalidInputs (toMap errs)))

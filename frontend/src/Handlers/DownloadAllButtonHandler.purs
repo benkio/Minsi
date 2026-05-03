@@ -6,6 +6,9 @@ import Effect (Effect)
 import Effect.Aff (Aff, runAff_)
 import Effect.Class (liftEffect)
 import Endpoints.Download (triggerDownloadLink)
+import Components.HtmlComponents (loadComponents)
+import Components.HtmlComponents.Lenses (_downloadAllButton)
+import Data.Lens (view)
 import Handlers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
 import Model.State.StateFromHtml (getCurrentState)
 import Prelude
@@ -15,8 +18,10 @@ import Web.Event.Internal.Types (Event)
 import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLButtonElement as HB
 
-setDownloadAllButtonHandler :: HB.HTMLButtonElement -> Effect Unit
-setDownloadAllButtonHandler downloadAllButton = genericErrorsHandler $ do
+setDownloadAllButtonHandler :: Effect Unit
+setDownloadAllButtonHandler = genericErrorsHandler $ do
+  components <- loadComponents
+  let downloadAllButton = view _downloadAllButton components
   evL <- eventListener downloadAllButtonEventListener
   addEventListener E.click evL false (toEventTarget (HB.toElement downloadAllButton))
 

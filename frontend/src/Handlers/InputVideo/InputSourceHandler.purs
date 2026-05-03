@@ -2,7 +2,10 @@ module Handlers.InputVideo.InputSourceHandler where
 
 import Prelude
 
+import Components.HtmlComponents (loadComponents)
+import Components.HtmlComponents.Lenses (_downloadFullButton, _inputSource, _localFile, _youtubeUrl)
 import Components.HTMLElement (addClassToElement, removeClassFromElement)
+import Data.Lens (view)
 import Effect (Effect)
 import Handlers.ErrorHandlers (genericErrorsHandler)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
@@ -14,12 +17,17 @@ import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLSelectElement as HS
 
-setInputSourceHandler :: HS.HTMLSelectElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> HB.HTMLButtonElement -> Effect Unit
-setInputSourceHandler inputSource youtubeUrl localFile downloadFullButton = genericErrorsHandler $ do
+setInputSourceHandler :: Effect Unit
+setInputSourceHandler = genericErrorsHandler $ do
+  components <- loadComponents
+  let
+    inputSource = view _inputSource components
+    youtubeUrl = view _youtubeUrl components
+    localFile = view _localFile components
+    downloadFullButton = view _downloadFullButton components
+    inputSourceEventTarget = toEventTarget (HS.toElement inputSource)
   inputSourceEvL <- eventListener (inputSourceEventListener inputSource youtubeUrl localFile downloadFullButton)
   addEventListener E.change inputSourceEvL false inputSourceEventTarget
-  where
-  inputSourceEventTarget = toEventTarget (HS.toElement inputSource)
 
 inputSourceEventListener :: HS.HTMLSelectElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> HB.HTMLButtonElement -> Event -> Effect Unit
 inputSourceEventListener inputSource youtubeUrl localFile downloadFullButton _ = do
