@@ -30,7 +30,7 @@ setVideoSourceHandler = genericErrorsHandler $ do
   addEventListener E.change videoSourceEvL false videoSourceEventTarget
 
 videoSourceEventListener :: HS.HTMLSelectElement -> HTMLVideoElement -> HTMLAudioElement -> Event -> Effect Unit
-videoSourceEventListener videoSource resultVideo resultAudio _ = do
+videoSourceEventListener videoSource resultVideo resultAudio _ = genericErrorsHandler $ do
   stateTuple <- getCurrentState
   let filename = (unwrap (fst stateTuple)).filename
   setResultMediaSrc filename videoSource resultVideo resultAudio
