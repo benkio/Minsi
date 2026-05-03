@@ -14,6 +14,7 @@ import Web.DOM.Element as Element
 import Web.HTML.HTMLAudioElement (HTMLAudioElement)
 import Web.HTML.HTMLAudioElement as HA
 import Web.HTML.HTMLSelectElement as HS
+import Web.HTML.HTMLMediaElement (HTMLMediaElement)
 import Web.HTML.HTMLVideoElement (HTMLVideoElement)
 import Web.HTML.HTMLVideoElement as HV
 
@@ -48,3 +49,8 @@ setResultAudioSrcAndVisibility :: String -> HTMLVideoElement -> HTMLAudioElement
 setResultAudioSrcAndVisibility filePathNoCache resultVideo resultAudio = do
   setMediaSrcAndLoad filePathNoCache (HA.toHTMLMediaElement resultAudio)
   showElementHideOther (HA.toElement resultAudio) (HV.toElement resultVideo)
+
+getMediaElement :: HS.HTMLSelectElement -> HTMLVideoElement -> HTMLAudioElement -> Effect HTMLMediaElement
+getMediaElement videoSource resultVideo resultAudio = do
+  selectedVideoSourceValue <- HS.value videoSource
+  pure $ if isVideoSource selectedVideoSourceValue then HV.toHTMLMediaElement resultVideo else HA.toHTMLMediaElement resultAudio
