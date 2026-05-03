@@ -47,6 +47,8 @@ setupEventHandlers
       , sortSubtitlesButton
       , setSubtitleStartButton
       , setSubtitleEndButton
+      , keyboardShortcutsButton
+      , resetButton
       , artist
       , title
       }
@@ -55,8 +57,6 @@ setupEventHandlers
       , playbackPositionResultVideo
       , resultVideo
       , resultAudio
-      , keyboardShortcutsButton
-      , resetButton
       }
   } = do
   setCutRangeHandlers

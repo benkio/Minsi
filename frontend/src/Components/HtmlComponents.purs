@@ -98,6 +98,8 @@ newtype HtmlInputs = HtmlInputs
   , setSubtitleStartButton :: HTMLButtonElement
   , setSubtitleEndButton :: HTMLButtonElement
   , subtitleRow :: HTMLTemplateElement
+  , keyboardShortcutsButton :: HTMLButtonElement
+  , resetButton :: HTMLButtonElement
   }
 
 data ResultPreview
@@ -129,8 +131,6 @@ newtype HtmlOutputs = HtmlOutputs
   , minsiErrorModal :: HTMLDivElement
   , resultVideo :: HTMLVideoElement
   , resultAudio :: HTMLAudioElement
-  , keyboardShortcutsButton :: HTMLButtonElement
-  , resetButton :: HTMLButtonElement
   }
 
 derive instance Newtype HtmlOutputs _
@@ -187,6 +187,8 @@ loadHtmlInputs doc = do
   setSubtitleStartButton <- loadButton setSubtitleStartButtonId doc
   setSubtitleEndButton <- loadButton setSubtitleEndButtonId doc
   subtitleRow <- loadTemplate subtitleRow doc
+  keyboardShortcutsButton <- loadButton keyboardShortcutsButtonId doc
+  resetButton <- loadButton resetButtonId doc
   pure
     ( HtmlInputs
         { cutStart: fst rangeTuple
@@ -213,6 +215,8 @@ loadHtmlInputs doc = do
         , setSubtitleStartButton: setSubtitleStartButton
         , setSubtitleEndButton: setSubtitleEndButton
         , subtitleRow: subtitleRow
+        , keyboardShortcutsButton: keyboardShortcutsButton
+        , resetButton: resetButton
         }
     )
 
@@ -227,8 +231,6 @@ loadHtmlOutputs doc = do
   minsiErrorModal <- loadDiv minsiErrorModalId doc
   resultVideo <- loadVideo resultVideoId doc
   resultAudio <- loadAudio resultAudioId doc
-  keyboardShortcutsButton <- loadButton keyboardShortcutsButtonId doc
-  resetButton <- loadButton resetButtonId doc
   pure
     ( HtmlOutputs
         { resultPreview: resultPreview
@@ -240,8 +242,6 @@ loadHtmlOutputs doc = do
         , minsiErrorModal: minsiErrorModal
         , resultVideo: resultVideo
         , resultAudio: resultAudio
-        , keyboardShortcutsButton: keyboardShortcutsButton
-        , resetButton: resetButton
         }
     )
 
