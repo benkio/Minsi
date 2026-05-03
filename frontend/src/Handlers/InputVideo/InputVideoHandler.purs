@@ -3,6 +3,8 @@ module Handlers.InputVideo.InputVideoHandler where
 import Prelude
 
 import Components.HtmlComponents (loadComponents, resultPreviewToMaybeIframe, resultPreviewToMaybeVideo)
+import Components.HtmlComponents.Lenses (_localFile, _playbackPositionYoutube, _setCutEndButton, _setCutStartButton, _youtubeUrl)
+import Data.Lens (view)
 import Components.HtmlIdAndClasses (resultPreviewId, youtubeUrlId)
 import Data.Foldable (foldl)
 import Data.Maybe (Maybe, maybe)
@@ -35,24 +37,19 @@ import Web.HTML.HTMLMediaElement (setSrc)
 import Web.HTML.HTMLSpanElement as HSP
 import Web.HTML.HTMLVideoElement as HV
 
-data VideoEventTargets = VET
-  { playbackPositionYoutube :: HSP.HTMLSpanElement
-  , setCutEndButton :: HB.HTMLButtonElement
-  , setCutStartButton :: HB.HTMLButtonElement
-  , youtubeUrl :: HI.HTMLInputElement
-  , localFile :: HI.HTMLInputElement
-  }
-
-setVideoHandlers :: VideoEventTargets -> Effect Unit
-setVideoHandlers
-  ( VET
-      { setCutStartButton
-      , playbackPositionYoutube
-      , setCutEndButton
-      , youtubeUrl
-      , localFile
-      }
-  ) = genericErrorsHandler $ do
+setVideoHandlers :: Effect Unit
+setVideoHandlers = genericErrorsHandler $ do
+  components <- loadComponents
+  let
+    playbackPositionYoutube = view _playbackPositionYoutube components
+    setCutStartButton = view _setCutStartButton components
+    setCutEndButton = view _setCutEndButton components
+    localFile = view _localFile components
+    youtubeUrl = view _youtubeUrl components
+    ytUrlEventTarget = (toEventTarget <<< HI.toElement) youtubeUrl
+    localFileEventTarget = (toEventTarget <<< HI.toElement) localFile
+    setCutStartButtonTarget = toEventTarget (HB.toElement setCutStartButton)
+    setCutEndButtonTarget = toEventTarget (HB.toElement setCutEndButton)
   ytEvL <- eventListener youtubeUrlEventListener
   lfEvL <- eventListener localFileEventListener
   addEventListener E.input ytEvL false ytUrlEventTarget
@@ -65,11 +62,6 @@ setVideoHandlers
   addEventListener E.click setCutStartButtonEvLV false setCutStartButtonTarget
   addEventListener E.click setCutEndButtonEvLV false setCutEndButtonTarget
   pure unit
-  where
-  ytUrlEventTarget = (toEventTarget <<< HI.toElement) youtubeUrl
-  localFileEventTarget = (toEventTarget <<< HI.toElement) localFile
-  setCutStartButtonTarget = toEventTarget (HB.toElement setCutStartButton)
-  setCutEndButtonTarget = toEventTarget (HB.toElement setCutEndButton)
 
 youtubeUrlEventListener :: Event -> Effect Unit
 youtubeUrlEventListener ev = genericErrorsHandler $ do

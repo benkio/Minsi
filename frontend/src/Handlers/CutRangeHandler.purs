@@ -1,6 +1,9 @@
 module Handlers.CutRangeHandler where
 
+import Components.HtmlComponents (loadComponents)
+import Components.HtmlComponents.Lenses (_cutEnd, _cutStart, _uploadLocalFile)
 import Components.HtmlIdAndClasses (cutEndId, cutStartId)
+import Data.Lens (view)
 import Data.Validation.Semigroup (validation)
 import Effect (Effect)
 import Effect.Console (log)
@@ -16,14 +19,12 @@ import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLInputElement (valueAsNumber)
 import Web.HTML.HTMLInputElement as HI
 
-data CutRangeTargets = CRET
-  { cutStart :: HI.HTMLInputElement
-  , cutEnd :: HI.HTMLInputElement
-  , uploadLocalFile :: HI.HTMLInputElement
-  }
-
-setCutRangeHandlers :: CutRangeTargets -> Effect Unit
-setCutRangeHandlers (CRET { cutStart, cutEnd, uploadLocalFile }) = genericErrorsHandler $ do
+setCutRangeHandlers :: Effect Unit
+setCutRangeHandlers = genericErrorsHandler $ do
+  components <- loadComponents
+  let cutStart = view _cutStart components
+  let cutEnd = view _cutEnd components
+  let uploadLocalFile = view _uploadLocalFile components
   cutStartEvL <- eventListener (rangeToNumberListenerStart cutStart cutEnd uploadLocalFile)
   cutEndEvL <- eventListener (rangeToNumberListenerEnd cutStart cutEnd uploadLocalFile)
   addEventListener E.input cutStartEvL false (toEventTarget (HI.toElement cutStart))

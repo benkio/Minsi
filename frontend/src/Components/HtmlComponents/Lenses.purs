@@ -90,56 +90,59 @@ _htmlVisualElements = prop (Proxy :: Proxy "htmlVisualElements")
 
 -- Newtype isos to the inner records ---------------------------------------------------
 
-_HtmlInputs :: Iso' HtmlInputs
-  { cutStart :: HTMLInputElement
-  , cutEnd :: HTMLInputElement
-  , subtitleOffset :: HTMLInputElement
-  , youtubeUrl :: HTMLInputElement
-  , downloadFullButton :: HTMLButtonElement
-  , localFile :: HTMLInputElement
-  , uploadLocalFile :: HTMLInputElement
-  , filename :: HTMLInputElement
-  , reverseLoop :: HTMLInputElement
-  , artist :: HTMLInputElement
-  , title :: HTMLInputElement
-  , applyButton :: HTMLButtonElement
-  , videoSource :: HTMLSelectElement
-  , inputSource :: HTMLSelectElement
-  , downloadAllButton :: HTMLButtonElement
-  , copyTranscriptButton :: HTMLButtonElement
-  , setCutEndButton :: HTMLButtonElement
-  , setCutStartButton :: HTMLButtonElement
-  , subtitleTable :: HTMLTableElement
-  , addSubtitleButton :: HTMLButtonElement
-  , sortSubtitlesButton :: HTMLButtonElement
-  , setSubtitleStartButton :: HTMLButtonElement
-  , setSubtitleEndButton :: HTMLButtonElement
-  , subtitleRow :: HTMLTemplateElement
-  , keyboardShortcutsButton :: HTMLButtonElement
-  , resetButton :: HTMLButtonElement
-  }
+_HtmlInputs
+  :: Iso' HtmlInputs
+       { cutStart :: HTMLInputElement
+       , cutEnd :: HTMLInputElement
+       , subtitleOffset :: HTMLInputElement
+       , youtubeUrl :: HTMLInputElement
+       , downloadFullButton :: HTMLButtonElement
+       , localFile :: HTMLInputElement
+       , uploadLocalFile :: HTMLInputElement
+       , filename :: HTMLInputElement
+       , reverseLoop :: HTMLInputElement
+       , artist :: HTMLInputElement
+       , title :: HTMLInputElement
+       , applyButton :: HTMLButtonElement
+       , videoSource :: HTMLSelectElement
+       , inputSource :: HTMLSelectElement
+       , downloadAllButton :: HTMLButtonElement
+       , copyTranscriptButton :: HTMLButtonElement
+       , setCutEndButton :: HTMLButtonElement
+       , setCutStartButton :: HTMLButtonElement
+       , subtitleTable :: HTMLTableElement
+       , addSubtitleButton :: HTMLButtonElement
+       , sortSubtitlesButton :: HTMLButtonElement
+       , setSubtitleStartButton :: HTMLButtonElement
+       , setSubtitleEndButton :: HTMLButtonElement
+       , subtitleRow :: HTMLTemplateElement
+       , keyboardShortcutsButton :: HTMLButtonElement
+       , resetButton :: HTMLButtonElement
+       }
 _HtmlInputs = unto HtmlInputs
 
-_HtmlOutputs :: Iso' HtmlOutputs
-  { resultPreview :: ResultPreview
-  , minsiLog :: HTMLDivElement
-  , minsiLogTitle :: HTMLDivElement
-  , playbackPositionYoutube :: HTMLSpanElement
-  , playbackPositionResultVideo :: HTMLSpanElement
-  , loadingModal :: HTMLDivElement
-  , minsiErrorModal :: HTMLDivElement
-  , resultVideo :: HTMLVideoElement
-  , resultAudio :: HTMLAudioElement
-  }
+_HtmlOutputs
+  :: Iso' HtmlOutputs
+       { resultPreview :: ResultPreview
+       , minsiLog :: HTMLDivElement
+       , minsiLogTitle :: HTMLDivElement
+       , playbackPositionYoutube :: HTMLSpanElement
+       , playbackPositionResultVideo :: HTMLSpanElement
+       , loadingModal :: HTMLDivElement
+       , minsiErrorModal :: HTMLDivElement
+       , resultVideo :: HTMLVideoElement
+       , resultAudio :: HTMLAudioElement
+       }
 _HtmlOutputs = unto HtmlOutputs
 
-_HtmlVisualElementsFields :: Iso' HtmlVisualElements
-  { videoSourceRow :: HTMLDivElement
-  , videoRow :: HTMLDivElement
-  , subtitlesRow :: HTMLDivElement
-  , playbackPositionResultRow :: HTMLDivElement
-  , minsiLogBox :: HTMLCollection
-  }
+_HtmlVisualElementsFields
+  :: Iso' HtmlVisualElements
+       { videoSourceRow :: HTMLDivElement
+       , videoRow :: HTMLDivElement
+       , subtitlesRow :: HTMLDivElement
+       , playbackPositionResultRow :: HTMLDivElement
+       , minsiLogBox :: HTMLCollection
+       }
 _HtmlVisualElementsFields = iso (\(HtmlVisualElements r) -> r) HtmlVisualElements
 
 -- HtmlInputs (template element: _subtitleRowTemplate — record label is still `subtitleRow`)

@@ -10,6 +10,9 @@ import Data.Foldable (traverse_)
 import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Effect (Effect)
 import Effect.Console (log)
+import Components.HtmlComponents (loadComponents)
+import Components.HtmlComponents.Lenses (_subtitleTable)
+import Data.Lens (view)
 import Handlers.ErrorHandlers (genericErrorsHandler)
 import Web.DOM.DOMTokenList (contains)
 import Web.DOM.Element (classList, fromNode, tagName, toEventTarget, toNode)
@@ -23,8 +26,10 @@ import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLTableElement as HT
 import Web.HTML.HTMLTableRowElement as HR
 
-setRemoveSubtitleButtonHandler :: HT.HTMLTableElement -> Effect Unit
-setRemoveSubtitleButtonHandler subtitleTable = genericErrorsHandler $ do
+setRemoveSubtitleButtonHandler :: Effect Unit
+setRemoveSubtitleButtonHandler = genericErrorsHandler $ do
+  components <- loadComponents
+  let subtitleTable = view _subtitleTable components
   log "Setting up remove subtitle button handlers"
   evl <- eventListener removeSubtitleButtonEventListener
   rows <- getRows subtitleTable

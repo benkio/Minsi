@@ -2,30 +2,32 @@ module Handlers.Subtitles.SubtitleTimeButtonsHandler where
 
 import Prelude
 
+import Components.HtmlComponents (loadComponents)
+import Components.HtmlComponents.Lenses (_resultVideo, _setSubtitleEndButton, _setSubtitleStartButton, _subtitleTable)
+import Components.HTMLTableElement (getFirstRow, getStartInput)
+import Components.HTMLTableRowElement (getEndInput)
+import Data.Lens (view)
 import Effect (Effect)
 import Effect.Console (log)
+import Handlers.ErrorHandlers (genericErrorsHandler)
 import Web.DOM.Element (toEventTarget)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
+import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLButtonElement as HB
+import Web.HTML.HTMLInputElement (setValue)
 import Web.HTML.HTMLTableElement as HT
 import Web.HTML.HTMLVideoElement (HTMLVideoElement, toHTMLMediaElement)
 import Web.HTML.HTMLMediaElement (currentTime)
-import Web.HTML.HTMLInputElement (setValue)
-import Web.HTML.Event.EventTypes as E
-import Handlers.ErrorHandlers (genericErrorsHandler)
-import Components.HTMLTableElement (getFirstRow, getStartInput)
-import Components.HTMLTableRowElement (getEndInput)
 
-data SubtitleTimeButtonsTargets = STBT
-  { setSubtitleStartButton :: HB.HTMLButtonElement
-  , setSubtitleEndButton :: HB.HTMLButtonElement
-  , subtitleTable :: HT.HTMLTableElement
-  , resultVideo :: HTMLVideoElement
-  }
-
-setSubtitleTimeButtonsHandlers :: SubtitleTimeButtonsTargets -> Effect Unit
-setSubtitleTimeButtonsHandlers (STBT { setSubtitleStartButton, setSubtitleEndButton, subtitleTable, resultVideo }) = genericErrorsHandler $ do
+setSubtitleTimeButtonsHandlers :: Effect Unit
+setSubtitleTimeButtonsHandlers = genericErrorsHandler $ do
+  components <- loadComponents
+  let
+    setSubtitleStartButton = view _setSubtitleStartButton components
+    setSubtitleEndButton = view _setSubtitleEndButton components
+    subtitleTable = view _subtitleTable components
+    resultVideo = view _resultVideo components
   startButtonEvL <- eventListener (setSubtitleStartButtonEventListener subtitleTable resultVideo)
   endButtonEvL <- eventListener (setSubtitleEndButtonEventListener subtitleTable resultVideo)
   addEventListener E.click startButtonEvL false (toEventTarget (HB.toElement setSubtitleStartButton))

@@ -10,6 +10,9 @@ import Data.Maybe (maybe)
 import Effect (Effect)
 import Effect.Console (log)
 import Effect.Exception (try)
+import Components.HtmlComponents (loadComponents)
+import Components.HtmlComponents.Lenses (_addSubtitleButton, _resultVideo, _subtitleRowTemplate, _subtitleTable)
+import Data.Lens (view)
 import Handlers.ErrorHandlers (genericErrorsHandler)
 import Handlers.Subtitles.RemoveSubtitleButtonHandler (addRemoveSubtitleListenerToRow)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
@@ -27,14 +30,19 @@ import Web.HTML.HTMLTableSectionElement as HTS
 import Web.HTML.HTMLTemplateElement as HTP
 import Web.HTML.HTMLVideoElement as HV
 
-setAddSubtitleButtonHandler :: HB.HTMLButtonElement -> HT.HTMLTableElement -> HTP.HTMLTemplateElement -> HV.HTMLVideoElement -> Effect Unit
-setAddSubtitleButtonHandler addSubtitleButton subtitleTable subtitleRowTemplate resultVideo = genericErrorsHandler $ do
+setAddSubtitleButtonHandler :: Effect Unit
+setAddSubtitleButtonHandler = genericErrorsHandler $ do
+  components <- loadComponents
+  let
+    addSubtitleButton = view _addSubtitleButton components
+    subtitleTable = view _subtitleTable components
+    subtitleRowTemplate = view _subtitleRowTemplate components
+    resultVideo = view _resultVideo components
+    addSubtitleButtonEventTarget = toEventTarget (HB.toElement addSubtitleButton)
   log "Setting up add subtitle button handler"
   addSubtitleButtonEvL <- eventListener (addSubtitleButtonEventListener subtitleTable subtitleRowTemplate resultVideo)
   addEventListener E.click addSubtitleButtonEvL false addSubtitleButtonEventTarget
   log "Add subtitle button handler set up successfully"
-  where
-  addSubtitleButtonEventTarget = toEventTarget (HB.toElement addSubtitleButton)
 
 addSubtitleButtonEventListener :: HT.HTMLTableElement -> HTP.HTMLTemplateElement -> HV.HTMLVideoElement -> Event -> Effect Unit
 addSubtitleButtonEventListener subtitleTable subtitleRowTemplate resultVideo _ = genericErrorsHandler $ do

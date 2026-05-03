@@ -2,7 +2,6 @@ module Main where
 
 import Prelude
 
-import Components.HtmlComponents (loadComponents)
 import Effect (Effect)
 import Effect.Aff (runAff_)
 import Effect.Class (liftEffect)
@@ -18,7 +17,6 @@ main = genericErrorsHandler program
 program :: Effect Unit
 program = do
   runAff_ genericErrorsHandlerEither (checkUpdates *> checkDependecies)
-  htmlComponents <- liftEffect loadComponents
-  log "Components correctly loaded"
-  setupEventHandlers htmlComponents
-  log "Setup Handlers Done"
+  log "Setup Handlers 🏁"
+  liftEffect setupEventHandlers
+  log "Setup Handlers ✅"

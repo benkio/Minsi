@@ -1,121 +1,39 @@
 module Handlers.Handlers where
 
-import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlOutputs(..))
-import Components.HtmlIdAndClasses (keyboardShortcutsModalId)
 import Effect (Effect)
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CopyTranscriptButtonHandler (setCopyTranscriptButtonHandler)
-import Handlers.CutRangeHandler (CutRangeTargets(..), setCutRangeHandlers)
+import Handlers.CutRangeHandler (setCutRangeHandlers)
 import Handlers.DownloadAllButtonHandler (setDownloadAllButtonHandler)
 import Handlers.DownloadFullButtonHandler (setDownloadFullButtonHandler)
 import Handlers.InputVideo.InputSourceHandler (setInputSourceHandler)
-import Handlers.InputVideo.InputVideoHandler (setVideoHandlers, VideoEventTargets(..))
+import Handlers.InputVideo.InputVideoHandler (setVideoHandlers)
+import Handlers.KeyboardHandler (setKeyboardHandlers)
 import Handlers.ResetButtonHandler (setResetButtonHandler)
-import Handlers.KeyboardHandler (KeyboardHandlerTargets(..), setKeyboardHandlers)
-import Handlers.ResultVideo.Handler (ResultVideoEventTargets(..), setResultVideoHandlers)
+import Handlers.ResultVideo.Handler (setResultVideoHandlers)
 import Handlers.ResultVideo.VideoSourceHandler (setVideoSourceHandler)
 import Handlers.Subtitles.AddSubtitleButtonHandler (setAddSubtitleButtonHandler)
 import Handlers.Subtitles.RemoveSubtitleButtonHandler (setRemoveSubtitleButtonHandler)
 import Handlers.Subtitles.SortSubtitlesButtonHandler (setSortSubtitlesButtonHandler)
-import Handlers.Subtitles.SubtitleTimeButtonsHandler (SubtitleTimeButtonsTargets(..), setSubtitleTimeButtonsHandlers)
-import Handlers.TextInputValidationHandler (TextInputValidationTargets(..), setTextInputValidationHandlers)
+import Handlers.Subtitles.SubtitleTimeButtonsHandler (setSubtitleTimeButtonsHandlers)
+import Handlers.TextInputValidationHandler (setTextInputValidationHandlers)
 import Prelude
 
---TODO: Handlers here get too much parameters
--- the idea is to set the handler with the given target
--- then inside the element itself, compute the current state and get the extra elements from there.
-setupEventHandlers :: HtmlComponents -> Effect Unit
-setupEventHandlers
-  { htmlInputs: HtmlInputs
-      { cutStart
-      , cutEnd
-      , youtubeUrl
-      , downloadFullButton
-      , localFile
-      , uploadLocalFile
-      , filename
-      , setCutStartButton
-      , setCutEndButton
-      , applyButton
-      , videoSource
-      , inputSource
-      , downloadAllButton
-      , copyTranscriptButton
-      , subtitleTable
-      , subtitleRow
-      , addSubtitleButton
-      , sortSubtitlesButton
-      , setSubtitleStartButton
-      , setSubtitleEndButton
-      , keyboardShortcutsButton
-      , resetButton
-      , artist
-      , title
-      }
-  , htmlOutputs: HtmlOutputs
-      { playbackPositionYoutube
-      , playbackPositionResultVideo
-      , resultVideo
-      , resultAudio
-      }
-  } = do
+setupEventHandlers :: Effect Unit
+setupEventHandlers = do
   setCutRangeHandlers
-    ( CRET
-        { cutStart: cutStart
-        , cutEnd: cutEnd
-        , uploadLocalFile: uploadLocalFile
-        }
-    )
   setVideoHandlers
-    ( VET
-        { playbackPositionYoutube: playbackPositionYoutube
-        , setCutStartButton: setCutStartButton
-        , setCutEndButton: setCutEndButton
-        , youtubeUrl: youtubeUrl
-        , localFile: localFile
-        }
-    )
   setResultVideoHandlers
-    ( RVET
-        { playbackPositionResultVideo: playbackPositionResultVideo
-        , resultVideo: resultVideo
-        , resultAudio: resultAudio
-        , videoSource: videoSource
-        }
-    )
-  setApplyButtonHandler applyButton
+  setApplyButtonHandler
   setKeyboardHandlers
-    ( KHT
-        { cutStart
-        , cutEnd
-        , subtitleTable
-        , subtitleRow
-        , resultVideo
-        , keyboardShortcutsModalId
-        , keyboardShortcutsButton
-        }
-    )
-  setAddSubtitleButtonHandler addSubtitleButton subtitleTable subtitleRow resultVideo
-  setSortSubtitlesButtonHandler sortSubtitlesButton subtitleTable
-  setRemoveSubtitleButtonHandler subtitleTable
+  setAddSubtitleButtonHandler
+  setSortSubtitlesButtonHandler
+  setRemoveSubtitleButtonHandler
   setSubtitleTimeButtonsHandlers
-    ( STBT
-        { setSubtitleStartButton: setSubtitleStartButton
-        , setSubtitleEndButton: setSubtitleEndButton
-        , subtitleTable: subtitleTable
-        , resultVideo: resultVideo
-        }
-    )
-  setVideoSourceHandler videoSource resultVideo resultAudio
-  setInputSourceHandler inputSource youtubeUrl localFile downloadFullButton
-  setDownloadFullButtonHandler downloadFullButton
-  setDownloadAllButtonHandler downloadAllButton
-  setCopyTranscriptButtonHandler copyTranscriptButton
-  setResetButtonHandler resetButton
+  setVideoSourceHandler
+  setInputSourceHandler
+  setDownloadFullButtonHandler
+  setDownloadAllButtonHandler
+  setCopyTranscriptButtonHandler
+  setResetButtonHandler
   setTextInputValidationHandlers
-    ( TIVT
-        { outputFilename: filename
-        , artist
-        , title
-        }
-    )
