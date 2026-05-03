@@ -73,7 +73,7 @@ handleKeyboardEvent keyboardEvent = genericErrorsHandler $ do
     keyValue = key keyboardEvent
   media <- getMediaElement components
   when (keyValue == "Enter" && (isCtrl || isMeta)) (applyButtonEventListener ev *> stop)
-  when (keyValue == "+") (addSubtitleButtonEventListener subtitleTable subtitleRow media (toEvent keyboardEvent) *> stop)
+  when (keyValue == "+") (addSubtitleButtonEventListener subtitleTable subtitleRow (toEvent keyboardEvent) *> stop)
   when (keyValue == "-") (removeFirstSubtitleRow subtitleTable *> stop)
   whenNotEditable (keyValue == " ") (toggleResultVideoPlayback media)
   whenNotEditable (keyValue == "ArrowLeft") (skipResultVideoBackward media)

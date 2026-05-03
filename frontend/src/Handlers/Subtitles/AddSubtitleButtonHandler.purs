@@ -38,20 +38,22 @@ setAddSubtitleButtonHandler = genericErrorsHandler $ do
     subtitleTable = view _subtitleTable components
     subtitleRowTemplate = view _subtitleRowTemplate components
     addSubtitleButtonEventTarget = toEventTarget (HB.toElement addSubtitleButton)
-  media <- getMediaElement components
   log "Setting up add subtitle button handler"
-  addSubtitleButtonEvL <- eventListener (addSubtitleButtonEventListener subtitleTable subtitleRowTemplate media)
+  addSubtitleButtonEvL <- eventListener (addSubtitleButtonEventListener subtitleTable subtitleRowTemplate)
   addEventListener E.click addSubtitleButtonEvL false addSubtitleButtonEventTarget
-  log "Add subtitle button handler set up successfully"
+  log "✅ ➕ subtitle button handler set up"
 
-addSubtitleButtonEventListener :: HT.HTMLTableElement -> HTP.HTMLTemplateElement -> HTMLMediaElement -> Event -> Effect Unit
-addSubtitleButtonEventListener subtitleTable subtitleRowTemplate media _ = genericErrorsHandler $ do
-  log "Add subtitle button clicked"
+addSubtitleButtonEventListener :: HT.HTMLTableElement -> HTP.HTMLTemplateElement -> Event -> Effect Unit
+addSubtitleButtonEventListener subtitleTable subtitleRowTemplate _ = genericErrorsHandler $ do
+  log "🏁 ➕ Subtitle Button"
+  components <- loadComponents
+  media <- getMediaElement components
   eitherFirstRow <- try $ getFirstRow subtitleTable
   either
     (const $ addNewRow subtitleTable subtitleRowTemplate)
     (\firstRow -> cloneFirstRow firstRow subtitleTable media)
     eitherFirstRow
+  log "✅ ➕ Subtitle Button"
 
 addNewRow :: HT.HTMLTableElement -> HTP.HTMLTemplateElement -> Effect Unit
 addNewRow subtitleTable subtitleRowTemplate = do
@@ -61,10 +63,11 @@ addNewRow subtitleTable subtitleRowTemplate = do
   clonedRow <- maybe (throwMinsiError (HTMLElementNotFound "subtitleRow")) pure (fromNode clonedRowNode >>= HTR.fromElement)
   appendChild clonedRowNode (HTS.toNode tbody)
   addRemoveSubtitleListenerToRow clonedRow
-  log "Subtitle row added successfully"
+  log "✅ Subtitle row added"
 
 cloneFirstRow :: HTR.HTMLTableRowElement -> HT.HTMLTableElement -> HTMLMediaElement -> Effect Unit
 cloneFirstRow firstRow subtitleTable media = do
+  log "🏁 Subtitle row clone"
   tbody <- getTBody subtitleTable
   clonedRowNode <- deepClone (HTR.toNode firstRow)
   endValueSeconds <- currentTime media
@@ -78,4 +81,4 @@ cloneFirstRow firstRow subtitleTable media = do
   setValue (show newEndValue) clonedRowEndInput
   insertBefore clonedRowNode (HTR.toNode firstRow) (HTS.toNode tbody)
   addRemoveSubtitleListenerToRow clonedRow
-  log "Subtitle row cloned successfully"
+  log "✅ Subtitle row cloned"
