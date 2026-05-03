@@ -88,10 +88,7 @@ localFileEventListener _ = genericErrorsHandler $ do
   components <- loadComponents
   let resultPreview = (unwrap components.htmlOutputs).resultPreview
   maybe (pure unit)
-    ( \_ -> do
-        log "Descroy YT IFrame"
-        destroyIFramePlayer
-    )
+    (const (log "Descroy YT IFrame" *> destroyIFramePlayer))
     (resultPreviewToMaybeIframe resultPreview)
   newComponents <- loadComponents
   let
