@@ -25,6 +25,7 @@ package:
     - ordered-collections
     - partial
     - prelude
+    - profunctor-lenses
     - quickcheck
     - spec
     - spec-discovery
