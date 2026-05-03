@@ -34,7 +34,6 @@ import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLInputElement (setChecked)
 import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLMediaElement (setSrc)
-import Web.HTML.HTMLSpanElement as HSP
 import Web.HTML.HTMLVideoElement as HV
 
 setVideoHandlers :: Effect Unit

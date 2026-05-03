@@ -13,7 +13,7 @@ import Components.HtmlIdAndClasses
   , minsiLogId
   , outputFilenameId
   , playbackPositionResultRowId
-  , playbackPositionResultVideoId
+  , playbackPositionResultMediaId
   , playbackPositionYoutubeId
   , resultPreviewId
   , resultAudioId
@@ -126,7 +126,7 @@ newtype HtmlOutputs = HtmlOutputs
   , minsiLog :: HTMLDivElement
   , minsiLogTitle :: HTMLDivElement
   , playbackPositionYoutube :: HTMLSpanElement
-  , playbackPositionResultVideo :: HTMLSpanElement
+  , playbackPositionResultMedia :: HTMLSpanElement
   , loadingModal :: HTMLDivElement
   , minsiErrorModal :: HTMLDivElement
   , resultVideo :: HTMLVideoElement
@@ -226,7 +226,7 @@ loadHtmlOutputs doc = do
   minsiLog <- loadDiv minsiLogId doc
   minsiLogTitle <- loadDiv minsiLogTitleId doc
   playbackPositionYoutube <- loadSpan playbackPositionYoutubeId doc
-  playbackPositionResultVideo <- loadSpan playbackPositionResultVideoId doc
+  playbackPositionResultMedia <- loadSpan playbackPositionResultMediaId doc
   loadingModal <- loadDiv loadingModalId doc
   minsiErrorModal <- loadDiv minsiErrorModalId doc
   resultVideo <- loadVideo resultVideoId doc
@@ -237,7 +237,7 @@ loadHtmlOutputs doc = do
         , minsiLog: minsiLog
         , minsiLogTitle: minsiLogTitle
         , playbackPositionYoutube: playbackPositionYoutube
-        , playbackPositionResultVideo: playbackPositionResultVideo
+        , playbackPositionResultMedia: playbackPositionResultMedia
         , loadingModal: loadingModal
         , minsiErrorModal: minsiErrorModal
         , resultVideo: resultVideo

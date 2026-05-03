@@ -39,7 +39,7 @@ module Components.HtmlComponents.Lenses
   , _minsiLog
   , _minsiLogTitle
   , _playbackPositionYoutube
-  , _playbackPositionResultVideo
+  , _playbackPositionResultMedia
   , _loadingModal
   , _minsiErrorModal
   , _resultVideo
@@ -127,7 +127,7 @@ _HtmlOutputs
        , minsiLog :: HTMLDivElement
        , minsiLogTitle :: HTMLDivElement
        , playbackPositionYoutube :: HTMLSpanElement
-       , playbackPositionResultVideo :: HTMLSpanElement
+       , playbackPositionResultMedia :: HTMLSpanElement
        , loadingModal :: HTMLDivElement
        , minsiErrorModal :: HTMLDivElement
        , resultVideo :: HTMLVideoElement
@@ -239,8 +239,8 @@ _minsiLogTitle = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "min
 _playbackPositionYoutube :: Lens' HtmlComponents HTMLSpanElement
 _playbackPositionYoutube = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "playbackPositionYoutube")
 
-_playbackPositionResultVideo :: Lens' HtmlComponents HTMLSpanElement
-_playbackPositionResultVideo = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "playbackPositionResultVideo")
+_playbackPositionResultMedia :: Lens' HtmlComponents HTMLSpanElement
+_playbackPositionResultMedia = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "playbackPositionResultMedia")
 
 _loadingModal :: Lens' HtmlComponents HTMLDivElement
 _loadingModal = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "loadingModal")

@@ -60,8 +60,8 @@ minsiLogId = "minsiLog"
 playbackPositionYoutubeId :: String
 playbackPositionYoutubeId = "playbackPositionYoutube"
 
-playbackPositionResultVideoId :: String
-playbackPositionResultVideoId = "playbackPositionResultVideo"
+playbackPositionResultMediaId :: String
+playbackPositionResultMediaId = "playbackPositionResultMedia"
 
 subtitleTableId :: String
 subtitleTableId = "subtitleTable"
