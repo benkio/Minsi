@@ -2,10 +2,13 @@ module Handlers.ResultVideo.MediaSrc where
 
 import Prelude
 
+import Components.HtmlComponents (HtmlComponents)
+import Components.HtmlComponents.Lenses (_resultAudio, _resultVideo, _videoSource)
 import Components.HTMLElement (showElementHideOther)
 import Components.HTMLMediaElement (setMediaSrcAndLoad)
 import Constants (mp4, gif, mp3)
 import Data.DateTime.Instant (unInstant)
+import Data.Lens (view)
 import Data.Time.Duration (Milliseconds(..))
 import Effect (Effect)
 import Effect.Now (now)
@@ -50,7 +53,11 @@ setResultAudioSrcAndVisibility filePathNoCache resultVideo resultAudio = do
   setMediaSrcAndLoad filePathNoCache (HA.toHTMLMediaElement resultAudio)
   showElementHideOther (HA.toElement resultAudio) (HV.toElement resultVideo)
 
-getMediaElement :: HS.HTMLSelectElement -> HTMLVideoElement -> HTMLAudioElement -> Effect HTMLMediaElement
-getMediaElement videoSource resultVideo resultAudio = do
+getMediaElement :: HtmlComponents -> Effect HTMLMediaElement
+getMediaElement components = do
+  let
+    videoSource = view _videoSource components
+    resultVideo = view _resultVideo components
+    resultAudio = view _resultAudio components
   selectedVideoSourceValue <- HS.value videoSource
   pure $ if isVideoSource selectedVideoSourceValue then HV.toHTMLMediaElement resultVideo else HA.toHTMLMediaElement resultAudio

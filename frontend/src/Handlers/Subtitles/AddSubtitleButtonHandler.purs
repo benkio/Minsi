@@ -5,15 +5,16 @@ import Prelude
 import Components.HTMLTableElement (getFirstRow, getStartInput, getTBody)
 import Components.HTMLTableRowElement (getEndInput, setEndInput)
 import Components.HTMLTemplateElement (getRow)
+import Components.HtmlComponents (loadComponents)
+import Components.HtmlComponents.Lenses (_addSubtitleButton, _subtitleRowTemplate, _subtitleTable)
 import Data.Either (either)
+import Data.Lens (view)
 import Data.Maybe (maybe)
 import Effect (Effect)
 import Effect.Console (log)
 import Effect.Exception (try)
-import Components.HtmlComponents (loadComponents)
-import Components.HtmlComponents.Lenses (_addSubtitleButton, _resultVideo, _subtitleRowTemplate, _subtitleTable)
-import Data.Lens (view)
 import Handlers.ErrorHandlers (genericErrorsHandler)
+import Handlers.ResultVideo.MediaSrc (getMediaElement)
 import Handlers.Subtitles.RemoveSubtitleButtonHandler (addRemoveSubtitleListenerToRow)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Web.DOM.Element (fromNode, toEventTarget)
@@ -23,12 +24,11 @@ import Web.Event.Internal.Types (Event)
 import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLInputElement (setValue)
-import Web.HTML.HTMLMediaElement (currentTime)
+import Web.HTML.HTMLMediaElement (HTMLMediaElement, currentTime)
 import Web.HTML.HTMLTableElement as HT
 import Web.HTML.HTMLTableRowElement as HTR
 import Web.HTML.HTMLTableSectionElement as HTS
 import Web.HTML.HTMLTemplateElement as HTP
-import Web.HTML.HTMLVideoElement as HV
 
 setAddSubtitleButtonHandler :: Effect Unit
 setAddSubtitleButtonHandler = genericErrorsHandler $ do
@@ -37,20 +37,20 @@ setAddSubtitleButtonHandler = genericErrorsHandler $ do
     addSubtitleButton = view _addSubtitleButton components
     subtitleTable = view _subtitleTable components
     subtitleRowTemplate = view _subtitleRowTemplate components
-    resultVideo = view _resultVideo components
     addSubtitleButtonEventTarget = toEventTarget (HB.toElement addSubtitleButton)
+  media <- getMediaElement components
   log "Setting up add subtitle button handler"
-  addSubtitleButtonEvL <- eventListener (addSubtitleButtonEventListener subtitleTable subtitleRowTemplate resultVideo)
+  addSubtitleButtonEvL <- eventListener (addSubtitleButtonEventListener subtitleTable subtitleRowTemplate media)
   addEventListener E.click addSubtitleButtonEvL false addSubtitleButtonEventTarget
   log "Add subtitle button handler set up successfully"
 
-addSubtitleButtonEventListener :: HT.HTMLTableElement -> HTP.HTMLTemplateElement -> HV.HTMLVideoElement -> Event -> Effect Unit
-addSubtitleButtonEventListener subtitleTable subtitleRowTemplate resultVideo _ = genericErrorsHandler $ do
+addSubtitleButtonEventListener :: HT.HTMLTableElement -> HTP.HTMLTemplateElement -> HTMLMediaElement -> Event -> Effect Unit
+addSubtitleButtonEventListener subtitleTable subtitleRowTemplate media _ = genericErrorsHandler $ do
   log "Add subtitle button clicked"
   eitherFirstRow <- try $ getFirstRow subtitleTable
   either
     (const $ addNewRow subtitleTable subtitleRowTemplate)
-    (\firstRow -> cloneFirstRow firstRow subtitleTable resultVideo)
+    (\firstRow -> cloneFirstRow firstRow subtitleTable media)
     eitherFirstRow
 
 addNewRow :: HT.HTMLTableElement -> HTP.HTMLTemplateElement -> Effect Unit
@@ -63,11 +63,11 @@ addNewRow subtitleTable subtitleRowTemplate = do
   addRemoveSubtitleListenerToRow clonedRow
   log "Subtitle row added successfully"
 
-cloneFirstRow :: HTR.HTMLTableRowElement -> HT.HTMLTableElement -> HV.HTMLVideoElement -> Effect Unit
-cloneFirstRow firstRow subtitleTable resultVideo = do
+cloneFirstRow :: HTR.HTMLTableRowElement -> HT.HTMLTableElement -> HTMLMediaElement -> Effect Unit
+cloneFirstRow firstRow subtitleTable media = do
   tbody <- getTBody subtitleTable
   clonedRowNode <- deepClone (HTR.toNode firstRow)
-  endValueSeconds <- currentTime (HV.toHTMLMediaElement resultVideo)
+  endValueSeconds <- currentTime media
   let endValue = endValueSeconds * 1000.0
   clonedRow <- maybe (throwMinsiError (HTMLElementNotFound "ClonedRow")) pure (fromNode clonedRowNode >>= HTR.fromElement)
   setEndInput endValue firstRow

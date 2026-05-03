@@ -3,7 +3,7 @@ module Handlers.KeyboardHandler where
 import Prelude
 
 import Components.HtmlComponents (loadComponents)
-import Components.HtmlComponents.Lenses (_keyboardShortcutsButton, _resultVideo, _subtitleRowTemplate, _subtitleTable)
+import Components.HtmlComponents.Lenses (_keyboardShortcutsButton, _subtitleRowTemplate, _subtitleTable)
 import Components.HtmlIdAndClasses (keyboardShortcutsModalId)
 import Components.Modal (showModal)
 import Data.Lens (view)
@@ -11,6 +11,7 @@ import Data.Maybe (maybe, isJust)
 import Effect (Effect)
 import Handlers.ApplyButtonHandler (applyButtonEventListener)
 import Handlers.ErrorHandlers (genericErrorsHandler)
+import Handlers.ResultVideo.MediaSrc (getMediaElement)
 import Handlers.Subtitles.AddSubtitleButtonHandler (addSubtitleButtonEventListener)
 import Handlers.Subtitles.RemoveSubtitleButtonHandler (removeFirstSubtitleRow)
 import Web.DOM.Element (fromEventTarget, toEventTarget)
@@ -22,10 +23,9 @@ import Web.HTML.Event.EventTypes as EClick
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLDocument as HTMLDocument
 import Web.HTML.HTMLInputElement as HI
-import Web.HTML.HTMLMediaElement (currentTime, duration, play, pause, paused, setCurrentTime)
+import Web.HTML.HTMLMediaElement (HTMLMediaElement, currentTime, duration, play, pause, paused, setCurrentTime)
 import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.HTMLTextAreaElement as HTA
-import Web.HTML.HTMLVideoElement (HTMLVideoElement, toHTMLMediaElement)
 import Web.HTML.Window (document)
 import Web.UIEvent.KeyboardEvent (KeyboardEvent, ctrlKey, key, metaKey, fromEvent, toEvent)
 import Web.UIEvent.KeyboardEvent.EventTypes as E
@@ -65,39 +65,36 @@ handleKeyboardEvent keyboardEvent = genericErrorsHandler $ do
   let
     subtitleTable = view _subtitleTable components
     subtitleRow = view _subtitleRowTemplate components
-    resultVideo = view _resultVideo components
     ev = toEvent keyboardEvent
     stop = preventDefault ev
     whenNotEditable cond act = when (cond && not (isTargetEditableElement keyboardEvent)) (act *> stop)
     isCtrl = ctrlKey keyboardEvent
     isMeta = metaKey keyboardEvent
     keyValue = key keyboardEvent
+  media <- getMediaElement components
   when (keyValue == "Enter" && (isCtrl || isMeta)) (applyButtonEventListener ev *> stop)
-  when (keyValue == "+") (addSubtitleButtonEventListener subtitleTable subtitleRow resultVideo (toEvent keyboardEvent) *> stop)
+  when (keyValue == "+") (addSubtitleButtonEventListener subtitleTable subtitleRow media (toEvent keyboardEvent) *> stop)
   when (keyValue == "-") (removeFirstSubtitleRow subtitleTable *> stop)
-  whenNotEditable (keyValue == " ") (toggleResultVideoPlayback resultVideo)
-  whenNotEditable (keyValue == "ArrowLeft") (skipResultVideoBackward resultVideo)
-  whenNotEditable (keyValue == "ArrowRight") (skipResultVideoForward resultVideo)
+  whenNotEditable (keyValue == " ") (toggleResultVideoPlayback media)
+  whenNotEditable (keyValue == "ArrowLeft") (skipResultVideoBackward media)
+  whenNotEditable (keyValue == "ArrowRight") (skipResultVideoForward media)
   whenNotEditable (keyValue == "?") (showModal keyboardShortcutsModalId true *> stop)
 
-toggleResultVideoPlayback :: HTMLVideoElement -> Effect Unit
-toggleResultVideoPlayback video = do
-  let media = toHTMLMediaElement video
+toggleResultVideoPlayback :: HTMLMediaElement -> Effect Unit
+toggleResultVideoPlayback media = do
   isPaused <- paused media
   if isPaused then play media else pause media
 
 skipSeconds :: Number
 skipSeconds = 0.5
 
-skipResultVideoBackward :: HTMLVideoElement -> Effect Unit
-skipResultVideoBackward video = do
-  let media = toHTMLMediaElement video
+skipResultVideoBackward :: HTMLMediaElement -> Effect Unit
+skipResultVideoBackward media = do
   t <- currentTime media
   setCurrentTime (max 0.0 (t - skipSeconds)) media
 
-skipResultVideoForward :: HTMLVideoElement -> Effect Unit
-skipResultVideoForward video = do
-  let media = toHTMLMediaElement video
+skipResultVideoForward :: HTMLMediaElement -> Effect Unit
+skipResultVideoForward media = do
   t <- currentTime media
   d <- duration media
   setCurrentTime (min d (t + skipSeconds)) media
