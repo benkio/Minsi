@@ -11,7 +11,7 @@ import Effect.Timer (setInterval)
 import Handlers.ErrorHandlers (genericErrorsHandler)
 import Handlers.ResultMedia.MediaSrc (getMediaElement)
 import Web.DOM.Node (setTextContent)
-import Web.HTML.HTMLMediaElement (currentTime)
+import Web.HTML.HTMLMediaElement (currentTime, duration)
 import Web.HTML.HTMLSpanElement as HSP
 
 setResultMediaHandlers :: Effect Unit
@@ -25,5 +25,9 @@ updatePlaybackPosition = do
   let
     playbackPositionResultMedia = view _playbackPositionResultMedia components
   media <- getMediaElement components
-  currentTimeValue <- currentTime media
-  setTextContent (formatToMaxSixDigits currentTimeValue) (HSP.toNode playbackPositionResultMedia)
+  currentTime <- currentTime media
+  duration <- duration media
+  let remainingTime = currentTime - duration
+  setTextContent
+    (formatToMaxSixDigits currentTime <> "/" <> formatToMaxSixDigits remainingTime)
+    (HSP.toNode playbackPositionResultMedia)
