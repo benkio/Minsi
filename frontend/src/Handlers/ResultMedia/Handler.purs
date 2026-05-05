@@ -27,7 +27,7 @@ updatePlaybackPosition = do
   media <- getMediaElement components
   currentTime <- currentTime media
   duration <- duration media
-  let remainingTime = currentTime - duration
+  let remainingTime = duration - currentTime
   setTextContent
     (formatToMaxSixDigits currentTime <> "/" <> formatToMaxSixDigits remainingTime)
     (HSP.toNode playbackPositionResultMedia)
