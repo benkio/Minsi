@@ -10,8 +10,8 @@ import Handlers.InputVideo.InputSourceHandler (setInputSourceHandler)
 import Handlers.InputVideo.InputVideoHandler (setVideoHandlers)
 import Handlers.KeyboardHandler (setKeyboardHandlers)
 import Handlers.ResetButtonHandler (setResetButtonHandler)
-import Handlers.ResultVideo.Handler (setResultVideoHandlers)
-import Handlers.ResultVideo.VideoSourceHandler (setVideoSourceHandler)
+import Handlers.ResultMedia.Handler (setResultMediaHandlers)
+import Handlers.ResultMedia.VideoSourceHandler (setVideoSourceHandler)
 import Handlers.Subtitles.AddSubtitleButtonHandler (setAddSubtitleButtonHandler)
 import Handlers.Subtitles.RemoveSubtitleButtonHandler (setRemoveSubtitleButtonHandler)
 import Handlers.Subtitles.SortSubtitlesButtonHandler (setSortSubtitlesButtonHandler)
@@ -23,7 +23,7 @@ setupEventHandlers :: Effect Unit
 setupEventHandlers = do
   setCutRangeHandlers
   setVideoHandlers
-  setResultVideoHandlers
+  setResultMediaHandlers
   setApplyButtonHandler
   setKeyboardHandlers
   setAddSubtitleButtonHandler

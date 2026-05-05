@@ -1,4 +1,4 @@
-module Handlers.ResultVideo.VideoSourceHandler where
+module Handlers.ResultMedia.VideoSourceHandler where
 
 import Components.HtmlComponents (loadComponents)
 import Components.HtmlComponents.Lenses (_resultAudio, _resultVideo, _videoSource)
@@ -7,7 +7,7 @@ import Data.Newtype (unwrap)
 import Data.Tuple (fst)
 import Effect (Effect)
 import Handlers.ErrorHandlers (genericErrorsHandler)
-import Handlers.ResultVideo.MediaSrc (setResultMediaSrc)
+import Handlers.ResultMedia.MediaSrc (setResultMediaSrc)
 import Model.State.StateFromHtml (getCurrentState)
 import Prelude
 import Web.DOM.Element (toEventTarget)

@@ -20,7 +20,7 @@ import Endpoints.Compute (callCompute)
 import Endpoints.StatusPolling (waitForStatus)
 import Endpoints.Upload (callUpload)
 import Handlers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
-import Handlers.ResultVideo.MediaSrc (setResultMediaSrc)
+import Handlers.ResultMedia.MediaSrc (setResultMediaSrc)
 import Handlers.Subtitles.SubtitleMaxValues (setSubtitleTableMaxValues)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.ProcessStatus (ProcessStatus(..))
@@ -29,10 +29,10 @@ import Model.State.StateFromHtml (getCurrentState)
 import Web.DOM.Element (toEventTarget)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
+import Web.File.File (name)
 import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLInputElement as HI
-import Web.File.File (name)
 
 setApplyButtonHandler :: Effect Unit
 setApplyButtonHandler = genericErrorsHandler $ do

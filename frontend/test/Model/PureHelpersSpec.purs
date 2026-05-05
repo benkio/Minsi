@@ -3,7 +3,7 @@ module Test.Model.PureHelpersSpec where
 import Prelude
 
 import Data.Time.Duration (Milliseconds(..))
-import Handlers.ResultVideo.MediaSrc (isVideoSource)
+import Handlers.ResultMedia.MediaSrc (isVideoSource)
 import Handlers.Subtitles.SubtitleMaxValues (durationMillis)
 import Model.State.State (DurationRange(..))
 import Test.Spec (Spec, describe, it)

@@ -11,7 +11,7 @@ import Data.Maybe (maybe, isJust)
 import Effect (Effect)
 import Handlers.ApplyButtonHandler (applyButtonEventListener)
 import Handlers.ErrorHandlers (genericErrorsHandler)
-import Handlers.ResultVideo.MediaSrc (getMediaElement)
+import Handlers.ResultMedia.MediaSrc (getMediaElement)
 import Handlers.Subtitles.AddSubtitleButtonHandler (addSubtitleButtonEventListener)
 import Handlers.Subtitles.RemoveSubtitleButtonHandler (removeFirstSubtitleRow)
 import Web.DOM.Element (fromEventTarget, toEventTarget)
@@ -75,26 +75,26 @@ handleKeyboardEvent keyboardEvent = genericErrorsHandler $ do
   when (keyValue == "Enter" && (isCtrl || isMeta)) (applyButtonEventListener ev *> stop)
   when (keyValue == "+") (addSubtitleButtonEventListener subtitleTable subtitleRow (toEvent keyboardEvent) *> stop)
   when (keyValue == "-") (removeFirstSubtitleRow subtitleTable *> stop)
-  whenNotEditable (keyValue == " ") (toggleResultVideoPlayback media)
-  whenNotEditable (keyValue == "ArrowLeft") (skipResultVideoBackward media)
-  whenNotEditable (keyValue == "ArrowRight") (skipResultVideoForward media)
+  whenNotEditable (keyValue == " ") (toggleResultMediaPlayback media)
+  whenNotEditable (keyValue == "ArrowLeft") (skipResultMediaBackward media)
+  whenNotEditable (keyValue == "ArrowRight") (skipResultMediaForward media)
   whenNotEditable (keyValue == "?") (showModal keyboardShortcutsModalId true *> stop)
 
-toggleResultVideoPlayback :: HTMLMediaElement -> Effect Unit
-toggleResultVideoPlayback media = do
+toggleResultMediaPlayback :: HTMLMediaElement -> Effect Unit
+toggleResultMediaPlayback media = do
   isPaused <- paused media
   if isPaused then play media else pause media
 
 skipSeconds :: Number
 skipSeconds = 0.5
 
-skipResultVideoBackward :: HTMLMediaElement -> Effect Unit
-skipResultVideoBackward media = do
+skipResultMediaBackward :: HTMLMediaElement -> Effect Unit
+skipResultMediaBackward media = do
   t <- currentTime media
   setCurrentTime (max 0.0 (t - skipSeconds)) media
 
-skipResultVideoForward :: HTMLMediaElement -> Effect Unit
-skipResultVideoForward media = do
+skipResultMediaForward :: HTMLMediaElement -> Effect Unit
+skipResultMediaForward media = do
   t <- currentTime media
   d <- duration media
   setCurrentTime (min d (t + skipSeconds)) media
