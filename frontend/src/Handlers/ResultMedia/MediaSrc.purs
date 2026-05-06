@@ -1,4 +1,4 @@
-module Handlers.ResultVideo.MediaSrc where
+module Handlers.ResultMedia.MediaSrc where
 
 import Prelude
 
@@ -40,11 +40,11 @@ setResultMediaSrc filename videoSource resultVideo resultAudio = do
   let filePathNoCache = path <> "?t=" <> show m
   Element.removeAttribute "src" (HV.toElement resultVideo)
   Element.removeAttribute "src" (HA.toElement resultAudio)
-  if isVideoSource selectedVideoSourceValue then setResultVideoSrcAndVisibility filePathNoCache resultVideo resultAudio
+  if isVideoSource selectedVideoSourceValue then setResultMediaSrcAndVisibility filePathNoCache resultVideo resultAudio
   else setResultAudioSrcAndVisibility filePathNoCache resultVideo resultAudio
 
-setResultVideoSrcAndVisibility :: String -> HTMLVideoElement -> HTMLAudioElement -> Effect Unit
-setResultVideoSrcAndVisibility filePathNoCache resultVideo resultAudio = do
+setResultMediaSrcAndVisibility :: String -> HTMLVideoElement -> HTMLAudioElement -> Effect Unit
+setResultMediaSrcAndVisibility filePathNoCache resultVideo resultAudio = do
   setMediaSrcAndLoad filePathNoCache (HV.toHTMLMediaElement resultVideo)
   pause (HA.toHTMLMediaElement resultAudio)
   showElementHideOther (HV.toElement resultVideo) (HA.toElement resultAudio)

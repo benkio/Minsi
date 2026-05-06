@@ -1,4 +1,4 @@
-module Handlers.ResultVideo.Handler where
+module Handlers.ResultMedia.Handler where
 
 import Prelude
 
@@ -9,13 +9,13 @@ import Data.Lens (view)
 import Effect (Effect)
 import Effect.Timer (setInterval)
 import Handlers.ErrorHandlers (genericErrorsHandler)
-import Handlers.ResultVideo.MediaSrc (getMediaElement)
+import Handlers.ResultMedia.MediaSrc (getMediaElement)
 import Web.DOM.Node (setTextContent)
-import Web.HTML.HTMLMediaElement (currentTime)
+import Web.HTML.HTMLMediaElement (currentTime, duration)
 import Web.HTML.HTMLSpanElement as HSP
 
-setResultVideoHandlers :: Effect Unit
-setResultVideoHandlers = genericErrorsHandler $ do
+setResultMediaHandlers :: Effect Unit
+setResultMediaHandlers = genericErrorsHandler $ do
   _ <- setInterval 1000 updatePlaybackPosition
   pure unit
 
@@ -25,5 +25,9 @@ updatePlaybackPosition = do
   let
     playbackPositionResultMedia = view _playbackPositionResultMedia components
   media <- getMediaElement components
-  currentTimeValue <- currentTime media
-  setTextContent (formatToMaxSixDigits currentTimeValue) (HSP.toNode playbackPositionResultMedia)
+  currentTime <- currentTime media
+  duration <- duration media
+  let remainingTime = duration - currentTime
+  setTextContent
+    (formatToMaxSixDigits currentTime <> "/" <> formatToMaxSixDigits remainingTime)
+    (HSP.toNode playbackPositionResultMedia)
