@@ -4,7 +4,6 @@ import Prelude
 
 import Components.HtmlIdAndClasses (loadingModalId)
 import Components.Modal (hideModal, showModal)
-import Data.Newtype (unwrap)
 import Data.Either (Either(..))
 import Data.Tuple (fst)
 import Effect (Effect)
@@ -15,6 +14,7 @@ import Components.HtmlComponents (loadComponents)
 import Components.HtmlComponents.Lenses (_downloadFullButton)
 import Data.Lens (view)
 import Handlers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
+import Model.State.Lenses (_source)
 import Model.State.StateFromHtml (getCurrentState)
 import Web.DOM.Element (toEventTarget)
 import Web.Event.EventTarget (addEventListener, eventListener)
@@ -32,7 +32,7 @@ setDownloadFullButtonHandler = do
 downloadFullButtonEventListener :: Event -> Effect Unit
 downloadFullButtonEventListener _ = genericErrorsHandler $ do
   stateTuple <- getCurrentState
-  let source = (unwrap (fst stateTuple)).source
+  let source = view _source (fst stateTuple)
   showModal loadingModalId true
   runAff_
     ( \result -> do

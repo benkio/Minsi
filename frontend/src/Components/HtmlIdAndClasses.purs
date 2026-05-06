@@ -54,6 +54,9 @@ downloadAllButtonId = "downloadAllButton"
 copyTranscriptButtonId :: String
 copyTranscriptButtonId = "copyTranscriptButton"
 
+exportStateButtonId :: String
+exportStateButtonId = "exportStateButton"
+
 minsiLogId :: String
 minsiLogId = "minsiLog"
 
@@ -80,6 +83,18 @@ minsiErrorModalId = "minsiErrorModal"
 
 minsiErrorModalContentId :: String
 minsiErrorModalContentId = "minsiErrorModalContent"
+
+genericModalId :: String
+genericModalId = "genericModal"
+
+genericModalTitleId :: String
+genericModalTitleId = "genericModalTitle"
+
+genericModalContentId :: String
+genericModalContentId = "genericModalContent"
+
+genericModalContentCopyClipboardButtonId :: String
+genericModalContentCopyClipboardButtonId = "genericModalContentCopyClipboardButton"
 
 resultVideoId :: String
 resultVideoId = "resultVideo"

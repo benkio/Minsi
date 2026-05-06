@@ -3,12 +3,11 @@ module Handlers.InputVideo.InputVideoHandler where
 import Prelude
 
 import Components.HtmlComponents (loadComponents, resultPreviewToMaybeIframe, resultPreviewToMaybeVideo)
-import Components.HtmlComponents.Lenses (_localFile, _playbackPositionYoutube, _setCutEndButton, _setCutStartButton, _youtubeUrl)
+import Components.HtmlComponents.Lenses (_localFile, _playbackPositionYoutube, _resultPreview, _setCutEndButton, _setCutStartButton, _uploadLocalFile, _youtubeUrl)
 import Data.Lens (view)
 import Components.HtmlIdAndClasses (resultPreviewId, youtubeUrlId)
 import Data.Foldable (foldl)
 import Data.Maybe (Maybe, maybe)
-import Data.Newtype (unwrap)
 import Data.Traversable (traverse)
 import Data.Validation.Semigroup (invalid)
 import Effect (Effect)
@@ -86,15 +85,15 @@ getInputValue ev =
 localFileEventListener :: Event -> Effect Unit
 localFileEventListener _ = genericErrorsHandler $ do
   components <- loadComponents
-  let resultPreview = (unwrap components.htmlOutputs).resultPreview
+  let resultPreview = view _resultPreview components
   maybe (pure unit)
     (const (log "Descroy YT IFrame" *> destroyIFramePlayer))
     (resultPreviewToMaybeIframe resultPreview)
   newComponents <- loadComponents
   let
-    newResultPreview = (unwrap newComponents.htmlOutputs).resultPreview
-    localFileInput = (unwrap newComponents.htmlInputs).localFile
-    uploadLocalFileInput = (unwrap newComponents.htmlInputs).uploadLocalFile
+    newResultPreview = view _resultPreview newComponents
+    localFileInput = view _localFile newComponents
+    uploadLocalFileInput = view _uploadLocalFile newComponents
   maybe (throwMinsiError (HTMLElementNotFound "resultPreviewId"))
     ( \video -> do
         fileListMaybe <- HI.files localFileInput

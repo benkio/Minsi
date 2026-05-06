@@ -3,11 +3,11 @@ module Handlers.ResultMedia.VideoSourceHandler where
 import Components.HtmlComponents (loadComponents)
 import Components.HtmlComponents.Lenses (_resultAudio, _resultVideo, _videoSource)
 import Data.Lens (view)
-import Data.Newtype (unwrap)
 import Data.Tuple (fst)
 import Effect (Effect)
 import Handlers.ErrorHandlers (genericErrorsHandler)
 import Handlers.ResultMedia.MediaSrc (setResultMediaSrc)
+import Model.State.Lenses (_filename)
 import Model.State.StateFromHtml (getCurrentState)
 import Prelude
 import Web.DOM.Element (toEventTarget)
@@ -32,5 +32,5 @@ setVideoSourceHandler = genericErrorsHandler $ do
 videoSourceEventListener :: HS.HTMLSelectElement -> HTMLVideoElement -> HTMLAudioElement -> Event -> Effect Unit
 videoSourceEventListener videoSource resultVideo resultAudio _ = genericErrorsHandler $ do
   stateTuple <- getCurrentState
-  let filename = (unwrap (fst stateTuple)).filename
+  let filename = view _filename (fst stateTuple)
   setResultMediaSrc filename videoSource resultVideo resultAudio

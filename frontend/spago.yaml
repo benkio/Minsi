@@ -16,6 +16,7 @@ package:
     - functions
     - integers
     - js-fetch
+    - js-promise-aff
     - js-timers
     - maybe
     - monad-loops
@@ -35,6 +36,7 @@ package:
     - tuples
     - url-immutable
     - validation
+    - web-clipboard
     - web-dom
     - web-events
     - web-file

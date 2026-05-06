@@ -1,6 +1,5 @@
 module Handlers.DownloadAllButtonHandler where
 
-import Data.Newtype (unwrap)
 import Data.Tuple (fst)
 import Effect (Effect)
 import Effect.Aff (Aff, runAff_)
@@ -10,6 +9,7 @@ import Components.HtmlComponents (loadComponents)
 import Components.HtmlComponents.Lenses (_downloadAllButton)
 import Data.Lens (view)
 import Handlers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
+import Model.State.Lenses (_filename)
 import Model.State.StateFromHtml (getCurrentState)
 import Prelude
 import Web.DOM.Element (toEventTarget)
@@ -28,7 +28,7 @@ setDownloadAllButtonHandler = genericErrorsHandler $ do
 downloadAllButtonEventListener :: Event -> Effect Unit
 downloadAllButtonEventListener _ = do
   stateComponents <- getCurrentState
-  let filename = (unwrap (fst stateComponents)).filename
+  let filename = view _filename (fst stateComponents)
   runAff_ genericErrorsHandlerEither (downloadAll filename)
 
 downloadAll :: String -> Aff Unit

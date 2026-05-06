@@ -21,6 +21,7 @@ data MinsiError
   | JSONParsingError String
   | ErrorResponse Int
   | ComputeFailed String
+  | ClipboardUnavailable String
 
 instance Show MinsiError where
   show = case _ of
@@ -45,6 +46,7 @@ instance Show MinsiError where
     JSONParsingError err -> "Error while parsing: " <> err
     ErrorResponse status -> "Got a Response with status ≠ 200: " <> show status
     ComputeFailed msg -> "Compute failed: " <> msg
+    ClipboardUnavailable msg -> "Clipboard: " <> msg
 
 throwMinsiError :: forall a. MinsiError -> Effect a
 throwMinsiError =
@@ -58,11 +60,13 @@ minsiErrorName (InvalidInputs _) = "InvalidInputs"
 minsiErrorName (JSONParsingError _) = "JSONParsingError"
 minsiErrorName (ErrorResponse _) = "ErrorResponse"
 minsiErrorName (ComputeFailed _) = "ComputeFailed"
+minsiErrorName (ClipboardUnavailable _) = "ClipboardUnavailable"
 minsiErrorName (OutOfDateError _ _) = "OutOfDateError"
 
 getErrorSeverity :: Error -> ErrorSeverity
 getErrorSeverity e = case name e of
   "HTMLElementNotFound" -> Critical
+  "ClipboardUnavailable" -> Critical
   "MissingDependenciesError" -> Fatal
   "OutOfDateError" -> Fatal
   "InvalidInput" -> Standard
