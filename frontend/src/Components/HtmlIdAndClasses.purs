@@ -84,6 +84,15 @@ minsiErrorModalId = "minsiErrorModal"
 minsiErrorModalContentId :: String
 minsiErrorModalContentId = "minsiErrorModalContent"
 
+genericModalId :: String
+genericModalId = "genericModal"
+
+genericModalTitleId :: String
+genericModalTitleId = "genericModalTitle"
+
+genericModalContentId :: String
+genericModalContentId = "genericModalContent"
+
 resultVideoId :: String
 resultVideoId = "resultVideo"
 

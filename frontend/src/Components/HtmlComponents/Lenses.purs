@@ -43,6 +43,7 @@ module Components.HtmlComponents.Lenses
   , _playbackPositionResultMedia
   , _loadingModal
   , _minsiErrorModal
+  , _genericModal
   , _resultVideo
   , _resultAudio
   -- HtmlComponents → HtmlVisualElements fields
@@ -58,7 +59,7 @@ module Components.HtmlComponents.Lenses
 
 import Prelude
 
-import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), HtmlOutputs(..), HtmlVisualElements(..), ResultPreview(..))
+import Components.HtmlComponents (GenericModal, HtmlComponents, HtmlInputs(..), HtmlOutputs(..), HtmlVisualElements(..), ResultPreview(..))
 import Data.Lens (Lens')
 import Data.Lens.Iso (Iso', iso)
 import Data.Lens.Iso.Newtype (unto)
@@ -132,6 +133,7 @@ _HtmlOutputs
        , playbackPositionResultMedia :: HTMLSpanElement
        , loadingModal :: HTMLDivElement
        , minsiErrorModal :: HTMLDivElement
+       , genericModal :: GenericModal
        , resultVideo :: HTMLVideoElement
        , resultAudio :: HTMLAudioElement
        }
@@ -252,6 +254,9 @@ _loadingModal = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "load
 
 _minsiErrorModal :: Lens' HtmlComponents HTMLDivElement
 _minsiErrorModal = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "minsiErrorModal")
+
+_genericModal :: Lens' HtmlComponents GenericModal
+_genericModal = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "genericModal")
 
 _resultVideo :: Lens' HtmlComponents HTMLVideoElement
 _resultVideo = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "resultVideo")

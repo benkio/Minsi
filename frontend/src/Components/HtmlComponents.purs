@@ -10,6 +10,9 @@ import Components.HtmlIdAndClasses
   , subtitleOffsetId
   , loadingModalId
   , minsiErrorModalId
+  , genericModalContentId
+  , genericModalId
+  , genericModalTitleId
   , minsiLogId
   , outputFilenameId
   , playbackPositionResultRowId
@@ -59,6 +62,8 @@ import Web.HTML.HTMLButtonElement (HTMLButtonElement)
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLDivElement (HTMLDivElement)
 import Web.HTML.HTMLDivElement as HD
+import Web.HTML.HTMLHeadingElement (HTMLHeadingElement)
+import Web.HTML.HTMLHeadingElement as HH
 import Web.HTML.HTMLIFrameElement (HTMLIFrameElement)
 import Web.HTML.HTMLIFrameElement as IF
 import Web.HTML.HTMLInputElement (HTMLInputElement)
@@ -73,6 +78,8 @@ import Web.HTML.HTMLTemplateElement (HTMLTemplateElement)
 import Web.HTML.HTMLTemplateElement as HTP
 import Web.HTML.HTMLVideoElement (HTMLVideoElement)
 import Web.HTML.HTMLVideoElement as HV
+import Web.HTML.HTMLPreElement (HTMLPreElement)
+import Web.HTML.HTMLPreElement as HP
 
 newtype HtmlInputs = HtmlInputs
   { cutStart :: HTMLInputElement
@@ -123,6 +130,14 @@ resultPreviewToMaybeVideo = case _ of
   ResultPreviewVideo video -> Just video
   ResultPreviewIframe _ -> Nothing
 
+newtype GenericModal = GenericModal
+  { modal :: HTMLDivElement
+  , title :: HTMLHeadingElement
+  , content :: HTMLPreElement
+  }
+
+derive instance Newtype GenericModal _
+
 newtype HtmlOutputs = HtmlOutputs
   { resultPreview :: ResultPreview
   , minsiLog :: HTMLDivElement
@@ -131,6 +146,7 @@ newtype HtmlOutputs = HtmlOutputs
   , playbackPositionResultMedia :: HTMLSpanElement
   , loadingModal :: HTMLDivElement
   , minsiErrorModal :: HTMLDivElement
+  , genericModal :: GenericModal
   , resultVideo :: HTMLVideoElement
   , resultAudio :: HTMLAudioElement
   }
@@ -233,6 +249,7 @@ loadHtmlOutputs doc = do
   playbackPositionResultMedia <- loadSpan playbackPositionResultMediaId doc
   loadingModal <- loadDiv loadingModalId doc
   minsiErrorModal <- loadDiv minsiErrorModalId doc
+  genericModal <- loadGenericModal doc
   resultVideo <- loadVideo resultVideoId doc
   resultAudio <- loadAudio resultAudioId doc
   pure
@@ -244,6 +261,7 @@ loadHtmlOutputs doc = do
         , playbackPositionResultMedia: playbackPositionResultMedia
         , loadingModal: loadingModal
         , minsiErrorModal: minsiErrorModal
+        , genericModal: genericModal
         , resultVideo: resultVideo
         , resultAudio: resultAudio
         }
@@ -282,6 +300,19 @@ loadCutRange doc = do
 
 loadDiv :: String -> NonElementParentNode -> Effect HTMLDivElement
 loadDiv id = loadHtmlElementId id HD.fromElement
+
+loadGenericModal :: NonElementParentNode -> Effect GenericModal
+loadGenericModal doc = do
+  modal <- loadDiv genericModalId doc
+  title <- loadHeading genericModalTitleId doc
+  content <- loadPre genericModalContentId doc
+  pure (GenericModal { modal, title, content })
+
+loadHeading :: String -> NonElementParentNode -> Effect HTMLHeadingElement
+loadHeading id = loadHtmlElementId id HH.fromElement
+
+loadPre :: String -> NonElementParentNode -> Effect HTMLPreElement
+loadPre id = loadHtmlElementId id HP.fromElement
 
 loadSelect :: String -> NonElementParentNode -> Effect HTMLSelectElement
 loadSelect id = loadHtmlElementId id HS.fromElement
