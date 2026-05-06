@@ -2,6 +2,7 @@ module Handlers.ExportStateButtonHandler where
 
 import Prelude
 
+import Handlers.ErrorHandlers (genericErrorsHandler)
 import Components.HtmlComponents (loadComponents)
 import Components.HtmlComponents.Lenses (_exportStateButton, _genericModalContent)
 import Components.HtmlIdAndClasses (genericModalId)
@@ -27,7 +28,7 @@ setExportStateButtonHandler = do
   addEventListener E.click evL false (toEventTarget (HB.toElement exportStateButton))
 
 exportStateButtonEventListener :: Event -> Effect Unit
-exportStateButtonEventListener _ = do
+exportStateButtonEventListener _ = genericErrorsHandler $ do
   stateTuple <- getCurrentState
   let
     stateJson = writeJSON (fst stateTuple)
