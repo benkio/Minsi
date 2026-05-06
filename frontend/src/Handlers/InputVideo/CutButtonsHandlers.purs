@@ -3,9 +3,10 @@ module Handlers.InputVideo.CutButtonsHandlers where
 import Prelude
 
 import Components.HtmlComponents (loadComponents)
+import Components.HtmlComponents.Lenses (_cutEnd, _cutStart)
+import Data.Lens (view)
 import Control.Monad.Loops (whileM_)
 import Data.Int (floor, toNumber)
-import Data.Newtype (unwrap)
 import Data.Time.Duration (Milliseconds(..))
 import Effect (Effect)
 import Effect.Aff (delay, launchAff_)
@@ -18,7 +19,7 @@ import Web.HTML.HTMLInputElement as HI
 setCutStartInputButtonEvL :: Event -> Effect Unit
 setCutStartInputButtonEvL _ = genericErrorsHandler $ do
   components <- loadComponents
-  let cutStart = (unwrap components.htmlInputs).cutStart
+  let cutStart = view _cutStart components
   currentTimeSeconds <- getPlayerCurrentTime
   let currentTimeMs = currentTimeSeconds * 1000.0
   HI.setValue (show (floor currentTimeMs)) cutStart
@@ -26,7 +27,7 @@ setCutStartInputButtonEvL _ = genericErrorsHandler $ do
 setCutEndInputButtonEvL :: Event -> Effect Unit
 setCutEndInputButtonEvL _ = genericErrorsHandler $ do
   components <- loadComponents
-  let cutEnd = (unwrap components.htmlInputs).cutEnd
+  let cutEnd = view _cutEnd components
   currentTimeSeconds <- getPlayerCurrentTime
   let currentTimeMs = currentTimeSeconds * 1000.0
   HI.setValue (show (floor currentTimeMs)) cutEnd
@@ -40,8 +41,8 @@ initializeCutInputs startTime = launchAff_ $ do
   where
   setCutInputValues components durationSeconds = do
     let
-      cutStart = (unwrap components.htmlInputs).cutStart
-      cutEnd = (unwrap components.htmlInputs).cutEnd
+      cutStart = view _cutStart components
+      cutEnd = view _cutEnd components
       durationMs = durationSeconds * 1000.0
       startTimeMs = toNumber startTime * 1000.0
     HI.setMax (show (floor durationMs)) cutStart

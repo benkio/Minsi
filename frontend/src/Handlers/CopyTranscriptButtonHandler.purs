@@ -4,7 +4,6 @@ import Prelude
 
 import Conversion.String (capitalizeFirst)
 import Data.Array (sort)
-import Data.Newtype (unwrap)
 import Data.String (joinWith)
 import Data.String.Common (toLower, trim)
 import Data.Tuple (fst)
@@ -13,6 +12,7 @@ import Model.State.State (Subtitle(..))
 import Components.HtmlComponents (loadComponents)
 import Components.HtmlComponents.Lenses (_copyTranscriptButton)
 import Data.Lens (view)
+import Model.State.Lenses (_subtitles)
 import Model.State.StateFromHtml (getCurrentState)
 import Web.DOM.Element (toEventTarget)
 import Web.Event.EventTarget (addEventListener, eventListener)
@@ -33,7 +33,7 @@ copyTranscriptButtonEventListener :: Event -> Effect Unit
 copyTranscriptButtonEventListener _ = do
   state <- getCurrentState
   let
-    subtitles = (unwrap (fst state)).subtitles
+    subtitles = view _subtitles (fst state)
     transcript = capitalizeFirst <<< joinWith " " $ (\(Subtitle { value }) -> (toLower <<< trim) value) <$> sort subtitles
   w <- window
   void $ promptDefault "Copy to clipboard: Ctrl+C, Enter" transcript w

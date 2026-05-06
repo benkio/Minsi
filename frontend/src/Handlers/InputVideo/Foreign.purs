@@ -1,9 +1,10 @@
 module Handlers.InputVideo.Foreign where
 
 import Components.HtmlComponents (loadComponents, resultPreviewToMaybeVideo)
+import Components.HtmlComponents.Lenses (_resultPreview)
 import Components.HTMLVideoElement (getVideoTagCurrentTime, getVideoTagDuration, isVideoTagReady)
+import Data.Lens (view)
 import Data.Maybe (maybe)
-import Data.Newtype (unwrap)
 import Effect (Effect)
 import Prelude
 
@@ -24,17 +25,17 @@ foreign import isIFramePlayerReady :: Effect Boolean
 getPlayerCurrentTime :: Effect Number
 getPlayerCurrentTime = do
   components <- loadComponents
-  let resultPreview = (unwrap components.htmlOutputs).resultPreview
+  let resultPreview = view _resultPreview components
   maybe getIFramePlayerCurrentTime getVideoTagCurrentTime (resultPreviewToMaybeVideo resultPreview)
 
 getVideoDuration :: Effect Number
 getVideoDuration = do
   components <- loadComponents
-  let resultPreview = (unwrap components.htmlOutputs).resultPreview
+  let resultPreview = view _resultPreview components
   maybe getIFrameVideoDuration getVideoTagDuration (resultPreviewToMaybeVideo resultPreview)
 
 isPlayerReady :: Effect Boolean
 isPlayerReady = do
   components <- loadComponents
-  let resultPreview = (unwrap components.htmlOutputs).resultPreview
+  let resultPreview = view _resultPreview components
   maybe isIFramePlayerReady isVideoTagReady (resultPreviewToMaybeVideo resultPreview)
