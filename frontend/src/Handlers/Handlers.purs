@@ -4,6 +4,7 @@ import Effect (Effect)
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CopyTranscriptButtonHandler (setCopyTranscriptButtonHandler)
 import Handlers.ExportStateButtonHandler (setExportStateButtonHandler)
+import Handlers.GenericModalCopyClipboardButtonHandler (setGenericModalCopyClipboardButtonHandler)
 import Handlers.CutRangeHandler (setCutRangeHandlers)
 import Handlers.DownloadAllButtonHandler (setDownloadAllButtonHandler)
 import Handlers.DownloadFullButtonHandler (setDownloadFullButtonHandler)
@@ -36,6 +37,7 @@ setupEventHandlers = do
   setDownloadFullButtonHandler
   setDownloadAllButtonHandler
   setCopyTranscriptButtonHandler
+  setGenericModalCopyClipboardButtonHandler
   setExportStateButtonHandler
   setResetButtonHandler
   setTextInputValidationHandlers

@@ -6,6 +6,7 @@ module Components.HtmlComponents.Lenses
   -- Newtype unwrapping (compose with prop for inner fields)
   , _HtmlInputs
   , _HtmlOutputs
+  , _GenericModal
   , _HtmlVisualElementsFields
   -- HtmlComponents → HtmlInputs fields
   , _cutStart
@@ -44,6 +45,8 @@ module Components.HtmlComponents.Lenses
   , _loadingModal
   , _minsiErrorModal
   , _genericModal
+  , _genericModalContent
+  , _genericModalContentCopyClipboardButton
   , _resultVideo
   , _resultAudio
   -- HtmlComponents → HtmlVisualElements fields
@@ -59,7 +62,7 @@ module Components.HtmlComponents.Lenses
 
 import Prelude
 
-import Components.HtmlComponents (GenericModal, HtmlComponents, HtmlInputs(..), HtmlOutputs(..), HtmlVisualElements(..), ResultPreview(..))
+import Components.HtmlComponents (GenericModal(..), HtmlComponents, HtmlInputs(..), HtmlOutputs(..), HtmlVisualElements(..), ResultPreview(..))
 import Data.Lens (Lens')
 import Data.Lens.Iso (Iso', iso)
 import Data.Lens.Iso.Newtype (unto)
@@ -71,8 +74,10 @@ import Web.DOM.HTMLCollection (HTMLCollection)
 import Web.HTML.HTMLAudioElement (HTMLAudioElement)
 import Web.HTML.HTMLButtonElement (HTMLButtonElement)
 import Web.HTML.HTMLDivElement (HTMLDivElement)
+import Web.HTML.HTMLHeadingElement (HTMLHeadingElement)
 import Web.HTML.HTMLIFrameElement (HTMLIFrameElement)
 import Web.HTML.HTMLInputElement (HTMLInputElement)
+import Web.HTML.HTMLPreElement (HTMLPreElement)
 import Web.HTML.HTMLSelectElement (HTMLSelectElement)
 import Web.HTML.HTMLSpanElement (HTMLSpanElement)
 import Web.HTML.HTMLTableElement (HTMLTableElement)
@@ -138,6 +143,15 @@ _HtmlOutputs
        , resultAudio :: HTMLAudioElement
        }
 _HtmlOutputs = unto HtmlOutputs
+
+_GenericModal
+  :: Iso' GenericModal
+       { modal :: HTMLDivElement
+       , title :: HTMLHeadingElement
+       , content :: HTMLPreElement
+       , contentCopyClipboardButton :: HTMLButtonElement
+       }
+_GenericModal = unto GenericModal
 
 _HtmlVisualElementsFields
   :: Iso' HtmlVisualElements
@@ -257,6 +271,13 @@ _minsiErrorModal = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "m
 
 _genericModal :: Lens' HtmlComponents GenericModal
 _genericModal = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "genericModal")
+
+_genericModalContent :: Lens' HtmlComponents HTMLPreElement
+_genericModalContent = _genericModal <<< _GenericModal <<< prop (Proxy :: Proxy "content")
+
+_genericModalContentCopyClipboardButton :: Lens' HtmlComponents HTMLButtonElement
+_genericModalContentCopyClipboardButton =
+  _genericModal <<< _GenericModal <<< prop (Proxy :: Proxy "contentCopyClipboardButton")
 
 _resultVideo :: Lens' HtmlComponents HTMLVideoElement
 _resultVideo = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "resultVideo")
