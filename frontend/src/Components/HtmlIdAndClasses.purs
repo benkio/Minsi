@@ -93,6 +93,9 @@ genericModalTitleId = "genericModalTitle"
 genericModalContentId :: String
 genericModalContentId = "genericModalContent"
 
+genericModalContentCopyClipboardButtonId :: String
+genericModalContentCopyClipboardButtonId = "genericModalContentCopyClipboardButton"
+
 resultVideoId :: String
 resultVideoId = "resultVideo"
 

@@ -10,6 +10,7 @@ import Components.HtmlIdAndClasses
   , subtitleOffsetId
   , loadingModalId
   , minsiErrorModalId
+  , genericModalContentCopyClipboardButtonId
   , genericModalContentId
   , genericModalId
   , genericModalTitleId
@@ -134,6 +135,7 @@ newtype GenericModal = GenericModal
   { modal :: HTMLDivElement
   , title :: HTMLHeadingElement
   , content :: HTMLPreElement
+  , contentCopyClipboardButton :: HTMLButtonElement
   }
 
 derive instance Newtype GenericModal _
@@ -306,7 +308,8 @@ loadGenericModal doc = do
   modal <- loadDiv genericModalId doc
   title <- loadHeading genericModalTitleId doc
   content <- loadPre genericModalContentId doc
-  pure (GenericModal { modal, title, content })
+  contentCopyClipboardButton <- loadButton genericModalContentCopyClipboardButtonId doc
+  pure (GenericModal { modal, title, content, contentCopyClipboardButton })
 
 loadHeading :: String -> NonElementParentNode -> Effect HTMLHeadingElement
 loadHeading id = loadHtmlElementId id HH.fromElement
