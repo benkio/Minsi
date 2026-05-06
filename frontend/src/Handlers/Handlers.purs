@@ -3,6 +3,7 @@ module Handlers.Handlers where
 import Effect (Effect)
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.CopyTranscriptButtonHandler (setCopyTranscriptButtonHandler)
+import Handlers.ExportStateButtonHandler (setExportStateButtonHandler)
 import Handlers.CutRangeHandler (setCutRangeHandlers)
 import Handlers.DownloadAllButtonHandler (setDownloadAllButtonHandler)
 import Handlers.DownloadFullButtonHandler (setDownloadFullButtonHandler)
@@ -35,5 +36,6 @@ setupEventHandlers = do
   setDownloadFullButtonHandler
   setDownloadAllButtonHandler
   setCopyTranscriptButtonHandler
+  setExportStateButtonHandler
   setResetButtonHandler
   setTextInputValidationHandlers

@@ -24,6 +24,7 @@ module Components.HtmlComponents.Lenses
   , _inputSource
   , _downloadAllButton
   , _copyTranscriptButton
+  , _exportStateButton
   , _setCutEndButton
   , _setCutStartButton
   , _subtitleTable
@@ -108,6 +109,7 @@ _HtmlInputs
        , inputSource :: HTMLSelectElement
        , downloadAllButton :: HTMLButtonElement
        , copyTranscriptButton :: HTMLButtonElement
+       , exportStateButton :: HTMLButtonElement
        , setCutEndButton :: HTMLButtonElement
        , setCutStartButton :: HTMLButtonElement
        , subtitleTable :: HTMLTableElement
@@ -194,6 +196,9 @@ _downloadAllButton = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "d
 
 _copyTranscriptButton :: Lens' HtmlComponents HTMLButtonElement
 _copyTranscriptButton = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "copyTranscriptButton")
+
+_exportStateButton :: Lens' HtmlComponents HTMLButtonElement
+_exportStateButton = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "exportStateButton")
 
 _setCutEndButton :: Lens' HtmlComponents HTMLButtonElement
 _setCutEndButton = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "setCutEndButton")
