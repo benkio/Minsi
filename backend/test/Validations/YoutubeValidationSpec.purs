@@ -24,6 +24,8 @@ spec = do
       case toEither regexResult of
         Right regex -> do
           test regex "https://www.youtube.com/watch?v=dQw4w9WgXcQ" `shouldEqual` true
+          test regex "https://youtube.com/shorts/_JryLY7pXLQ" `shouldEqual` true
+          test regex "https://www.youtube.com/shorts/C8p4SOnSXeQ?t=30" `shouldEqual` true
           test regex "https://youtu.be/dQw4w9WgXcQ" `shouldEqual` true
           test regex "not a youtube url" `shouldEqual` false
         Left _ -> pure unit
@@ -56,3 +58,7 @@ spec = do
       isValid (youtubeUrlValidation "testId" "https://www.youtube.com/") `shouldEqual` false
       isValid (youtubeUrlValidation "testId" "http://www.youtube.com") `shouldEqual` false
       isValid (youtubeUrlValidation "testId" "https://www.youtube.com") `shouldEqual` false
+    it "should validate a youtube.com shorts URL" $ liftEffect $ do
+      isValid (youtubeUrlValidation "testId" "https://youtube.com/shorts/_JryLY7pXLQ") `shouldEqual` true
+      isValid (youtubeUrlValidation "testId" "https://www.youtube.com/shorts/C8p4SOnSXeQ") `shouldEqual` true
+      isValid (youtubeUrlValidation "testId" "https://www.youtube.com/shorts/C8p4SOnSXeQ?t=30") `shouldEqual` true

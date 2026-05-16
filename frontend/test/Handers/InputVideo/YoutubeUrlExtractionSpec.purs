@@ -41,6 +41,12 @@ spec = do
     it "should extract video ID from youtube.com URL without www" $ liftEffect $ do
       let url = urlFromString "https://youtube.com/watch?v=PHi-UNsm2Ds"
       extractYoutubeVideoId url `shouldEqual` Just "PHi-UNsm2Ds"
+    it "should extract video ID from youtube.com URL shorts" $ liftEffect $ do
+      let
+        url1 = urlFromString "https://youtube.com/shorts/_JryLY7pXLQ"
+        url2 = urlFromString "https://www.youtube.com/shorts/C8p4SOnSXeQ"
+      extractYoutubeVideoId url1 `shouldEqual` Just "_JryLY7pXLQ"
+      extractYoutubeVideoId url2 `shouldEqual` Just "C8p4SOnSXeQ"
 
     it "should return Nothing for URL without video ID" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/"
