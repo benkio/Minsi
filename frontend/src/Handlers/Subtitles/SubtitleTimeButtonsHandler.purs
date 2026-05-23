@@ -2,8 +2,8 @@ module Handlers.Subtitles.SubtitleTimeButtonsHandler where
 
 import Prelude
 
-import Components.HTMLTableElement (getFirstRow, getStartInput)
-import Components.HTMLTableRowElement (getEndInput)
+import Components.HTMLTableElement (getFirstRow)
+import Components.HTMLTableRowElement (getEndInput, getStartInput)
 import Components.HtmlComponents (loadComponents)
 import Components.HtmlComponents.Lenses (_setSubtitleEndButton, _setSubtitleStartButton, _subtitleTable)
 import Data.Lens (view)

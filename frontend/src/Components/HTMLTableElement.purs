@@ -9,13 +9,8 @@ import Data.TraversableWithIndex (traverseWithIndex)
 import Effect (Effect)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.State.State (Subtitle)
-import Web.DOM.Element (toParentNode)
 import Web.DOM.Node (appendChild, removeChild)
 import Web.DOM.HTMLCollection as HC
-import Web.DOM.ParentNode (QuerySelector(..), querySelector)
-import Web.HTML.HTMLInputElement (HTMLInputElement)
-import Web.HTML.HTMLInputElement as HI
-import Web.HTML.HTMLTableCellElement as HTC
 import Web.HTML.HTMLTableElement as HT
 import Web.HTML.HTMLTableRowElement as HTR
 import Web.HTML.HTMLTableSectionElement as HTS
