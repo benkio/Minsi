@@ -67,18 +67,29 @@ addNewRow subtitleTable subtitleRowTemplate = do
 
 cloneFirstRow :: HTR.HTMLTableRowElement -> HT.HTMLTableElement -> HTMLMediaElement -> Effect Unit
 cloneFirstRow firstRow subtitleTable media = do
-  log "🏁 Subtitle row clone"
+  log "🏁 Subtitle row clone - Clone Row"
   tbody <- getTBody subtitleTable
   clonedRowNode <- deepClone (HTR.toNode firstRow)
-  endValueSeconds <- currentTime media
-  let endValue = endValueSeconds * 1000.0
   clonedRow <- maybe (throwMinsiError (HTMLElementNotFound "ClonedRow")) pure (fromNode clonedRowNode >>= HTR.fromElement)
-  setEndInput endValue firstRow
-  clonedRowStartInput <- getStartInput clonedRow
-  setValue (show (endValue + 100.0)) clonedRowStartInput
-  let newEndValue = endValue + 201.0
-  clonedRowEndInput <- getEndInput clonedRow
-  setValue (show newEndValue) clonedRowEndInput
+  log "Subtitle row clone - get current media value (ms)"
+  endValue <- map (_ * 1000.0) currentTime media
+  log $ "Subtitle row clone - Set End Last row to " <> show endValue
+  setTableElement "End" endValue firstRow
+  let newStartValue = show (endValue + 100.0)
+  log $ "Subtitle row clone - Set new row to start to " <> newStartValue
+  setTableElement "Start" newStartValue clonedRow
+  let newEndValue = show $ endValue + 201.0
+  fontColor <- getTableElement "FontColor" firstRow
+  log $ "Subtitle row clone - Set new row to Font/Color to " <> fontColor
+  setTableElement "FontColor" fontColor clonedRow
+  size <- getTableElement "Size" firstRow
+  log $ "Subtitle row clone - Set new row size to " <> size
+  setTableElement "Size" size clonedRow
+  position <- getTableElement "Position" firstRow
+  log $ "Subtitle row clone - Set new row font position to " <> position
+  setTableElement "Position" position clonedRow
+  log "Insert the new row"
   insertBefore clonedRowNode (HTR.toNode firstRow) (HTS.toNode tbody)
+  log "Add remove event listeren to new row"
   addRemoveSubtitleListenerToRow clonedRow
   log "✅ Subtitle row cloned"

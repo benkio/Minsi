@@ -58,20 +58,6 @@ getLastRow table = do
   maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableLastRow")) pure
     $ last rows
 
--- | Get the start input element from a table row (first cell)
-getStartInput :: HTR.HTMLTableRowElement -> Effect HTMLInputElement
-getStartInput row = do
-  cells <- HTR.cells row
-  cellArray <- HC.toArray cells
-  startCell <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableStartCell")) pure
-    $ (head cellArray >>= HTC.fromElement)
-  let element = HTC.toElement startCell
-  let parentNode = toParentNode element
-  elementMaybe <- querySelector (QuerySelector "input") parentNode
-  input <- maybe (throwMinsiError (HTMLElementNotFound "SubtitleTableStartInput")) pure
-    $ (elementMaybe >>= HI.fromElement)
-  pure input
-
 loadSubtitlesFromTable :: (Int -> HTR.HTMLTableRowElement -> Effect Subtitle) -> HT.HTMLTableElement -> Effect (Array Subtitle)
 loadSubtitlesFromTable loadSubtitleFromRow table = do
   rows <- getRows table
