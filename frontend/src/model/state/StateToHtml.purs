@@ -12,6 +12,7 @@ import Data.Time.Duration (Milliseconds(..))
 import Data.Traversable (traverse, traverse_)
 import Data.URL (toString)
 import Effect (Effect)
+import Handlers.ApplyButtonHandler (revealComputedResultPanels)
 import Handlers.Subtitles.RemoveSubtitleButtonHandler (addRemoveSubtitleListenerToRow)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.State.State (State(..), DurationRange(..), Subtitle(..), Source(..), WURL(..), shiftSubtitle)
@@ -35,6 +36,7 @@ loadCurrentState (State s) = do
   applyTitleToHtml s.title inputs
   applyArtistToHtml s.artist inputs
   applySubtitlesToHtml s.subtitles inputs
+  revealComputedResultPanels components $ State s
 
 applySubtitleOffsetToHtml :: HtmlInputs -> Effect Unit
 applySubtitleOffsetToHtml (HtmlInputs { subtitleOffset }) =
@@ -48,30 +50,30 @@ applyCutVideoToHtml (DurationRange { start: startMs, end: endMs }) (HtmlInputs {
 applySourceToHtml :: Source -> HtmlInputs -> Effect Unit
 applySourceToHtml source (HtmlInputs { inputSource, youtubeUrl }) =
   case source of
-      WebURL (WURL url) -> do
-        HS.setValue "youtubeUrl" inputSource
-        HI.setValue (toString url) youtubeUrl
-      LocalFile _ ->
-        -- Cannot repopulate the file picker for security reasons; align mode with empty YouTube URL.
-        do
-          HS.setValue "localFile" inputSource
-          HI.setValue "" youtubeUrl
+    WebURL (WURL url) -> do
+      HS.setValue "youtubeUrl" inputSource
+      HI.setValue (toString url) youtubeUrl
+    LocalFile _ ->
+      -- Cannot repopulate the file picker for security reasons; align mode with empty YouTube URL.
+      do
+        HS.setValue "localFile" inputSource
+        HI.setValue "" youtubeUrl
 
 applyFilenameToHtml :: String -> HtmlInputs -> Effect Unit
 applyFilenameToHtml filename (HtmlInputs { filename: filenameInput }) =
-    HI.setValue filename filenameInput
+  HI.setValue filename filenameInput
 
 applyReverseLoopToHtml :: Boolean -> HtmlInputs -> Effect Unit
 applyReverseLoopToHtml flag (HtmlInputs { reverseLoop: reverseLoopInput }) =
-    HI.setChecked flag reverseLoopInput
+  HI.setChecked flag reverseLoopInput
 
 applyUploadLocalFileToHtml :: Boolean -> HtmlInputs -> Effect Unit
 applyUploadLocalFileToHtml flag (HtmlInputs { uploadLocalFile: uploadLocalFileInput }) =
-    HI.setChecked flag uploadLocalFileInput
+  HI.setChecked flag uploadLocalFileInput
 
 applyTitleToHtml :: String -> HtmlInputs -> Effect Unit
 applyTitleToHtml titleText (HtmlInputs { title: titleInput }) =
-    HI.setValue titleText titleInput
+  HI.setValue titleText titleInput
 
 applyArtistToHtml :: String -> HtmlInputs -> Effect Unit
 applyArtistToHtml artistText (HtmlInputs { artist: artistInput }) =
@@ -79,14 +81,14 @@ applyArtistToHtml artistText (HtmlInputs { artist: artistInput }) =
 
 applySubtitlesToHtml :: Array Subtitle -> HtmlInputs -> Effect Unit
 applySubtitlesToHtml subtitles (HtmlInputs { subtitleOffset, subtitleTable, subtitleRow }) = do
-      offsetMillis <- HI.valueAsNumber subtitleOffset
-      let
-        subtitlesForDom =
-          map (shiftSubtitle (Milliseconds (-offsetMillis))) subtitles
-      subtitleTemplateRow <- getRow subtitleRow
-      newRows <- traverse (cloneAndFillSubtitleRow subtitleTemplateRow) subtitlesForDom
-      setRows newRows subtitleTable
-      traverse_ addRemoveSubtitleListenerToRow newRows
+  offsetMillis <- HI.valueAsNumber subtitleOffset
+  let
+    subtitlesForDom =
+      map (shiftSubtitle (Milliseconds (-offsetMillis))) subtitles
+  subtitleTemplateRow <- getRow subtitleRow
+  newRows <- traverse (cloneAndFillSubtitleRow subtitleTemplateRow) subtitlesForDom
+  setRows newRows subtitleTable
+  traverse_ addRemoveSubtitleListenerToRow newRows
 
 millisecondsInputString :: Milliseconds -> String
 millisecondsInputString (Milliseconds n) = show $ floor n
