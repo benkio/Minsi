@@ -6,7 +6,8 @@ module Components.HtmlComponents.Lenses
   -- Newtype unwrapping (compose with prop for inner fields)
   , _HtmlInputs
   , _HtmlOutputs
-  , _GenericModal
+  , _ClipboardOutputModal
+  , _ImportStateModal
   , _HtmlVisualElementsFields
   -- HtmlComponents → HtmlInputs fields
   , _cutStart
@@ -26,6 +27,8 @@ module Components.HtmlComponents.Lenses
   , _downloadAllButton
   , _copyTranscriptButton
   , _exportStateButton
+  , _importStateButton
+  , _importStateModalImportButton
   , _setCutEndButton
   , _setCutStartButton
   , _subtitleTable
@@ -44,9 +47,12 @@ module Components.HtmlComponents.Lenses
   , _playbackPositionResultMedia
   , _loadingModal
   , _minsiErrorModal
-  , _genericModal
-  , _genericModalContent
-  , _genericModalContentCopyClipboardButton
+  , _clipboardOutputModal
+  , _clipboardOutputModalContent
+  , _clipboardOutputModalCopyClipboardButton
+  , _importStateModal
+  , _importStateModalTitle
+  , _importStateModalTextarea
   , _resultVideo
   , _resultAudio
   -- HtmlComponents → HtmlVisualElements fields
@@ -62,7 +68,7 @@ module Components.HtmlComponents.Lenses
 
 import Prelude
 
-import Components.HtmlComponents (GenericModal(..), HtmlComponents, HtmlInputs(..), HtmlOutputs(..), HtmlVisualElements(..), ResultPreview(..))
+import Components.HtmlComponents (ClipboardOutputModal(..), HtmlComponents, HtmlInputs(..), HtmlOutputs(..), HtmlVisualElements(..), ImportStateModal(..), ResultPreview(..))
 import Data.Lens (Lens')
 import Data.Lens.Iso (Iso', iso)
 import Data.Lens.Iso.Newtype (unto)
@@ -82,6 +88,7 @@ import Web.HTML.HTMLSelectElement (HTMLSelectElement)
 import Web.HTML.HTMLSpanElement (HTMLSpanElement)
 import Web.HTML.HTMLTableElement (HTMLTableElement)
 import Web.HTML.HTMLTemplateElement (HTMLTemplateElement)
+import Web.HTML.HTMLTextAreaElement (HTMLTextAreaElement)
 import Web.HTML.HTMLVideoElement (HTMLVideoElement)
 
 -- Top-level HtmlComponents ---------------------------------------------------
@@ -116,6 +123,7 @@ _HtmlInputs
        , downloadAllButton :: HTMLButtonElement
        , copyTranscriptButton :: HTMLButtonElement
        , exportStateButton :: HTMLButtonElement
+       , importStateButton :: HTMLButtonElement
        , setCutEndButton :: HTMLButtonElement
        , setCutStartButton :: HTMLButtonElement
        , subtitleTable :: HTMLTableElement
@@ -126,6 +134,7 @@ _HtmlInputs
        , subtitleRow :: HTMLTemplateElement
        , keyboardShortcutsButton :: HTMLButtonElement
        , resetButton :: HTMLButtonElement
+       , importStateModalImportButton :: HTMLButtonElement
        }
 _HtmlInputs = unto HtmlInputs
 
@@ -138,20 +147,29 @@ _HtmlOutputs
        , playbackPositionResultMedia :: HTMLSpanElement
        , loadingModal :: HTMLDivElement
        , minsiErrorModal :: HTMLDivElement
-       , genericModal :: GenericModal
+       , clipboardOutputModal :: ClipboardOutputModal
+       , importStateModal :: ImportStateModal
        , resultVideo :: HTMLVideoElement
        , resultAudio :: HTMLAudioElement
        }
 _HtmlOutputs = unto HtmlOutputs
 
-_GenericModal
-  :: Iso' GenericModal
+_ClipboardOutputModal
+  :: Iso' ClipboardOutputModal
        { modal :: HTMLDivElement
        , title :: HTMLHeadingElement
        , content :: HTMLPreElement
        , contentCopyClipboardButton :: HTMLButtonElement
        }
-_GenericModal = unto GenericModal
+_ClipboardOutputModal = unto ClipboardOutputModal
+
+_ImportStateModal
+  :: Iso' ImportStateModal
+       { modal :: HTMLDivElement
+       , title :: HTMLHeadingElement
+       , textarea :: HTMLTextAreaElement
+       }
+_ImportStateModal = unto ImportStateModal
 
 _HtmlVisualElementsFields
   :: Iso' HtmlVisualElements
@@ -216,6 +234,13 @@ _copyTranscriptButton = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy
 _exportStateButton :: Lens' HtmlComponents HTMLButtonElement
 _exportStateButton = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "exportStateButton")
 
+_importStateButton :: Lens' HtmlComponents HTMLButtonElement
+_importStateButton = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "importStateButton")
+
+_importStateModalImportButton :: Lens' HtmlComponents HTMLButtonElement
+_importStateModalImportButton =
+  _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "importStateModalImportButton")
+
 _setCutEndButton :: Lens' HtmlComponents HTMLButtonElement
 _setCutEndButton = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "setCutEndButton")
 
@@ -269,15 +294,30 @@ _loadingModal = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "load
 _minsiErrorModal :: Lens' HtmlComponents HTMLDivElement
 _minsiErrorModal = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "minsiErrorModal")
 
-_genericModal :: Lens' HtmlComponents GenericModal
-_genericModal = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "genericModal")
+_clipboardOutputModal :: Lens' HtmlComponents ClipboardOutputModal
+_clipboardOutputModal =
+  _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "clipboardOutputModal")
 
-_genericModalContent :: Lens' HtmlComponents HTMLPreElement
-_genericModalContent = _genericModal <<< _GenericModal <<< prop (Proxy :: Proxy "content")
+_clipboardOutputModalContent :: Lens' HtmlComponents HTMLPreElement
+_clipboardOutputModalContent =
+  _clipboardOutputModal <<< _ClipboardOutputModal <<< prop (Proxy :: Proxy "content")
 
-_genericModalContentCopyClipboardButton :: Lens' HtmlComponents HTMLButtonElement
-_genericModalContentCopyClipboardButton =
-  _genericModal <<< _GenericModal <<< prop (Proxy :: Proxy "contentCopyClipboardButton")
+_clipboardOutputModalCopyClipboardButton :: Lens' HtmlComponents HTMLButtonElement
+_clipboardOutputModalCopyClipboardButton =
+  _clipboardOutputModal
+    <<< _ClipboardOutputModal
+    <<< prop (Proxy :: Proxy "contentCopyClipboardButton")
+
+_importStateModal :: Lens' HtmlComponents ImportStateModal
+_importStateModal = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "importStateModal")
+
+_importStateModalTitle :: Lens' HtmlComponents HTMLHeadingElement
+_importStateModalTitle =
+  _importStateModal <<< _ImportStateModal <<< prop (Proxy :: Proxy "title")
+
+_importStateModalTextarea :: Lens' HtmlComponents HTMLTextAreaElement
+_importStateModalTextarea =
+  _importStateModal <<< _ImportStateModal <<< prop (Proxy :: Proxy "textarea")
 
 _resultVideo :: Lens' HtmlComponents HTMLVideoElement
 _resultVideo = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "resultVideo")

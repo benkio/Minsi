@@ -1,8 +1,8 @@
 module Handlers.CopyTranscriptButtonHandler where
 
 import Components.HtmlComponents (loadComponents)
-import Components.HtmlComponents.Lenses (_copyTranscriptButton, _genericModalContent)
-import Components.HtmlIdAndClasses (genericModalId)
+import Components.HtmlComponents.Lenses (_clipboardOutputModalContent, _copyTranscriptButton)
+import Components.HtmlIdAndClasses (clipboardOutputModalId)
 import Components.Modal (showModal)
 import Conversion.String (capitalizeFirst)
 import Data.Array (sort)
@@ -39,6 +39,6 @@ copyTranscriptButtonEventListener _ = genericErrorsHandler $ do
   let
     subtitles = view _subtitles (fst state)
     transcript = capitalizeFirst <<< joinWith " " $ (\(Subtitle { value }) -> (toLower <<< trim) value) <$> sort subtitles
-    genericModalContentEl = view _genericModalContent components
-  setTextContent transcript (HP.toNode genericModalContentEl)
-  showModal genericModalId true
+    clipboardContentEl = view _clipboardOutputModalContent components
+  setTextContent transcript (HP.toNode clipboardContentEl)
+  showModal clipboardOutputModalId true

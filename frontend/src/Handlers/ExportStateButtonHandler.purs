@@ -4,8 +4,8 @@ import Prelude
 
 import Handlers.ErrorHandlers (genericErrorsHandler)
 import Components.HtmlComponents (loadComponents)
-import Components.HtmlComponents.Lenses (_exportStateButton, _genericModalContent)
-import Components.HtmlIdAndClasses (genericModalId)
+import Components.HtmlComponents.Lenses (_clipboardOutputModalContent, _exportStateButton)
+import Components.HtmlIdAndClasses (clipboardOutputModalId)
 import Components.Modal (showModal)
 import Data.Lens (view)
 import Data.Tuple (fst, snd)
@@ -32,6 +32,6 @@ exportStateButtonEventListener _ = genericErrorsHandler $ do
   stateTuple <- getCurrentState
   let
     stateJson = writeJSON (fst stateTuple)
-    genericModalContentEl = view _genericModalContent (snd stateTuple)
-  setTextContent stateJson (HP.toNode genericModalContentEl)
-  showModal genericModalId true
+    clipboardContentEl = view _clipboardOutputModalContent (snd stateTuple)
+  setTextContent stateJson (HP.toNode clipboardContentEl)
+  showModal clipboardOutputModalId true

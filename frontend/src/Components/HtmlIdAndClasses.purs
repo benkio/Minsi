@@ -57,6 +57,9 @@ copyTranscriptButtonId = "copyTranscriptButton"
 exportStateButtonId :: String
 exportStateButtonId = "exportStateButton"
 
+importStateButtonId :: String
+importStateButtonId = "importStateButton"
+
 minsiLogId :: String
 minsiLogId = "minsiLog"
 
@@ -84,17 +87,29 @@ minsiErrorModalId = "minsiErrorModal"
 minsiErrorModalContentId :: String
 minsiErrorModalContentId = "minsiErrorModalContent"
 
-genericModalId :: String
-genericModalId = "genericModal"
+clipboardOutputModalId :: String
+clipboardOutputModalId = "clipboardOutputModal"
 
-genericModalTitleId :: String
-genericModalTitleId = "genericModalTitle"
+clipboardOutputModalTitleId :: String
+clipboardOutputModalTitleId = "clipboardOutputModalTitle"
 
-genericModalContentId :: String
-genericModalContentId = "genericModalContent"
+clipboardOutputModalContentId :: String
+clipboardOutputModalContentId = "clipboardOutputModalContent"
 
-genericModalContentCopyClipboardButtonId :: String
-genericModalContentCopyClipboardButtonId = "genericModalContentCopyClipboardButton"
+clipboardOutputModalCopyClipboardButtonId :: String
+clipboardOutputModalCopyClipboardButtonId = "clipboardOutputModalCopyClipboardButton"
+
+importStateModalId :: String
+importStateModalId = "importStateModal"
+
+importStateModalTitleId :: String
+importStateModalTitleId = "importStateModalTitle"
+
+importStateModalTextareaId :: String
+importStateModalTextareaId = "importStateModalTextarea"
+
+importStateModalImportButtonId :: String
+importStateModalImportButtonId = "importStateModalImportButton"
 
 resultVideoId :: String
 resultVideoId = "resultVideo"

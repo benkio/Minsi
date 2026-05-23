@@ -317,13 +317,40 @@
               >
                 Copy transcript
               </button>
-              <button
-                type="button"
-                class="btn btn-outline-secondary"
-                id="exportStateButton"
-              >
-                Export State
-              </button>
+              <div class="dropdown">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary dropdown-toggle"
+                  id="stateMenuDropdownButton"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  State
+                </button>
+                <ul
+                  class="dropdown-menu dropdown-menu-end"
+                  aria-labelledby="stateMenuDropdownButton"
+                >
+                  <li>
+                    <button
+                      type="button"
+                      class="dropdown-item"
+                      id="exportStateButton"
+                    >
+                      Export state
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      class="dropdown-item"
+                      id="importStateButton"
+                    >
+                      Import state
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
 
@@ -654,18 +681,18 @@
       </div>
     </div>
 
-    <!-- Generic Modal -->
+    <!-- Clipboard output (export JSON, copy transcript body, …) -->
     <div
       class="modal fade"
-      id="genericModal"
+      id="clipboardOutputModal"
       tabindex="-1"
-      aria-labelledby="genericModalTitle"
+      aria-labelledby="clipboardOutputModalTitle"
       aria-hidden="true"
     >
       <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="genericModalTitle"></h1>
+            <h1 class="modal-title fs-5" id="clipboardOutputModalTitle"></h1>
             <button
               type="button"
               class="btn-close"
@@ -675,12 +702,52 @@
           </div>
           <div class="modal-body">
             <pre
-              id="genericModalContent"
+              id="clipboardOutputModalContent"
               class="mb-0 font-monospace small bg-light border rounded p-3 user-select-all"
             ></pre>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="genericModalContentCopyClipboardButton">Copy to Clipboard</button>
+            <button type="button" class="btn btn-primary" id="clipboardOutputModalCopyClipboardButton">Copy to clipboard</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Import state (paste JSON) -->
+    <div
+      class="modal fade"
+      id="importStateModal"
+      tabindex="-1"
+      aria-labelledby="importStateModalTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="importStateModalTitle">Import state</h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <label for="importStateModalTextarea" class="form-label visually-hidden">
+              JSON to import
+            </label>
+            <textarea
+              id="importStateModalTextarea"
+              class="form-control font-monospace small"
+              rows="14"
+              placeholder="Paste exported state JSON here…"
+              spellcheck="false"
+            ></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="importStateModalImportButton">
+              Import state
+            </button>
           </div>
         </div>
       </div>
