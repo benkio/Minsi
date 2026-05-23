@@ -1,12 +1,16 @@
 module Model.State.State where
 
 import Prelude
+
+import Data.Maybe (maybe)
 import Data.Newtype (class Newtype)
 import Data.Time.Duration (Milliseconds(..))
-import Data.URL (URL, toString)
+import Data.URL (URL, fromString, toString)
+import Foreign (ForeignError(..), fail)
+import Foreign.Index (readProp)
 import Node.Path (FilePath)
-import Yoga.JSON (class WriteForeign, writeImpl)
 import Web.File.File (File)
+import Yoga.JSON (class ReadForeign, class WriteForeign, readImpl, writeImpl)
 
 -------------------------------------------------------------------------------
 --                    Copy Pasted between Frontend↔Backend                   --
@@ -139,6 +143,56 @@ instance WriteForeign Source where
   writeImpl (WebURL w) = writeImpl w
 
 derive newtype instance writeState :: WriteForeign State
+
+foreign import importedLocalFilePlaceholder :: File
+
+instance ReadForeign DurationRange where
+  readImpl obj = do
+    startN <- readProp "start" obj >>= readImpl
+    endN <- readProp "end" obj >>= readImpl
+    pure $ DurationRange { start: Milliseconds startN, end: Milliseconds endN }
+
+instance ReadForeign Position where
+  readImpl f = do
+    s <- readImpl f
+    case s of
+      "Top" -> pure Top
+      "Bottom" -> pure Bottom
+      _ -> fail $ TypeMismatch "Position" $ "Invalid Position: " <> s
+
+instance ReadForeign Color where
+  readImpl f = do
+    s <- readImpl f
+    case s of
+      "#ffffff" -> pure White
+      "#000000" -> pure Black
+      "#ABEBC6" -> pure LightGreen
+      "#FAD7A0" -> pure LightOrange
+      "#FFFF00" -> pure Yellow
+      _ -> fail $ TypeMismatch "Color" $ "Invalid Color: " <> s
+
+instance ReadForeign Font where
+  readImpl f = do
+    s <- readImpl f
+    case s of
+      "Impact" -> pure Impact
+      "Arial Black" -> pure ArialBlack
+      _ -> fail $ TypeMismatch "Font" $ "Invalid Font: " <> s
+
+derive newtype instance readSubtitle :: ReadForeign Subtitle
+
+instance ReadForeign WURL where
+  readImpl f = do
+    s <- readImpl f
+    maybe (fail $ TypeMismatch "URL" $ "Invalid URL: " <> s) (pure <<< WURL) (fromString s)
+
+instance ReadForeign Source where
+  readImpl f = do
+    s <- readImpl f
+    if s == "LocalFile" then pure $ LocalFile importedLocalFilePlaceholder
+    else maybe (fail $ TypeMismatch "Source" $ "Invalid Source: " <> s) (pure <<< WebURL <<< WURL) (fromString s)
+
+derive newtype instance readState :: ReadForeign State
 
 -- Other Typeclass Instances --------------------------
 

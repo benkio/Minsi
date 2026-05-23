@@ -10,10 +10,14 @@ import Components.HtmlIdAndClasses
   , subtitleOffsetId
   , loadingModalId
   , minsiErrorModalId
-  , genericModalContentCopyClipboardButtonId
-  , genericModalContentId
-  , genericModalId
-  , genericModalTitleId
+  , clipboardOutputModalCopyClipboardButtonId
+  , clipboardOutputModalContentId
+  , clipboardOutputModalId
+  , clipboardOutputModalTitleId
+  , importStateModalId
+  , importStateModalImportButtonId
+  , importStateModalTextareaId
+  , importStateModalTitleId
   , minsiLogId
   , outputFilenameId
   , playbackPositionResultRowId
@@ -38,6 +42,7 @@ import Components.HtmlIdAndClasses
   , downloadAllButtonId
   , copyTranscriptButtonId
   , exportStateButtonId
+  , importStateButtonId
   , downloadFullButtonId
   , youtubeUrlId
   , subtitleRow
@@ -81,6 +86,8 @@ import Web.HTML.HTMLVideoElement (HTMLVideoElement)
 import Web.HTML.HTMLVideoElement as HV
 import Web.HTML.HTMLPreElement (HTMLPreElement)
 import Web.HTML.HTMLPreElement as HP
+import Web.HTML.HTMLTextAreaElement (HTMLTextAreaElement)
+import Web.HTML.HTMLTextAreaElement as HTA
 
 newtype HtmlInputs = HtmlInputs
   { cutStart :: HTMLInputElement
@@ -100,6 +107,7 @@ newtype HtmlInputs = HtmlInputs
   , downloadAllButton :: HTMLButtonElement
   , copyTranscriptButton :: HTMLButtonElement
   , exportStateButton :: HTMLButtonElement
+  , importStateButton :: HTMLButtonElement
   , setCutEndButton :: HTMLButtonElement
   , setCutStartButton :: HTMLButtonElement
   , subtitleTable :: HTMLTableElement
@@ -110,6 +118,7 @@ newtype HtmlInputs = HtmlInputs
   , subtitleRow :: HTMLTemplateElement
   , keyboardShortcutsButton :: HTMLButtonElement
   , resetButton :: HTMLButtonElement
+  , importStateModalImportButton :: HTMLButtonElement
   }
 
 data ResultPreview
@@ -131,14 +140,22 @@ resultPreviewToMaybeVideo = case _ of
   ResultPreviewVideo video -> Just video
   ResultPreviewIframe _ -> Nothing
 
-newtype GenericModal = GenericModal
+newtype ClipboardOutputModal = ClipboardOutputModal
   { modal :: HTMLDivElement
   , title :: HTMLHeadingElement
   , content :: HTMLPreElement
   , contentCopyClipboardButton :: HTMLButtonElement
   }
 
-derive instance Newtype GenericModal _
+derive instance Newtype ClipboardOutputModal _
+
+newtype ImportStateModal = ImportStateModal
+  { modal :: HTMLDivElement
+  , title :: HTMLHeadingElement
+  , textarea :: HTMLTextAreaElement
+  }
+
+derive instance Newtype ImportStateModal _
 
 newtype HtmlOutputs = HtmlOutputs
   { resultPreview :: ResultPreview
@@ -148,7 +165,8 @@ newtype HtmlOutputs = HtmlOutputs
   , playbackPositionResultMedia :: HTMLSpanElement
   , loadingModal :: HTMLDivElement
   , minsiErrorModal :: HTMLDivElement
-  , genericModal :: GenericModal
+  , clipboardOutputModal :: ClipboardOutputModal
+  , importStateModal :: ImportStateModal
   , resultVideo :: HTMLVideoElement
   , resultAudio :: HTMLAudioElement
   }
@@ -200,6 +218,7 @@ loadHtmlInputs doc = do
   downloadAllButton <- loadButton downloadAllButtonId doc
   copyTranscriptButton <- loadButton copyTranscriptButtonId doc
   exportStateButton <- loadButton exportStateButtonId doc
+  importStateButton <- loadButton importStateButtonId doc
   setCutStartButton <- loadButton setCutStartButton doc
   setCutEndButton <- loadButton setCutEndButton doc
   subtitleTable <- loadTable subtitleTableId doc
@@ -210,6 +229,7 @@ loadHtmlInputs doc = do
   subtitleRow <- loadTemplate subtitleRow doc
   keyboardShortcutsButton <- loadButton keyboardShortcutsButtonId doc
   resetButton <- loadButton resetButtonId doc
+  importStateModalImportButton <- loadButton importStateModalImportButtonId doc
   pure
     ( HtmlInputs
         { cutStart: fst rangeTuple
@@ -229,6 +249,7 @@ loadHtmlInputs doc = do
         , downloadAllButton: downloadAllButton
         , copyTranscriptButton: copyTranscriptButton
         , exportStateButton: exportStateButton
+        , importStateButton: importStateButton
         , setCutStartButton: setCutStartButton
         , setCutEndButton: setCutEndButton
         , subtitleTable: subtitleTable
@@ -239,6 +260,7 @@ loadHtmlInputs doc = do
         , subtitleRow: subtitleRow
         , keyboardShortcutsButton: keyboardShortcutsButton
         , resetButton: resetButton
+        , importStateModalImportButton: importStateModalImportButton
         }
     )
 
@@ -251,7 +273,8 @@ loadHtmlOutputs doc = do
   playbackPositionResultMedia <- loadSpan playbackPositionResultMediaId doc
   loadingModal <- loadDiv loadingModalId doc
   minsiErrorModal <- loadDiv minsiErrorModalId doc
-  genericModal <- loadGenericModal doc
+  clipboardOutputModal <- loadClipboardOutputModal doc
+  importStateModal <- loadImportStateModal doc
   resultVideo <- loadVideo resultVideoId doc
   resultAudio <- loadAudio resultAudioId doc
   pure
@@ -263,7 +286,8 @@ loadHtmlOutputs doc = do
         , playbackPositionResultMedia: playbackPositionResultMedia
         , loadingModal: loadingModal
         , minsiErrorModal: minsiErrorModal
-        , genericModal: genericModal
+        , clipboardOutputModal: clipboardOutputModal
+        , importStateModal: importStateModal
         , resultVideo: resultVideo
         , resultAudio: resultAudio
         }
@@ -303,19 +327,29 @@ loadCutRange doc = do
 loadDiv :: String -> NonElementParentNode -> Effect HTMLDivElement
 loadDiv id = loadHtmlElementId id HD.fromElement
 
-loadGenericModal :: NonElementParentNode -> Effect GenericModal
-loadGenericModal doc = do
-  modal <- loadDiv genericModalId doc
-  title <- loadHeading genericModalTitleId doc
-  content <- loadPre genericModalContentId doc
-  contentCopyClipboardButton <- loadButton genericModalContentCopyClipboardButtonId doc
-  pure (GenericModal { modal, title, content, contentCopyClipboardButton })
+loadClipboardOutputModal :: NonElementParentNode -> Effect ClipboardOutputModal
+loadClipboardOutputModal doc = do
+  modal <- loadDiv clipboardOutputModalId doc
+  title <- loadHeading clipboardOutputModalTitleId doc
+  content <- loadPre clipboardOutputModalContentId doc
+  contentCopyClipboardButton <- loadButton clipboardOutputModalCopyClipboardButtonId doc
+  pure (ClipboardOutputModal { modal, title, content, contentCopyClipboardButton })
+
+loadImportStateModal :: NonElementParentNode -> Effect ImportStateModal
+loadImportStateModal doc = do
+  modal <- loadDiv importStateModalId doc
+  title <- loadHeading importStateModalTitleId doc
+  textarea <- loadTextArea importStateModalTextareaId doc
+  pure (ImportStateModal { modal, title, textarea })
 
 loadHeading :: String -> NonElementParentNode -> Effect HTMLHeadingElement
 loadHeading id = loadHtmlElementId id HH.fromElement
 
 loadPre :: String -> NonElementParentNode -> Effect HTMLPreElement
 loadPre id = loadHtmlElementId id HP.fromElement
+
+loadTextArea :: String -> NonElementParentNode -> Effect HTMLTextAreaElement
+loadTextArea id = loadHtmlElementId id HTA.fromElement
 
 loadSelect :: String -> NonElementParentNode -> Effect HTMLSelectElement
 loadSelect id = loadHtmlElementId id HS.fromElement

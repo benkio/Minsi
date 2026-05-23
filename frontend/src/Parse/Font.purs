@@ -14,3 +14,15 @@ parseFontAndColor _ = { font: Impact, color: White }
 parsePosition :: String -> Position
 parsePosition "Top" = Top
 parsePosition _ = Bottom
+
+formatFontAndColor :: Font -> Color -> String
+formatFontAndColor Impact Black = "ImpactBlack"
+formatFontAndColor Impact White = "ImpactWhite"
+formatFontAndColor ArialBlack Yellow = "ArialBlackYellow"
+formatFontAndColor ArialBlack LightGreen = "ArialBlackLightGreen"
+formatFontAndColor ArialBlack LightOrange = "ArialBlackLightOrange"
+formatFontAndColor _ _ = "ImpactWhite"
+
+formatPosition :: Position -> String
+formatPosition Top = "Top"
+formatPosition Bottom = "Bottom"

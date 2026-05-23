@@ -1,4 +1,9 @@
-module Handlers.ApplyButtonHandler where
+module Handlers.ApplyButtonHandler
+  ( setApplyButtonHandler
+  , applyButtonEventListener
+  , revealComputedResultPanels
+  , syncApplyResultMediaAndSubtitleCeilings
+  ) where
 
 import Prelude
 
@@ -79,21 +84,28 @@ uploadLocalFileLogic (LocalFile file) filename uploadLocalFileInput = genericErr
     HI.setChecked false uploadLocalFileInput
 uploadLocalFileLogic x _ _ = liftEffect $ throwMinsiError (InvalidInput "StateSource" ("Expected LocalFile, got " <> show x))
 
-finallyHandlers :: HtmlComponents -> State -> Effect Unit
-finallyHandlers components state@(State rec) = do
-  let reverseLoop = rec.reverseLoop
-  let filename = rec.filename
-  log "return from server, show elements and set src"
-  showHiddenElements components.htmlVisualElements reverseLoop
-  log "hide modal, and scroll"
-  hideModal loadingModalId
-  scrollToElement videoSourceId
+-- | Scroll to outputs, attach result URLs, clamp subtitle timings — same fragment as Apply’s `finally` after the loading modal hides.
+syncApplyResultMediaAndSubtitleCeilings :: HtmlComponents -> State -> Effect Unit
+syncApplyResultMediaAndSubtitleCeilings components state@(State rec) = do
   let
     resultVideo = view _resultVideo components
     resultAudio = view _resultAudio components
     videoSourceElement = view _videoSource components
-  setResultMediaSrc filename videoSourceElement resultVideo resultAudio
-  let
     subtitleTable = view _subtitleTable components
     subtitleRowTemplate = view _subtitleRowTemplate components
+  setResultMediaSrc rec.filename videoSourceElement resultVideo resultAudio
+  scrollToElement videoSourceId
   setSubtitleTableMaxValues state subtitleTable subtitleRowTemplate
+
+-- | Drops `d-none` on result/toolbar strips (respecting GIF reverse-loop), then runs `syncApplyResultMediaAndSubtitleCeilings`.
+revealComputedResultPanels :: HtmlComponents -> State -> Effect Unit
+revealComputedResultPanels components (State rec) = do
+  showHiddenElements components.htmlVisualElements rec.reverseLoop
+
+finallyHandlers :: HtmlComponents -> State -> Effect Unit
+finallyHandlers components state@(State rec) = do
+  log "return from server, show elements and set src"
+  showHiddenElements components.htmlVisualElements rec.reverseLoop
+  log "hide modal, and scroll"
+  hideModal loadingModalId
+  syncApplyResultMediaAndSubtitleCeilings components state
