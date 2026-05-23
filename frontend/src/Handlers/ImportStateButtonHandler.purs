@@ -29,4 +29,4 @@ importStateButtonEventListener _ =
     components <- loadComponents
     let textarea = view _importStateModalTextarea components
     HTA.setValue "" textarea
-    showModal importStateModalId true
+    showModal importStateModalId false

@@ -1,4 +1,4 @@
-const backgroundSound = new Audio('loadingSound.mp3')
+const backgroundSound = new Audio("loadingSound.mp3");
 export function showModal(id) {
   return function (enableTimeout) {
     return function () {
@@ -9,6 +9,7 @@ export function showModal(id) {
       // Set timeout. If after 10 sec nothing happened, something is wrong or the user saw it already.
       if (enableTimeout) {
         setTimeout(() => {
+          console.log(`Hiding the modal ${id}`);
           backgroundSound.pause();
           backgroundSound.currentTime = 0;
           modal.hide(id);

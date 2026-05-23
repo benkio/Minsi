@@ -4,6 +4,8 @@ import Prelude
 
 import Components.HtmlComponents (loadComponents)
 import Components.HtmlComponents.Lenses (_importStateModalImportButton, _importStateModalTextarea)
+import Components.HtmlIdAndClasses (importStateModalId)
+import Components.Modal (hideModal)
 import Data.Either (Either(..))
 import Data.Lens (view)
 import Effect (Effect)
@@ -37,3 +39,4 @@ importStateModalImportClick textarea _ =
         throwMinsiError (JSONParsingError (show errs))
       Right state ->
         loadCurrentState state
+    hideModal importStateModalId

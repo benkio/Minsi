@@ -99,9 +99,8 @@ syncApplyResultMediaAndSubtitleCeilings components state@(State rec) = do
 
 -- | Drops `d-none` on result/toolbar strips (respecting GIF reverse-loop), then runs `syncApplyResultMediaAndSubtitleCeilings`.
 revealComputedResultPanels :: HtmlComponents -> State -> Effect Unit
-revealComputedResultPanels components state@(State rec) = do
+revealComputedResultPanels components (State rec) = do
   showHiddenElements components.htmlVisualElements rec.reverseLoop
-  syncApplyResultMediaAndSubtitleCeilings components state
 
 finallyHandlers :: HtmlComponents -> State -> Effect Unit
 finallyHandlers components state@(State rec) = do
