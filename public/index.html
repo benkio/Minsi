@@ -46,6 +46,40 @@
             >
               ⌨️ Shortcuts
             </button>
+            <div class="dropdown d-inline-block ms-1">
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm dropdown-toggle"
+                id="stateMenuDropdownButton"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                State
+              </button>
+              <ul
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="stateMenuDropdownButton"
+              >
+                <li>
+                  <button
+                    type="button"
+                    class="dropdown-item"
+                    id="exportStateButton"
+                  >
+                    Export state
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    class="dropdown-item"
+                    id="importStateButton"
+                  >
+                    Import state
+                  </button>
+                </li>
+              </ul>
+            </div>
             <button
               type="button"
               id="resetButton"
@@ -317,40 +351,6 @@
               >
                 Copy transcript
               </button>
-              <div class="dropdown">
-                <button
-                  type="button"
-                  class="btn btn-outline-secondary dropdown-toggle"
-                  id="stateMenuDropdownButton"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  State
-                </button>
-                <ul
-                  class="dropdown-menu dropdown-menu-end"
-                  aria-labelledby="stateMenuDropdownButton"
-                >
-                  <li>
-                    <button
-                      type="button"
-                      class="dropdown-item"
-                      id="exportStateButton"
-                    >
-                      Export state
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      type="button"
-                      class="dropdown-item"
-                      id="importStateButton"
-                    >
-                      Import state
-                    </button>
-                  </li>
-                </ul>
-              </div>
             </div>
           </div>
 
