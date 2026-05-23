@@ -8,11 +8,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: npm
-          cache-dependency-path: backend/package-lock.json
+        uses: actions/setup-node@v5
       - name: Setup PureScript
         uses: purescript-contrib/setup-purescript@main
         with:
@@ -44,9 +40,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
+        uses: actions/setup-node@v5
       - name: Setup PureScript
         uses: purescript-contrib/setup-purescript@main
         with:

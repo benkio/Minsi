@@ -2,8 +2,8 @@ module Handlers.Subtitles.SubtitleMaxValues where
 
 import Prelude
 
-import Components.HTMLTableElement (getRows, getStartInput)
-import Components.HTMLTableRowElement (getEndInput)
+import Components.HTMLTableElement (getRows)
+import Components.HTMLTableRowElement (getEndInput, getStartInput)
 import Components.HTMLTemplateElement (getRow)
 import Data.Array (cons)
 import Data.Time.Duration (Milliseconds(..))

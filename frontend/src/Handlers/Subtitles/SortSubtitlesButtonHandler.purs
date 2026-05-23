@@ -2,7 +2,8 @@ module Handlers.Subtitles.SortSubtitlesButtonHandler where
 
 import Prelude
 
-import Components.HTMLTableElement (getRows, getStartInput, setRows)
+import Components.HTMLTableElement (getRows, setRows)
+import Components.HTMLTableRowElement (getStartInput)
 import Data.Array (sortBy, reverse)
 import Data.Traversable (traverse)
 import Effect (Effect)
