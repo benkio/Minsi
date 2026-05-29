@@ -5,6 +5,7 @@ import Components.HtmlComponents.Lenses (_clipboardOutputModalContent, _copyTran
 import Components.HtmlIdAndClasses (clipboardOutputModalId)
 import Components.Modal (showModal)
 import Data.Lens (view)
+import Data.Maybe (Maybe(..))
 import Data.Tuple (fst)
 import Effect (Effect)
 
@@ -37,4 +38,4 @@ copyTranscriptButtonEventListener _ = genericErrorsHandler $ do
     transcript = subtitlesToString subtitles
     clipboardContentEl = view _clipboardOutputModalContent components
   setTextContent transcript (HP.toNode clipboardContentEl)
-  showModal clipboardOutputModalId true
+  showModal clipboardOutputModalId (Just 5000)

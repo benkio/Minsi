@@ -10,7 +10,7 @@ import Components.Modal (setBlockingModalBody, showModal)
 import Components.Window (getDocument, raiseErrorAlert)
 import Control.Monad.Error.Class (catchError, class MonadError)
 import Data.Either (Either, either)
-import Data.Maybe (maybe)
+import Data.Maybe (Maybe(..), maybe)
 import Data.String (split)
 import Data.String.Pattern (Pattern(..))
 import Data.Traversable (traverse)
@@ -25,12 +25,12 @@ import Web.DOM.Element (toNode) as E
 import Web.DOM.Node (appendChild, removeChild, setTextContent)
 import Web.HTML (window)
 import Web.HTML.HTMLDivElement (toElement, toNode)
+import Web.HTML.HTMLDivElement as HD
 import Web.HTML.HTMLDocument (toDocument)
 import Web.HTML.HTMLLIElement as LIH
 import Web.HTML.HTMLParagraphElement as HP
 import Web.HTML.HTMLUListElement as ULH
 import Web.HTML.Window (document)
-import Web.HTML.HTMLDivElement as HD
 
 -- | Runs an action and handles errors in both Effect and Aff using MonadError + MonadEffect.
 genericErrorsHandler :: forall m. MonadError Error m => MonadEffect m => m Unit -> m Unit
@@ -90,7 +90,7 @@ showMinsiErrorDialog errorMessage = do
   let minsiErrorModalContentNode = toNode minsiErrorModalContent
   let errorListNode = E.toNode (ULH.toElement errorList)
   appendChild errorListNode minsiErrorModalContentNode
-  showModal minsiErrorModalId true
+  showModal minsiErrorModalId (Just 5000)
 
 createErrorList :: String -> Effect ULH.HTMLUListElement
 createErrorList errorMessage = do
@@ -136,4 +136,4 @@ showMinsiBlockingErrorDialog :: String -> Effect Unit
 showMinsiBlockingErrorDialog errorMessage = do
   divEl <- createErrorParagraphsDiv errorMessage
   setBlockingModalBody (HD.toHTMLElement divEl)
-  showModal minsiBlockingModalId false
+  showModal minsiBlockingModalId (Just 5000)

@@ -8,6 +8,7 @@ import Components.HtmlComponents.Lenses (_clipboardOutputModalContent, _exportSt
 import Components.HtmlIdAndClasses (clipboardOutputModalId)
 import Components.Modal (showModal)
 import Data.Lens (view)
+import Data.Maybe (Maybe(..))
 import Data.Tuple (fst, snd)
 import Effect (Effect)
 import Model.State.StateFromHtml (getCurrentState)
@@ -34,4 +35,4 @@ exportStateButtonEventListener _ = genericErrorsHandler $ do
     stateJson = writeJSON (fst stateTuple)
     clipboardContentEl = view _clipboardOutputModalContent (snd stateTuple)
   setTextContent stateJson (HP.toNode clipboardContentEl)
-  showModal clipboardOutputModalId true
+  showModal clipboardOutputModalId (Just 5000)

@@ -9,6 +9,7 @@ import Components.HtmlIdAndClasses
   , cutStartId
   , subtitleOffsetId
   , loadingModalId
+  , loadingModalExtraConentId
   , minsiErrorModalId
   , clipboardOutputModalCopyClipboardButtonId
   , clipboardOutputModalContentId
@@ -164,6 +165,7 @@ newtype HtmlOutputs = HtmlOutputs
   , playbackPositionYoutube :: HTMLSpanElement
   , playbackPositionResultMedia :: HTMLSpanElement
   , loadingModal :: HTMLDivElement
+  , loadingModalExtraContent :: HTMLSpanElement
   , minsiErrorModal :: HTMLDivElement
   , clipboardOutputModal :: ClipboardOutputModal
   , importStateModal :: ImportStateModal
@@ -272,6 +274,7 @@ loadHtmlOutputs doc = do
   playbackPositionYoutube <- loadSpan playbackPositionYoutubeId doc
   playbackPositionResultMedia <- loadSpan playbackPositionResultMediaId doc
   loadingModal <- loadDiv loadingModalId doc
+  loadingModalExtraContent <- loadSpan loadingModalExtraConentId doc
   minsiErrorModal <- loadDiv minsiErrorModalId doc
   clipboardOutputModal <- loadClipboardOutputModal doc
   importStateModal <- loadImportStateModal doc
@@ -285,6 +288,7 @@ loadHtmlOutputs doc = do
         , playbackPositionYoutube: playbackPositionYoutube
         , playbackPositionResultMedia: playbackPositionResultMedia
         , loadingModal: loadingModal
+        , loadingModalExtraContent: loadingModalExtraContent
         , minsiErrorModal: minsiErrorModal
         , clipboardOutputModal: clipboardOutputModal
         , importStateModal: importStateModal

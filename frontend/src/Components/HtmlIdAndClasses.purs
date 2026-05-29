@@ -81,6 +81,9 @@ setCutEndButton = "setCutEndButton"
 loadingModalId :: String
 loadingModalId = "loadingModal"
 
+loadingModalExtraConentId :: String
+loadingModalExtraConentId = "loadingModalExtraContent"
+
 minsiErrorModalId :: String
 minsiErrorModalId = "minsiErrorModal"
 

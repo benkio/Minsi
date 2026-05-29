@@ -3,7 +3,7 @@ module Handlers.DownloadFullButtonHandler where
 import Prelude
 
 import Components.HtmlIdAndClasses (loadingModalId)
-import Components.Modal (hideModal, showModal)
+import Components.Modal (hideModal)
 import Data.Either (Either(..))
 import Data.Tuple (fst)
 import Effect (Effect)
@@ -33,7 +33,6 @@ downloadFullButtonEventListener :: Event -> Effect Unit
 downloadFullButtonEventListener _ = genericErrorsHandler $ do
   stateTuple <- getCurrentState
   let source = view _source (fst stateTuple)
-  showModal loadingModalId true
   runAff_
     ( \result -> do
         case result of

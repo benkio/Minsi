@@ -8,12 +8,14 @@ module Handlers.ApplyButtonHandler
 import Prelude
 
 import Components.HtmlComponents (HtmlComponents, loadComponents)
+import Components.LoadingModal (loadingModalExtraContentRotation)
 import Components.HtmlComponents.Lenses (_applyButton, _resultAudio, _resultVideo, _subtitleRowTemplate, _subtitleTable, _uploadLocalFile, _videoSource)
 import Components.HtmlIdAndClasses (loadingModalId, videoSourceId)
 import Components.HtmlVisualElements (showHiddenElements)
 import Components.Modal (hideModal, showModal)
 import Components.Window (scrollToElement)
 import Data.Array (dropWhile)
+import Data.Maybe (Maybe(..))
 import Data.Lens (view)
 import Data.String.CodeUnits (fromCharArray, toCharArray)
 import Data.Tuple (fst, snd)
@@ -52,7 +54,7 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   let state = fst stateComponents
   let components = snd stateComponents
   let uploadLocalFileInput = view _uploadLocalFile components
-  showModal loadingModalId true
+  showModal loadingModalId (Just 15240)
   runAff_
     (\result -> genericErrorsHandlerEither result) $
     finally (liftEffect (finallyHandlers components state)) (applyButtonLogic state uploadLocalFileInput)
@@ -66,10 +68,10 @@ applyButtonLogic (State rec) uploadLocalFileInput = genericErrorsHandler $ do
     source = rec.source
   when (uploadLocalFile && isLocalFile source)
     ( uploadLocalFileLogic source filename uploadLocalFileInput
-        *> waitForStatus filename LocalFileUploaded
+        *> waitForStatus filename LocalFileUploaded Nothing
     )
   void (callCompute state)
-  waitForStatus filename Succeed
+  waitForStatus filename Succeed (Just loadingModalExtraContentRotation)
 
 uploadLocalFileLogic :: Source -> String -> HI.HTMLInputElement -> Aff Unit
 uploadLocalFileLogic (LocalFile file) filename uploadLocalFileInput = genericErrorsHandler $ do
