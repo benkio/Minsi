@@ -2,7 +2,12 @@ module Model.State.State where
 
 import Prelude
 
+import Conversion.String (capitalizeFirst)
+import Data.Array (group, sort)
+import Data.Array.NonEmpty (NonEmptyArray, toArray)
 import Data.Maybe (maybe)
+import Data.String (joinWith)
+import Data.String.Common (toLower, trim)
 import Data.Newtype (class Newtype)
 import Data.Time.Duration (Milliseconds(..))
 import Data.URL (URL, fromString, toString)
@@ -62,7 +67,9 @@ derive instance Eq Font
 derive instance Eq Color
 derive instance Eq Position
 derive newtype instance eqDurationRange :: Eq DurationRange
-derive newtype instance eqSubtitle :: Eq Subtitle
+instance Eq Subtitle where
+  eq (Subtitle { font: f1, screenPosition: sp1, color: c1 }) (Subtitle { font: f2, screenPosition: sp2, color: c2 }) =
+    f1 == f2 && sp1 == sp2 && c1 == c2
 
 -- Show Instances -----------------------
 
@@ -215,3 +222,13 @@ shiftDurationRange (Milliseconds millis) (DurationRange { start: (Milliseconds s
 shiftSubtitle :: Milliseconds -> Subtitle -> Subtitle
 shiftSubtitle millis (Subtitle { videoPosition, value, font, fontSize, color, screenPosition }) =
   Subtitle { videoPosition: shiftDurationRange millis videoPosition, value, font, fontSize, color, screenPosition }
+
+subtitlesToString :: Array Subtitle -> String
+subtitlesToString subtitles = joinWith "\n" subtitleGroupsValues
+  where
+  subtitleGroups = (sort >>> group) subtitles
+  subtitleToLower (Subtitle { value }) = (toLower <<< trim) value
+
+  groupToString :: NonEmptyArray Subtitle -> String
+  groupToString group = (capitalizeFirst <<< joinWith " " <<< map subtitleToLower <<< toArray) group
+  subtitleGroupsValues = groupToString <$> subtitleGroups
