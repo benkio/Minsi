@@ -7,7 +7,7 @@ import Components.HtmlComponents.Lenses (_keyboardShortcutsButton, _subtitleRowT
 import Components.HtmlIdAndClasses (keyboardShortcutsModalId)
 import Components.Modal (showModal)
 import Data.Lens (view)
-import Data.Maybe (maybe, isJust)
+import Data.Maybe (Maybe(..), maybe, isJust)
 import Effect (Effect)
 import Handlers.ApplyButtonHandler (applyButtonEventListener)
 import Handlers.ErrorHandlers (genericErrorsHandler)
@@ -46,7 +46,7 @@ setKeyboardShortcutsButtonHandler :: Effect Unit
 setKeyboardShortcutsButtonHandler = do
   components <- loadComponents
   let keyboardShortcutsButton = view _keyboardShortcutsButton components
-  shortcutsClickEvL <- eventListener \_ -> showModal keyboardShortcutsModalId true
+  shortcutsClickEvL <- eventListener \_ -> showModal keyboardShortcutsModalId (Just 10000)
   addEventListener EClick.click shortcutsClickEvL false (toEventTarget (HB.toElement keyboardShortcutsButton))
 
 keyboardEventListener :: Event -> Effect Unit
@@ -78,7 +78,7 @@ handleKeyboardEvent keyboardEvent = genericErrorsHandler $ do
   whenNotEditable (keyValue == " ") (toggleResultMediaPlayback media)
   whenNotEditable (keyValue == "ArrowLeft") (skipResultMediaBackward media)
   whenNotEditable (keyValue == "ArrowRight") (skipResultMediaForward media)
-  whenNotEditable (keyValue == "?") (showModal keyboardShortcutsModalId true *> stop)
+  whenNotEditable (keyValue == "?") (showModal keyboardShortcutsModalId (Just 10000) *> stop)
 
 toggleResultMediaPlayback :: HTMLMediaElement -> Effect Unit
 toggleResultMediaPlayback media = do

@@ -7,6 +7,7 @@ import Components.HtmlComponents.Lenses (_importStateButton, _importStateModalTe
 import Components.HtmlIdAndClasses (importStateModalId)
 import Components.Modal (showModal)
 import Data.Lens (view)
+import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Handlers.ErrorHandlers (genericErrorsHandler)
 import Web.DOM.Element (toEventTarget)
@@ -29,4 +30,4 @@ importStateButtonEventListener _ =
     components <- loadComponents
     let textarea = view _importStateModalTextarea components
     HTA.setValue "" textarea
-    showModal importStateModalId false
+    showModal importStateModalId Nothing

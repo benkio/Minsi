@@ -14,6 +14,7 @@ import Components.HtmlVisualElements (showHiddenElements)
 import Components.Modal (hideModal, showModal)
 import Components.Window (scrollToElement)
 import Data.Array (dropWhile)
+import Data.Maybe (Maybe(..))
 import Data.Lens (view)
 import Data.String.CodeUnits (fromCharArray, toCharArray)
 import Data.Tuple (fst, snd)
@@ -52,7 +53,7 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   let state = fst stateComponents
   let components = snd stateComponents
   let uploadLocalFileInput = view _uploadLocalFile components
-  showModal loadingModalId true
+  showModal loadingModalId (Just 10240)
   runAff_
     (\result -> genericErrorsHandlerEither result) $
     finally (liftEffect (finallyHandlers components state)) (applyButtonLogic state uploadLocalFileInput)
