@@ -8,6 +8,7 @@ module Handlers.ApplyButtonHandler
 import Prelude
 
 import Components.HtmlComponents (HtmlComponents, loadComponents)
+import Components.LoadingModal (loadingModalExtraContentRotation)
 import Components.HtmlComponents.Lenses (_applyButton, _resultAudio, _resultVideo, _subtitleRowTemplate, _subtitleTable, _uploadLocalFile, _videoSource)
 import Components.HtmlIdAndClasses (loadingModalId, videoSourceId)
 import Components.HtmlVisualElements (showHiddenElements)
@@ -67,10 +68,10 @@ applyButtonLogic (State rec) uploadLocalFileInput = genericErrorsHandler $ do
     source = rec.source
   when (uploadLocalFile && isLocalFile source)
     ( uploadLocalFileLogic source filename uploadLocalFileInput
-        *> waitForStatus filename LocalFileUploaded
+        *> waitForStatus filename LocalFileUploaded Nothing
     )
   void (callCompute state)
-  waitForStatus filename Succeed
+  waitForStatus filename Succeed (Just loadingModalExtraContentRotation)
 
 uploadLocalFileLogic :: Source -> String -> HI.HTMLInputElement -> Aff Unit
 uploadLocalFileLogic (LocalFile file) filename uploadLocalFileInput = genericErrorsHandler $ do
