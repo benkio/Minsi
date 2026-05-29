@@ -53,7 +53,7 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   let state = fst stateComponents
   let components = snd stateComponents
   let uploadLocalFileInput = view _uploadLocalFile components
-  showModal loadingModalId (Just 10240)
+  showModal loadingModalId (Just 15240)
   runAff_
     (\result -> genericErrorsHandlerEither result) $
     finally (liftEffect (finallyHandlers components state)) (applyButtonLogic state uploadLocalFileInput)

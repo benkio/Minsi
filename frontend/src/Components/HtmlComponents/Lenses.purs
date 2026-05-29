@@ -46,6 +46,7 @@ module Components.HtmlComponents.Lenses
   , _playbackPositionYoutube
   , _playbackPositionResultMedia
   , _loadingModal
+  , _loadingModalExtraContent
   , _minsiErrorModal
   , _clipboardOutputModal
   , _clipboardOutputModalContent
@@ -146,6 +147,7 @@ _HtmlOutputs
        , playbackPositionYoutube :: HTMLSpanElement
        , playbackPositionResultMedia :: HTMLSpanElement
        , loadingModal :: HTMLDivElement
+       , loadingModalExtraContent :: HTMLSpanElement
        , minsiErrorModal :: HTMLDivElement
        , clipboardOutputModal :: ClipboardOutputModal
        , importStateModal :: ImportStateModal
@@ -290,6 +292,9 @@ _playbackPositionResultMedia = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy
 
 _loadingModal :: Lens' HtmlComponents HTMLDivElement
 _loadingModal = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "loadingModal")
+
+_loadingModalExtraContent :: Lens' HtmlComponents HTMLSpanElement
+_loadingModalExtraContent = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "loadingModalExtraContent")
 
 _minsiErrorModal :: Lens' HtmlComponents HTMLDivElement
 _minsiErrorModal = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "minsiErrorModal")
