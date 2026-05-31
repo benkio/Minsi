@@ -78,6 +78,9 @@ cloneFirstRow firstRow subtitleTable media = do
   let newStartValue = show $ endValueMs + 100.0
   log $ "Subtitle row clone - Set new row to start to " <> newStartValue
   setTableCellValue "Start" newStartValue clonedRow
+  let newEndValue = show $ endValueMs + 201.0
+  log $ "Subtitle row clone - Set new row to end to " <> newEndValue
+  setTableCellValue "End" newEndValue clonedRow
   fontColor <- getTableCellValue "FontColor" firstRow
   log $ "Subtitle row clone - Set new row to Font/Color to " <> fontColor
   setTableCellValue "FontColor" fontColor clonedRow
