@@ -1,0 +1,10 @@
+package:
+  name: shared
+  dependencies:
+    - console
+    - effect
+    - prelude
+workspace:
+  packageSet:
+    registry: 77.4.0
+  extraPackages: {}
