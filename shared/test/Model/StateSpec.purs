@@ -4,7 +4,7 @@ import Prelude
 
 import Data.Either (isLeft, isRight)
 import Effect.Class (liftEffect)
-import Model.State (Color(..), DurationRange, Font(..), Position(..), Subtitle(..), validateFilename, validateRange, validateSubtitles)
+import Model.State.State (Color(..), DurationRange, Font(..), Position(..), Subtitle(..), validateFilename, validateRange, validateSubtitles)
 import Test.Arbitrary (InvalidDurationRange(..), LongerThanNCharacters(..), NonEmptyInvalidDurationRanges(..), NonEmptyValidDurationRanges(..), ValidDurationRange(..))
 import Test.QuickCheck (quickCheck)
 import Test.Spec (Spec, describe, it)

@@ -1,6 +1,34 @@
 name: CI
 on: [push, pull_request, workflow_dispatch]
 jobs:
+  shared:
+    name: Shared
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup PureScript
+        uses: purescript-contrib/setup-purescript@main
+        with:
+          purescript: latest
+          purs-tidy: latest
+          spago: unstable
+      - name: Cache PureScript dependencies (shared)
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-spago-shared-${{ hashFiles('shared/spago.yaml') }}
+          path: |
+            shared/.spago
+            shared/output
+      - name: Check Formatting
+        working-directory: shared
+        run: purs-tidy check "src/**/*.purs" && purs-tidy check "test/**/*.purs"
+      - name: Build shared
+        working-directory: shared
+        run: spago build
+      - name: Test shared
+        working-directory: shared
+        run: spago test
   backend:
     name: Backend
     runs-on: ubuntu-latest
@@ -126,6 +154,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     needs:
+      - shared
       - backend
       - frontend
       - docker

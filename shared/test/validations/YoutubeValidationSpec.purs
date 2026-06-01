@@ -1,7 +1,6 @@
 module Test.Validations.YoutubeValidationSpec where
 
-import Data.Either (Either(Left, Right))
-import Data.String.Regex (test)
+import Data.Either (either)
 import Data.Traversable (traverse_)
 import Data.Validation.Semigroup (isValid, toEither)
 import Effect.Class (liftEffect)
@@ -9,6 +8,8 @@ import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Validations.YoutubeValidation (youtubeRegexValidation, youtubeUrlValidation)
 import Prelude
+
+import Data.String.Regex (test)
 
 spec :: Spec Unit
 spec = do
@@ -21,14 +22,15 @@ spec = do
     it "should create a valid regex that matches youtube URLs" $ liftEffect $ do
       let regexResult = youtubeRegexValidation "testId"
       isValid regexResult `shouldEqual` true
-      case toEither regexResult of
-        Right regex -> do
-          test regex "https://www.youtube.com/watch?v=dQw4w9WgXcQ" `shouldEqual` true
-          test regex "https://youtube.com/shorts/_JryLY7pXLQ" `shouldEqual` true
-          test regex "https://www.youtube.com/shorts/C8p4SOnSXeQ?t=30" `shouldEqual` true
-          test regex "https://youtu.be/dQw4w9WgXcQ" `shouldEqual` true
-          test regex "not a youtube url" `shouldEqual` false
-        Left _ -> pure unit
+      either (const $ pure unit)
+        ( \regex -> do
+            test regex "https://www.youtube.com/watch?v=dQw4w9WgXcQ" `shouldEqual` true
+            test regex "https://youtube.com/shorts/_JryLY7pXLQ" `shouldEqual` true
+            test regex "https://www.youtube.com/shorts/C8p4SOnSXeQ?t=30" `shouldEqual` true
+            test regex "https://youtu.be/dQw4w9WgXcQ" `shouldEqual` true
+            test regex "not a youtube url" `shouldEqual` false
+        )
+        (toEither regexResult)
 
   describe "youtubeUrlValidation" do
     it "should validate a standard youtube.com URL" $ liftEffect $ do

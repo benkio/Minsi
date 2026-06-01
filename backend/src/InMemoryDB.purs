@@ -7,7 +7,7 @@ import Data.Maybe (Maybe)
 import Effect (Effect)
 import Effect.Ref as Ref
 import Model.ProcessStatus (ProcessStatus)
-import Model.State (State)
+import Model.State.State (State)
 
 type Filename = String
 type StateProcessStatus = { state :: Maybe State, processStatus :: ProcessStatus }

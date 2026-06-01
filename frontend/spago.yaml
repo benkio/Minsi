@@ -28,6 +28,7 @@ package:
     - prelude
     - profunctor-lenses
     - quickcheck
+    - shared
     - spec
     - spec-discovery
     - strings
@@ -45,6 +46,8 @@ package:
     - yoga-json
   name: minsi-frontend
 workspace:
-  extraPackages: {}
+  extraPackages:
+    shared:
+      path: ../shared
   packageSet:
     url: https://raw.githubusercontent.com/purescript/package-sets/master/packages.json

@@ -16,11 +16,11 @@ package:
     - maybe
     - monad-loops
     - node-buffer
-    - node-process
     - node-child-process
     - node-execa
     - node-fs
     - node-path
+    - node-process
     - now
     - open-foreign-generic
     - ordered-collections
@@ -28,6 +28,7 @@ package:
     - printf
     - quickcheck
     - refs
+    - shared
     - spec
     - spec-discovery
     - strings
@@ -39,6 +40,8 @@ package:
     - yoga-json
   name: minsi-backend
 workspace:
-  extraPackages: {}
+  extraPackages:
+    shared:
+      path: ../shared
   packageSet:
     url: https://raw.githubusercontent.com/purescript/package-sets/master/packages.json
