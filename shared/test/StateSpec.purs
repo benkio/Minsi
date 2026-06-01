@@ -44,7 +44,6 @@ spec :: Spec Unit
 spec = do
   describe "State JSON encoding" do
     it "should encode State to JSON properly" $ liftEffect $ do
-      -- Create a sample State
       let
         youtubeUrl = WURL (unsafePartial fromJust (fromString "https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
         cutVideo = DurationRange { start: Milliseconds 0.0, end: Milliseconds 100.0 }
@@ -74,16 +73,10 @@ spec = do
             , subtitles: [ subtitle ]
             }
 
-      -- Encode to JSON
       let jsonString = writeJSON state
-
-      -- Parse JSON string to Foreign
       let json = parseJSON jsonString
-
-      -- Verify the JSON structure
       let jsonObj = Foreign.unsafeFromForeign json :: Object Foreign
 
-      -- Check cutVideo
       cutVideoJson <- case lookup "cutVideo" jsonObj of
         Just cv -> pure cv
         Nothing -> liftEffect $ throwException $ error "cutVideo field missing"
@@ -97,79 +90,66 @@ spec = do
       startValue `shouldEqual` 0.0
       endValue `shouldEqual` 100.0
 
-      -- Check source (WebURL is encoded as URL string)
       sourceValue <- case lookup "source" jsonObj of
         Just s -> liftEffect $ readForeignString s
         Nothing -> liftEffect $ throwException $ error "source field missing"
       sourceValue `shouldEqual` "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 
-      -- Check filename
       filenameValue <- case lookup "filename" jsonObj of
         Just f -> liftEffect $ readForeignString f
         Nothing -> liftEffect $ throwException $ error "filename field missing"
       filenameValue `shouldEqual` filename
 
-      -- Check reverseLoop
       reverseLoopValue <- case lookup "reverseLoop" jsonObj of
         Just rl -> liftEffect $ readForeignBoolean rl
         Nothing -> liftEffect $ throwException $ error "reverseLoop field missing"
       reverseLoopValue `shouldEqual` reverseLoop
 
-      -- Check uploadLocalFile
       uploadLocalFileValue <- case lookup "uploadLocalFile" jsonObj of
         Just ul -> liftEffect $ readForeignBoolean ul
         Nothing -> liftEffect $ throwException $ error "uploadLocalFile field missing"
       uploadLocalFileValue `shouldEqual` uploadLocalFile
 
-      -- Check artist
       artistValue <- case lookup "artist" jsonObj of
         Just a -> liftEffect $ readForeignString a
         Nothing -> liftEffect $ throwException $ error "artist field missing"
       artistValue `shouldEqual` artist
 
-      -- Check title
       titleValue <- case lookup "title" jsonObj of
         Just t -> liftEffect $ readForeignString t
         Nothing -> liftEffect $ throwException $ error "title field missing"
       titleValue `shouldEqual` title
 
-      -- Check subtitles array
       subtitlesArray <- case lookup "subtitles" jsonObj of
         Just st -> liftEffect $ readForeignArray st
         Nothing -> liftEffect $ throwException $ error "subtitles field missing"
       (length subtitlesArray) `shouldEqual` 1
 
-      -- Check first subtitle
       subtitleJson <- case index subtitlesArray 0 of
         Just s -> pure s
         Nothing -> liftEffect $ throwException $ error "subtitle missing in array"
       let subtitleObj = Foreign.unsafeFromForeign subtitleJson :: Object Foreign
 
-      -- Check subtitle value
       subtitleValue <- case lookup "value" subtitleObj of
         Just v -> liftEffect $ readForeignString v
         Nothing -> liftEffect $ throwException $ error "value field missing in subtitle"
       subtitleValue `shouldEqual` "Test subtitle"
 
-      -- Check subtitle font
       subtitleFont <- case lookup "font" subtitleObj of
         Just f -> liftEffect $ readForeignString f
         Nothing -> liftEffect $ throwException $ error "font field missing in subtitle"
       subtitleFont `shouldEqual` "Impact"
 
-      -- Check subtitle color
       subtitleColor <- case lookup "color" subtitleObj of
         Just c -> liftEffect $ readForeignString c
         Nothing -> liftEffect $ throwException $ error "color field missing in subtitle"
       subtitleColor `shouldEqual` "#ffffff"
 
-      -- Check subtitle position
       subtitlePosition <- case lookup "screenPosition" subtitleObj of
         Just p -> liftEffect $ readForeignString p
         Nothing -> liftEffect $ throwException $ error "screenPosition field missing in subtitle"
       subtitlePosition `shouldEqual` "Top"
 
-      -- Check subtitle size
       subtitleSize <- case lookup "fontSize" subtitleObj of
         Just s -> liftEffect $ readForeignInt s
         Nothing -> liftEffect $ throwException $ error "fontSize field missing in subtitle"

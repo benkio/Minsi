@@ -4,7 +4,7 @@ import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Prelude
 import Data.Time.Duration (Milliseconds(..))
-import Model.State (Subtitle(..), DurationRange(..), Font(..), Color(..), Position(..))
+import Model.State.State (Subtitle(..), DurationRange(..), Font(..), Color(..), Position(..))
 import Command.Ffmpeg.Gif (makeSrtString)
 
 spec :: Spec Unit

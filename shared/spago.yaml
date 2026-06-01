@@ -1,9 +1,33 @@
 package:
   name: shared
   dependencies:
-    - console
-    - effect
+    - arrays
+    - bifunctors
+    - datetime
+    - either
+    - foldable-traversable
+    - foreign
+    - maybe
+    - newtype
+    - node-path
+    - ordered-collections
     - prelude
+    - strings
+    - url-immutable
+    - validation
+    - web-file
+    - yoga-json
+  test:
+    main: Test.Main
+    dependencies:
+      - control
+      - effect
+      - exceptions
+      - functions
+      - partial
+      - quickcheck
+      - spec
+      - spec-discovery
 workspace:
   packageSet:
     registry: 77.4.0

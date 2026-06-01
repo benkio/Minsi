@@ -5,7 +5,7 @@ import Prelude
 import Controller.ComputeController (cutDownloadRequired)
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Time.Duration (Milliseconds(..))
-import Model.State (DurationRange(..), Source(..), State(..), WURL(..))
+import Model.State.State (DurationRange(..), Source(..), State(..), WURL(..))
 import Partial.Unsafe (unsafePartial)
 import Data.URL (fromString)
 import Test.Spec (Spec, describe, it)

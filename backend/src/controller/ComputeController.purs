@@ -22,7 +22,7 @@ import Effect.Class (liftEffect)
 import Effect.Console (log)
 import InMemoryDB (Store, insert, lookupProcessStatus)
 import Model.ProcessStatus (ProcessStatus(..), isFinished)
-import Model.State (DurationRange(..), Source(..), State(..), WURL(..), validateState)
+import Model.State.State (DurationRange(..), Source(..), State(..), WURL(..), validateState)
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody)
 

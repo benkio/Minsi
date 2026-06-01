@@ -5,7 +5,7 @@ import Effect.Class (liftEffect)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Data.Validation.Semigroup (isValid, toEither)
-import Data.Either (Either(Left, Right), either)
+import Data.Either (either)
 import Data.String.Regex (regex)
 import Data.String.Regex.Flags (noFlags)
 import Validations.RegexValidation (matches)
@@ -18,9 +18,7 @@ spec = do
         ( \regex -> do
             let result = matches regex "testId" "hello"
             isValid result `shouldEqual` true
-            case toEither result of
-              Right str -> str `shouldEqual` "hello"
-              Left _ -> pure unit
+            either (const $ pure unit) (\str -> str `shouldEqual` "hello") (toEither result)
         )
         (regex "hello" noFlags)
 

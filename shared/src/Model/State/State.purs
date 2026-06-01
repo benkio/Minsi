@@ -3,33 +3,27 @@ module Model.State.State where
 import Prelude
 
 import Conversion.String (capitalizeFirst)
-import Data.Array (group, sort)
+import Data.Array (group, null, sort)
 import Data.Array.NonEmpty (NonEmptyArray, toArray)
+import Data.Either (Either(..))
 import Data.Maybe (maybe)
-import Data.String (joinWith)
-import Data.String.Common (toLower, trim)
 import Data.Newtype (class Newtype)
+import Data.String (joinWith, length)
+import Data.String.Common (toLower, trim)
 import Data.Time.Duration (Milliseconds(..))
+import Data.Traversable (traverse_)
 import Data.URL (URL, fromString, toString)
+import Data.Validation.Semigroup (isValid)
 import Foreign (ForeignError(..), fail)
-import Foreign.Index (readProp)
 import Node.Path (FilePath)
+import Validations.YoutubeValidation (youtubeUrlValidation)
 import Web.File.File (File)
 import Yoga.JSON (class ReadForeign, class WriteForeign, readImpl, writeImpl)
-
--------------------------------------------------------------------------------
---                    Copy Pasted between Frontend↔Backend                   --
--------------------------------------------------------------------------------
 
 -- Type Definitions -----------------------------------------------------------
 
 newtype WURL = WURL URL
 data Source = LocalFile File | WebURL WURL
-
-instance Eq Source where
-  eq (LocalFile _) (LocalFile _) = true
-  eq (WebURL a) (WebURL b) = eq a b
-  eq _ _ = false
 
 newtype State = State
   { cutVideo :: DurationRange
@@ -78,11 +72,11 @@ instance Show Font where
   show ArialBlack = "ArialBlack"
 
 instance Show Color where
-  show White = "White"
-  show Black = "Black"
-  show LightGreen = "LightGreen"
-  show LightOrange = "LightOrange"
-  show Yellow = "Yellow"
+  show White = "#ffffff"
+  show Black = "#000000"
+  show LightGreen = "#ABEBC6"
+  show LightOrange = "#FAD7A0"
+  show Yellow = "#FFFF00"
 
 instance Show Position where
   show Top = "Top"
@@ -110,6 +104,11 @@ instance Show Subtitle where
       <> show color
       <> ", screenPosition: "
       <> show screenPosition
+
+instance Eq Source where
+  eq (LocalFile _) (LocalFile _) = true
+  eq (WebURL w1) (WebURL w2) = w1 == w2
+  eq _ _ = false
 
 instance Show Source where
   show (LocalFile _) = "LocalFile"
@@ -153,12 +152,6 @@ derive newtype instance writeState :: WriteForeign State
 
 foreign import importedLocalFilePlaceholder :: File
 
-instance ReadForeign DurationRange where
-  readImpl obj = do
-    startN <- readProp "start" obj >>= readImpl
-    endN <- readProp "end" obj >>= readImpl
-    pure $ DurationRange { start: Milliseconds startN, end: Milliseconds endN }
-
 instance ReadForeign Position where
   readImpl f = do
     s <- readImpl f
@@ -186,7 +179,9 @@ instance ReadForeign Font where
       "Arial Black" -> pure ArialBlack
       _ -> fail $ TypeMismatch "Font" $ "Invalid Font: " <> s
 
-derive newtype instance readSubtitle :: ReadForeign Subtitle
+derive newtype instance ReadForeign DurationRange
+derive newtype instance ReadForeign Subtitle
+derive newtype instance ReadForeign State
 
 instance ReadForeign WURL where
   readImpl f = do
@@ -196,10 +191,8 @@ instance ReadForeign WURL where
 instance ReadForeign Source where
   readImpl f = do
     s <- readImpl f
-    if s == "LocalFile" then pure $ LocalFile importedLocalFilePlaceholder
+    if s == "LocalFile" then pure (LocalFile importedLocalFilePlaceholder)
     else maybe (fail $ TypeMismatch "Source" $ "Invalid Source: " <> s) (pure <<< WebURL <<< WURL) (fromString s)
-
-derive newtype instance readState :: ReadForeign State
 
 -- Other Typeclass Instances --------------------------
 
@@ -232,3 +225,35 @@ subtitlesToString subtitles = joinWith "\n" subtitleGroupsValues
   groupToString :: NonEmptyArray Subtitle -> String
   groupToString group = (capitalizeFirst <<< joinWith " " <<< map subtitleToLower <<< toArray) group
   subtitleGroupsValues = groupToString <$> subtitleGroups
+
+validateState :: State -> Either (Array String) State
+validateState state@(State ({ source, filename, cutVideo: durationRange, subtitles, reverseLoop })) = do
+  _ <- validateRange durationRange
+  _ <- validateSubtitles subtitles reverseLoop
+  _ <- validateFilename filename
+  _ <- validateSource source
+  pure state
+
+validateSubtitles :: Array Subtitle -> Boolean -> Either (Array String) Unit
+validateSubtitles subtitles reverseLoop = do
+  _ <- traverse_ (\(Subtitle { videoPosition, value }) -> validateRange videoPosition *> validateSubtitleValue value) subtitles
+  if reverseLoop && (not <<< null) subtitles then Left [ "ReverseLoop and subtitles not supported" ] else Right unit
+
+validateRange :: DurationRange -> Either (Array String) Unit
+validateRange (DurationRange { start: (Milliseconds start), end: (Milliseconds end) })
+  | start < end - 100.0 = Right unit
+  | otherwise = Left [ "State Validation: range start >= end - 100" ]
+
+validateSubtitleValue :: String -> Either (Array String) Unit
+validateSubtitleValue v =
+  if length v > 30 then Left [ "State Validation: subtitle too long. > 30 chars" ] else Right unit
+
+validateFilename :: String -> Either (Array String) Unit
+validateFilename v -- TODO: should check for the prefix
+  | length v > 50 = Left [ "State Validation: filename too long. > 50 chars" ]
+  | otherwise = Right unit
+
+validateSource :: Source -> Either (Array String) Unit
+validateSource (LocalFile _) = Right unit
+validateSource (WebURL (WURL url)) =
+  if isValid (youtubeUrlValidation "source" (toString url)) then Right unit else Left [ "State Validation: source must be a valid YouTube URL" ]

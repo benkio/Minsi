@@ -9,20 +9,10 @@ import Data.Maybe (Maybe(..))
 import Data.String.CodeUnits (fromCharArray)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Traversable (traverse)
-import Model.State (DurationRange(..))
+import Model.State.State (DurationRange(..))
 import Test.QuickCheck.Arbitrary (class Arbitrary, arbitrary)
 import Test.QuickCheck.Gen (Gen, choose, suchThat, arrayOf1, chooseInt)
 
-data Range = Range Number Number
-
-instance Arbitrary Range where
-  arbitrary = do
-    start <- arbitrary
-    -- arbitrary for Number is uniform [0,1]; use choose so gap is always > 100
-    gap <- choose 100.1 10000.0
-    pure (Range start (start + gap))
-
--- | DurationRange that satisfies validateRange: start < end - 100 (i.e. end - start > 100 ms)
 newtype ValidDurationRange = ValidDurationRange DurationRange
 
 instance Arbitrary ValidDurationRange where
@@ -34,7 +24,6 @@ instance Arbitrary ValidDurationRange where
       , end: Milliseconds (start + gap)
       }
 
--- | DurationRange that fails validateRange: start >= end - 100 (i.e. end - start <= 100 ms)
 newtype InvalidDurationRange = InvalidDurationRange DurationRange
 
 instance Arbitrary InvalidDurationRange where
@@ -46,7 +35,6 @@ instance Arbitrary InvalidDurationRange where
       , end: Milliseconds (start + gap)
       }
 
--- | Non-empty array of valid DurationRanges (for validateSubtitles tests)
 newtype NonEmptyValidDurationRanges = NonEmptyValidDurationRanges (Array DurationRange)
 
 instance Arbitrary NonEmptyValidDurationRanges where
@@ -54,7 +42,6 @@ instance Arbitrary NonEmptyValidDurationRanges where
     nea <- arrayOf1 arbitrary
     pure $ NonEmptyValidDurationRanges (map (\(ValidDurationRange r) -> r) (NEA.toArray nea))
 
--- | Non-empty array of invalid DurationRanges (for validateSubtitles tests)
 newtype NonEmptyInvalidDurationRanges = NonEmptyInvalidDurationRanges (Array DurationRange)
 
 instance Arbitrary NonEmptyInvalidDurationRanges where
