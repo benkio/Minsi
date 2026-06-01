@@ -24,7 +24,8 @@ import InMemoryDB (Store, insert, lookupProcessStatus)
 import Model.ProcessStatus (ProcessStatus(..), isFinished)
 import Model.State.State (DurationRange(..), Source(..), State(..), WURL(..), validateState)
 import Node.Express.Handler (Handler)
-import Node.Express.Request (getBody)
+import Node.Express.Request (getBody')
+import Yoga.JSON (read)
 
 data ComputeResponse
   = InvalidInput (Array String)
@@ -33,8 +34,8 @@ data ComputeResponse
 
 computeController :: Store -> Handler
 computeController store = do
-  bodyResult <- getBody
-  let stateParsingResult = validateState =<< lmap (fromFoldable <<< map show) (runExcept bodyResult)
+  bodyForeign <- getBody'
+  let stateParsingResult = validateState =<< lmap (fromFoldable <<< map show) (read bodyForeign)
   response <- liftEffect $ computeResponse store stateParsingResult
   case response of
     InvalidInput errors ->
@@ -86,7 +87,7 @@ runComputePipeline mayOldState state@(State { source, filename, cutVideo: Durati
                 case result of
                   YtdlpDownloadResult execaResult -> pure execaResult
                   YtdlpDownloadProcess _ -> liftEffect $ throwMinsiError (YtdlpError "Streaming download is not implemented yet")
-            LocalFile -> void $ exceptTStep "Video download" $ (liftEffect $ uploaded filename) >>= \fn -> cutVideo (FfmpegInput { input: fn, filename, maybeStart: Just start, maybeEnd: Just end })
+            LocalFile _ -> void $ exceptTStep "Video download" $ (liftEffect $ uploaded filename) >>= \fn -> cutVideo (FfmpegInput { input: fn, filename, maybeStart: Just start, maybeEnd: Just end })
           void $ exceptTStep "Video Normalization" $ normalizeVideo filename
       )
     void $ exceptTStep "MP3 extraction" $ extractMp3 filename
