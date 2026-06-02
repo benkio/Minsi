@@ -69,7 +69,7 @@ instance Eq Subtitle where
 
 instance Show Font where
   show Impact = "Impact"
-  show ArialBlack = "ArialBlack"
+  show ArialBlack = "Arial Black"
 
 instance Show Color where
   show White = "#ffffff"
