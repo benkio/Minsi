@@ -11,6 +11,7 @@ I don't plan to develop new features on this for now. Just fix bugs and keep it 
 
 - **[Frontend](./frontend/README.md)** — PureScript UI (Bootstrap, YouTube embed)
 - **[Backend](./backend/README.md)** — PureScript Express server (yt-dlp, ffmpeg, id3v2)
+- **[Shared](./shared/)** — Contains shared types and logic between Frontend and Backend
 
 ## System dependencies
 
