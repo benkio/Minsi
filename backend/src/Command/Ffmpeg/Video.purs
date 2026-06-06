@@ -7,6 +7,7 @@ import Constants (mp4, tempVideo)
 import Conversion.Time (millisecondsToSecondsString)
 import Data.Maybe (Maybe(..), maybe)
 import Data.Newtype (class Newtype, unwrap)
+import Data.Number (abs)
 import Data.Time.Duration (Milliseconds(..))
 import Effect (Effect)
 import Effect.Aff (Aff, apathize, finally)
@@ -50,6 +51,8 @@ normalizeVideoArgs mp4 tempVideo (Milliseconds shiftVideoSync) =
     , "-af"
     , "\"loudnorm=I=-16:TP=-1.5:LRA=11\""
     ]
+  seekStart =
+    millisecondsToSecondsString (Milliseconds (abs shiftVideoSync)) (Just '.')
   inputFlags =
     if shiftVideoSync == 0.0 then [ "-i", show mp4 ]
     else
@@ -63,6 +66,8 @@ normalizeVideoArgs mp4 tempVideo (Milliseconds shiftVideoSync) =
       , "1:a"
       , "-map"
       , "0:v"
+      , "-ss"
+      , seekStart
       ]
 
 millisecondsToOffsetSeconds :: Number -> String
