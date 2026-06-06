@@ -2,8 +2,9 @@ module Test.Controller.ComputeControllerSpec where
 
 import Prelude
 
-import Controller.ComputeController (cutDownloadRequired)
+import Controller.ComputeController (cutDownloadRequired, shiftVideoSyncChanged, videoNormalizationRequired)
 import Data.Maybe (Maybe(..), fromJust)
+import Data.Newtype (unwrap)
 import Data.Time.Duration (Milliseconds(..))
 import Model.State.State (DurationRange(..), Source(..), State(..), WURL(..))
 import Partial.Unsafe (unsafePartial)
@@ -56,3 +57,23 @@ spec = do
 
     it "returns true when both source and cut range change" $
       cutDownloadRequired (Just (mkState source1 cut1)) (mkState source2 cut2) `shouldEqual` true
+
+  describe "shiftVideoSyncChanged" do
+    it "returns false when there is no old state" $
+      shiftVideoSyncChanged Nothing (mkState source1 cut1) `shouldEqual` false
+
+    it "returns false when shiftVideoSync is unchanged" $
+      shiftVideoSyncChanged (Just (mkState source1 cut1)) (mkState source1 cut1) `shouldEqual` false
+
+    it "returns true when shiftVideoSync changes" $
+      shiftVideoSyncChanged
+        (Just (mkState source1 cut1))
+        (State $ (unwrap $ mkState source1 cut1) { shiftVideoSync = Milliseconds 500.0 })
+        `shouldEqual` true
+
+  describe "videoNormalizationRequired" do
+    it "returns true when shiftVideoSync changes but source and cut range do not" $
+      videoNormalizationRequired
+        (Just (mkState source1 cut1))
+        (State $ (unwrap $ mkState source1 cut1) { shiftVideoSync = Milliseconds 500.0 })
+        `shouldEqual` true
