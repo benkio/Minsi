@@ -15,7 +15,7 @@ import Effect (Effect)
 import Handlers.ApplyButtonHandler (revealComputedResultPanels)
 import Handlers.Subtitles.RemoveSubtitleButtonHandler (addRemoveSubtitleListenerToRow)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
-import Model.State.State (State(..), DurationRange(..), Subtitle(..), Source(..), WURL(..), shiftSubtitle)
+import Model.State.State (State(..), DurationRange(..), Subtitle(..), Source(..), WURL(..))
 import Parse.Font (formatFontAndColor, formatPosition)
 import Web.DOM.Element (fromNode)
 import Web.DOM.Node (deepClone)
@@ -27,7 +27,7 @@ loadCurrentState :: State -> Effect Unit
 loadCurrentState (State s) = do
   components <- loadComponents
   let inputs = components.htmlInputs
-  applySubtitleOffsetToHtml inputs
+  applySyncAVToHtml s.syncAV inputs
   applyCutVideoToHtml s.cutVideo inputs
   applySourceToHtml s.source inputs
   applyFilenameToHtml s.filename inputs
@@ -38,9 +38,9 @@ loadCurrentState (State s) = do
   applySubtitlesToHtml s.subtitles inputs
   revealComputedResultPanels components $ State s
 
-applySubtitleOffsetToHtml :: HtmlInputs -> Effect Unit
-applySubtitleOffsetToHtml (HtmlInputs { subtitleOffset }) =
-  HI.setValue "0.0" subtitleOffset
+applySyncAVToHtml :: Milliseconds -> HtmlInputs -> Effect Unit
+applySyncAVToHtml (Milliseconds value) (HtmlInputs { syncAV }) =
+  HI.setValue (show value) syncAV
 
 applyCutVideoToHtml :: DurationRange -> HtmlInputs -> Effect Unit
 applyCutVideoToHtml (DurationRange { start: startMs, end: endMs }) (HtmlInputs { cutStart, cutEnd }) = do
@@ -80,13 +80,9 @@ applyArtistToHtml artistText (HtmlInputs { artist: artistInput }) =
   HI.setValue artistText artistInput
 
 applySubtitlesToHtml :: Array Subtitle -> HtmlInputs -> Effect Unit
-applySubtitlesToHtml subtitles (HtmlInputs { subtitleOffset, subtitleTable, subtitleRow }) = do
-  offsetMillis <- HI.valueAsNumber subtitleOffset
-  let
-    subtitlesForDom =
-      map (shiftSubtitle (Milliseconds (-offsetMillis))) subtitles
+applySubtitlesToHtml subtitles (HtmlInputs { subtitleTable, subtitleRow }) = do
   subtitleTemplateRow <- getRow subtitleRow
-  newRows <- traverse (cloneAndFillSubtitleRow subtitleTemplateRow) subtitlesForDom
+  newRows <- traverse (cloneAndFillSubtitleRow subtitleTemplateRow) subtitles
   setRows newRows subtitleTable
   traverse_ addRemoveSubtitleListenerToRow newRows
 

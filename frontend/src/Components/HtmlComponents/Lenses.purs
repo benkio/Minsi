@@ -12,7 +12,7 @@ module Components.HtmlComponents.Lenses
   -- HtmlComponents → HtmlInputs fields
   , _cutStart
   , _cutEnd
-  , _subtitleOffset
+  , _syncAV
   , _youtubeUrl
   , _downloadFullButton
   , _localFile
@@ -109,7 +109,7 @@ _HtmlInputs
   :: Iso' HtmlInputs
        { cutStart :: HTMLInputElement
        , cutEnd :: HTMLInputElement
-       , subtitleOffset :: HTMLInputElement
+       , syncAV :: HTMLInputElement
        , youtubeUrl :: HTMLInputElement
        , downloadFullButton :: HTMLButtonElement
        , localFile :: HTMLInputElement
@@ -191,8 +191,8 @@ _cutStart = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "cutStart")
 _cutEnd :: Lens' HtmlComponents HTMLInputElement
 _cutEnd = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "cutEnd")
 
-_subtitleOffset :: Lens' HtmlComponents HTMLInputElement
-_subtitleOffset = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "subtitleOffset")
+_syncAV :: Lens' HtmlComponents HTMLInputElement
+_syncAV = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "syncAV")
 
 _youtubeUrl :: Lens' HtmlComponents HTMLInputElement
 _youtubeUrl = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "youtubeUrl")

@@ -19,7 +19,7 @@ import Data.Validation.Semigroup (V, andThen, invalid, toEither, validation)
 import Effect (Effect)
 import HTMLTableCellElement (valueFromInputTableCell, valueFromSelectTableCell, valueFromTextAreaTableCell)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
-import Model.State.State (State(..), DurationRange(..), WURL(..), Source(..), Subtitle(..), shiftSubtitle)
+import Model.State.State (State(..), DurationRange(..), WURL(..), Source(..), Subtitle(..))
 import Model.ValidationErrors (ValidationErrors, toMap, fromSingleton)
 import Parse.Font (parseFontAndColor, parsePosition)
 import Partial.Unsafe (unsafePartial)
@@ -57,7 +57,7 @@ fromHtmlInputs
       , reverseLoop: reverseLoopInput
       , artist: artistInput
       , title: titleInput
-      , subtitleOffset
+      , syncAV
       , subtitleTable
       }
   ) = do
@@ -68,7 +68,7 @@ fromHtmlInputs
   uploadLocalFileValue <- checked uploadLocalFileInput
   artistV <- HI.value artistInput <#> nonEmptyValidation artistId <#> (_ `andThen` printableAsciiLatinValidation artistId)
   titleV <- HI.value titleInput <#> nonEmptyValidation titleId <#> (_ `andThen` printableAsciiLatinValidation titleId)
-  subtitleOffsetValue <- valueAsNumber subtitleOffset
+  syncAVSetValue <- valueAsNumber syncAV
   subtitlesV <- loadSubtitlesFromTable loadSubtitleFromRow subtitleTable <#> \subs -> traverse (\(sub@(Subtitle { value })) -> maxCharsValidation 30 "SubtitleRow" value <#> const sub) subs
   pure $ ado
     cutVideo <- cutVideoV
@@ -77,7 +77,6 @@ fromHtmlInputs
     artist <- artistV
     title <- titleV
     subtitles <- subtitlesV
-    let subtitlesWithOffset = map (shiftSubtitle (Milliseconds subtitleOffsetValue)) subtitles
     in
       State
         { cutVideo: cutVideo
@@ -87,7 +86,8 @@ fromHtmlInputs
         , uploadLocalFile: uploadLocalFileValue
         , artist: capitalize artist
         , title: capitalize title
-        , subtitles: subtitlesWithOffset
+        , subtitles: subtitles
+        , syncAV: (Milliseconds syncAVSetValue)
         }
 
 cutVideoFromHtmlRange :: HTMLInputElement -> HTMLInputElement -> Effect (V ValidationErrors DurationRange)

@@ -7,7 +7,7 @@ import Components.HtmlIdAndClasses
   , artistId
   , cutEndId
   , cutStartId
-  , subtitleOffsetId
+  , syncAVId
   , loadingModalId
   , loadingModalExtraConentId
   , minsiErrorModalId
@@ -93,7 +93,7 @@ import Web.HTML.HTMLTextAreaElement as HTA
 newtype HtmlInputs = HtmlInputs
   { cutStart :: HTMLInputElement
   , cutEnd :: HTMLInputElement
-  , subtitleOffset :: HTMLInputElement
+  , syncAV :: HTMLInputElement
   , youtubeUrl :: HTMLInputElement
   , downloadFullButton :: HTMLButtonElement
   , localFile :: HTMLInputElement
@@ -205,7 +205,7 @@ loadComponents = do
 loadHtmlInputs :: NonElementParentNode -> Effect HtmlInputs
 loadHtmlInputs doc = do
   rangeTuple <- loadCutRange doc
-  subtitleOffset <- loadInput subtitleOffsetId doc
+  syncAV <- loadInput syncAVId doc
   youtubeUrl <- loadInput youtubeUrlId doc
   downloadFullButton <- loadButton downloadFullButtonId doc
   localFile <- loadInput localFileId doc
@@ -236,7 +236,7 @@ loadHtmlInputs doc = do
     ( HtmlInputs
         { cutStart: fst rangeTuple
         , cutEnd: snd rangeTuple
-        , subtitleOffset: subtitleOffset
+        , syncAV: syncAV
         , youtubeUrl: youtubeUrl
         , downloadFullButton: downloadFullButton
         , localFile: localFile

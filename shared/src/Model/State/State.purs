@@ -34,6 +34,7 @@ newtype State = State
   , artist :: String
   , title :: String
   , subtitles :: Array Subtitle
+  , syncAV :: Milliseconds
   }
 
 newtype DurationRange = DurationRange
@@ -211,10 +212,6 @@ isLocalFile (WebURL _) = false
 shiftDurationRange :: Milliseconds -> DurationRange -> DurationRange
 shiftDurationRange (Milliseconds millis) (DurationRange { start: (Milliseconds s), end: (Milliseconds e) }) =
   DurationRange { start: (Milliseconds (s + millis)), end: (Milliseconds (e + millis)) }
-
-shiftSubtitle :: Milliseconds -> Subtitle -> Subtitle
-shiftSubtitle millis (Subtitle { videoPosition, value, font, fontSize, color, screenPosition }) =
-  Subtitle { videoPosition: shiftDurationRange millis videoPosition, value, font, fontSize, color, screenPosition }
 
 subtitlesToString :: Array Subtitle -> String
 subtitlesToString subtitles = joinWith "\n" subtitleGroupsValues

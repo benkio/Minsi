@@ -71,6 +71,7 @@ spec = do
             , artist: artist
             , title: title
             , subtitles: [ subtitle ]
+            , syncAV: Milliseconds 0.0
             }
 
       let jsonString = writeJSON state
