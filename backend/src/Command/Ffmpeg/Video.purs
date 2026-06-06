@@ -50,19 +50,20 @@ normalizeVideoArgs mp4 tempVideo (Milliseconds shiftVideoSync) =
     , "-af"
     , "\"loudnorm=I=-16:TP=-1.5:LRA=11\""
     ]
-  inputFlags = if shiftVideoSync == 0.0
-               then [ "-i", show mp4 ]
-               else  [ "-itsoffset"
-                     , millisecondsToOffsetSeconds shiftVideoSync
-                     , "-i"
-                     , show mp4
-                     , "-i"
-                     , show mp4
-                     , "-map"
-                     , "1:a"
-                     , "-map"
-                     , "0:v"
-                     ]
+  inputFlags =
+    if shiftVideoSync == 0.0 then [ "-i", show mp4 ]
+    else
+      [ "-itsoffset"
+      , millisecondsToOffsetSeconds shiftVideoSync
+      , "-i"
+      , show mp4
+      , "-i"
+      , show mp4
+      , "-map"
+      , "1:a"
+      , "-map"
+      , "0:v"
+      ]
 
 millisecondsToOffsetSeconds :: Number -> String
 millisecondsToOffsetSeconds ms = show (ms / 1000.0)
