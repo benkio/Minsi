@@ -34,7 +34,7 @@ newtype State = State
   , artist :: String
   , title :: String
   , subtitles :: Array Subtitle
-  , syncAV :: Milliseconds
+  , shiftVideoSync :: Milliseconds
   }
 
 newtype DurationRange = DurationRange

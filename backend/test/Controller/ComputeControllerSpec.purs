@@ -24,7 +24,7 @@ mkState source cutVideo = State
   , artist: "artist"
   , title: "title"
   , subtitles: []
-  , syncAV: Milliseconds 0.0
+  , shiftVideoSync: Milliseconds 0.0
   }
 
 source1 :: Source

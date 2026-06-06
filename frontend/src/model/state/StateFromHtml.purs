@@ -57,7 +57,7 @@ fromHtmlInputs
       , reverseLoop: reverseLoopInput
       , artist: artistInput
       , title: titleInput
-      , syncAV
+      , shiftVideoSync
       , subtitleTable
       }
   ) = do
@@ -68,7 +68,7 @@ fromHtmlInputs
   uploadLocalFileValue <- checked uploadLocalFileInput
   artistV <- HI.value artistInput <#> nonEmptyValidation artistId <#> (_ `andThen` printableAsciiLatinValidation artistId)
   titleV <- HI.value titleInput <#> nonEmptyValidation titleId <#> (_ `andThen` printableAsciiLatinValidation titleId)
-  syncAVSetValue <- valueAsNumber syncAV
+  shiftVideoSyncSetValue <- valueAsNumber shiftVideoSync
   subtitlesV <- loadSubtitlesFromTable loadSubtitleFromRow subtitleTable <#> \subs -> traverse (\(sub@(Subtitle { value })) -> maxCharsValidation 30 "SubtitleRow" value <#> const sub) subs
   pure $ ado
     cutVideo <- cutVideoV
@@ -87,7 +87,7 @@ fromHtmlInputs
         , artist: capitalize artist
         , title: capitalize title
         , subtitles: subtitles
-        , syncAV: (Milliseconds syncAVSetValue)
+        , shiftVideoSync: (Milliseconds shiftVideoSyncSetValue)
         }
 
 cutVideoFromHtmlRange :: HTMLInputElement -> HTMLInputElement -> Effect (V ValidationErrors DurationRange)

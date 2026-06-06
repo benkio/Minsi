@@ -27,7 +27,7 @@ loadCurrentState :: State -> Effect Unit
 loadCurrentState (State s) = do
   components <- loadComponents
   let inputs = components.htmlInputs
-  applySyncAVToHtml s.syncAV inputs
+  applyShiftVideoSyncToHtml s.shiftVideoSync inputs
   applyCutVideoToHtml s.cutVideo inputs
   applySourceToHtml s.source inputs
   applyFilenameToHtml s.filename inputs
@@ -38,9 +38,9 @@ loadCurrentState (State s) = do
   applySubtitlesToHtml s.subtitles inputs
   revealComputedResultPanels components $ State s
 
-applySyncAVToHtml :: Milliseconds -> HtmlInputs -> Effect Unit
-applySyncAVToHtml (Milliseconds value) (HtmlInputs { syncAV }) =
-  HI.setValue (show value) syncAV
+applyShiftVideoSyncToHtml :: Milliseconds -> HtmlInputs -> Effect Unit
+applyShiftVideoSyncToHtml (Milliseconds value) (HtmlInputs { shiftVideoSync }) =
+  HI.setValue (show value) shiftVideoSync
 
 applyCutVideoToHtml :: DurationRange -> HtmlInputs -> Effect Unit
 applyCutVideoToHtml (DurationRange { start: startMs, end: endMs }) (HtmlInputs { cutStart, cutEnd }) = do
