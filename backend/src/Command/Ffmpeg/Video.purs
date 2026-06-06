@@ -7,7 +7,6 @@ import Constants (mp4, tempVideo)
 import Conversion.Time (millisecondsToSecondsString)
 import Data.Maybe (Maybe(..), maybe)
 import Data.Newtype (class Newtype, unwrap)
-import Data.Number (abs)
 import Data.Time.Duration (Milliseconds(..))
 import Effect (Effect)
 import Effect.Aff (Aff, apathize, finally)
@@ -39,7 +38,7 @@ makeNormalizeVideo filename shiftVideoSync = do
   process.getResult
 
 normalizeVideoArgs :: FilePath -> FilePath -> Milliseconds -> Array String
-normalizeVideoArgs mp4 tempVideo shiftVideoSync =
+normalizeVideoArgs mp4 tempVideo (Milliseconds shiftVideoSync) =
   baseFlags <> inputFlags <> codecFlags <> [ show tempVideo ]
   where
   baseFlags = [ "-hide_banner", "-loglevel", "warning" ]
@@ -51,36 +50,22 @@ normalizeVideoArgs mp4 tempVideo shiftVideoSync =
     , "-af"
     , "\"loudnorm=I=-16:TP=-1.5:LRA=11\""
     ]
-  inputFlags = case unwrap shiftVideoSync of
-    0.0 ->
-      [ "-i", show mp4 ]
-    ms | ms > 0.0 ->
-      [ "-i"
-      , show mp4
-      , "-itsoffset"
-      , millisecondsToOffsetSeconds shiftVideoSync
-      , "-i"
-      , show mp4
-      , "-map"
-      , "0:a"
-      , "-map"
-      , "1:v"
-      ]
-    ms ->
-      [ "-i"
-      , show mp4
-      , "-itsoffset"
-      , millisecondsToOffsetSeconds (Milliseconds (abs ms))
-      , "-i"
-      , show mp4
-      , "-map"
-      , "1:a"
-      , "-map"
-      , "0:v"
-      ]
+  inputFlags = if shiftVideoSync == 0.0
+               then [ "-i", show mp4 ]
+               else  [ "-itsoffset"
+                     , millisecondsToOffsetSeconds shiftVideoSync
+                     , "-i"
+                     , show mp4
+                     , "-i"
+                     , show mp4
+                     , "-map"
+                     , "1:a"
+                     , "-map"
+                     , "0:v"
+                     ]
 
-millisecondsToOffsetSeconds :: Milliseconds -> String
-millisecondsToOffsetSeconds (Milliseconds ms) = show (ms / 1000.0)
+millisecondsToOffsetSeconds :: Number -> String
+millisecondsToOffsetSeconds ms = show (ms / 1000.0)
 
 normaliseVideoCleanup :: String -> Aff Unit
 normaliseVideoCleanup filename = liftEffect do
