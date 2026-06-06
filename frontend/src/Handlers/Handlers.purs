@@ -14,6 +14,7 @@ import Handlers.InputVideo.InputSourceHandler (setInputSourceHandler)
 import Handlers.InputVideo.InputVideoHandler (setVideoHandlers)
 import Handlers.KeyboardHandler (setKeyboardHandlers)
 import Handlers.ResetButtonHandler (setResetButtonHandler)
+import Handlers.ShiftVideoSyncHandler (setShiftVideoSyncHandler)
 import Handlers.ResultMedia.Handler (setResultMediaHandlers)
 import Handlers.ResultMedia.VideoSourceHandler (setVideoSourceHandler)
 import Handlers.Subtitles.AddSubtitleButtonHandler (setAddSubtitleButtonHandler)
@@ -26,6 +27,7 @@ import Prelude
 setupEventHandlers :: Effect Unit
 setupEventHandlers = do
   setCutRangeHandlers
+  setShiftVideoSyncHandler
   setVideoHandlers
   setResultMediaHandlers
   setApplyButtonHandler

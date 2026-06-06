@@ -18,8 +18,8 @@ cutStartId = "cutStart"
 cutEndId :: String
 cutEndId = "cutEnd"
 
-subtitleOffsetId :: String
-subtitleOffsetId = "subtitleOffset"
+shiftVideoSyncId :: String
+shiftVideoSyncId = "shiftVideoSync"
 
 youtubeUrlId :: String
 youtubeUrlId = "youtubeUrl"

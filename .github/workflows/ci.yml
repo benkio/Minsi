@@ -16,10 +16,8 @@ jobs:
       - name: Cache PureScript dependencies (shared)
         uses: actions/cache@v4
         with:
-          key: ${{ runner.os }}-spago-shared-${{ hashFiles('shared/spago.yaml') }}
-          path: |
-            shared/.spago
-            shared/output
+          key: ${{ runner.os }}-spago-shared-${{ hashFiles('shared/spago.yaml', 'shared/spago.lock', 'shared/src/**/*.purs', 'shared/test/**/*.purs') }}
+          path: shared/.spago
       - name: Check Formatting
         working-directory: shared
         run: purs-tidy check "src/**/*.purs" && purs-tidy check "test/**/*.purs"
@@ -46,10 +44,8 @@ jobs:
       - name: Cache PureScript dependencies (backend)
         uses: actions/cache@v4
         with:
-          key: ${{ runner.os }}-spago-backend-${{ hashFiles('backend/spago.yaml') }}
-          path: |
-            backend/.spago
-            backend/output
+          key: ${{ runner.os }}-spago-backend-${{ hashFiles('backend/spago.yaml', 'backend/spago.lock', 'backend/src/**/*.purs', 'backend/test/**/*.purs') }}
+          path: backend/.spago
       - name: Install backend dependencies
         run: npm ci --prefix backend
       - name: Check Formatting
@@ -78,10 +74,8 @@ jobs:
       - name: Cache PureScript dependencies (frontend)
         uses: actions/cache@v4
         with:
-          key: ${{ runner.os }}-spago-frontend-${{ hashFiles('frontend/spago.yaml') }}
-          path: |
-            frontend/.spago
-            frontend/output
+          key: ${{ runner.os }}-spago-frontend-${{ hashFiles('frontend/spago.yaml', 'frontend/spago.lock', 'frontend/src/**/*.purs', 'frontend/test/**/*.purs') }}
+          path: frontend/.spago
       - name: Check Formatting
         working-directory: frontend
         run: purs-tidy check "src/**/*.purs" && purs-tidy check "test/**/*.purs"

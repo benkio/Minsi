@@ -10,8 +10,7 @@ import Command.Ffmpeg.Video (FfmpegInput(..), cutVideo, normalizeVideo)
 import Command.Id3v2 (addId3Tags)
 import Command.Ytdlp (YtdlpDownloadResult(..), YtdlpInput(..), ytdlpDownload)
 import Constants (uploaded)
-import MinsiErrors (MinsiError(..), throwMinsiError)
-import Control.Monad.Except (runExcept, runExceptT)
+import Control.Monad.Except (runExceptT)
 import Data.Array (fromFoldable)
 import Data.Bifunctor (lmap)
 import Data.Either (Either, either)
@@ -21,6 +20,7 @@ import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
 import InMemoryDB (Store, insert, lookupProcessStatus)
+import MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.ProcessStatus (ProcessStatus(..), isFinished)
 import Model.State.State (DurationRange(..), Source(..), State(..), WURL(..), validateState)
 import Node.Express.Handler (Handler)
@@ -76,7 +76,7 @@ compute mayOldState state@(State { filename }) store = do
     insert filename (Just state) processResult store
 
 runComputePipeline :: Maybe State -> State -> Aff (Either String Unit)
-runComputePipeline mayOldState state@(State { source, filename, cutVideo: DurationRange { start, end }, artist, title }) =
+runComputePipeline mayOldState state@(State { source, filename, cutVideo: DurationRange { start, end }, artist, title, shiftVideoSync }) =
   runExceptT do
     when (cutDownloadRequired mayOldState state)
       ( do
@@ -88,8 +88,11 @@ runComputePipeline mayOldState state@(State { source, filename, cutVideo: Durati
                   YtdlpDownloadResult execaResult -> pure execaResult
                   YtdlpDownloadProcess _ -> liftEffect $ throwMinsiError (YtdlpError "Streaming download is not implemented yet")
             LocalFile _ -> void $ exceptTStep "Video download" $ (liftEffect $ uploaded filename) >>= \fn -> cutVideo (FfmpegInput { input: fn, filename, maybeStart: Just start, maybeEnd: Just end })
-          void $ exceptTStep "Video Normalization" $ normalizeVideo filename
       )
+    when (videoNormalizationRequired mayOldState state)
+      $ void
+      $ exceptTStep "Video Normalization"
+      $ normalizeVideo filename shiftVideoSync
     void $ exceptTStep "MP3 extraction" $ extractMp3 filename
     void $ exceptTStep "ID3 tags" $ addId3Tags filename artist title
     void $ exceptTMultiple "Gif Creation" $ makeGif state
@@ -100,3 +103,11 @@ cutDownloadRequired mayOldState (State { source: newSource, cutVideo: newCutVide
   maybe true
     (\(State { source: oldSource, cutVideo: oldCutVideo }) -> oldSource /= newSource || oldCutVideo /= newCutVideo)
     mayOldState
+
+videoNormalizationRequired :: Maybe State -> State -> Boolean
+videoNormalizationRequired mayOldState newState =
+  cutDownloadRequired mayOldState newState || shiftVideoSyncChanged mayOldState newState
+
+shiftVideoSyncChanged :: Maybe State -> State -> Boolean
+shiftVideoSyncChanged mayOldState (State { shiftVideoSync: newShift }) =
+  maybe false (\(State { shiftVideoSync: oldShift }) -> oldShift /= newShift) mayOldState

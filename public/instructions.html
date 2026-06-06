@@ -60,9 +60,12 @@
                 <code>https://www.youtube.com/watch?v=…</code>). The preview
                 loads so you can scrub and set the exact clip.
                 Alternatively, select <strong>Local File</strong> as the source
-                and upload a video file from your computer. Check
+                and upload a video file from your computer. For local files,
                 <strong>local file will be uploaded</strong> in the left panel
-                if the uploaded file needs to be cut to the specified time range.
+                is set automatically when the cut range, output filename,
+                <strong>Shift Video</strong>, or the selected file changes, so
+                the next <strong>Apply</strong> re-uploads and re-cuts the
+                source before processing.
               </p>
 
               <h5 class="mt-4 mb-2">2. Set output and metadata (left panel)</h5>
@@ -70,6 +73,7 @@
                 <li><strong>Output Filename</strong> — must follow the format <code>prefix_Name</code>: 1–5 lowercase letters, an underscore, then a capitalized name with letters and numbers (e.g. <code>rphjb_Hello</code> → <code>rphjb_Hello.mp4</code>, <code>rphjb_Hello.mp3</code>, <code>rphjb_HelloGif.mp4</code>). The prefix is set automatically when a known artist is selected.</li>
                 <li><strong>Artist</strong> and <strong>Title</strong> — used for the MP3’s ID3 tags. Letters, numbers, spaces, and Italian accented characters (àèéìòù) are allowed.</li>
                 <li><strong>Reverse / Loop GIF</strong> — optional, for the GIF output.</li>
+                <li><strong>Shift Video (ms)</strong> — optional A/V sync correction applied to the output video during normalization. Positive values delay the video relative to the audio; negative values delay the audio relative to the video. Use <code>0</code> for no shift. Changing this value requires clicking <strong>Apply</strong> again.</li>
               </ul>
 
               <h5 class="mt-4 mb-2">3. Set the clip range</h5>
@@ -88,13 +92,14 @@
                 Click <strong>Apply</strong>. The backend will:
               </p>
               <ol class="small mb-3">
-                <li><strong>Download</strong> the clip as MP4 (via yt-dlp).</li>
+                <li><strong>Download / cut</strong> the clip as MP4 (via yt-dlp for YouTube, or from the uploaded local file).</li>
+                <li><strong>Normalize</strong> the video (ffmpeg), including optional <strong>Shift Video</strong> sync and audio loudness normalization.</li>
                 <li><strong>Extract MP3</strong> from that clip (ffmpeg) and write ID3 artist/title (id3v2).</li>
                 <li>Optionally produce a <strong>GIF</strong> (with or without subtitles; see below).</li>
               </ol>
               <p class="text-muted small mb-3">
                 A loading modal appears while the job runs. When it finishes,
-                the UI shows the result video, a <strong>Video / Gif</strong> source
+                the UI shows the result video, a <strong>Video / Gif / Mp3</strong> source
                 selector, and (if you didn’t use Reverse Loop) the <strong>subtitles</strong>
                 table so you can add or edit captions for the next run.
               </p>
@@ -104,7 +109,7 @@
                 Once the pipeline completes, the result area shows:
               </p>
               <ul class="small mb-3">
-                <li><strong>Video / Gif</strong> — A dropdown to switch between the MP4 clip and the generated GIF. Use it to preview both outputs.</li>
+                <li><strong>Video / Gif / Mp3</strong> — A dropdown to preview the MP4 clip, the generated GIF, or the MP3 audio extract.</li>
                 <li><strong>Subtitles table</strong> — Visible only when <strong>Reverse / Loop GIF</strong> is <em>un</em>checked. Use it to define captions that will be burned into the GIF on the next Apply (see below).</li>
               </ul>
 
@@ -148,8 +153,8 @@
               </p>
               <ul class="small mb-3">
                 <li><strong>Ctrl/⌘ + Enter</strong> — Apply (cut video / MP3 / GIF)</li>
-                <li><strong>Space</strong> — Toggle result video play/pause</li>
-                <li><strong>←</strong> / <strong>→</strong> — Skip result video backward / forward (0.5 s)</li>
+                <li><strong>Space</strong> — Toggle result media play/pause (video, GIF, or MP3 depending on the source selector)</li>
+                <li><strong>←</strong> / <strong>→</strong> — Skip result media backward / forward (0.5 s)</li>
                 <li><strong>?</strong> — Show keyboard shortcuts modal</li>
                 <li><strong>+</strong> — Add Table Subtitle</li>
                 <li><strong>-</strong> — Remove Top Table Subtitle</li>

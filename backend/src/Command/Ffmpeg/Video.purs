@@ -7,6 +7,7 @@ import Constants (mp4, tempVideo)
 import Conversion.Time (millisecondsToSecondsString)
 import Data.Maybe (Maybe(..), maybe)
 import Data.Newtype (class Newtype, unwrap)
+import Data.Number (abs)
 import Data.Time.Duration (Milliseconds(..))
 import Effect (Effect)
 import Effect.Aff (Aff, apathize, finally)
@@ -27,31 +28,50 @@ newtype FfmpegInput = FfmpegInput
 
 derive instance newtypeFfmpegInput :: Newtype FfmpegInput _
 
-normalizeVideo :: FilePath -> Aff ExecaResult
-normalizeVideo filename = do
-  finally (normaliseVideoCleanup filename) (makeNormalizeVideo filename)
+normalizeVideo :: FilePath -> Milliseconds -> Aff ExecaResult
+normalizeVideo filename shiftVideoSync = do
+  finally (normaliseVideoCleanup filename) (makeNormalizeVideo filename shiftVideoSync)
 
-makeNormalizeVideo :: FilePath -> Aff ExecaResult
-makeNormalizeVideo filename = do
-  args <- liftEffect $ normalizeVideoArgs <$> mp4 filename <*> tempVideo filename
+makeNormalizeVideo :: FilePath -> Milliseconds -> Aff ExecaResult
+makeNormalizeVideo filename shiftVideoSync = do
+  args <- liftEffect $ normalizeVideoArgs <$> mp4 filename <*> tempVideo filename <*> pure shiftVideoSync
   process <- runCommand args FfmpegGifError "ffmpeg"
   process.getResult
 
-normalizeVideoArgs :: FilePath -> FilePath -> Array String
-normalizeVideoArgs mp4 tempVideo =
-  [ "-hide_banner"
-  , "-loglevel"
-  , "warning"
-  , "-i"
-  , show mp4
-  , "-c:v"
-  , "libx264"
-  , "-c:a"
-  , "aac"
-  , "-af"
-  , "\"loudnorm=I=-16:TP=-1.5:LRA=11\""
-  , show tempVideo
-  ]
+normalizeVideoArgs :: FilePath -> FilePath -> Milliseconds -> Array String
+normalizeVideoArgs mp4 tempVideo (Milliseconds shiftVideoSync) =
+  baseFlags <> inputFlags <> codecFlags <> [ show tempVideo ]
+  where
+  baseFlags = [ "-hide_banner", "-loglevel", "warning" ]
+  codecFlags =
+    [ "-c:v"
+    , "libx264"
+    , "-c:a"
+    , "aac"
+    , "-af"
+    , "\"loudnorm=I=-16:TP=-1.5:LRA=11\""
+    ]
+  seekStart =
+    millisecondsToSecondsString (Milliseconds (abs shiftVideoSync)) (Just '.')
+  inputFlags =
+    if shiftVideoSync == 0.0 then [ "-i", show mp4 ]
+    else
+      [ "-itsoffset"
+      , millisecondsToOffsetSeconds shiftVideoSync
+      , "-i"
+      , show mp4
+      , "-i"
+      , show mp4
+      , "-map"
+      , "1:a"
+      , "-map"
+      , "0:v"
+      , "-ss"
+      , seekStart
+      ]
+
+millisecondsToOffsetSeconds :: Number -> String
+millisecondsToOffsetSeconds ms = show (ms / 1000.0)
 
 normaliseVideoCleanup :: String -> Aff Unit
 normaliseVideoCleanup filename = liftEffect do
