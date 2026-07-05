@@ -3,7 +3,7 @@ module Command.Ffmpeg.Video where
 import Prelude
 
 import Command.Command (runCommand)
-import Command.Ffmpeg.Base (baseFlags)
+import Command.Ffmpeg.Base (baseFlagsInput, baseFlagsOutput)
 import Constants (mp4, tempVideo)
 import Conversion.Time (millisecondsToSecondsString)
 import Data.Maybe (Maybe(..), maybe)
@@ -41,7 +41,7 @@ makeNormalizeVideo filename shiftVideoSync = do
 
 normalizeVideoArgs :: FilePath -> FilePath -> Milliseconds -> Array String
 normalizeVideoArgs mp4 tempVideo (Milliseconds shiftVideoSync) =
-  baseFlags <> inputFlags <> codecFlags <> [ show tempVideo ]
+  baseFlagsInput <> inputFlags <> codecFlags <> baseFlagsOutput <> [ show tempVideo ]
   where
   codecFlags =
     [ "-c:v"
@@ -109,9 +109,10 @@ cutAndConvertUploadedVideo ffmpegInput@(FfmpegInput { input, filename }) = do
 
 cutAndConvertUpladedVideoArgs :: FilePath -> FfmpegInput -> Array String
 cutAndConvertUpladedVideoArgs output (FfmpegInput { input, maybeStart, maybeEnd }) =
-  baseFlags <> [ "-i", input, "-c:v", "libx264", "-c:a", "aac" ]
+  baseFlagsInput <> [ "-i", input, "-c:v", "libx264", "-c:a", "aac" ]
     <> maybe [] (\s -> [ "-ss", s ]) maybeStartStr
     <> maybe [] (\s -> [ "-t", s ]) maybeDurationStr
+    <> baseFlagsOutput
     <> [ output ]
   where
   maybeStartStr = map (\s -> millisecondsToSecondsString s (Just '.')) maybeStart

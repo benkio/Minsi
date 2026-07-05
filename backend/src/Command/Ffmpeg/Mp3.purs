@@ -3,7 +3,7 @@ module Command.Ffmpeg.Mp3 where
 import Prelude
 
 import Command.Command (runCommand)
-import Command.Ffmpeg.Base (baseFlags)
+import Command.Ffmpeg.Base (baseFlagsInput, baseFlagsOutput)
 import Constants (mp3, mp4)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
@@ -19,4 +19,4 @@ extractMp3 filename = do
 
 extractMp3CommandArgs :: FilePath -> FilePath -> Array String
 extractMp3CommandArgs filepathMp3 filepathMp4 =
-  baseFlags <> [ "-i", filepathMp4, "-vn", "-acodec", "libmp3lame", "-y", filepathMp3 ]
+  baseFlagsInput <> [ "-i", filepathMp4, "-vn", "-acodec", "libmp3lame", "-y" ] <> baseFlagsOutput <> [ filepathMp3 ]

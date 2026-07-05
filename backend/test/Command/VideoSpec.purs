@@ -16,8 +16,6 @@ spec = do
         [ "-hide_banner"
         , "-loglevel"
         , "warning"
-        , "-metadata"
-        , "encoding_tool=Minsi " <> currentVersion
         , "-i"
         , "\"input.mp4\""
         , "-c:v"
@@ -26,6 +24,8 @@ spec = do
         , "aac"
         , "-af"
         , "\"loudnorm=I=-16:TP=-1.5:LRA=11\""
+        , "-metadata"
+        , "encoding_tool=Minsi-" <> currentVersion
         , "\"output.mp4\""
         ]
 
@@ -34,8 +34,6 @@ spec = do
         [ "-hide_banner"
         , "-loglevel"
         , "warning"
-        , "-metadata"
-        , "encoding_tool=Minsi " <> currentVersion
         , "-itsoffset"
         , "1.5"
         , "-i"
@@ -54,6 +52,8 @@ spec = do
         , "aac"
         , "-af"
         , "\"loudnorm=I=-16:TP=-1.5:LRA=11\""
+        , "-metadata"
+        , "encoding_tool=Minsi-" <> currentVersion
         , "\"output.mp4\""
         ]
 
@@ -62,8 +62,6 @@ spec = do
         [ "-hide_banner"
         , "-loglevel"
         , "warning"
-        , "-metadata"
-        , "encoding_tool=Minsi " <> currentVersion
         , "-itsoffset"
         , "-0.5"
         , "-i"
@@ -82,5 +80,7 @@ spec = do
         , "aac"
         , "-af"
         , "\"loudnorm=I=-16:TP=-1.5:LRA=11\""
+        , "-metadata"
+        , "encoding_tool=Minsi-" <> currentVersion
         , "\"output.mp4\""
         ]
