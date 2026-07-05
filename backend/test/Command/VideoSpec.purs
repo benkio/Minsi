@@ -3,6 +3,7 @@ module Test.Command.VideoSpec where
 import Prelude
 
 import Command.Ffmpeg.Video (normalizeVideoArgs)
+import Config (currentVersion)
 import Data.Time.Duration (Milliseconds(..))
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
@@ -15,6 +16,8 @@ spec = do
         [ "-hide_banner"
         , "-loglevel"
         , "warning"
+        , "-metadata"
+        ,  "encoding_tool=Minsi " <> currentVersion
         , "-i"
         , "\"input.mp4\""
         , "-c:v"
@@ -31,6 +34,8 @@ spec = do
         [ "-hide_banner"
         , "-loglevel"
         , "warning"
+        , "-metadata"
+        ,  "encoding_tool=Minsi " <> currentVersion
         , "-itsoffset"
         , "1.5"
         , "-i"
@@ -57,6 +62,8 @@ spec = do
         [ "-hide_banner"
         , "-loglevel"
         , "warning"
+        , "-metadata"
+        ,  "encoding_tool=Minsi " <> currentVersion
         , "-itsoffset"
         , "-0.5"
         , "-i"
