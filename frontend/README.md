@@ -42,7 +42,7 @@ The backend must be running (see [root README](../README.md)) so the app can cal
 
 4. **Format:**
    ```bash
-   npx purs-tidy format-in-place "src/**/*.purs" && npx purs-tidy format-in-place "test/**/*.purs"
+   npm run format:purs
    ```
 
 ### Production

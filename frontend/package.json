@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "format:purs": "purs-tidy format-in-place \"src/**/*.purs\" && purs-tidy format-in-place \"test/**/*.purs\""
+  },
   "devDependencies": {
     "purs-tidy": "^0.11.1"
   }

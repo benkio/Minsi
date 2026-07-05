@@ -17,7 +17,7 @@ spec = do
         , "-loglevel"
         , "warning"
         , "-metadata"
-        ,  "encoding_tool=Minsi " <> currentVersion
+        , "encoding_tool=Minsi " <> currentVersion
         , "-i"
         , "\"input.mp4\""
         , "-c:v"
@@ -35,7 +35,7 @@ spec = do
         , "-loglevel"
         , "warning"
         , "-metadata"
-        ,  "encoding_tool=Minsi " <> currentVersion
+        , "encoding_tool=Minsi " <> currentVersion
         , "-itsoffset"
         , "1.5"
         , "-i"
@@ -63,7 +63,7 @@ spec = do
         , "-loglevel"
         , "warning"
         , "-metadata"
-        ,  "encoding_tool=Minsi " <> currentVersion
+        , "encoding_tool=Minsi " <> currentVersion
         , "-itsoffset"
         , "-0.5"
         , "-i"
