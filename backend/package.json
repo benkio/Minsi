@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "format:purs": "npx -y node@22 \"$(command -v purs-tidy)\" format-in-place \"src/**/*.purs\" && npx -y node@22 \"$(command -v purs-tidy)\" format-in-place \"test/**/*.purs\""
   },
   "keywords": [],
   "author": "",
@@ -17,5 +17,8 @@
     "express": "^5.2.1",
     "helmet": "^8.1.0",
     "multer": "^2.1.1"
+  },
+  "devDependencies": {
+    "purs-tidy": "^0.11.1"
   }
 }

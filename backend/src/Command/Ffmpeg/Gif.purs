@@ -1,6 +1,9 @@
 module Command.Ffmpeg.Gif where
 
+import Prelude
+
 import Command.Command (runCommand)
+import Command.Ffmpeg.Base (baseFlagsInput, baseFlagsOutput)
 import Constants (mp4, gif, srt, txt, reversed, reversedFull)
 import Conversion.Time (millisecondsToSecondsString)
 import Data.Array (mapWithIndex, null, singleton)
@@ -17,7 +20,6 @@ import Node.Encoding (Encoding(..))
 import Node.FS.Sync (writeFile, rm, rename)
 import Node.Library.Execa (ExecaResult)
 import Node.Path (FilePath)
-import Prelude
 
 makeGif :: State -> Aff (Array ExecaResult)
 makeGif (State { filename, subtitles, reverseLoop })
@@ -42,7 +44,7 @@ makePlainGif filename = do
 
 addFfmpegPlainGifArgs :: FilePath -> FilePath -> Array String
 addFfmpegPlainGifArgs mp4 gif =
-  [ "-hide_banner", "-loglevel", "warning", "-i", show mp4, "-an", show gif ]
+  baseFlagsInput <> [ "-i", show mp4, "-an" ] <> baseFlagsOutput <> [ show gif ]
 
 makeSubtitleGif :: FilePath -> Array Subtitle -> Aff ExecaResult
 makeSubtitleGif filename subtitles = do
@@ -62,7 +64,7 @@ makeSubtitleGif filename subtitles = do
 
 addFfmpegSubtitleGifArgs :: FilePath -> FilePath -> FilePath -> Array String
 addFfmpegSubtitleGifArgs mp4 gif srt =
-  [ "-hide_banner", "-loglevel", "warning", "-i", show mp4, "-an", "-vf", show subtitleArg, show gif ]
+  baseFlagsInput <> [ "-i", show mp4, "-an", "-vf", show subtitleArg ] <> baseFlagsOutput <> [ show gif ]
   where
   subtitleArg = "subtitles=" <> srt
 
@@ -85,7 +87,7 @@ makeReverseSingleGif filename = do
 
 addFfmpegReverseGifArgs :: FilePath -> FilePath -> Array String
 addFfmpegReverseGifArgs filepathGif filepathReversed =
-  [ "-hide_banner", "-loglevel", "warning", "-i", show filepathGif, "-vf", "reverse", show filepathReversed ]
+  baseFlagsInput <> [ "-i", show filepathGif, "-vf", "reverse" ] <> baseFlagsOutput <> [ show filepathReversed ]
 
 mergeVideos :: FilePath -> FilePath -> FilePath -> Aff ExecaResult
 mergeVideos filename filepathGif filepathReversed = do
@@ -101,7 +103,7 @@ mergeVideos filename filepathGif filepathReversed = do
 
 addFfmpegMergeVideosArgs :: FilePath -> FilePath -> Array String
 addFfmpegMergeVideosArgs filepathTxt filepathReversedFull =
-  [ "-hide_banner", "-loglevel", "warning", "-f", "concat", "-safe", "0", "-i", show filepathTxt, "-c", "copy", show filepathReversedFull ]
+  baseFlagsInput <> [ "-f", "concat", "-safe", "0", "-i", show filepathTxt, "-c", "copy" ] <> baseFlagsOutput <> [ show filepathReversedFull ]
 
 reverseGifCleanup :: String -> Aff Unit
 reverseGifCleanup filename = liftEffect do

@@ -3,6 +3,7 @@ module Test.Command.VideoSpec where
 import Prelude
 
 import Command.Ffmpeg.Video (normalizeVideoArgs)
+import Config (currentVersion)
 import Data.Time.Duration (Milliseconds(..))
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
@@ -23,6 +24,8 @@ spec = do
         , "aac"
         , "-af"
         , "\"loudnorm=I=-16:TP=-1.5:LRA=11\""
+        , "-metadata"
+        , "encoding_tool=Minsi-" <> currentVersion
         , "\"output.mp4\""
         ]
 
@@ -49,6 +52,8 @@ spec = do
         , "aac"
         , "-af"
         , "\"loudnorm=I=-16:TP=-1.5:LRA=11\""
+        , "-metadata"
+        , "encoding_tool=Minsi-" <> currentVersion
         , "\"output.mp4\""
         ]
 
@@ -75,5 +80,7 @@ spec = do
         , "aac"
         , "-af"
         , "\"loudnorm=I=-16:TP=-1.5:LRA=11\""
+        , "-metadata"
+        , "encoding_tool=Minsi-" <> currentVersion
         , "\"output.mp4\""
         ]

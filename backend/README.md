@@ -40,7 +40,7 @@ System tools used at runtime (must be on `PATH`): **ffmpeg**, **yt-dlp**, **id3v
 
 3. **Format:**
    ```bash
-   npx purs-tidy format-in-place "src/**/*.purs" && npx purs-tidy format-in-place "test/**/*.purs"
+   npm run format:purs
    ```
 
 ### Behaviour

@@ -3,6 +3,7 @@ module Command.Id3v2 where
 import Prelude
 
 import Command.Command (runCommand)
+import Config (currentVersion)
 import Constants (mp3)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
@@ -19,4 +20,11 @@ addId3Tags filename artist title = do
 
 addId3TagsArgs :: FilePath -> String -> String -> Array String
 addId3TagsArgs filepathMp3 artist title =
-  [ "-a", show artist, "-t", show title, filepathMp3 ]
+  [ "-a"
+  , show artist
+  , "-t"
+  , show title
+  , "--TSSE"
+  , show ("Minsi-" <> currentVersion)
+  , filepathMp3
+  ]
