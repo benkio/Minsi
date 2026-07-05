@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "format:purs": "purs-tidy format-in-place \"src/**/*.purs\" && purs-tidy format-in-place \"test/**/*.purs\""
+    "format:purs": "npx -y node@22 \"$(command -v purs-tidy)\" format-in-place \"src/**/*.purs\" && npx -y node@22 \"$(command -v purs-tidy)\" format-in-place \"test/**/*.purs\""
   },
   "keywords": [],
   "author": "",
