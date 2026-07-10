@@ -58,11 +58,9 @@ getYtdlpOutputUrl cookie (YtdlpInput { url: url, filename: filename, maybeStart:
     pure [ "--download-sections", show ("*" <> start <> "-" <> end) ]
   rangeArgs = maybe [] identity maybeRangeArg
   outputArgs filepath = if streaming then [ "-o", "-" ] else [ "-o", show filepath ]
-  buildArgs filepath =
-    if cookie == "" then
-      [ "-f", "\"best[ext=mp4]\"", "--force-overwrite" ] <> rangeArgs <> outputArgs filepath <> [ show urlString ]
-    else
-      [ "-f", "\"best[ext=mp4]\"", "--force-overwrite" ] <> rangeArgs <> outputArgs filepath <> [ "--cookies-from-browser", cookie, show urlString ]
+  formatArgs = [ "-f", "\"bv*[ext=mp4][height<=720]+ba[ext=m4a]/b[ext=mp4]\"", "--merge-output-format", "mp4", "--force-keyframes-at-cuts", "--force-overwrite" ]
+  inputArgs = if cookie == "" then [ show urlString ] else [ "--cookies-from-browser", cookie, show urlString ]
+  buildArgs filepath = formatArgs <> rangeArgs <> outputArgs filepath <> inputArgs
 
 ytdlpDownload :: YtdlpInput -> Aff YtdlpDownloadResult
 ytdlpDownload input@(YtdlpInput { filename, streaming }) = do
