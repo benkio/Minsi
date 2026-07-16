@@ -76,6 +76,8 @@ jobs:
         with:
           key: ${{ runner.os }}-spago-frontend-${{ hashFiles('frontend/spago.yaml', 'frontend/spago.lock', 'frontend/src/**/*.purs', 'frontend/test/**/*.purs') }}
           path: frontend/.spago
+      - name: Install frontend dependencies
+        run: npm ci --prefix frontend
       - name: Check Formatting
         working-directory: frontend
         run: purs-tidy check "src/**/*.purs" && purs-tidy check "test/**/*.purs"
