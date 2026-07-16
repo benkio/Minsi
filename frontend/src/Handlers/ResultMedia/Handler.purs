@@ -12,7 +12,7 @@ import Handlers.ErrorHandlers (genericErrorsHandler)
 import Handlers.ResultMedia.MediaSrc (getMediaElement)
 import Web.DOM.Node (setTextContent)
 import Web.HTML.HTMLMediaElement (currentTime, duration)
-import Web.HTML.HTMLSpanElement as HSP
+import Web.HTML.HTMLParagraphElement as HP
 
 setResultMediaHandlers :: Effect Unit
 setResultMediaHandlers = genericErrorsHandler $ do
@@ -30,4 +30,4 @@ updatePlaybackPosition = do
   let remainingTime = duration - currentTime
   setTextContent
     (formatToMaxSixDigits currentTime <> "/" <> formatToMaxSixDigits remainingTime)
-    (HSP.toNode playbackPositionResultMedia)
+    (HP.toNode playbackPositionResultMedia)

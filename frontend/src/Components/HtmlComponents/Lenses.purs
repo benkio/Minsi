@@ -84,6 +84,7 @@ import Web.HTML.HTMLDivElement (HTMLDivElement)
 import Web.HTML.HTMLHeadingElement (HTMLHeadingElement)
 import Web.HTML.HTMLIFrameElement (HTMLIFrameElement)
 import Web.HTML.HTMLInputElement (HTMLInputElement)
+import Web.HTML.HTMLParagraphElement (HTMLParagraphElement)
 import Web.HTML.HTMLPreElement (HTMLPreElement)
 import Web.HTML.HTMLSelectElement (HTMLSelectElement)
 import Web.HTML.HTMLSpanElement (HTMLSpanElement)
@@ -144,8 +145,8 @@ _HtmlOutputs
        { resultPreview :: ResultPreview
        , minsiLog :: HTMLDivElement
        , minsiLogTitle :: HTMLDivElement
-       , playbackPositionYoutube :: HTMLSpanElement
-       , playbackPositionResultMedia :: HTMLSpanElement
+       , playbackPositionYoutube :: HTMLParagraphElement
+       , playbackPositionResultMedia :: HTMLParagraphElement
        , loadingModal :: HTMLDivElement
        , loadingModalExtraContent :: HTMLSpanElement
        , minsiErrorModal :: HTMLDivElement
@@ -284,10 +285,10 @@ _minsiLog = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "minsiLog
 _minsiLogTitle :: Lens' HtmlComponents HTMLDivElement
 _minsiLogTitle = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "minsiLogTitle")
 
-_playbackPositionYoutube :: Lens' HtmlComponents HTMLSpanElement
+_playbackPositionYoutube :: Lens' HtmlComponents HTMLParagraphElement
 _playbackPositionYoutube = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "playbackPositionYoutube")
 
-_playbackPositionResultMedia :: Lens' HtmlComponents HTMLSpanElement
+_playbackPositionResultMedia :: Lens' HtmlComponents HTMLParagraphElement
 _playbackPositionResultMedia = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "playbackPositionResultMedia")
 
 _loadingModal :: Lens' HtmlComponents HTMLDivElement
