@@ -75,6 +75,10 @@ import Web.HTML.HTMLIFrameElement (HTMLIFrameElement)
 import Web.HTML.HTMLIFrameElement as IF
 import Web.HTML.HTMLInputElement (HTMLInputElement)
 import Web.HTML.HTMLInputElement as HI
+import Web.HTML.HTMLParagraphElement (HTMLParagraphElement)
+import Web.HTML.HTMLParagraphElement as HSPR
+import Web.HTML.HTMLPreElement (HTMLPreElement)
+import Web.HTML.HTMLPreElement as HP
 import Web.HTML.HTMLSelectElement (HTMLSelectElement)
 import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.HTMLSpanElement (HTMLSpanElement)
@@ -83,12 +87,10 @@ import Web.HTML.HTMLTableElement (HTMLTableElement)
 import Web.HTML.HTMLTableElement as HT
 import Web.HTML.HTMLTemplateElement (HTMLTemplateElement)
 import Web.HTML.HTMLTemplateElement as HTP
-import Web.HTML.HTMLVideoElement (HTMLVideoElement)
-import Web.HTML.HTMLVideoElement as HV
-import Web.HTML.HTMLPreElement (HTMLPreElement)
-import Web.HTML.HTMLPreElement as HP
 import Web.HTML.HTMLTextAreaElement (HTMLTextAreaElement)
 import Web.HTML.HTMLTextAreaElement as HTA
+import Web.HTML.HTMLVideoElement (HTMLVideoElement)
+import Web.HTML.HTMLVideoElement as HV
 
 newtype HtmlInputs = HtmlInputs
   { cutStart :: HTMLInputElement
@@ -162,8 +164,8 @@ newtype HtmlOutputs = HtmlOutputs
   { resultPreview :: ResultPreview
   , minsiLog :: HTMLDivElement
   , minsiLogTitle :: HTMLDivElement
-  , playbackPositionYoutube :: HTMLSpanElement
-  , playbackPositionResultMedia :: HTMLSpanElement
+  , playbackPositionYoutube :: HTMLParagraphElement
+  , playbackPositionResultMedia :: HTMLParagraphElement
   , loadingModal :: HTMLDivElement
   , loadingModalExtraContent :: HTMLSpanElement
   , minsiErrorModal :: HTMLDivElement
@@ -271,8 +273,8 @@ loadHtmlOutputs doc = do
   resultPreview <- loadResultPreview doc
   minsiLog <- loadDiv minsiLogId doc
   minsiLogTitle <- loadDiv minsiLogTitleId doc
-  playbackPositionYoutube <- loadSpan playbackPositionYoutubeId doc
-  playbackPositionResultMedia <- loadSpan playbackPositionResultMediaId doc
+  playbackPositionYoutube <- loadParagraph playbackPositionYoutubeId doc
+  playbackPositionResultMedia <- loadParagraph playbackPositionResultMediaId doc
   loadingModal <- loadDiv loadingModalId doc
   loadingModalExtraContent <- loadSpan loadingModalExtraConentId doc
   minsiErrorModal <- loadDiv minsiErrorModalId doc
@@ -360,6 +362,9 @@ loadSelect id = loadHtmlElementId id HS.fromElement
 
 loadSpan :: String -> NonElementParentNode -> Effect HTMLSpanElement
 loadSpan id = loadHtmlElementId id HSP.fromElement
+
+loadParagraph :: String -> NonElementParentNode -> Effect HTMLParagraphElement
+loadParagraph id = loadHtmlElementId id HSPR.fromElement
 
 loadTable :: String -> NonElementParentNode -> Effect HTMLTableElement
 loadTable id = loadHtmlElementId id HT.fromElement

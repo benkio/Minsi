@@ -3,6 +3,7 @@
     "format:purs": "npx -y node@22 \"$(command -v purs-tidy)\" format-in-place \"src/**/*.purs\" && npx -y node@22 \"$(command -v purs-tidy)\" format-in-place \"test/**/*.purs\""
   },
   "devDependencies": {
+    "jsdom": "^29.1.1",
     "purs-tidy": "^0.11.1"
   }
 }
