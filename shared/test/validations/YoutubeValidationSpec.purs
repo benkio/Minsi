@@ -27,6 +27,9 @@ spec = do
             test regex "https://www.youtube.com/watch?v=dQw4w9WgXcQ" `shouldEqual` true
             test regex "https://youtube.com/shorts/_JryLY7pXLQ" `shouldEqual` true
             test regex "https://www.youtube.com/shorts/C8p4SOnSXeQ?t=30" `shouldEqual` true
+            test regex "https://www.youtube.com/live/XRN1BsAwMCc" `shouldEqual` true
+            test regex "https://www.youtube.com/live/XRN1BsAwMCc?t=2695" `shouldEqual` true
+            test regex "https://www.youtube.com/live/vyB7BnvGOE4?t=2130" `shouldEqual` true
             test regex "https://youtu.be/dQw4w9WgXcQ" `shouldEqual` true
             test regex "not a youtube url" `shouldEqual` false
         )
@@ -64,3 +67,8 @@ spec = do
       isValid (youtubeUrlValidation "testId" "https://youtube.com/shorts/_JryLY7pXLQ") `shouldEqual` true
       isValid (youtubeUrlValidation "testId" "https://www.youtube.com/shorts/C8p4SOnSXeQ") `shouldEqual` true
       isValid (youtubeUrlValidation "testId" "https://www.youtube.com/shorts/C8p4SOnSXeQ?t=30") `shouldEqual` true
+    it "should validate a youtube.com live URL" $ liftEffect $ do
+      isValid (youtubeUrlValidation "testId" "https://www.youtube.com/live/XRN1BsAwMCc") `shouldEqual` true
+      isValid (youtubeUrlValidation "testId" "https://youtube.com/live/XRN1BsAwMCc") `shouldEqual` true
+      isValid (youtubeUrlValidation "testId" "https://www.youtube.com/live/XRN1BsAwMCc?t=2695") `shouldEqual` true
+      isValid (youtubeUrlValidation "testId" "https://www.youtube.com/live/vyB7BnvGOE4?t=2130") `shouldEqual` true

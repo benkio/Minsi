@@ -1,7 +1,7 @@
 module Test.Handers.InputVideo.YoutubeUrlExtractionSpec where
 
 import Data.Maybe (Maybe(..), fromJust)
-import Data.URL (Path(..), URL, fromString)
+import Data.URL (Path(..), URL, fromString, toString)
 import Effect.Class (liftEffect)
 import Handlers.InputVideo.YoutubeUrlExtraction
   ( extractYoutubeVideoId
@@ -9,6 +9,7 @@ import Handlers.InputVideo.YoutubeUrlExtraction
   , parseUnit
   , parseYouTubeT
   , pathToArray
+  , toYoutubeWatchUrl
   )
 import Partial.Unsafe (unsafePartial)
 import Prelude
@@ -42,6 +43,17 @@ spec = do
       let url = urlFromString "https://youtube.com/watch?v=PHi-UNsm2Ds"
       extractYoutubeVideoId url `shouldEqual` Just "PHi-UNsm2Ds"
 
+    it "should extract video ID from youtube.com live URL" $ liftEffect $ do
+      let
+        url1 = urlFromString "https://www.youtube.com/live/XRN1BsAwMCc"
+        url2 = urlFromString "https://www.youtube.com/live/XRN1BsAwMCc?t=2695"
+      extractYoutubeVideoId url1 `shouldEqual` Just "XRN1BsAwMCc"
+      extractYoutubeVideoId url2 `shouldEqual` Just "XRN1BsAwMCc"
+
+    it "should canonicalize live URL to watch URL" $ liftEffect $ do
+      let url = urlFromString "https://www.youtube.com/live/vyB7BnvGOE4?t=2130"
+      (toString <$> toYoutubeWatchUrl url) `shouldEqual` Just "https://www.youtube.com/watch?v=vyB7BnvGOE4"
+
     it "should return Nothing for URL without video ID" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/"
       extractYoutubeVideoId url `shouldEqual` Nothing
@@ -63,6 +75,10 @@ spec = do
     it "should extract start time from URL with t parameter in seconds" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=90"
       extractYoutubeVideoStartTime url `shouldEqual` 90
+
+    it "should extract start time from youtube.com live URL with t parameter" $ liftEffect $ do
+      let url = urlFromString "https://www.youtube.com/live/XRN1BsAwMCc?t=2695"
+      extractYoutubeVideoStartTime url `shouldEqual` 2695
 
     it "should extract start time from URL with t parameter in seconds format" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10s"

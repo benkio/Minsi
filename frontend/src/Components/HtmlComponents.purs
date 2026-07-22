@@ -1,66 +1,16 @@
 module Components.HtmlComponents where
 
+import Prelude
+
 import Components.HTMLComponentsLoader (loadHtmlElementClass, loadHtmlElementId)
-import Components.HtmlIdAndClasses
-  ( addSubtitleId
-  , applyId
-  , artistId
-  , cutEndId
-  , cutStartId
-  , shiftVideoSyncId
-  , loadingModalId
-  , loadingModalExtraConentId
-  , minsiErrorModalId
-  , clipboardOutputModalCopyClipboardButtonId
-  , clipboardOutputModalContentId
-  , clipboardOutputModalId
-  , clipboardOutputModalTitleId
-  , importStateModalId
-  , importStateModalImportButtonId
-  , importStateModalTextareaId
-  , importStateModalTitleId
-  , minsiLogId
-  , outputFilenameId
-  , playbackPositionResultRowId
-  , playbackPositionResultMediaId
-  , playbackPositionYoutubeId
-  , resultPreviewId
-  , resultAudioId
-  , resultVideoId
-  , reverseLoopGifId
-  , sortSubtitlesId
-  , setCutEndButton
-  , setCutStartButton
-  , setSubtitleEndButtonId
-  , setSubtitleStartButtonId
-  , subtitleTableId
-  , subtitlesRowId
-  , titleId
-  , videoRowId
-  , videoSourceId
-  , inputSourceId
-  , videoSourceRowId
-  , downloadAllButtonId
-  , copyTranscriptButtonId
-  , exportStateButtonId
-  , importStateButtonId
-  , downloadFullButtonId
-  , youtubeUrlId
-  , subtitleRow
-  , keyboardShortcutsButtonId
-  , resetButtonId
-  , localFileId
-  , uploadLocalFileId
-  , minsiLogBoxClass
-  , minsiLogTitleId
-  )
+import Components.HTMLElement (addClassToElement, removeClassFromElement)
+import Components.HtmlIdAndClasses (addSubtitleId, applyId, artistId, cutEndId, cutStartId, shiftVideoSyncId, loadingModalId, loadingModalExtraConentId, minsiErrorModalId, clipboardOutputModalCopyClipboardButtonId, clipboardOutputModalContentId, clipboardOutputModalId, clipboardOutputModalTitleId, importStateModalId, importStateModalImportButtonId, importStateModalTextareaId, importStateModalTitleId, minsiLogId, outputFilenameId, playbackPositionResultRowId, playbackPositionResultMediaId, playbackPositionYoutubeId, resultPreviewId, resultAudioId, resultVideoId, reverseLoopGifId, sortSubtitlesId, setCutEndButton, setCutStartButton, setSubtitleEndButtonId, setSubtitleStartButtonId, subtitleTableId, subtitlesRowId, titleId, videoRowId, videoSourceId, inputSourceId, videoSourceRowId, downloadAllButtonId, copyTranscriptButtonId, exportStateButtonId, importStateButtonId, downloadFullButtonId, youtubeUrlId, subtitleRow, keyboardShortcutsButtonId, resetButtonId, localFileId, uploadLocalFileId, minsiLogBoxClass, minsiLogTitleId)
 import Components.Window (getDocument)
 import Control.Monad.Error.Class (catchError)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
 import Data.Tuple (Tuple(..), fst, snd)
 import Effect (Effect)
-import Prelude (bind, pure)
 import Web.DOM.HTMLCollection (HTMLCollection)
 import Web.DOM.NonElementParentNode (NonElementParentNode)
 import Web.HTML.HTMLAudioElement (HTMLAudioElement)
@@ -389,3 +339,15 @@ loadResultPreview doc = do
         iframe <- loadHtmlElementId resultPreviewId IF.fromElement doc
         pure (ResultPreviewIframe iframe)
     )
+
+showLocalfileInput :: HtmlInputs -> Effect Unit
+showLocalfileInput (HtmlInputs { youtubeUrl, localFile, downloadFullButton }) = do
+  addClassToElement "d-none" (HI.toElement youtubeUrl)
+  addClassToElement "d-none" (HB.toElement downloadFullButton)
+  removeClassFromElement "d-none" (HI.toElement localFile)
+
+showYoutubeUrlInput :: HtmlInputs -> Effect Unit
+showYoutubeUrlInput (HtmlInputs { youtubeUrl, localFile, downloadFullButton }) = do
+  addClassToElement "d-none" (HI.toElement localFile)
+  removeClassFromElement "d-none" (HI.toElement youtubeUrl)
+  removeClassFromElement "d-none" (HB.toElement downloadFullButton)
