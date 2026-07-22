@@ -48,6 +48,13 @@ spec = do
       extractYoutubeVideoId url1 `shouldEqual` Just "_JryLY7pXLQ"
       extractYoutubeVideoId url2 `shouldEqual` Just "C8p4SOnSXeQ"
 
+    it "should extract video ID from youtube.com live URL" $ liftEffect $ do
+      let
+        url1 = urlFromString "https://www.youtube.com/live/XRN1BsAwMCc"
+        url2 = urlFromString "https://www.youtube.com/live/XRN1BsAwMCc?t=2695"
+      extractYoutubeVideoId url1 `shouldEqual` Just "XRN1BsAwMCc"
+      extractYoutubeVideoId url2 `shouldEqual` Just "XRN1BsAwMCc"
+
     it "should return Nothing for URL without video ID" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/"
       extractYoutubeVideoId url `shouldEqual` Nothing
@@ -69,6 +76,10 @@ spec = do
     it "should extract start time from URL with t parameter in seconds" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=90"
       extractYoutubeVideoStartTime url `shouldEqual` 90
+
+    it "should extract start time from youtube.com live URL with t parameter" $ liftEffect $ do
+      let url = urlFromString "https://www.youtube.com/live/XRN1BsAwMCc?t=2695"
+      extractYoutubeVideoStartTime url `shouldEqual` 2695
 
     it "should extract start time from URL with t parameter in seconds format" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10s"

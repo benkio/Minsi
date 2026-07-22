@@ -5,7 +5,7 @@ import Prelude
 import Components.HTMLTableElement (setRows)
 import Components.HTMLTableRowElement (setTableCellValue)
 import Components.HTMLTemplateElement (getRow)
-import Components.HtmlComponents (HtmlInputs(..), loadComponents)
+import Components.HtmlComponents (HtmlInputs(..), loadComponents, showLocalfileInput, showYoutubeUrlInput)
 import Data.Int (floor)
 import Data.Maybe (maybe)
 import Data.Time.Duration (Milliseconds(..))
@@ -48,16 +48,18 @@ applyCutVideoToHtml (DurationRange { start: startMs, end: endMs }) (HtmlInputs {
   HI.setValue (millisecondsInputString endMs) cutEnd
 
 applySourceToHtml :: Source -> HtmlInputs -> Effect Unit
-applySourceToHtml source (HtmlInputs { inputSource, youtubeUrl }) =
+applySourceToHtml source inputs@(HtmlInputs { inputSource, youtubeUrl }) =
   case source of
     WebURL (WURL url) -> do
       HS.setValue "youtubeUrl" inputSource
       HI.setValue (toString url) youtubeUrl
+      showYoutubeUrlInput inputs
     LocalFile _ ->
       -- Cannot repopulate the file picker for security reasons; align mode with empty YouTube URL.
       do
         HS.setValue "localFile" inputSource
         HI.setValue "" youtubeUrl
+        showLocalfileInput inputs
 
 applyFilenameToHtml :: String -> HtmlInputs -> Effect Unit
 applyFilenameToHtml filename (HtmlInputs { filename: filenameInput }) =

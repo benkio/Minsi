@@ -11,7 +11,7 @@ import Model.ValidationErrors (ValidationErrors, fromSingleton)
 import Validations.RegexValidation (matches)
 
 youtubeRegex :: String
-youtubeRegex = """^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=([a-zA-Z0-9_-]+)|shorts\/([a-zA-Z0-9_-]+))|youtu\.be\/([a-zA-Z0-9_-]+))(?:[?&].*)?$"""
+youtubeRegex = """^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=([a-zA-Z0-9_-]+)|shorts\/([a-zA-Z0-9_-]+)|live\/([a-zA-Z0-9_-]+))|youtu\.be\/([a-zA-Z0-9_-]+))(?:[?&].*)?$"""
 
 youtubeRegexValidation :: String -> V ValidationErrors Regex
 youtubeRegexValidation id = V $ lmap (\x -> fromSingleton id x) (regex youtubeRegex noFlags)
