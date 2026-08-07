@@ -19,6 +19,15 @@
           align-self: start;
         }
       }
+
+      .advanced-options-toggle[aria-expanded="true"] .advanced-options-chevron {
+        transform: rotate(180deg);
+      }
+
+      .advanced-options-chevron {
+        display: inline-block;
+        transition: transform 0.2s ease;
+      }
     </style>
   </head>
 
@@ -96,18 +105,18 @@
       <div class="row gy-4">
         <!-- Left column: sticky only on large screens; single column on tablets/phones -->
         <div class="col-12 col-lg-3 sticky-left-lg">
-          <div class="card shadow-sm mb-3 p-2">
-            <div class="card-body">
-              <div class="row mb-3 align-items-center">
+          <div class="card shadow-sm mb-3">
+            <div class="card-body p-3">
+              <div class="row g-2 mb-3 align-items-center">
                 <label
                   for="artist"
-                  class="col-3 px-0 col-form-label col-form-label-sm"
+                  class="col-4 col-form-label col-form-label-sm"
                   >Artist</label
                 >
-                <div class="col-9">
+                <div class="col-8">
                   <input
                     type="text"
-                    class="form-control"
+                    class="form-control form-control-sm"
                     id="artist"
                     list="artists"
                   />
@@ -122,17 +131,17 @@
                 </div>
               </div>
 
-              <div class="row mb-3 align-items-center">
+              <div class="row g-2 mb-3 align-items-center">
                 <label
                   for="outputFilename"
-                  class="col-3 px-0 col-form-label col-form-label-sm"
+                  class="col-4 col-form-label col-form-label-sm"
                 >
                   Filename
                 </label>
-                <div class="col-9">
+                <div class="col-8">
                   <input
                     type="text"
-                    class="form-control"
+                    class="form-control form-control-sm"
                     id="outputFilename"
                     maxlength="50"
                     placeholder="prefix_CamelCaseValue"
@@ -140,74 +149,86 @@
                 </div>
               </div>
 
-              <div class="row mb-3 align-items-center">
+              <div class="row g-2 mb-3 align-items-center">
                 <label
                   for="title"
-                  class="col-3 px-0 col-form-label col-form-label-sm"
+                  class="col-4 col-form-label col-form-label-sm"
                 >
                   Title
                 </label>
-                <div class="col-9">
-                  <input type="text" class="form-control" id="title" />
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="mb-4 col-6">
-                  <label for="cutStart" class="form-label small">
-                    Start Time (ms)
-                  </label>
+                <div class="col-8">
                   <input
-                    type="number"
-                    id="cutStart"
-                    class="form-control form-control-sm d-inline-block ms-1"
-                    style="width: 7em"
-                    min="0"
-                    step="50"
-                    value="0"
-                  />
-                </div>
-
-                <div class="mb-4 col-6">
-                  <label for="cutEnd" class="form-label small">
-                    End Time (ms)</label
-                  >
-                  <input
-                    type="number"
-                    id="cutEnd"
-                    class="form-control form-control-sm d-inline-block ms-1"
-                    style="width: 7em"
-                    min="0"
-                    value="100000"
-                    step="50"
+                    type="text"
+                    class="form-control form-control-sm"
+                    id="title"
                   />
                 </div>
               </div>
 
-              <div class="d-flex justify-content-center">
-                <button
-                  id="applyButton"
-                  type="button"
-                  class="btn btn-primary btn-lg px-5"
-                >
+              <fieldset class="border rounded p-2 mb-3">
+                <legend class="float-none w-auto px-1 fs-6 mb-1">
+                  Cut range
+                </legend>
+                <div class="row g-3">
+                  <div class="col-12 col-sm-6">
+                    <label for="cutStart" class="form-label form-label-sm mb-1">
+                      Start Time (ms)
+                    </label>
+                    <input
+                      type="number"
+                      id="cutStart"
+                      class="form-control form-control-sm"
+                      min="0"
+                      step="50"
+                      value="0"
+                    />
+                  </div>
+
+                  <div class="col-12 col-sm-6">
+                    <label for="cutEnd" class="form-label form-label-sm mb-1">
+                      End Time (ms)
+                    </label>
+                    <input
+                      type="number"
+                      id="cutEnd"
+                      class="form-control form-control-sm"
+                      min="0"
+                      value="100000"
+                      step="50"
+                    />
+                  </div>
+                </div>
+              </fieldset>
+
+              <div class="d-grid mb-1">
+                <button id="applyButton" type="button" class="btn btn-primary btn-lg">
                   Apply
                 </button>
               </div>
-              <div class="m-2 d-flex justify-content-center">
+              <p class="text-muted text-center small mb-3">
+                Applies current cut and output options.
+              </p>
+
+              <div class="d-flex justify-content-center mb-2">
                 <button
                   type="button"
-                  class="btn btn-link text-reset text-decoration-none p-0"
+                  id="advancedOptionsToggle"
+                  class="btn btn-link text-reset text-decoration-none p-0 advanced-options-toggle"
                   data-bs-toggle="collapse"
                   data-bs-target="#collapseAdvancedOptions"
                   aria-expanded="false"
                   aria-controls="collapseAdvancedOptions"
                 >
-                  ↓ Advanced Options ↓
+                  <span class="advanced-options-chevron" aria-hidden="true">▼</span>
+                  <span id="advancedOptionsToggleLabel">Show advanced options</span>
                 </button>
               </div>
               <div class="collapse" id="collapseAdvancedOptions">
-                <div class="border rounded p-3 mt-2">
-                  <div class="row g-2 align-items-center mb-3">
+                <fieldset class="border rounded p-3 mt-2">
+                  <legend class="float-none w-auto px-1 fs-6 mb-2">
+                    Advanced options
+                  </legend>
+                  <div class="row g-2 align-items-center mb-2">
                     <label
                       for="shiftVideoSync"
                       class="col-7 col-form-label col-form-label-sm"
@@ -221,20 +242,26 @@
                         class="form-control form-control-sm"
                         value="0"
                         step="50"
+                        aria-describedby="shiftVideoSyncHelp"
                       />
+                    </div>
+                    <div class="col-12">
+                      <p id="shiftVideoSyncHelp" class="mb-0 form-text pt-1">
+                        Positive values delay video. Negative values advance it.
+                      </p>
                     </div>
                   </div>
 
-                  <div class="row g-2 align-items-center mb-3">
+                  <div class="row g-2 align-items-center mb-2">
                     <div class="col-12">
-                      <div class="form-check form-switch mb-0">
+                      <div class="form-check mb-0">
                         <input
                           class="form-check-input"
                           type="checkbox"
                           id="reverseLoopGif"
                         />
                         <label class="form-check-label" for="reverseLoopGif">
-                          Reverse / Loop GIF
+                          Reverse/Loop GIF
                         </label>
                       </div>
                     </div>
@@ -242,21 +269,25 @@
 
                   <div class="row g-2 align-items-center">
                     <div class="col-12">
-                      <div class="form-check form-switch mb-0">
+                      <div class="form-check mb-0">
                         <input
                           class="form-check-input"
                           type="checkbox"
                           id="uploadLocalFile"
                           checked
                           disabled
+                          aria-describedby="uploadLocalFileHelp"
                         />
                         <label class="form-check-label" for="uploadLocalFile">
                           Local file will be uploaded
                         </label>
+                        <p id="uploadLocalFileHelp" class="mb-0 form-text">
+                          Auto-enabled when local source is used.
+                        </p>
                       </div>
                     </div>
                   </div>
-                </div>
+                </fieldset>
               </div>
             </div>
           </div>
@@ -283,14 +314,17 @@
           <!-- YouTube block (URL + preview + cut buttons) -->
           <div class="card shadow-sm mb-4">
             <div class="card-body text-center">
-              <div class="row mb-2">
-                <div class="col-3 m-auto">
-                  <select id="inputSource" class="w-100 text-center mt-2">
-                    <option value="youtubeUrl" selected>Youtube URL</option>
+              <div class="row mb-2 g-2 align-items-center">
+                <div class="col-12 col-md-3">
+                  <label for="inputSource" class="visually-hidden">
+                    Input source
+                  </label>
+                  <select id="inputSource" class="form-select text-center mt-2 mt-md-0">
+                    <option value="youtubeUrl" selected>YouTube URL</option>
                     <option value="localFile">Local File</option>
                   </select>
                 </div>
-                <div class="mt-2 col-9 mx-auto">
+                <div class="col-12 col-md-9">
                   <div class="input-group w-100 w-md-75 mx-auto">
                     <input
                       type="url"
@@ -346,34 +380,38 @@
           </div>
 
           <!-- Result block: video source + result video + playback + subtitles (like youtube block) -->
-          <div class="d-none mt-5" id="videoSourceRowId">
-            <div
-              class="text-center mb-3 d-flex justify-content-center align-items-center gap-2 flex-wrap"
-            >
-              <select
-                name="videoSource"
-                id="videoSource"
-                class="form-select w-50 text-center"
-                style="max-width: 12rem"
-              >
-                <option value="mp4">Video</option>
-                <option value="gif">Gif</option>
-                <option value="mp3">Mp3</option>
-              </select>
-              <button
-                type="button"
-                class="btn btn-success"
-                id="downloadAllButton"
-              >
-                Download all
-              </button>
-              <button
-                type="button"
-                class="btn btn-warning"
-                id="copyTranscriptButton"
-              >
-                Copy transcript
-              </button>
+          <div class="d-none mt-4 mt-md-5" id="videoSourceRowId">
+            <div class="row g-2 align-items-center justify-content-center mb-3">
+              <div class="col-12 col-sm-5 col-md-4 col-lg-3">
+                <label for="videoSource" class="visually-hidden">Output media type</label>
+                <select
+                  name="videoSource"
+                  id="videoSource"
+                  class="form-select text-center"
+                >
+                  <option value="mp4">Video</option>
+                  <option value="gif">GIF</option>
+                  <option value="mp3">MP3</option>
+                </select>
+              </div>
+              <div class="col-6 col-sm-auto">
+                <button
+                  type="button"
+                  class="btn btn-outline-success w-100"
+                  id="downloadAllButton"
+                >
+                  Download All
+                </button>
+              </div>
+              <div class="col-6 col-sm-auto">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary w-100"
+                  id="copyTranscriptButton"
+                >
+                  Copy Transcript
+                </button>
+              </div>
             </div>
           </div>
 
@@ -382,7 +420,7 @@
               <video
                 id="resultVideo"
                 class="w-100 bg-dark"
-                style="object-fit: contain; height: 60vh"
+                style="object-fit: contain; height: clamp(16rem, 60vh, 42rem)"
                 controls
               ></video>
               <audio id="resultAudio" class="w-100 d-none" controls></audio>
@@ -404,6 +442,9 @@
                 class="table table-bordered table-sm bg-white shadow-sm align-middle"
                 id="subtitleTable"
               >
+                <caption class="caption-top small text-muted py-1 px-2">
+                  Subtitles timeline editor
+                </caption>
                 <thead class="table-light text-center">
                   <tr>
                     <th style="width: 6em">
@@ -435,6 +476,7 @@
                           type="button"
                           class="btn btn-sm btn-outline-primary"
                           title="Add subtitle row"
+                          aria-label="Add subtitle row"
                         >
                           ➕
                         </button>
@@ -443,6 +485,7 @@
                           type="button"
                           class="btn btn-sm btn-outline-secondary"
                           title="Sort subtitles"
+                          aria-label="Sort subtitle rows"
                         >
                           ⇅
                         </button>
@@ -489,7 +532,6 @@
               <option value="ImpactWhite" selected>White</option>
               <option value="ImpactBlack">Black</option>
             </optgroup>
-            <hr />
             <optgroup label="Arial Black">
               <option value="ArialBlackYellow">Yellow</option>
               <option value="ArialBlackLightGreen">Light Green</option>
@@ -498,7 +540,7 @@
           </select>
         </td>
         <td>
-          <select type="number" class="form-control form-control-sm">
+          <select class="form-select form-select-sm">
             <option>24</option>
             <option selected>36</option>
             <option>48</option>
@@ -514,6 +556,7 @@
           <button
             type="button"
             class="btn btn-sm btn-outline-danger removeSubtitleButton"
+            aria-label="Remove subtitle row"
           >
             ➖
           </button>

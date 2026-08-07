@@ -1,6 +1,7 @@
 module Handlers.Handlers where
 
 import Effect (Effect)
+import Handlers.AdvancedOptionsToggleHandler (setAdvancedOptionsToggleHandler)
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
 import Handlers.ClipboardOutputModalCopyClipboardButtonHandler (setClipboardOutputModalCopyClipboardButtonHandler)
 import Handlers.ConfirmationOnClose (setConfirmationOnClosing)
@@ -42,6 +43,7 @@ setupEventHandlers = do
   setDownloadFullButtonHandler
   setDownloadAllButtonHandler
   setCopyTranscriptButtonHandler
+  setAdvancedOptionsToggleHandler
   setClipboardOutputModalCopyClipboardButtonHandler
   setExportStateButtonHandler
   setImportStateButtonHandler

@@ -4,7 +4,7 @@ import Prelude
 
 import Components.HTMLComponentsLoader (loadHtmlElementClass, loadHtmlElementId)
 import Components.HTMLElement (addClassToElement, removeClassFromElement)
-import Components.HtmlIdAndClasses (addSubtitleId, applyId, artistId, cutEndId, cutStartId, shiftVideoSyncId, loadingModalId, loadingModalExtraConentId, minsiErrorModalId, clipboardOutputModalCopyClipboardButtonId, clipboardOutputModalContentId, clipboardOutputModalId, clipboardOutputModalTitleId, importStateModalId, importStateModalImportButtonId, importStateModalTextareaId, importStateModalTitleId, minsiLogId, outputFilenameId, playbackPositionResultRowId, playbackPositionResultMediaId, playbackPositionYoutubeId, resultPreviewId, resultAudioId, resultVideoId, reverseLoopGifId, sortSubtitlesId, setCutEndButton, setCutStartButton, setSubtitleEndButtonId, setSubtitleStartButtonId, subtitleTableId, subtitlesRowId, titleId, videoRowId, videoSourceId, inputSourceId, videoSourceRowId, downloadAllButtonId, copyTranscriptButtonId, exportStateButtonId, importStateButtonId, downloadFullButtonId, youtubeUrlId, subtitleRow, keyboardShortcutsButtonId, resetButtonId, localFileId, uploadLocalFileId, minsiLogBoxClass, minsiLogTitleId)
+import Components.HtmlIdAndClasses (addSubtitleId, advancedOptionsToggleId, advancedOptionsToggleLabelId, applyId, artistId, collapseAdvancedOptionsId, cutEndId, cutStartId, shiftVideoSyncId, loadingModalId, loadingModalExtraConentId, minsiErrorModalId, clipboardOutputModalCopyClipboardButtonId, clipboardOutputModalContentId, clipboardOutputModalId, clipboardOutputModalTitleId, importStateModalId, importStateModalImportButtonId, importStateModalTextareaId, importStateModalTitleId, minsiLogId, outputFilenameId, playbackPositionResultRowId, playbackPositionResultMediaId, playbackPositionYoutubeId, resultPreviewId, resultAudioId, resultVideoId, reverseLoopGifId, sortSubtitlesId, setCutEndButton, setCutStartButton, setSubtitleEndButtonId, setSubtitleStartButtonId, subtitleTableId, subtitlesRowId, titleId, videoRowId, videoSourceId, inputSourceId, videoSourceRowId, downloadAllButtonId, copyTranscriptButtonId, exportStateButtonId, importStateButtonId, downloadFullButtonId, youtubeUrlId, subtitleRow, keyboardShortcutsButtonId, resetButtonId, localFileId, uploadLocalFileId, minsiLogBoxClass, minsiLogTitleId)
 import Components.Window (getDocument)
 import Control.Monad.Error.Class (catchError)
 import Data.Maybe (Maybe(..))
@@ -133,6 +133,9 @@ data HtmlVisualElements = HtmlVisualElements
   , videoRow :: HTMLDivElement
   , subtitlesRow :: HTMLDivElement
   , playbackPositionResultRow :: HTMLDivElement
+  , collapseAdvancedOptions :: HTMLDivElement
+  , advancedOptionsToggle :: HTMLButtonElement
+  , advancedOptionsToggleLabel :: HTMLSpanElement
   , minsiLogBox :: HTMLCollection
   }
 
@@ -255,6 +258,9 @@ loadHtmlVisualElements doc = do
   videoRow <- loadDiv videoRowId doc
   subtitlesRow <- loadDiv subtitlesRowId doc
   playbackPositionResultRow <- loadDiv playbackPositionResultRowId doc
+  collapseAdvancedOptions <- loadDiv collapseAdvancedOptionsId doc
+  advancedOptionsToggle <- loadButton advancedOptionsToggleId doc
+  advancedOptionsToggleLabel <- loadSpan advancedOptionsToggleLabelId doc
   minsiLogBox <- loadHtmlElementClass minsiLogBoxClass doc
   pure
     ( HtmlVisualElements
@@ -262,6 +268,9 @@ loadHtmlVisualElements doc = do
         , videoRow: videoRow
         , subtitlesRow: subtitlesRow
         , playbackPositionResultRow: playbackPositionResultRow
+        , collapseAdvancedOptions: collapseAdvancedOptions
+        , advancedOptionsToggle: advancedOptionsToggle
+        , advancedOptionsToggleLabel: advancedOptionsToggleLabel
         , minsiLogBox: minsiLogBox
         }
     )
