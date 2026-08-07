@@ -61,6 +61,9 @@ module Components.HtmlComponents.Lenses
   , _videoRow
   , _subtitlesRow
   , _playbackPositionResultRow
+  , _collapseAdvancedOptions
+  , _advancedOptionsToggle
+  , _advancedOptionsToggleLabel
   , _minsiLogBox
   -- ResultPreview
   , _ResultPreviewVideo
@@ -180,6 +183,9 @@ _HtmlVisualElementsFields
        , videoRow :: HTMLDivElement
        , subtitlesRow :: HTMLDivElement
        , playbackPositionResultRow :: HTMLDivElement
+       , collapseAdvancedOptions :: HTMLDivElement
+       , advancedOptionsToggle :: HTMLButtonElement
+       , advancedOptionsToggleLabel :: HTMLSpanElement
        , minsiLogBox :: HTMLCollection
        }
 _HtmlVisualElementsFields = iso (\(HtmlVisualElements r) -> r) HtmlVisualElements
@@ -344,6 +350,15 @@ _subtitlesRow = _htmlVisualElements <<< _HtmlVisualElementsFields <<< prop (Prox
 
 _playbackPositionResultRow :: Lens' HtmlComponents HTMLDivElement
 _playbackPositionResultRow = _htmlVisualElements <<< _HtmlVisualElementsFields <<< prop (Proxy :: Proxy "playbackPositionResultRow")
+
+_collapseAdvancedOptions :: Lens' HtmlComponents HTMLDivElement
+_collapseAdvancedOptions = _htmlVisualElements <<< _HtmlVisualElementsFields <<< prop (Proxy :: Proxy "collapseAdvancedOptions")
+
+_advancedOptionsToggle :: Lens' HtmlComponents HTMLButtonElement
+_advancedOptionsToggle = _htmlVisualElements <<< _HtmlVisualElementsFields <<< prop (Proxy :: Proxy "advancedOptionsToggle")
+
+_advancedOptionsToggleLabel :: Lens' HtmlComponents HTMLSpanElement
+_advancedOptionsToggleLabel = _htmlVisualElements <<< _HtmlVisualElementsFields <<< prop (Proxy :: Proxy "advancedOptionsToggleLabel")
 
 _minsiLogBox :: Lens' HtmlComponents HTMLCollection
 _minsiLogBox = _htmlVisualElements <<< _HtmlVisualElementsFields <<< prop (Proxy :: Proxy "minsiLogBox")

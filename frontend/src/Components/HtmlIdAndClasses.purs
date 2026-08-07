@@ -156,6 +156,15 @@ inputSourceId = "inputSource"
 uploadLocalFileId :: String
 uploadLocalFileId = "uploadLocalFile"
 
+advancedOptionsToggleId :: String
+advancedOptionsToggleId = "advancedOptionsToggle"
+
+advancedOptionsToggleLabelId :: String
+advancedOptionsToggleLabelId = "advancedOptionsToggleLabel"
+
+collapseAdvancedOptionsId :: String
+collapseAdvancedOptionsId = "collapseAdvancedOptions"
+
 minsiLogBoxClass :: String
 minsiLogBoxClass = "minsiLogBox"
 
