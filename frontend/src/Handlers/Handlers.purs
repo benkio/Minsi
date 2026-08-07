@@ -2,21 +2,22 @@ module Handlers.Handlers where
 
 import Effect (Effect)
 import Handlers.ApplyButtonHandler (setApplyButtonHandler)
-import Handlers.CopyTranscriptButtonHandler (setCopyTranscriptButtonHandler)
-import Handlers.ExportStateButtonHandler (setExportStateButtonHandler)
-import Handlers.ImportStateButtonHandler (setImportStateButtonHandler)
-import Handlers.ImportStateModalImportButtonHandler (setImportStateModalImportButtonHandler)
 import Handlers.ClipboardOutputModalCopyClipboardButtonHandler (setClipboardOutputModalCopyClipboardButtonHandler)
+import Handlers.ConfirmationOnClose (setConfirmationOnClosing)
+import Handlers.CopyTranscriptButtonHandler (setCopyTranscriptButtonHandler)
 import Handlers.CutRangeHandler (setCutRangeHandlers)
 import Handlers.DownloadAllButtonHandler (setDownloadAllButtonHandler)
 import Handlers.DownloadFullButtonHandler (setDownloadFullButtonHandler)
+import Handlers.ExportStateButtonHandler (setExportStateButtonHandler)
+import Handlers.ImportStateButtonHandler (setImportStateButtonHandler)
+import Handlers.ImportStateModalImportButtonHandler (setImportStateModalImportButtonHandler)
 import Handlers.InputVideo.InputSourceHandler (setInputSourceHandler)
 import Handlers.InputVideo.InputVideoHandler (setVideoHandlers)
 import Handlers.KeyboardHandler (setKeyboardHandlers)
 import Handlers.ResetButtonHandler (setResetButtonHandler)
-import Handlers.ShiftVideoSyncHandler (setShiftVideoSyncHandler)
 import Handlers.ResultMedia.Handler (setResultMediaHandlers)
 import Handlers.ResultMedia.VideoSourceHandler (setVideoSourceHandler)
+import Handlers.ShiftVideoSyncHandler (setShiftVideoSyncHandler)
 import Handlers.Subtitles.AddSubtitleButtonHandler (setAddSubtitleButtonHandler)
 import Handlers.Subtitles.RemoveSubtitleButtonHandler (setRemoveSubtitleButtonHandler)
 import Handlers.Subtitles.SortSubtitlesButtonHandler (setSortSubtitlesButtonHandler)
@@ -47,3 +48,4 @@ setupEventHandlers = do
   setImportStateModalImportButtonHandler
   setResetButtonHandler
   setTextInputValidationHandlers
+  setConfirmationOnClosing
