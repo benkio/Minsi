@@ -1,14 +1,12 @@
 module Test.Validations.NonEmptyValidationSpec where
 
-import Prelude
-import Effect.Class (liftEffect)
-import Test.Arbitrary (NonEmptyASCIIString(..), EmptyASCIIString(..))
-import Test.QuickCheck (quickCheck)
-import Test.Spec (Spec, describe, it)
-import Test.Spec.Assertions (shouldEqual)
-import Data.Validation.Semigroup (isValid, toEither)
 import Data.Either (Either(Left, Right))
 import Data.String.Regex (test)
+import Data.Validation.Semigroup (isValid, toEither)
+import Effect.Class (liftEffect)
+import Prelude
+import Test.Spec (Spec, describe, it)
+import Test.Spec.Assertions (shouldEqual)
 import Validations.NonEmptyValidation (nonEmptyRegexValidation, nonEmptyValidation)
 
 spec :: Spec Unit
@@ -31,13 +29,11 @@ spec = do
         Left _ -> pure unit
 
   describe "nonEmptyValidation" do
-    it "should validate a non-empty string" $ liftEffect $
-      quickCheck
-        ( \(NonEmptyASCIIString s) ->
-            (isValid <<< nonEmptyValidation "testId") s
-        )
-    it "should not validate a empty string" $ liftEffect $
-      quickCheck
-        ( \(EmptyASCIIString s) ->
-            (not <<< isValid <<< nonEmptyValidation "testId") s
-        )
+    it "should validate non-empty strings" do
+      isValid (nonEmptyValidation "testId" "hello") `shouldEqual` true
+      isValid (nonEmptyValidation "testId" "  hello  ") `shouldEqual` true
+      isValid (nonEmptyValidation "testId" "0") `shouldEqual` true
+    it "should not validate empty-like strings" do
+      isValid (nonEmptyValidation "testId" "") `shouldEqual` false
+      isValid (nonEmptyValidation "testId" "   ") `shouldEqual` false
+      isValid (nonEmptyValidation "testId" "\n\t") `shouldEqual` false

@@ -1,17 +1,16 @@
 module Endpoints.CheckDependencies where
 
+import Contracts.Api (CheckDependenciesResponse)
 import Effect.Aff (Aff)
 import Fetch (Method(..), fetch)
 import Main.Config (backendUrl)
 import Prelude
 import Endpoints.ResponseParser (decodeJsonResponse)
 
-type MissingDependenciesResponse = { missedDependencies :: Array String }
-
 checkDependeciesEndpoint :: String
 checkDependeciesEndpoint = backendUrl <> "checkDependencies"
 
-callCheckDependencies :: Aff MissingDependenciesResponse
+callCheckDependencies :: Aff CheckDependenciesResponse
 callCheckDependencies = do
   response <- fetch checkDependeciesEndpoint { method: POST }
   if response.ok then

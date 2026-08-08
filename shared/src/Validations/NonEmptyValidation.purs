@@ -1,10 +1,11 @@
 module Validations.NonEmptyValidation where
 
 import Prelude
-import Data.Validation.Semigroup (V(..), andThen)
+
+import Data.Bifunctor (lmap)
 import Data.String.Regex (Regex, regex)
 import Data.String.Regex.Flags (noFlags)
-import Data.Bifunctor (lmap)
+import Data.Validation.Semigroup (V(..), andThen)
 import Model.ValidationErrors (ValidationErrors, fromSingleton)
 import Validations.RegexValidation (matches)
 

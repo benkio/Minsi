@@ -1,6 +1,6 @@
 module Test.Parse.FontSpec where
 
-import Model.State.State (Font(..), Color(..), Position(..))
+import Model.State.State (Color(..), Font(..), Position(..))
 import Parse.Font (parseFontAndColor, parsePosition)
 import Prelude
 import Test.Spec (Spec, describe, it)

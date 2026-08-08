@@ -2,16 +2,11 @@ module Endpoints.UpdateCheck where
 
 import Prelude
 
+import Contracts.Api (UpdateCheckResponse)
 import Effect.Aff (Aff)
 import Endpoints.ResponseParser (decodeJsonResponse)
 import Fetch (Method(..), fetch)
 import Main.Config (backendUrl)
-
-type UpdateCheckResponse =
-  { updateAvailable :: Boolean
-  , currentVersion :: String
-  , latestVersion :: String
-  }
 
 updateCheckEndpoint :: String
 updateCheckEndpoint = backendUrl <> "updateCheck"

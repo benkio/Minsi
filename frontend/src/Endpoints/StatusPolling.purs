@@ -5,11 +5,11 @@ import Prelude
 import Control.Monad.Rec.Class (Step(..), tailRecM)
 import Data.Maybe (Maybe, fromMaybe)
 import Data.Time.Duration (Milliseconds(..))
+import Domain.ProcessStatus (ProcessStatus)
 import Effect.Aff (Aff, delay)
 import Effect.Class (liftEffect)
 import Endpoints.Status (callStatus)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
-import Model.ProcessStatus (ProcessStatus)
 
 waitForStatus :: String -> ProcessStatus -> Maybe (Int -> Aff Unit) -> Aff Unit
 waitForStatus filename target maybeHandler = tailRecM pollStatus 0

@@ -1,8 +1,7 @@
 module Test.Model.ProcessStatusSpec where
 
+import Domain.ProcessStatus (ProcessStatus(..), isFinished)
 import Prelude
-
-import Model.ProcessStatus (ProcessStatus(..), isFinished)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 
@@ -17,3 +16,10 @@ spec = do
 
     it "returns true for Failed" do
       isFinished (Failed "") `shouldEqual` true
+
+  describe "show" do
+    it "hides LocalFileUploaded payload in status string" do
+      show (LocalFileUploaded "tmp.mp4") `shouldEqual` "LocalFileUploaded"
+
+    it "hides Failed payload in status string" do
+      show (Failed "some backend error") `shouldEqual` "Failed"

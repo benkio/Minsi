@@ -4,9 +4,9 @@ import Prelude
 
 import Data.Map as Map
 import Data.Maybe (Maybe)
+import Domain.ProcessStatus (ProcessStatus)
 import Effect (Effect)
 import Effect.Ref as Ref
-import Model.ProcessStatus (ProcessStatus)
 import Model.State.State (State)
 
 type Filename = String
