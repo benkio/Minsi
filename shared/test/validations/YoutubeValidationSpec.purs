@@ -72,3 +72,21 @@ spec = do
       isValid (youtubeUrlValidation "testId" "https://youtube.com/live/XRN1BsAwMCc") `shouldEqual` true
       isValid (youtubeUrlValidation "testId" "https://www.youtube.com/live/XRN1BsAwMCc?t=2695") `shouldEqual` true
       isValid (youtubeUrlValidation "testId" "https://www.youtube.com/live/vyB7BnvGOE4?t=2130") `shouldEqual` true
+    it "should validate known Invidious and alternative watch instances" $ liftEffect $ do
+      let
+        videoId = "dQw4w9WgXcQ"
+
+        youtubeInstances =
+          [ "https://inv.nadeko.net/watch?v="
+          , "https://yewtu.be/watch?v="
+          , "https://invidious.nerdvpn.de/watch?v="
+          , "https://yt.chocolatemoo53.com/watch?v="
+          , "https://invidious.tiekoetter.com//watch?v="
+          , "https://invidious.f5.si/watch?v="
+          , "https://inv.zoomerville.com/watch?v="
+          , "https://ymusicapp.com/watch?v="
+          , "https://piped.video/watch?v="
+          ]
+
+        youtubeUrls = map (_ <> videoId) youtubeInstances
+      traverse_ (\i -> isValid (youtubeUrlValidation "testId" i) `shouldEqual` true) youtubeUrls
