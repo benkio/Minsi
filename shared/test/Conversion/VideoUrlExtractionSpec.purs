@@ -1,16 +1,17 @@
-module Test.Handers.InputVideo.YoutubeUrlExtractionSpec where
+module Test.Conversion.VideoUrlExtractionSpec where
 
-import Data.Maybe (Maybe(..), fromJust)
-import Data.URL (Path(..), URL, fromString, toString)
-import Effect.Class (liftEffect)
-import Handlers.InputVideo.YoutubeUrlExtraction
-  ( extractYoutubeVideoId
-  , extractYoutubeVideoStartTime
+import Conversion.VideoUrlExtraction
+  ( extractVideoId
+  , extractVideoStartTime
   , parseUnit
   , parseYouTubeT
   , pathToArray
-  , toYoutubeWatchUrl
+  , toCanonicalYoutubeWatchUrl
   )
+import Data.Maybe (Maybe(..), fromJust)
+import Data.URL (Path(..), URL, fromString, toString)
+import Effect (foreachE)
+import Effect.Class (liftEffect)
 import Partial.Unsafe (unsafePartial)
 import Prelude
 import Test.Spec (Spec, describe, it)
@@ -22,41 +23,42 @@ urlFromString = unsafePartial fromJust <<< fromString
 
 spec :: Spec Unit
 spec = do
-  describe "extractYoutubeVideoId" do
+  describe "extractVideoId" do
     it "should extract video ID from standard youtube.com URL with v parameter" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-      extractYoutubeVideoId url `shouldEqual` Just "dQw4w9WgXcQ"
+      extractVideoId url `shouldEqual` Just "dQw4w9WgXcQ"
 
     it "should extract video ID from youtube.com URL with v parameter and other query params" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10s&list=PLxxx"
-      extractYoutubeVideoId url `shouldEqual` Just "dQw4w9WgXcQ"
+      extractVideoId url `shouldEqual` Just "dQw4w9WgXcQ"
 
     it "should extract video ID from youtu.be short URL" $ liftEffect $ do
       let url = urlFromString "https://youtu.be/dQw4w9WgXcQ"
-      extractYoutubeVideoId url `shouldEqual` Just "dQw4w9WgXcQ"
+      extractVideoId url `shouldEqual` Just "dQw4w9WgXcQ"
 
     it "should extract video ID from youtu.be URL with query parameters" $ liftEffect $ do
       let url = urlFromString "https://youtu.be/dQw4w9WgXcQ?t=364"
-      extractYoutubeVideoId url `shouldEqual` Just "dQw4w9WgXcQ"
+      extractVideoId url `shouldEqual` Just "dQw4w9WgXcQ"
 
     it "should extract video ID from youtube.com URL without www" $ liftEffect $ do
       let url = urlFromString "https://youtube.com/watch?v=PHi-UNsm2Ds"
-      extractYoutubeVideoId url `shouldEqual` Just "PHi-UNsm2Ds"
+      extractVideoId url `shouldEqual` Just "PHi-UNsm2Ds"
 
     it "should extract video ID from youtube.com live URL" $ liftEffect $ do
       let
         url1 = urlFromString "https://www.youtube.com/live/XRN1BsAwMCc"
         url2 = urlFromString "https://www.youtube.com/live/XRN1BsAwMCc?t=2695"
-      extractYoutubeVideoId url1 `shouldEqual` Just "XRN1BsAwMCc"
-      extractYoutubeVideoId url2 `shouldEqual` Just "XRN1BsAwMCc"
-
-    it "should canonicalize live URL to watch URL" $ liftEffect $ do
-      let url = urlFromString "https://www.youtube.com/live/vyB7BnvGOE4?t=2130"
-      (toString <$> toYoutubeWatchUrl url) `shouldEqual` Just "https://www.youtube.com/watch?v=vyB7BnvGOE4"
+      extractVideoId url1 `shouldEqual` Just "XRN1BsAwMCc"
+      extractVideoId url2 `shouldEqual` Just "XRN1BsAwMCc"
 
     it "should return Nothing for URL without video ID" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/"
-      extractYoutubeVideoId url `shouldEqual` Nothing
+      extractVideoId url `shouldEqual` Nothing
+
+    it "should support other mirror video websites and extract the video id" $ liftEffect $ do
+      let targetId = "uVT-eHgNEgs"
+      let urls = (\url -> urlFromString (url <> targetId)) <$> alternativeWatchPrefixes
+      foreachE urls (\url -> extractVideoId url `shouldEqual` Just targetId)
 
   describe "pathToArray" do
     it "should convert PathEmpty to empty array" $ liftEffect $ do
@@ -71,38 +73,45 @@ spec = do
     it "should handle single element path" $ liftEffect $ do
       pathToArray (PathAbsolute [ "dQw4w9WgXcQ" ]) `shouldEqual` [ "dQw4w9WgXcQ" ]
 
-  describe "extractYoutubeVideoStartTime" do
+  describe "extractVideoStartTime" do
     it "should extract start time from URL with t parameter in seconds" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=90"
-      extractYoutubeVideoStartTime url `shouldEqual` 90
+      extractVideoStartTime url `shouldEqual` 90
 
     it "should extract start time from youtube.com live URL with t parameter" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/live/XRN1BsAwMCc?t=2695"
-      extractYoutubeVideoStartTime url `shouldEqual` 2695
+      extractVideoStartTime url `shouldEqual` 2695
 
     it "should extract start time from URL with t parameter in seconds format" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10s"
-      extractYoutubeVideoStartTime url `shouldEqual` 10
+      extractVideoStartTime url `shouldEqual` 10
 
     it "should extract start time from URL with t parameter in minutes format" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=5m"
-      extractYoutubeVideoStartTime url `shouldEqual` 300
+      extractVideoStartTime url `shouldEqual` 300
 
     it "should extract start time from URL with t parameter in hours format" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=1h"
-      extractYoutubeVideoStartTime url `shouldEqual` 3600
+      extractVideoStartTime url `shouldEqual` 3600
 
     it "should extract start time from URL with combined time format" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=1h30m45s"
-      extractYoutubeVideoStartTime url `shouldEqual` 5445
+      extractVideoStartTime url `shouldEqual` 5445
 
     it "should return 0 for URL without t parameter" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-      extractYoutubeVideoStartTime url `shouldEqual` 0
+      extractVideoStartTime url `shouldEqual` 0
 
     it "should return 0 for URL with empty t parameter" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t="
-      extractYoutubeVideoStartTime url `shouldEqual` 0
+      extractVideoStartTime url `shouldEqual` 0
+
+    it "should support other mirror video websites and extract the start time" $ liftEffect $ do
+      let
+        targetTime = 1052
+        targetId = "uVT-eHgNEgs"
+        urls = (\url -> urlFromString (url <> targetId <> "&t=17m32s")) <$> alternativeWatchPrefixes
+      foreachE urls (\url -> extractVideoStartTime url `shouldEqual` targetTime)
 
   describe "parseUnit" do
     it "should parse hours from string" $ liftEffect $ do
@@ -176,3 +185,23 @@ spec = do
 
     it "should return Nothing for empty string" $ liftEffect $ do
       parseYouTubeT "" `shouldEqual` Nothing
+  describe "toCanonicalYoutubeWatchUrl" do
+    it "should canonicalize live URL to watch URL" $ liftEffect $ do
+      let url = urlFromString "https://www.youtube.com/live/vyB7BnvGOE4?t=2130"
+      (toString <$> toCanonicalYoutubeWatchUrl url) `shouldEqual` Just "https://www.youtube.com/watch?v=vyB7BnvGOE4"
+  where
+  alternativeWatchPrefixes =
+    [
+      -- <2026-08-08 Sat> - Known Invidious Instances
+      "https://inv.nadeko.net/watch?v="
+    , "https://yewtu.be/watch?v="
+    , "https://invidious.nerdvpn.de/watch?v="
+    , "https://yt.chocolatemoo53.com/watch?v="
+    , "https://invidious.tiekoetter.com//watch?v="
+    , "https://invidious.f5.si/watch?v="
+    , "https://inv.zoomerville.com/watch?v="
+    ,
+      -- Others
+      "https://ymusicapp.com/watch?v="
+    , "https://piped.video/watch?v="
+    ]

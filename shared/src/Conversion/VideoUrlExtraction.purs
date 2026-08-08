@@ -1,4 +1,4 @@
-module Handlers.InputVideo.YoutubeUrlExtraction where
+module Conversion.VideoUrlExtraction where
 
 import Data.Array (head, last)
 import Data.Array.NonEmpty (index)
@@ -13,17 +13,17 @@ import Data.URL (URL, Path(..), fromString, path, query)
 import Control.Alt ((<|>))
 import Prelude
 
-extractYoutubeVideoId :: URL -> Maybe String
-extractYoutubeVideoId url =
+extractVideoId :: URL -> Maybe String
+extractVideoId url =
   maybeVQueryString <|> lastPath
   where
   maybeVQueryString = ((\v -> lookup "v" v >>= head) <<< query) url
   lastPath = (path >>> pathToArray >>> last) url
 
--- | Canonical watch URL for yt-dlp (avoids /live/ hang-stream manifests).
-toYoutubeWatchUrl :: URL -> Maybe URL
-toYoutubeWatchUrl url = do
-  videoId <- extractYoutubeVideoId url
+-- | Canonical YouTube watch URL for yt-dlp (avoids /live/ hang-stream manifests).
+toCanonicalYoutubeWatchUrl :: URL -> Maybe URL
+toCanonicalYoutubeWatchUrl url = do
+  videoId <- extractVideoId url
   fromString ("https://www.youtube.com/watch?v=" <> videoId)
 
 pathToArray :: Path -> Array String
@@ -31,8 +31,8 @@ pathToArray PathEmpty = []
 pathToArray (PathAbsolute s) = s
 pathToArray (PathRelative s) = s
 
-extractYoutubeVideoStartTime :: URL -> Int
-extractYoutubeVideoStartTime url = fromMaybe 0 $ do
+extractVideoStartTime :: URL -> Int
+extractVideoStartTime url = fromMaybe 0 $ do
   values <- (query >>> lookup "t") url
   v <- head values
   parseYouTubeT v

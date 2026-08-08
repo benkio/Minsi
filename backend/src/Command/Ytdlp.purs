@@ -6,6 +6,7 @@ import Command.Command (runCommand)
 import Constants (mp4)
 import Control.Monad.Error.Class (catchError)
 import Conversion.Time (millisecondsToSecondsString)
+import Conversion.VideoUrlExtraction (toCanonicalYoutubeWatchUrl)
 import Data.Array (uncons)
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..), fromMaybe, maybe)
@@ -14,7 +15,6 @@ import Data.URL (URL, toString)
 import Effect.Aff (Aff, apathize, delay)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
-import Handlers.InputVideo.YoutubeUrlExtraction (toYoutubeWatchUrl)
 import MinsiErrors (MinsiError(..), throwMinsiError)
 import Node.ChildProcess.Types (Exit(..))
 import Node.FS.Aff (rm)
@@ -52,7 +52,7 @@ getYtdlpOutputUrl cookie (YtdlpInput { url: url, filename: filename, maybeStart:
   args <- liftEffect $ mp4 filename <#> buildArgs
   runCommand args YtdlpError "yt-dlp"
   where
-  urlString = toString (fromMaybe url (toYoutubeWatchUrl url))
+  urlString = toString (fromMaybe url (toCanonicalYoutubeWatchUrl url))
   maybeRangeArg = do
     start <- map (\start -> millisecondsToSecondsString start (Just '.')) maybeStart
     end <- map (\end -> millisecondsToSecondsString end (Just '.')) maybeEnd

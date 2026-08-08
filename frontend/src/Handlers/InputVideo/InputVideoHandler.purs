@@ -4,9 +4,10 @@ import Prelude
 
 import Components.HtmlComponents (loadComponents, resultPreviewToMaybeIframe, resultPreviewToMaybeVideo)
 import Components.HtmlComponents.Lenses (_localFile, _playbackPositionYoutube, _resultPreview, _setCutEndButton, _setCutStartButton, _uploadLocalFile, _youtubeUrl)
-import Data.Lens (view)
 import Components.HtmlIdAndClasses (resultPreviewId, youtubeUrlId)
+import Conversion.VideoUrlExtraction (extractVideoId, extractVideoStartTime)
 import Data.Foldable (foldl)
+import Data.Lens (view)
 import Data.Maybe (Maybe, maybe)
 import Data.Traversable (traverse)
 import Data.Validation.Semigroup (invalid)
@@ -17,10 +18,9 @@ import Handlers.ErrorHandlers (genericErrorsHandler)
 import Handlers.InputVideo.CutButtonsHandlers (initializeCutInputs, setCutStartInputButtonEvL, setCutEndInputButtonEvL)
 import Handlers.InputVideo.Foreign (destroyIFramePlayer, embedIFrameVideo)
 import Handlers.InputVideo.PlaybackPositionHandler (updatePlaybackPosition)
-import Handlers.InputVideo.YoutubeUrlExtraction (extractYoutubeVideoId, extractYoutubeVideoStartTime)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.ValidationErrors (fromSingleton)
-import Validations.YoutubeValidation (youtubeUrlValidation)
+import Validations.VideoUrlValidation (videoUrlValidation)
 import Web.DOM.Element (fromEventTarget, toEventTarget)
 import Web.Event.Event (target)
 import Web.Event.EventTarget (addEventListener, eventListener)
@@ -64,10 +64,10 @@ setVideoHandlers = genericErrorsHandler $ do
 youtubeUrlEventListener :: Event -> Effect Unit
 youtubeUrlEventListener ev = genericErrorsHandler $ do
   rawValue <- getInputValue ev
-  let youtubeUrlV = maybe (invalid (fromSingleton youtubeUrlId "Empty YoutubeUrl Input")) (\v -> youtubeUrlValidation youtubeUrlId v) rawValue
+  let youtubeUrlV = maybe (invalid (fromSingleton youtubeUrlId "Empty YoutubeUrl Input")) (\v -> videoUrlValidation youtubeUrlId v) rawValue
   source <- foldl (\_ v -> pure v) (throwMinsiError (InvalidInput youtubeUrlId (show rawValue))) youtubeUrlV
-  videoId <- (maybe (throwMinsiError (InvalidInput youtubeUrlId (show rawValue))) pure <<< extractYoutubeVideoId) source
-  let startTime = extractYoutubeVideoStartTime source
+  videoId <- (maybe (throwMinsiError (InvalidInput youtubeUrlId (show rawValue))) pure <<< extractVideoId) source
+  let startTime = extractVideoStartTime source
   log ("Youtube Url Handler fired with value: " <> show videoId)
   embedIFrameVideo
     { resultPreviewId: resultPreviewId

@@ -25,7 +25,7 @@ import Node.Express.Types (Request, Response)
 import Node.Library.Execa (ExecaProcess)
 import Node.Stream as Stream
 import Unsafe.Coerce (unsafeCoerce)
-import Validations.YoutubeValidation (youtubeUrlValidation)
+import Validations.VideoUrlValidation (videoUrlValidation)
 import Control.Monad.Error.Class (catchError)
 
 downloadController :: Store -> Handler
@@ -91,7 +91,7 @@ runDownloadJob id =
   catchError
     ( do
         let videoUrlString = "https://www.youtube.com/watch?v=" <> id
-        if not (isValid (youtubeUrlValidation "videoId" videoUrlString)) then liftEffect $ throwMinsiError (InvalidInputError "Bad Request: source must be a valid YouTube URL")
+        if not (isValid (videoUrlValidation "videoId" videoUrlString)) then liftEffect $ throwMinsiError (InvalidInputError "Bad Request: source must be a valid supported video URL")
         else pure unit
         url <- maybe
           (liftEffect $ throwMinsiError (InvalidInputError ("[Download Controller] Can't build youtube url from id: " <> id)))

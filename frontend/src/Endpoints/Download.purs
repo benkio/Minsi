@@ -1,11 +1,11 @@
 module Endpoints.Download where
 
 import Constants (fromType, suggestedDownloadName)
+import Conversion.VideoUrlExtraction (extractVideoId)
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
-import Handlers.InputVideo.YoutubeUrlExtraction (extractYoutubeVideoId)
 import Main.Config (backendUrl)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.State.State (Source(..), WURL(..))
@@ -26,7 +26,7 @@ downloadEndpoint = backendUrl <> "download"
 
 callDownload :: Source -> Aff Unit
 callDownload (WebURL (WURL u)) = do
-  let maybeVideoId = extractYoutubeVideoId u
+  let maybeVideoId = extractVideoId u
   case maybeVideoId of
     Just videoId -> liftEffect $ triggerDownloadFromUrl (downloadEndpoint <> "/" <> videoId) (videoId <> ".mp4")
     Nothing -> liftEffect $ throwMinsiError (InvalidInput "downloadFull" "Could not extract a YouTube video id from the input URL.")
