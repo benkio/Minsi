@@ -79,9 +79,9 @@
 
   <body
     style="
-      background-image: url(imgs/minsibackground.jpg);
-      background-size: cover;
-    "
+           background-image: url(imgs/minsibackground.jpg);
+           background-size: cover;
+           "
   >
     <div class="container-fluid">
       <!-- Header -->
@@ -93,8 +93,8 @@
             style="background-color: rgba(255, 255, 255, 0.5)"
           >
             <a href="./instructions.html" class="btn btn-info btn-sm w-100"
-              >How to use (Video, MP3, GIF)</a
-            >
+            >How to use (Video, MP3, GIF)</a
+                                         >
             <button
               type="button"
               id="keyboardShortcutsButton"
@@ -182,8 +182,8 @@
                 <label
                   for="artist"
                   class="col-4 col-form-label col-form-label-sm"
-                  >Artist</label
-                >
+                >Artist</label
+                       >
                 <div class="col-8">
                   <input
                     type="text"
@@ -497,12 +497,24 @@
               <audio id="resultAudio" class="w-100 d-none" controls></audio>
             </div>
             <div class="px-3 pb-3 d-none" id="playbackPositionResultRowId">
-              <p
-                id="playbackPositionResultMedia"
-                class="mb-0 text-center fs-3 fw-bold"
+              <div
+                class="d-flex justify-content-between align-items-center flex-wrap gap-2"
               >
-                0
-              </p>
+                <button id="setResultCutStartButton" class="btn btn-primary">
+                  Add to Start ➡️
+                </button>
+
+                <p
+                  id="playbackPositionResultMedia"
+                  class="mb-0 text-center flex-grow-1 fs-3 fw-bold"
+                >
+                  0
+                </p>
+
+                <button id="setResultCutEndButton" class="btn btn-primary">
+                  ⬅️ Remove from End
+                </button>
+              </div>
             </div>
           </div>
 

@@ -31,6 +31,8 @@ module Components.HtmlComponents.Lenses
   , _importStateModalImportButton
   , _setCutEndButton
   , _setCutStartButton
+  , _setResultCutStartButton
+  , _setResultCutEndButton
   , _subtitleTable
   , _addSubtitleButton
   , _sortSubtitlesButton
@@ -131,6 +133,8 @@ _HtmlInputs
        , importStateButton :: HTMLButtonElement
        , setCutEndButton :: HTMLButtonElement
        , setCutStartButton :: HTMLButtonElement
+       , setResultCutStartButton :: HTMLButtonElement
+       , setResultCutEndButton :: HTMLButtonElement
        , subtitleTable :: HTMLTableElement
        , addSubtitleButton :: HTMLButtonElement
        , sortSubtitlesButton :: HTMLButtonElement
@@ -255,6 +259,12 @@ _setCutEndButton = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "set
 
 _setCutStartButton :: Lens' HtmlComponents HTMLButtonElement
 _setCutStartButton = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "setCutStartButton")
+
+_setResultCutStartButton :: Lens' HtmlComponents HTMLButtonElement
+_setResultCutStartButton = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "setResultCutStartButton")
+
+_setResultCutEndButton :: Lens' HtmlComponents HTMLButtonElement
+_setResultCutEndButton = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "setResultCutEndButton")
 
 _subtitleTable :: Lens' HtmlComponents HTMLTableElement
 _subtitleTable = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "subtitleTable")
