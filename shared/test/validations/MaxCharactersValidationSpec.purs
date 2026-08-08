@@ -27,4 +27,3 @@ spec = do
           toMap errs `shouldEqual`
             Map.singleton "id" "Invalid Input, max number of char exceded, got: 6 - max: 5"
         Right _ -> fail "Expected invalid result for too-long input, but got valid"
-

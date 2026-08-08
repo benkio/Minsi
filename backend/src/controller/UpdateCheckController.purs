@@ -5,6 +5,7 @@ import Prelude
 import Api.HttpLog (respondJsonPost)
 import Config (currentVersion)
 import Control.Monad.Except (ExceptT, runExceptT, throwError)
+import Contracts.Api (UpdateCheckResponse)
 import Data.Array (head)
 import Data.Either (Either(..), either)
 import Data.Maybe (maybe)
@@ -17,12 +18,6 @@ import Node.ChildProcess (execSync)
 import Node.Encoding (Encoding(..))
 import Node.Express.Handler (Handler)
 import Yoga.JSON (readJSON)
-
-type UpdateCheckResponse =
-  { updateAvailable :: Boolean
-  , currentVersion :: String
-  , latestVersion :: String
-  }
 
 type GitHubTag = { name :: String }
 

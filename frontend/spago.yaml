@@ -26,6 +26,7 @@ package:
     - ordered-collections
     - partial
     - prelude
+    - printf
     - profunctor-lenses
     - quickcheck
     - shared

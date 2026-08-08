@@ -2,10 +2,11 @@ module Conversion.Time where
 
 import Prelude
 
+import Data.Array (dropWhile, tail, take, takeWhile)
 import Data.Foldable (intercalate)
 import Data.Int (floor)
-import Data.Maybe (Maybe(..))
-import Data.String.CodeUnits (singleton)
+import Data.Maybe (Maybe(..), maybe)
+import Data.String.CodeUnits (fromCharArray, singleton, toCharArray)
 import Data.Time.Duration (Milliseconds(..))
 import Text.Printf (formatInt)
 
@@ -27,3 +28,12 @@ millisToString (Milliseconds ms) millisSeparator =
 millisecondsToSecondsString :: Milliseconds -> Maybe Char -> String
 millisecondsToSecondsString ms Nothing = millisToString ms ','
 millisecondsToSecondsString ms (Just c) = millisToString ms c
+
+formatToMaxSixDigits :: Number -> String
+formatToMaxSixDigits n =
+  let
+    chars = toCharArray (show n)
+    digits = takeWhile (_ /= '.') chars
+    millis = (maybe [] (take 3) <<< tail <<< dropWhile (_ /= '.')) chars
+  in
+    fromCharArray (digits <> millis)

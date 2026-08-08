@@ -12,6 +12,7 @@ package:
     - node-path
     - ordered-collections
     - prelude
+    - printf
     - strings
     - url-immutable
     - validation

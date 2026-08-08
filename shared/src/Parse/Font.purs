@@ -1,6 +1,6 @@
 module Parse.Font where
 
-import Model.State.State (Font(..), Color(..), Position(..))
+import Model.State.State (Color(..), Font(..), Position(..))
 
 -- | Parses the combined font+color select value (e.g. "ImpactBlack", "ArialBlackYellow").
 parseFontAndColor :: String -> { font :: Font, color :: Color }

@@ -30,7 +30,7 @@ import Handlers.ErrorHandlers (genericErrorsHandler, genericErrorsHandlerEither)
 import Handlers.ResultMedia.MediaSrc (setResultMediaSrc)
 import Handlers.Subtitles.SubtitleMaxValues (setSubtitleTableMaxValues)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
-import Model.ProcessStatus (ProcessStatus(..))
+import Domain.ProcessStatus (ProcessStatus(..))
 import Model.State.State (Source(..), State(..), isLocalFile)
 import Model.State.StateFromHtml (getCurrentState)
 import Web.DOM.Element (toEventTarget)
@@ -68,7 +68,7 @@ applyButtonLogic (State rec) uploadLocalFileInput = genericErrorsHandler $ do
     source = rec.source
   when (uploadLocalFile && isLocalFile source)
     ( uploadLocalFileLogic source filename uploadLocalFileInput
-        *> waitForStatus filename LocalFileUploaded Nothing
+        *> waitForStatus filename (LocalFileUploaded "") Nothing
     )
   void (callCompute state)
   waitForStatus filename Succeed (Just loadingModalExtraContentRotation)

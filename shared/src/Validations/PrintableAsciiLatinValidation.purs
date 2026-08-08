@@ -1,7 +1,7 @@
 module Validations.PrintableAsciiLatinValidation where
 
 import Data.Bifunctor (lmap)
-import Data.String.Regex (Regex, test, regex)
+import Data.String.Regex (Regex, regex, test)
 import Data.String.Regex.Flags (noFlags)
 import Data.Validation.Semigroup (V(..), andThen, invalid)
 import Model.ValidationErrors (ValidationErrors, fromSingleton)

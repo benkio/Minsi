@@ -2,7 +2,7 @@ module Test.Conversion.TimeSpec where
 
 import Prelude
 
-import Conversion.Time (millisToString, millisecondsToSecondsString, secondsToString)
+import Conversion.Time (formatToMaxSixDigits, millisToString, millisecondsToSecondsString, secondsToString)
 import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Milliseconds(..))
 import Test.Spec (Spec, describe, it)
@@ -81,3 +81,9 @@ spec = do
     it "handles various time values with default separator" do
       millisecondsToSecondsString (Milliseconds 3661234.0) Nothing `shouldEqual` "01:01:01,234"
       millisecondsToSecondsString (Milliseconds 90061000.0) Nothing `shouldEqual` "25:01:01,000"
+
+  describe "formatToMaxSixDigits" do
+    it "keeps integer digits and up to three decimals" do
+      formatToMaxSixDigits 1.234567 `shouldEqual` "1234"
+      formatToMaxSixDigits 10.2 `shouldEqual` "102"
+      formatToMaxSixDigits 99.9999 `shouldEqual` "99999"

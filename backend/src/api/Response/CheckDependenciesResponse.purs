@@ -1,6 +1,6 @@
 module Response.CheckDependenciesResponse where
 
-type CheckDependenciesResponse = { missedDependencies :: Array String }
+import Contracts.Api (CheckDependenciesResponse)
 
 buildResponse :: Array String -> CheckDependenciesResponse
 buildResponse missingDependencies =

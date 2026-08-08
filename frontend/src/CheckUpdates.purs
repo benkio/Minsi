@@ -1,8 +1,9 @@
 module Main.CheckUpdates where
 
+import Contracts.Api (UpdateCheckResponse)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
-import Endpoints.UpdateCheck (UpdateCheckResponse, callUpdateCheck)
+import Endpoints.UpdateCheck (callUpdateCheck)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Prelude
 
