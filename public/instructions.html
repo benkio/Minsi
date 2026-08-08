@@ -8,18 +8,55 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <style>
+      .logo-shell {
+        position: relative;
+        overflow: visible;
+        border-radius: 0.75rem;
+        background: transparent;
+      }
+
+      .logo-shell::before {
+        content: "";
+        position: absolute;
+        inset: -28px -40px;
+        border-radius: 1.25rem;
+        pointer-events: none;
+        background: radial-gradient(
+          135% 118% at 50% 50%,
+          rgba(255, 255, 255, 0.74) 0%,
+          rgba(255, 255, 255, 0.56) 34%,
+          rgba(255, 255, 255, 0.28) 66%,
+          rgba(255, 255, 255, 0.12) 82%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        filter: blur(9px);
+        z-index: 0;
+      }
+
+      .logo-shell > img {
+        position: relative;
+        z-index: 1;
+      }
+    </style>
   </head>
   <body>
     <div class="container-fluid px-3 px-lg-4 py-3">
       <!-- Header (same as index.html) -->
       <div class="row text-center mb-4">
         <div class="col">
-          <h1 class="mb-1">Minsi</h1>
-          <p class="text-muted mb-0">
-            Opinionated Video Clip GIF Audio Extractor
-          </p>
+          <div
+            class="d-inline-block mb-1 px-3 py-2 logo-shell"
+          >
+            <img
+              src="./imgs/minsiLogo.png"
+              alt="Minsi"
+              class="img-fluid"
+              style="max-height: clamp(72px, 12vw, 150px); max-width: min(96vw, 980px); width: auto"
+            />
+          </div>
           <p class="mt-2 mb-0">
-            <a href="./index.html" class="btn btn-outline-primary btn-sm"
+            <a href="./index.html" class="btn btn-primary btn-sm"
               >← Back to app</a
             >
           </p>

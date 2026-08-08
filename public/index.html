@@ -11,23 +11,69 @@
       rel="stylesheet"
     />
     <style>
-      /* Sticky left column only on large screens (≥992px); single column on tablets/phones */
-      @media (min-width: 992px) {
-        .sticky-left-lg {
-          position: sticky;
-          top: 0;
-          align-self: start;
-        }
-      }
+     /* Sticky left column only on large screens (≥992px); single column on tablets/phones */
+     @media (min-width: 992px) {
+       .sticky-left-lg {
+         position: sticky;
+         top: 0;
+         align-self: start;
+       }
+     }
 
-      .advanced-options-toggle[aria-expanded="true"] .advanced-options-chevron {
-        transform: rotate(180deg);
-      }
+     .advanced-options-toggle[aria-expanded="true"] .advanced-options-chevron {
+       transform: rotate(180deg);
+     }
 
-      .advanced-options-chevron {
-        display: inline-block;
-        transition: transform 0.2s ease;
-      }
+     .advanced-options-chevron {
+       display: inline-block;
+       transition: transform 0.2s ease;
+     }
+
+     .logo-shell {
+       position: relative;
+       overflow: visible;
+       border-radius: 0.75rem;
+       background: transparent;
+     }
+
+     .logo-shell::before {
+       content: "";
+       position: absolute;
+       inset: -28px -40px;
+       border-radius: 1.25rem;
+       pointer-events: none;
+       background: radial-gradient(
+         135% 118% at 50% 50%,
+         rgba(255, 255, 255, 0.74) 0%,
+         rgba(255, 255, 255, 0.56) 34%,
+         rgba(255, 255, 255, 0.28) 66%,
+         rgba(255, 255, 255, 0.12) 82%,
+         rgba(255, 255, 255, 0) 100%
+       );
+       filter: blur(9px);
+       z-index: 0;
+     }
+
+     .logo-shell > img {
+       position: relative;
+       z-index: 1;
+     }
+
+     @media (max-width: 991.98px) {
+       .mobile-tools-toast {
+         position: fixed;
+         top: 0.75rem;
+         right: 0.75rem;
+         z-index: 1080;
+         width: min(92vw, 320px);
+       }
+     }
+
+     @media (min-width: 992px) {
+       #headerToolsPanel.collapse:not(.show) {
+         display: flex !important;
+       }
+     }
     </style>
   </head>
 
@@ -39,26 +85,28 @@
   >
     <div class="container-fluid">
       <!-- Header -->
-      <div class="row text-center mb-4 text-white">
-        <div class="col">
-          <h1 class="mb-1">Minsi</h1>
-          <p class="mb-0">Opinionated Video Clip GIF Audio Extractor</p>
-          <div class="mt-2 mb-0">
-            <a href="./instructions.html" class="btn btn-outline-info btn-sm"
+      <div class="row mb-4 text-white align-items-start">
+        <div class="col-12 col-lg-3">
+          <div
+            class="collapse d-lg-flex flex-column gap-2 p-2 rounded-3 shadow-sm mobile-tools-toast"
+            id="headerToolsPanel"
+            style="background-color: rgba(255, 255, 255, 0.5)"
+          >
+            <a href="./instructions.html" class="btn btn-info btn-sm w-100"
               >How to use (Video, MP3, GIF)</a
             >
             <button
               type="button"
               id="keyboardShortcutsButton"
-              class="btn btn-outline-info btn-sm ms-1"
+              class="btn btn-info btn-sm w-100"
               title="Keyboard shortcuts"
             >
               ⌨️ Shortcuts
             </button>
-            <div class="dropdown d-inline-block ms-1">
+            <div class="dropdown w-100">
               <button
                 type="button"
-                class="btn btn-secondary btn-sm dropdown-toggle"
+                class="btn btn-secondary btn-sm dropdown-toggle w-100"
                 id="stateMenuDropdownButton"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
@@ -66,7 +114,7 @@
                 State
               </button>
               <ul
-                class="dropdown-menu dropdown-menu-end"
+                class="dropdown-menu w-100"
                 aria-labelledby="stateMenuDropdownButton"
               >
                 <li>
@@ -92,11 +140,34 @@
             <button
               type="button"
               id="resetButton"
-              class="btn btn-danger btn-sm ms-1"
+              class="btn btn-danger btn-sm w-100"
               title="Clear in-memory jobs and status"
             >
               Reset
             </button>
+          </div>
+        </div>
+        <div class="col-12 col-lg-9 text-center position-relative">
+          <button
+            type="button"
+            class="btn btn-info btn-sm d-lg-none position-absolute top-0 end-0"
+            data-bs-toggle="collapse"
+            data-bs-target="#headerToolsPanel"
+            aria-expanded="false"
+            aria-controls="headerToolsPanel"
+            style="z-index: 1081"
+          >
+            Tools
+          </button>
+          <div
+            class="d-inline-block mb-1 px-3 py-2 logo-shell"
+          >
+            <img
+              src="./imgs/minsiLogo.png"
+              alt="Minsi"
+              class="img-fluid"
+              style="max-height: clamp(72px, 12vw, 150px); max-width: min(96vw, 980px); width: auto"
+            />
           </div>
         </div>
       </div>
@@ -336,7 +407,7 @@
                     <button
                       type="button"
                       id="downloadFullButton"
-                      class="btn btn-outline-secondary"
+                      class="btn btn-secondary"
                       title="Download full"
                     >
                       Download Full
@@ -351,13 +422,13 @@
                 </div>
               </div>
               <video
-                class="w-100 w-md-75 mx-auto bg-dark mb-3"
+                class="w-100 w-md-75 mx-auto bg-dark mb-1"
                 id="resultPreviewId"
                 controls
               ></video>
             </div>
 
-            <div class="w-100 w-md-75 mx-auto px-3 pb-3">
+            <div class="w-100 w-md-75 mx-auto px-3 pb-2">
               <div
                 class="d-flex justify-content-between align-items-center flex-wrap gap-2"
               >
@@ -397,7 +468,7 @@
               <div class="col-6 col-sm-auto">
                 <button
                   type="button"
-                  class="btn btn-outline-success w-100"
+                  class="btn btn-success w-100"
                   id="downloadAllButton"
                 >
                   Download All
@@ -406,7 +477,7 @@
               <div class="col-6 col-sm-auto">
                 <button
                   type="button"
-                  class="btn btn-outline-secondary w-100"
+                  class="btn btn-secondary w-100"
                   id="copyTranscriptButton"
                 >
                   Copy Transcript
@@ -448,7 +519,7 @@
                       <button
                         id="setSubtitleStartButton"
                         type="button"
-                        class="btn btn-sm btn-outline-primary"
+                        class="btn btn-sm btn-primary"
                       >
                         Start
                       </button>
@@ -457,7 +528,7 @@
                       <button
                         id="setSubtitleEndButton"
                         type="button"
-                        class="btn btn-sm btn-outline-primary"
+                        class="btn btn-sm btn-primary"
                       >
                         End
                       </button>
@@ -471,7 +542,7 @@
                         <button
                           id="addSubtitleButton"
                           type="button"
-                          class="btn btn-sm btn-outline-primary"
+                          class="btn btn-sm btn-primary"
                           title="Add subtitle row"
                           aria-label="Add subtitle row"
                         >
@@ -480,7 +551,7 @@
                         <button
                           id="sortSubtitlesButton"
                           type="button"
-                          class="btn btn-sm btn-outline-secondary"
+                          class="btn btn-sm btn-secondary"
                           title="Sort subtitles"
                           aria-label="Sort subtitle rows"
                         >
@@ -552,7 +623,7 @@
         <td class="text-center">
           <button
             type="button"
-            class="btn btn-sm btn-outline-danger removeSubtitleButton"
+            class="btn btn-sm btn-danger removeSubtitleButton"
             aria-label="Remove subtitle row"
           >
             ➖
