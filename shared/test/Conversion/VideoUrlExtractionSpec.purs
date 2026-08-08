@@ -107,9 +107,10 @@ spec = do
       extractVideoStartTime url `shouldEqual` 0
 
     it "should support other mirror video websites and extract the start time" $ liftEffect $ do
-      let targetTime = 1052
-          targetId = "uVT-eHgNEgs"
-          urls = (\url -> urlFromString (url <> targetId <> "&t=17m32s")) <$> alternativeWatchPrefixes
+      let
+        targetTime = 1052
+        targetId = "uVT-eHgNEgs"
+        urls = (\url -> urlFromString (url <> targetId <> "&t=17m32s")) <$> alternativeWatchPrefixes
       foreachE urls (\url -> extractVideoStartTime url `shouldEqual` targetTime)
 
   describe "parseUnit" do
@@ -189,16 +190,18 @@ spec = do
       let url = urlFromString "https://www.youtube.com/live/vyB7BnvGOE4?t=2130"
       (toString <$> toCanonicalYoutubeWatchUrl url) `shouldEqual` Just "https://www.youtube.com/watch?v=vyB7BnvGOE4"
   where
-    alternativeWatchPrefixes = [
+  alternativeWatchPrefixes =
+    [
       -- <2026-08-08 Sat> - Known Invidious Instances
-      "https://inv.nadeko.net/watch?v=",
-      "https://yewtu.be/watch?v=",
-      "https://invidious.nerdvpn.de/watch?v=",
-      "https://yt.chocolatemoo53.com/watch?v=",
-      "https://invidious.tiekoetter.com//watch?v=",
-      "https://invidious.f5.si/watch?v=",
-      "https://inv.zoomerville.com/watch?v=",
+      "https://inv.nadeko.net/watch?v="
+    , "https://yewtu.be/watch?v="
+    , "https://invidious.nerdvpn.de/watch?v="
+    , "https://yt.chocolatemoo53.com/watch?v="
+    , "https://invidious.tiekoetter.com//watch?v="
+    , "https://invidious.f5.si/watch?v="
+    , "https://inv.zoomerville.com/watch?v="
+    ,
       -- Others
-      "https://ymusicapp.com/watch?v=",
-      "https://piped.video/watch?v="
-      ]
+      "https://ymusicapp.com/watch?v="
+    , "https://piped.video/watch?v="
+    ]
