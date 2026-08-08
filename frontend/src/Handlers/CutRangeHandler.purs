@@ -23,8 +23,8 @@ setCutRangeHandlers :: Effect Unit
 setCutRangeHandlers = genericErrorsHandler $ do
   components <- loadComponents
   let cutStart = view _cutStart components
-  let cutEnd = view _cutEnd components
-  let uploadLocalFile = view _uploadLocalFile components
+      cutEnd = view _cutEnd components
+      uploadLocalFile = view _uploadLocalFile components
   cutStartEvL <- eventListener (rangeToNumberListenerStart cutStart cutEnd uploadLocalFile)
   cutEndEvL <- eventListener (rangeToNumberListenerEnd cutStart cutEnd uploadLocalFile)
   addEventListener E.input cutStartEvL false (toEventTarget (HI.toElement cutStart))
