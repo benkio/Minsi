@@ -4,7 +4,7 @@ import Prelude
 
 import Components.HTMLComponentsLoader (loadHtmlElementClass, loadHtmlElementId)
 import Components.HTMLElement (addClassToElement, removeClassFromElement)
-import Components.HtmlIdAndClasses (addSubtitleId, advancedOptionsToggleId, advancedOptionsToggleLabelId, applyId, artistId, collapseAdvancedOptionsId, cutEndId, cutStartId, shiftVideoSyncId, loadingModalId, loadingModalExtraConentId, minsiErrorModalId, clipboardOutputModalCopyClipboardButtonId, clipboardOutputModalContentId, clipboardOutputModalId, clipboardOutputModalTitleId, importStateModalId, importStateModalImportButtonId, importStateModalTextareaId, importStateModalTitleId, minsiLogId, outputFilenameId, playbackPositionResultRowId, playbackPositionResultMediaId, playbackPositionYoutubeId, resultPreviewId, resultAudioId, resultVideoId, reverseLoopGifId, sortSubtitlesId, setCutEndButton, setCutStartButton, setSubtitleEndButtonId, setSubtitleStartButtonId, subtitleTableId, subtitlesRowId, titleId, videoRowId, videoSourceId, inputSourceId, videoSourceRowId, downloadAllButtonId, copyTranscriptButtonId, exportStateButtonId, importStateButtonId, downloadFullButtonId, youtubeUrlId, subtitleRow, keyboardShortcutsButtonId, resetButtonId, localFileId, uploadLocalFileId, minsiLogBoxClass, minsiLogTitleId)
+import Components.HtmlIdAndClasses (addSubtitleId, advancedOptionsToggleId, advancedOptionsToggleLabelId, applyId, artistId, clipboardOutputModalContentId, clipboardOutputModalCopyClipboardButtonId, clipboardOutputModalId, clipboardOutputModalTitleId, collapseAdvancedOptionsId, copyTranscriptButtonId, cutEndId, cutStartId, downloadAllButtonId, downloadFullButtonId, exportStateButtonId, importStateButtonId, importStateModalId, importStateModalImportButtonId, importStateModalTextareaId, importStateModalTitleId, inputSourceId, keyboardShortcutsButtonId, loadingModalExtraConentId, loadingModalId, localFileId, minsiErrorModalId, minsiLogBoxClass, minsiLogId, minsiLogTitleId, outputFilenameId, playbackPositionResultMediaId, playbackPositionResultRowId, playbackPositionYoutubeId, resetButtonId, resultAudioId, resultPreviewId, resultVideoId, reverseLoopGifId, setCutEndButton, setCutStartButton, setResultCutEndButton, setResultCutStartButton, setSubtitleEndButtonId, setSubtitleStartButtonId, shiftVideoSyncId, sortSubtitlesId, subtitleRow, subtitleTableId, subtitlesRowId, titleId, uploadLocalFileId, videoRowId, videoSourceId, videoSourceRowId, youtubeUrlId)
 import Components.Window (getDocument)
 import Control.Monad.Error.Class (catchError)
 import Data.Maybe (Maybe(..))
@@ -63,6 +63,8 @@ newtype HtmlInputs = HtmlInputs
   , importStateButton :: HTMLButtonElement
   , setCutEndButton :: HTMLButtonElement
   , setCutStartButton :: HTMLButtonElement
+  , setResultCutStartButton :: HTMLButtonElement
+  , setResultCutEndButton :: HTMLButtonElement
   , subtitleTable :: HTMLTableElement
   , addSubtitleButton :: HTMLButtonElement
   , sortSubtitlesButton :: HTMLButtonElement
@@ -178,6 +180,8 @@ loadHtmlInputs doc = do
   importStateButton <- loadButton importStateButtonId doc
   setCutStartButton <- loadButton setCutStartButton doc
   setCutEndButton <- loadButton setCutEndButton doc
+  setResultCutStartButton <- loadButton setResultCutStartButton doc
+  setResultCutEndButton <- loadButton setResultCutEndButton doc
   subtitleTable <- loadTable subtitleTableId doc
   addSubtitleButton <- loadButton addSubtitleId doc
   sortSubtitlesButton <- loadButton sortSubtitlesId doc
@@ -209,6 +213,8 @@ loadHtmlInputs doc = do
         , importStateButton: importStateButton
         , setCutStartButton: setCutStartButton
         , setCutEndButton: setCutEndButton
+        , setResultCutStartButton: setResultCutStartButton
+        , setResultCutEndButton: setResultCutEndButton
         , subtitleTable: subtitleTable
         , addSubtitleButton: addSubtitleButton
         , sortSubtitlesButton: sortSubtitlesButton

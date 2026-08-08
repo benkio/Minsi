@@ -78,6 +78,12 @@ setCutStartButton = "setCutStartButton"
 setCutEndButton :: String
 setCutEndButton = "setCutEndButton"
 
+setResultCutStartButton :: String
+setResultCutStartButton = "setResultCutStartButton"
+
+setResultCutEndButton :: String
+setResultCutEndButton = "setResultCutEndButton"
+
 loadingModalId :: String
 loadingModalId = "loadingModal"
 

@@ -9,6 +9,7 @@ import Data.Lens (view)
 import Effect (Effect)
 import Effect.Timer (setInterval)
 import Handlers.ErrorHandlers (genericErrorsHandler)
+import Handlers.ResultMedia.CutButtonsHandlers (setResultCutButtonsHandlers)
 import Handlers.ResultMedia.MediaSrc (getMediaElement)
 import Web.DOM.Node (setTextContent, textContent)
 import Web.HTML.HTMLMediaElement (currentTime, duration)
@@ -16,6 +17,7 @@ import Web.HTML.HTMLParagraphElement as HP
 
 setResultMediaHandlers :: Effect Unit
 setResultMediaHandlers = genericErrorsHandler $ do
+  setResultCutButtonsHandlers
   _ <- setInterval 1000 updatePlaybackPosition
   pure unit
 
