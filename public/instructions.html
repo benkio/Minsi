@@ -16,7 +16,7 @@
         <div class="col">
           <h1 class="mb-1">Minsi</h1>
           <p class="text-muted mb-0">
-            Opinionated YouTube Clip Video Gif Audio Extractor
+            Opinionated Video Clip GIF Audio Extractor
           </p>
           <p class="mt-2 mb-0">
             <a href="./index.html" class="btn btn-outline-primary btn-sm"
@@ -33,7 +33,7 @@
             <div class="card-body">
               <p class="lead mb-4">
                 Use the main app (<a href="./index.html">index.html</a>) to pick a
-                YouTube clip, set the time range and metadata, then run the
+                video clip, set the time range and metadata, then run the
                 pipeline. You get a <strong>video</strong> (MP4), an
                 <strong>MP3</strong>, and optionally a <strong>GIF</strong>.
               </p>
@@ -50,13 +50,13 @@
                   Your browser does not support the video tag.
                 </video>
                 <p class="text-muted small mt-2 mb-0">
-                  Quick walkthrough of the app: YouTube URL, clip range, Apply, and result (Video / Gif, subtitles).
+                  Quick walkthrough of the app: video URL, clip range, Apply, and result (Video / Gif, subtitles).
                 </p>
               </div>
 
-              <h5 class="mt-4 mb-2">1. Paste a YouTube URL or upload a local file</h5>
+              <h5 class="mt-4 mb-2">1. Paste a supported video URL or upload a local file</h5>
               <p class="text-muted small mb-3">
-                In the main area, paste a YouTube watch URL (e.g.
+                In the main area, paste a supported watch URL (e.g.
                 <code>https://www.youtube.com/watch?v=…</code>). The preview
                 loads so you can scrub and set the exact clip.
                 Alternatively, select <strong>Local File</strong> as the source
@@ -92,7 +92,7 @@
                 Click <strong>Apply</strong>. The backend will:
               </p>
               <ol class="small mb-3">
-                <li><strong>Download / cut</strong> the clip as MP4 (via yt-dlp for YouTube, or from the uploaded local file).</li>
+                <li><strong>Download / cut</strong> the clip as MP4 (via yt-dlp for supported hosts, or from the uploaded local file).</li>
                 <li><strong>Normalize</strong> the video (ffmpeg), including optional <strong>Shift Video</strong> sync and audio loudness normalization.</li>
                 <li><strong>Extract MP3</strong> from that clip (ffmpeg) and write ID3 artist/title (id3v2).</li>
                 <li>Optionally produce a <strong>GIF</strong> (with or without subtitles; see below).</li>
@@ -162,7 +162,7 @@
 
               <hr class="my-4" />
               <p class="text-muted small mb-2">
-                <strong>Validation:</strong> The app checks that the YouTube URL is non-empty, the output filename follows the <code>prefix_Name</code> format, artist and title contain only allowed characters, the clip range is valid (end &gt; start + 100 ms), and subtitle times (if any) fall within the clip. Errors appear in the <strong>Minsi Log</strong> (left panel) or in a modal for critical failures.
+                <strong>Validation:</strong> The app checks that the video URL is non-empty and from a supported host, the output filename follows the <code>prefix_Name</code> format, artist and title contain only allowed characters, the clip range is valid (end &gt; start + 100 ms), and subtitle times (if any) fall within the clip. Errors appear in the <strong>Minsi Log</strong> (left panel) or in a modal for critical failures.
               </p>
               <p class="text-muted small mb-0">
                 If the app reports missing dependencies (e.g. yt-dlp, ffmpeg),

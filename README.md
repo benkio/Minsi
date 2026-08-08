@@ -1,8 +1,8 @@
 # Minsi
 
-**Opinionated YouTube Clip Video, GIF & Audio Extractor**
+**Opinionated Video Clip, GIF & Audio Extractor**
 
-A web application to download YouTube videos and produce customized clips: **video** (MP4), **MP3** audio, and **GIF** (with optional subtitles), with best-possible quality.
+A web application to download supported video URLs (YouTube and selected mirror hosts) and produce customized clips: **video** (MP4), **MP3** audio, and **GIF** (with optional subtitles), with best-possible quality.
 
 **PROJECT IN MAINTENANCE MODE**
 I don't plan to develop new features on this for now. Just fix bugs and keep it working
@@ -20,7 +20,7 @@ Required for video/audio processing (must be on your `PATH`):
 | Tool     | Purpose                    |
 |----------|----------------------------|
 | **ffmpeg** | Video/audio conversion     |
-| **yt-dlp** | YouTube download           |
+| **yt-dlp** | Video download from supported hosts |
 | **id3v2**  | MP3 metadata (artist/title)|
 | **fc-list** | Font listing (subtitles)   |
 
@@ -47,7 +47,7 @@ You also need **Impact** and **Arial Black** fonts installed if you use subtitle
 
 3. **Use the app**
    - Open **http://localhost:8080** in your browser.
-   - See **[Instructions](http://localhost:8080/instructions.html)** for how to get video, MP3, and GIF from a YouTube URL.
+  - See **[Instructions](http://localhost:8080/instructions.html)** for how to get video, MP3, and GIF from a supported video URL.
 
 Output files are written to **`public/output/`** (e.g. `rphjb_Hello.mp4`, `rphjb_Hello.mp3`, `rphjb_HelloGif.mp4`).
 The output filename must follow the format `prefix_Name`: 1–5 lowercase letters, an underscore, then a capitalized name with letters and numbers.
@@ -154,7 +154,7 @@ Manual steps (if you prefer):
 
 ## Motivation
 
-I needed a single tool to turn a YouTube clip into:
+I needed a single tool to turn a video clip into:
 
 - A **GIF** (with optional subtitles)
 - An **MP3** audio extract

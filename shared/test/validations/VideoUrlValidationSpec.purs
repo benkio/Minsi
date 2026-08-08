@@ -1,4 +1,4 @@
-module Test.Validations.YoutubeValidationSpec where
+module Test.Validations.VideoUrlValidationSpec where
 
 import Data.Either (either)
 import Data.Traversable (traverse_)
@@ -6,21 +6,21 @@ import Data.Validation.Semigroup (isValid, toEither)
 import Effect.Class (liftEffect)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
-import Validations.YoutubeValidation (youtubeRegexValidation, youtubeUrlValidation)
+import Validations.VideoUrlValidation (videoUrlValidation, youtubeHostRegexValidation)
 import Prelude
 
 import Data.String.Regex (test)
 
 spec :: Spec Unit
 spec = do
-  describe "youtubeRegex" do
+  describe "youtubeHostRegex" do
     it "should be a valid regex pattern string" $ liftEffect $ do
-      let regexResult = youtubeRegexValidation "testId"
+      let regexResult = youtubeHostRegexValidation "testId"
       isValid regexResult `shouldEqual` true
 
-  describe "youtubeRegexValidation" do
+  describe "youtubeHostRegexValidation" do
     it "should create a valid regex that matches youtube URLs" $ liftEffect $ do
-      let regexResult = youtubeRegexValidation "testId"
+      let regexResult = youtubeHostRegexValidation "testId"
       isValid regexResult `shouldEqual` true
       either (const $ pure unit)
         ( \regex -> do
@@ -35,12 +35,12 @@ spec = do
         )
         (toEither regexResult)
 
-  describe "youtubeUrlValidation" do
+  describe "videoUrlValidation" do
     it "should validate a standard youtube.com URL" $ liftEffect $ do
-      let result = youtubeUrlValidation "testId" "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      let result = videoUrlValidation "testId" "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
       isValid result `shouldEqual` true
     it "should validate a standard youtube.com URL with time query parameter" $ liftEffect $ do
-      let result = youtubeUrlValidation "testId" "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10s"
+      let result = videoUrlValidation "testId" "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10s"
       isValid result `shouldEqual` true
     it "should validate a youtu.be short URL" $ liftEffect $ do
       let
@@ -49,34 +49,34 @@ spec = do
           , "https://youtu.be/dQw4w9WgXcQ"
           , "https://youtu.be/PHi-UNsm2Ds?t=364"
           ]
-      traverse_ (\i -> isValid (youtubeUrlValidation "testId" i) `shouldEqual` true) input
+      traverse_ (\i -> isValid (videoUrlValidation "testId" i) `shouldEqual` true) input
     it "should validate a youtube.com URL without www" $ liftEffect $ do
-      let result = youtubeUrlValidation "testId" "https://youtube.com/watch?v=dQw4w9WgXcQ"
+      let result = videoUrlValidation "testId" "https://youtube.com/watch?v=dQw4w9WgXcQ"
       isValid result `shouldEqual` true
     it "should validate a youtube.com URL without https" $ liftEffect $ do
-      let result = youtubeUrlValidation "testId" "http://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      let result = videoUrlValidation "testId" "http://www.youtube.com/watch?v=dQw4w9WgXcQ"
       isValid result `shouldEqual` true
     it "should reject an invalid URL" $ liftEffect $ do
-      isValid (youtubeUrlValidation "testId" "not a youtube url") `shouldEqual` false
+      isValid (videoUrlValidation "testId" "not a youtube url") `shouldEqual` false
     it "should reject an youtube URL without id" $ liftEffect $ do
-      isValid (youtubeUrlValidation "testId" "http://www.youtube.com/") `shouldEqual` false
-      isValid (youtubeUrlValidation "testId" "https://www.youtube.com/") `shouldEqual` false
-      isValid (youtubeUrlValidation "testId" "http://www.youtube.com") `shouldEqual` false
-      isValid (youtubeUrlValidation "testId" "https://www.youtube.com") `shouldEqual` false
+      isValid (videoUrlValidation "testId" "http://www.youtube.com/") `shouldEqual` false
+      isValid (videoUrlValidation "testId" "https://www.youtube.com/") `shouldEqual` false
+      isValid (videoUrlValidation "testId" "http://www.youtube.com") `shouldEqual` false
+      isValid (videoUrlValidation "testId" "https://www.youtube.com") `shouldEqual` false
     it "should validate a youtube.com shorts URL" $ liftEffect $ do
-      isValid (youtubeUrlValidation "testId" "https://youtube.com/shorts/_JryLY7pXLQ") `shouldEqual` true
-      isValid (youtubeUrlValidation "testId" "https://www.youtube.com/shorts/C8p4SOnSXeQ") `shouldEqual` true
-      isValid (youtubeUrlValidation "testId" "https://www.youtube.com/shorts/C8p4SOnSXeQ?t=30") `shouldEqual` true
+      isValid (videoUrlValidation "testId" "https://youtube.com/shorts/_JryLY7pXLQ") `shouldEqual` true
+      isValid (videoUrlValidation "testId" "https://www.youtube.com/shorts/C8p4SOnSXeQ") `shouldEqual` true
+      isValid (videoUrlValidation "testId" "https://www.youtube.com/shorts/C8p4SOnSXeQ?t=30") `shouldEqual` true
     it "should validate a youtube.com live URL" $ liftEffect $ do
-      isValid (youtubeUrlValidation "testId" "https://www.youtube.com/live/XRN1BsAwMCc") `shouldEqual` true
-      isValid (youtubeUrlValidation "testId" "https://youtube.com/live/XRN1BsAwMCc") `shouldEqual` true
-      isValid (youtubeUrlValidation "testId" "https://www.youtube.com/live/XRN1BsAwMCc?t=2695") `shouldEqual` true
-      isValid (youtubeUrlValidation "testId" "https://www.youtube.com/live/vyB7BnvGOE4?t=2130") `shouldEqual` true
+      isValid (videoUrlValidation "testId" "https://www.youtube.com/live/XRN1BsAwMCc") `shouldEqual` true
+      isValid (videoUrlValidation "testId" "https://youtube.com/live/XRN1BsAwMCc") `shouldEqual` true
+      isValid (videoUrlValidation "testId" "https://www.youtube.com/live/XRN1BsAwMCc?t=2695") `shouldEqual` true
+      isValid (videoUrlValidation "testId" "https://www.youtube.com/live/vyB7BnvGOE4?t=2130") `shouldEqual` true
     it "should validate known Invidious and alternative watch instances" $ liftEffect $ do
       let
         videoId = "dQw4w9WgXcQ"
 
-        youtubeInstances =
+        alternativeWatchPrefixes =
           [ "https://inv.nadeko.net/watch?v="
           , "https://yewtu.be/watch?v="
           , "https://invidious.nerdvpn.de/watch?v="
@@ -88,5 +88,5 @@ spec = do
           , "https://piped.video/watch?v="
           ]
 
-        youtubeUrls = map (_ <> videoId) youtubeInstances
-      traverse_ (\i -> isValid (youtubeUrlValidation "testId" i) `shouldEqual` true) youtubeUrls
+        alternativeWatchUrls = map (_ <> videoId) alternativeWatchPrefixes
+      traverse_ (\i -> isValid (videoUrlValidation "testId" i) `shouldEqual` true) alternativeWatchUrls

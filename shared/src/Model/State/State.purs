@@ -16,7 +16,7 @@ import Data.URL (URL, fromString, toString)
 import Data.Validation.Semigroup (isValid)
 import Foreign (ForeignError(..), fail)
 import Node.Path (FilePath)
-import Validations.YoutubeValidation (youtubeUrlValidation)
+import Validations.VideoUrlValidation (videoUrlValidation)
 import Web.File.File (File)
 import Yoga.JSON (class ReadForeign, class WriteForeign, readImpl, writeImpl)
 
@@ -253,4 +253,4 @@ validateFilename v -- TODO: should check for the prefix
 validateSource :: Source -> Either (Array String) Unit
 validateSource (LocalFile _) = Right unit
 validateSource (WebURL (WURL url)) =
-  if isValid (youtubeUrlValidation "source" (toString url)) then Right unit else Left [ "State Validation: source must be a valid YouTube URL" ]
+  if isValid (videoUrlValidation "source" (toString url)) then Right unit else Left [ "State Validation: source must be a valid supported video URL" ]

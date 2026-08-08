@@ -28,7 +28,7 @@ import Validations.MaxCharatersValidation (maxCharsValidation)
 import Validations.NonEmptyValidation (nonEmptyValidation)
 import Validations.OutputFilenameValidation (outputFilenameValidation)
 import Validations.PrintableAsciiLatinValidation (printableAsciiLatinValidation)
-import Validations.YoutubeValidation (youtubeUrlValidation)
+import Validations.VideoUrlValidation (videoUrlValidation)
 import Web.DOM.HTMLCollection as HC
 import Web.File.FileList (item)
 import Web.HTML.HTMLInputElement (HTMLInputElement, valueAsNumber, checked)
@@ -101,7 +101,7 @@ sourceFromHTMLInput inputSourceSelect youtubeUrlComponent localFileComponent = d
   urlString <- HI.value youtubeUrlComponent
   inputSource <- HS.value inputSourceSelect
   let
-    youtubeValidation = youtubeUrlValidation youtubeUrlId urlString <#> \url -> WebURL (WURL url)
+    youtubeValidation = videoUrlValidation youtubeUrlId urlString <#> \url -> WebURL (WURL url)
   case inputSource of
     "youtubeUrl" -> pure youtubeValidation
     "localFile" -> do

@@ -42,7 +42,7 @@
       <div class="row text-center mb-4 text-white">
         <div class="col">
           <h1 class="mb-1">Minsi</h1>
-          <p class="mb-0">Opinionated YouTube Clip Video Gif Audio Extractor</p>
+          <p class="mb-0">Opinionated Video Clip GIF Audio Extractor</p>
           <div class="mt-2 mb-0">
             <a href="./instructions.html" class="btn btn-outline-info btn-sm"
               >How to use (Video, MP3, GIF)</a
@@ -309,9 +309,9 @@
           </div>
         </div>
 
-        <!-- Right column: YouTube block + Result video block (similar layout) -->
+        <!-- Right column: source URL block + Result video block (similar layout) -->
         <div class="col-12 col-lg-9">
-          <!-- YouTube block (URL + preview + cut buttons) -->
+          <!-- Source URL block (URL + preview + cut buttons) -->
           <div class="card shadow-sm mb-4">
             <div class="card-body text-center">
               <div class="row mb-2 g-2 align-items-center">
@@ -320,7 +320,7 @@
                     Input source
                   </label>
                   <select id="inputSource" class="form-select text-center mt-2 mt-md-0">
-                    <option value="youtubeUrl" selected>YouTube URL</option>
+                    <option value="youtubeUrl" selected>Video URL</option>
                     <option value="localFile">Local File</option>
                   </select>
                 </div>
@@ -329,7 +329,7 @@
                     <input
                       type="url"
                       class="form-control"
-                      pattern="https?://(www\.)?(youtube\.com|youtu\.be)/.+"
+                      pattern="https?://.+"
                       id="youtubeUrl"
                       placeholder="https://www.youtube.com/watch?v=..."
                     />
@@ -442,9 +442,6 @@
                 class="table table-bordered table-sm bg-white shadow-sm align-middle"
                 id="subtitleTable"
               >
-                <caption class="caption-top small text-muted py-1 px-2">
-                  Subtitles timeline editor
-                </caption>
                 <thead class="table-light text-center">
                   <tr>
                     <th style="width: 6em">
