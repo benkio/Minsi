@@ -1,11 +1,11 @@
 module Endpoints.Download where
 
 import Constants (fromType, suggestedDownloadName)
+import Conversion.YoutubeUrlExtraction (extractYoutubeVideoId)
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
-import Handlers.InputVideo.YoutubeUrlExtraction (extractYoutubeVideoId)
 import Main.Config (backendUrl)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.State.State (Source(..), WURL(..))

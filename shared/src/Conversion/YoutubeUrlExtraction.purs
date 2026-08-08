@@ -1,4 +1,4 @@
-module Handlers.InputVideo.YoutubeUrlExtraction where
+module Conversion.YoutubeUrlExtraction where
 
 import Data.Array (head, last)
 import Data.Array.NonEmpty (index)

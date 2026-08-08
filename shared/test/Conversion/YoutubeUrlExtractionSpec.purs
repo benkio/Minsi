@@ -1,9 +1,6 @@
-module Test.Handers.InputVideo.YoutubeUrlExtractionSpec where
+module Test.Conversion.YoutubeUrlExtractionSpec where
 
-import Data.Maybe (Maybe(..), fromJust)
-import Data.URL (Path(..), URL, fromString, toString)
-import Effect.Class (liftEffect)
-import Handlers.InputVideo.YoutubeUrlExtraction
+import Conversion.YoutubeUrlExtraction
   ( extractYoutubeVideoId
   , extractYoutubeVideoStartTime
   , parseUnit
@@ -11,6 +8,9 @@ import Handlers.InputVideo.YoutubeUrlExtraction
   , pathToArray
   , toYoutubeWatchUrl
   )
+import Data.Maybe (Maybe(..), fromJust)
+import Data.URL (Path(..), URL, fromString, toString)
+import Effect.Class (liftEffect)
 import Partial.Unsafe (unsafePartial)
 import Prelude
 import Test.Spec (Spec, describe, it)
