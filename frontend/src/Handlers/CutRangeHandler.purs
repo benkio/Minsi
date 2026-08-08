@@ -22,9 +22,10 @@ import Web.HTML.HTMLInputElement as HI
 setCutRangeHandlers :: Effect Unit
 setCutRangeHandlers = genericErrorsHandler $ do
   components <- loadComponents
-  let cutStart = view _cutStart components
-      cutEnd = view _cutEnd components
-      uploadLocalFile = view _uploadLocalFile components
+  let
+    cutStart = view _cutStart components
+    cutEnd = view _cutEnd components
+    uploadLocalFile = view _uploadLocalFile components
   cutStartEvL <- eventListener (rangeToNumberListenerStart cutStart cutEnd uploadLocalFile)
   cutEndEvL <- eventListener (rangeToNumberListenerEnd cutStart cutEnd uploadLocalFile)
   addEventListener E.input cutStartEvL false (toEventTarget (HI.toElement cutStart))
