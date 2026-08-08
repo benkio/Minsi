@@ -10,6 +10,7 @@ import Conversion.YoutubeUrlExtraction
   )
 import Data.Maybe (Maybe(..), fromJust)
 import Data.URL (Path(..), URL, fromString, toString)
+import Effect (foreachE)
 import Effect.Class (liftEffect)
 import Partial.Unsafe (unsafePartial)
 import Prelude
@@ -50,13 +51,14 @@ spec = do
       extractYoutubeVideoId url1 `shouldEqual` Just "XRN1BsAwMCc"
       extractYoutubeVideoId url2 `shouldEqual` Just "XRN1BsAwMCc"
 
-    it "should canonicalize live URL to watch URL" $ liftEffect $ do
-      let url = urlFromString "https://www.youtube.com/live/vyB7BnvGOE4?t=2130"
-      (toString <$> toYoutubeWatchUrl url) `shouldEqual` Just "https://www.youtube.com/watch?v=vyB7BnvGOE4"
-
     it "should return Nothing for URL without video ID" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/"
       extractYoutubeVideoId url `shouldEqual` Nothing
+
+    it "should support other mirror video websites other then YouTube, successfully extracting the youtube id" $ liftEffect $ do
+      let targetId = "uVT-eHgNEgs"
+      let urls = (\url -> urlFromString (url <> targetId)) <$> youtubeInstances
+      foreachE urls (\url ->  extractYoutubeVideoId url `shouldEqual` Just targetId)
 
   describe "pathToArray" do
     it "should convert PathEmpty to empty array" $ liftEffect $ do
@@ -103,6 +105,12 @@ spec = do
     it "should return 0 for URL with empty t parameter" $ liftEffect $ do
       let url = urlFromString "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t="
       extractYoutubeVideoStartTime url `shouldEqual` 0
+
+    it "should support other mirror video websites other then YouTube, successfully extracting the youtube id" $ liftEffect $ do
+      let targetTime = 1052
+          targetId = "uVT-eHgNEgs"
+          urls = (\url -> urlFromString (url <> targetId <> "&t=17m32s")) <$> youtubeInstances
+      foreachE urls (\url ->  extractYoutubeVideoStartTime url `shouldEqual` targetTime)
 
   describe "parseUnit" do
     it "should parse hours from string" $ liftEffect $ do
@@ -176,3 +184,21 @@ spec = do
 
     it "should return Nothing for empty string" $ liftEffect $ do
       parseYouTubeT "" `shouldEqual` Nothing
+  describe "toYoutubeWatchUrl" do
+    it "should canonicalize live URL to watch URL" $ liftEffect $ do
+      let url = urlFromString "https://www.youtube.com/live/vyB7BnvGOE4?t=2130"
+      (toString <$> toYoutubeWatchUrl url) `shouldEqual` Just "https://www.youtube.com/watch?v=vyB7BnvGOE4"
+  where
+    youtubeInstances = [
+      -- <2026-08-08 Sat> - Known Invidious Instances
+      "https://inv.nadeko.net/watch?v=",
+      "https://yewtu.be/watch?v=",
+      "https://invidious.nerdvpn.de/watch?v=",
+      "https://yt.chocolatemoo53.com/watch?v=",
+      "https://invidious.tiekoetter.com//watch?v=",
+      "https://invidious.f5.si/watch?v=",
+      "https://inv.zoomerville.com/watch?v=",
+      -- Others
+      "https://ymusicapp.com/watch?v=",
+      "https://piped.video/watch?v="
+      ]
