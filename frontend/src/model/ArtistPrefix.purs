@@ -14,12 +14,13 @@ import Data.Tuple (Tuple(..))
 artistPrefixMap :: Map String String
 artistPrefixMap =
   Map.fromFoldable
-    [ Tuple "Richard Philip Henry John Benson" "rphjb_"
-    , Tuple "Omar Palermo" "ytai_"
-    , Tuple "Xah Lee" "xah_"
-    , Tuple "Alessandro Barbero" "abar_"
+    [ Tuple "Alessandro Barbero" "abar_"
+    , Tuple "Alessandro Orlando" "orl_"
     , Tuple "Germano Mosconi" "mos_"
+    , Tuple "Omar Palermo" "ytai_"
     , Tuple "Pino Scotto" "pino_"
+    , Tuple "Richard Philip Henry John Benson" "rphjb_"
+    , Tuple "Xah Lee" "xah_"
     ]
 
 -- | Look up the output filename prefix for a known artist (trimmed input). Nothing if not in the map.
