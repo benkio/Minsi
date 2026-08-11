@@ -49,7 +49,7 @@ normalizeVideoArgs mp4 tempVideo (Milliseconds shiftVideoSync) =
     , "-c:a"
     , "aac"
     , "-af"
-    , "\"loudnorm=I=-16:TP=-1.5:LRA=11\""
+    , "\"loudnorm=I=-16:TP=-1.5:LRA=11:dual_mono=true\""
     ]
   seekStart =
     millisecondsToSecondsString (Milliseconds (abs shiftVideoSync)) (Just '.')

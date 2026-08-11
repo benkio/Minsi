@@ -23,7 +23,7 @@ spec = do
         , "-c:a"
         , "aac"
         , "-af"
-        , "\"loudnorm=I=-16:TP=-1.5:LRA=11\""
+        , "\"loudnorm=I=-16:TP=-1.5:LRA=11:dual_mono=true\""
         , "-metadata"
         , "encoding_tool=Minsi-" <> currentVersion
         , "\"output.mp4\""
@@ -51,7 +51,7 @@ spec = do
         , "-c:a"
         , "aac"
         , "-af"
-        , "\"loudnorm=I=-16:TP=-1.5:LRA=11\""
+        , "\"loudnorm=I=-16:TP=-1.5:LRA=11:dual_mono=true\""
         , "-metadata"
         , "encoding_tool=Minsi-" <> currentVersion
         , "\"output.mp4\""
@@ -79,7 +79,7 @@ spec = do
         , "-c:a"
         , "aac"
         , "-af"
-        , "\"loudnorm=I=-16:TP=-1.5:LRA=11\""
+        , "\"loudnorm=I=-16:TP=-1.5:LRA=11:dual_mono=true\""
         , "-metadata"
         , "encoding_tool=Minsi-" <> currentVersion
         , "\"output.mp4\""
