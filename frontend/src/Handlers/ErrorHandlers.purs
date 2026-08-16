@@ -10,8 +10,9 @@ import Components.Modal (setBlockingModalBody, showModal)
 import Components.Window (getDocument, raiseErrorAlert)
 import Control.Monad.Error.Class (catchError, class MonadError)
 import Data.Either (Either, either)
-import Data.Maybe (Maybe(..), maybe)
+import Data.Maybe (Maybe(..), isJust, maybe)
 import Data.String (split)
+import Data.String.CodeUnits (stripPrefix)
 import Data.String.Pattern (Pattern(..))
 import Data.Traversable (traverse)
 import Effect (Effect)
@@ -20,13 +21,15 @@ import Effect.Console (log)
 import Effect.Exception (Error, message)
 import Effect.Timer (setTimeout)
 import Main.MinsiErrors (ErrorSeverity(..), MinsiError(..), getErrorSeverity, throwMinsiError)
-import Web.DOM.Document (createElement)
+import Web.DOM.Document (Document, createElement)
 import Web.DOM.Element (toNode) as E
-import Web.DOM.Node (appendChild, removeChild, setTextContent)
+import Web.DOM.Node (Node, appendChild, removeChild, setTextContent)
 import Web.HTML (window)
+import Web.HTML.HTMLAnchorElement as HA
 import Web.HTML.HTMLDivElement (toElement, toNode)
 import Web.HTML.HTMLDivElement as HD
 import Web.HTML.HTMLDocument (toDocument)
+import Web.HTML.HTMLHyperlinkElementUtils (setHref)
 import Web.HTML.HTMLLIElement as LIH
 import Web.HTML.HTMLParagraphElement as HP
 import Web.HTML.HTMLUListElement as ULH
@@ -106,7 +109,7 @@ createErrorList errorMessage = do
         liElementRaw <- createElement "li" doc
         liElement <- maybe (throwMinsiError (HTMLElementNotFound "li")) pure (LIH.fromElement liElementRaw)
         let liNode = E.toNode (LIH.toElement liElement)
-        setTextContent line liNode
+        appendMessageLine doc liNode line
         appendChild liNode ulNode
     )
     errorLines
@@ -126,11 +129,28 @@ createErrorParagraphsDiv errorMessage = do
         pRaw <- createElement "p" doc
         pEl <- maybe (throwMinsiError (HTMLElementNotFound "p")) pure (HP.fromElement pRaw)
         let pNode = E.toNode (HP.toElement pEl)
-        setTextContent line pNode
+        appendMessageLine doc pNode line
         appendChild pNode divNode
     )
     errorLines
   pure divEl
+
+appendMessageLine :: Document -> Node -> String -> Effect Unit
+appendMessageLine doc parentNode line =
+  if isUrlLine line then do
+    anchorRaw <- createElement "a" doc
+    anchor <- maybe (throwMinsiError (HTMLElementNotFound "a")) pure (HA.fromElement anchorRaw)
+    let anchorNode = HA.toNode anchor
+    setHref line (HA.toHTMLHyperlinkElementUtils anchor)
+    setTextContent line anchorNode
+    appendChild anchorNode parentNode
+  else
+    setTextContent line parentNode
+
+isUrlLine :: String -> Boolean
+isUrlLine line =
+  isJust (stripPrefix (Pattern "https://") line)
+    || isJust (stripPrefix (Pattern "http://") line)
 
 showMinsiBlockingErrorDialog :: String -> Effect Unit
 showMinsiBlockingErrorDialog errorMessage = do

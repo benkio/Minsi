@@ -20,6 +20,7 @@ artistPrefixMap =
     , Tuple "Omar Palermo" "ytai_"
     , Tuple "Pino Scotto" "pino_"
     , Tuple "Richard Philip Henry John Benson" "rphjb_"
+    , Tuple "Vittorio Sgarbi" "sgar_"
     , Tuple "Xah Lee" "xah_"
     ]
 

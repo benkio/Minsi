@@ -60,17 +60,52 @@ The Docker image is published on Docker Hub: [benkio/minsi](https://hub.docker.c
 
 ### From scratch (new machine with Docker installed)
 
-Pull the image:
+#### 1. Pull the image
 
 ```bash
 docker pull benkio/minsi:latest
 ```
 
-Run the container (publish port 8080 so the app is reachable from your host):
+#### 2a. Single Script - Port 8080 - With Cookies:
+
+Recommended one-command startup (no clone required):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/benkio/minsi/main/start-minsi.sh -o start-minsi.sh
+chmod +x ./start-minsi.sh
+./start-minsi.sh
+```
+
+`start-minsi.sh` tries to export browser cookies from host profiles and then starts `docker run -d`. By default it tries `chrome`, `chromium`, `brave`, `firefox`, `edge`, `opera`, `vivaldi`, `safari`, writes `~/.config/minsi/cookies.txt`, and mounts that file to the container as read-only when available.
+
+If you cloned the project, you can run the local script directly from repo root:
+
+```bash
+./start-minsi.sh
+```
+
+Useful options:
+
+```bash
+./start-minsi.sh --browser firefox --browser chrome --output "$HOME/.config/minsi/cookies.txt"
+./start-minsi.sh --strict-cookies
+./start-minsi.sh --no-pull
+./start-minsi.sh --image benkio/minsi:latest --container minsi-app --port 8080
+```
+
+Notes:
+- `cookies.txt` must be in Netscape format (the format yt-dlp expects).
+- Keep the mount read-only (`:ro`) and avoid committing cookie files anywhere in this repository.
+- Minsi now tries `YTDLP_COOKIES_FILE` first, then no cookies, then browser-cookie extraction fallbacks.
+- The startup helper script is at [`./start-minsi.sh`](./start-minsi.sh).
+
+#### 2b. Manual - Port 8080 - No Cookies:
 
 ```bash
 docker run -d --name minsi-app -p 8080:8080 benkio/minsi:latest
 ```
+
+#### 3. Open the App
 
 Then open **http://localhost:8080** in your browser.
 
