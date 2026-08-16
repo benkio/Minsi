@@ -96,9 +96,10 @@ ytdlpDownload input@(YtdlpInput { filename, streaming }) = do
   apathize (rm filepath)
   maybeCookieFile <- liftEffect $ lookupEnv "YTDLP_COOKIES_FILE"
   maybeYtDlpCookieFile <- liftEffect $ lookupEnv "YT_DLP_COOKIES_FILE"
-  let cookieFileSource = case maybeCookieFile of
-        Just cookieFile -> Just (CookieFile cookieFile)
-        Nothing -> map CookieFile maybeYtDlpCookieFile
+  let
+    cookieFileSource = case maybeCookieFile of
+      Just cookieFile -> Just (CookieFile cookieFile)
+      Nothing -> map CookieFile maybeYtDlpCookieFile
   let cookieSources = maybe [] (\source -> [ source ]) cookieFileSource <> [ NoCookies ] <> map BrowserCookies ytdlpSupportedBrowserCookies
   runtimeCookieSources <- traverse (prepareCookieSource filename) cookieSources
   tryCookies runtimeCookieSources
