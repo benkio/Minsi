@@ -11,6 +11,7 @@ import Data.Array (uncons)
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Data.Time.Duration (Milliseconds(..))
+import Data.Traversable (traverse)
 import Data.URL (URL, toString)
 import Effect.Aff (Aff, apathize, delay)
 import Effect.Class (liftEffect)
@@ -41,8 +42,7 @@ data YtdlpCookieSource
 
 ytdlpSupportedBrowserCookies :: Array String
 ytdlpSupportedBrowserCookies =
-  [ ""
-  , "chrome"
+  [ "chrome"
   , "chromium"
   , "firefox"
   , "brave"
@@ -71,7 +71,16 @@ getYtdlpOutputUrl cookieSource (YtdlpInput { url: url, filename: filename, maybe
     pure [ "--download-sections", show ("*" <> start <> "-" <> end) ]
   rangeArgs = maybe [] identity maybeRangeArg
   outputArgs filepath = if streaming then [ "-o", "-" ] else [ "-o", show filepath ]
-  formatArgs = [ "-f", "\"bv*[ext=mp4][height<=720]+ba[ext=m4a]/b[ext=mp4]\"", "--merge-output-format", "mp4", "--force-keyframes-at-cuts", "--force-overwrite" ]
+  formatArgs =
+    [ "-f"
+    , "\"bv*[ext=mp4][height<=720]+ba[ext=m4a]/b[ext=mp4]\""
+    , "--merge-output-format"
+    , "mp4"
+    , "--force-keyframes-at-cuts"
+    , "--force-overwrite"
+    , "--js-runtimes"
+    , "node"
+    ]
   inputArgs = case cookieSource of
     NoCookies -> [ show urlString ]
     BrowserCookies browser -> [ "--cookies-from-browser", browser, show urlString ]
@@ -91,8 +100,20 @@ ytdlpDownload input@(YtdlpInput { filename, streaming }) = do
         Just cookieFile -> Just (CookieFile cookieFile)
         Nothing -> map CookieFile maybeYtDlpCookieFile
   let cookieSources = maybe [] (\source -> [ source ]) cookieFileSource <> [ NoCookies ] <> map BrowserCookies ytdlpSupportedBrowserCookies
-  tryCookies cookieSources
+  runtimeCookieSources <- traverse (prepareCookieSource filename) cookieSources
+  tryCookies runtimeCookieSources
   where
+
+  prepareCookieSource :: String -> YtdlpCookieSource -> Aff YtdlpCookieSource
+  prepareCookieSource _ NoCookies = pure NoCookies
+  prepareCookieSource _ (BrowserCookies browser) = pure (BrowserCookies browser)
+  prepareCookieSource outputFilename (CookieFile cookiePath) = do
+    let runtimeCookiePath = "/tmp/minsi-cookies-" <> outputFilename <> ".txt"
+    apathize (rm runtimeCookiePath)
+    cpResult <- runCommand [ show cookiePath, show runtimeCookiePath ] YtdlpError "cp" >>= _.getResult
+    case cpResult.exit of
+      Normally 0 -> pure (CookieFile runtimeCookiePath)
+      _ -> liftEffect $ throwMinsiError (YtdlpError cpResult.message)
 
   tryCookies :: Array YtdlpCookieSource -> Aff YtdlpDownloadResult
   tryCookies cookies =
