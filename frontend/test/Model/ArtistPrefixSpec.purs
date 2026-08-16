@@ -22,6 +22,9 @@ spec = do
     it "returns prefix for Richard Philip Henry John Benson" $
       prefixForArtist "Richard Philip Henry John Benson" `shouldEqual` Just "rphjb_"
 
+    it "returns prefix for Vittorio Sgarbi" $
+      prefixForArtist "Vittorio Sgarbi" `shouldEqual` Just "sgar_"
+
   describe "findMatchingPrefix" do
     it "finds a matching prefix at start of string" do
       let result = findMatchingPrefix "rphjb_SomeVideo"
