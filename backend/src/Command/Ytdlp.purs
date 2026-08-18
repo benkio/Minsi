@@ -73,7 +73,7 @@ getYtdlpOutputUrl cookieSource (YtdlpInput { url: url, filename: filename, maybe
   outputArgs filepath = if streaming then [ "-o", "-" ] else [ "-o", show filepath ]
   formatArgs =
     [ "-f"
-    , "\"bv*[ext=mp4][height<=720]+ba[ext=m4a]/b[ext=mp4]\""
+    , "\"bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]\""
     , "--merge-output-format"
     , "mp4"
     , "--force-keyframes-at-cuts"
