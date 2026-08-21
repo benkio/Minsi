@@ -51,9 +51,9 @@ spec = do
             { videoPosition: DurationRange { start: Milliseconds 1000.0, end: Milliseconds 2000.0 }
             , value: "ciao"
             , font: Impact
-            , fontSize: 24
+            , fontSize: 36
             , color: White
-            , screenPosition: Top
+            , screenPosition: Bottom
             }
         ]
 

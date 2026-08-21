@@ -139,8 +139,8 @@ mkSubtitle start end text =
         }
     , value: text
     , font: Impact
-    , fontSize: 24
+    , fontSize: 36
     , color: White
-    , screenPosition: Top
+    , screenPosition: Bottom
     }
 

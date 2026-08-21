@@ -2,7 +2,7 @@ module Test.Controller.ComputeControllerSpec where
 
 import Prelude
 
-import Controller.ComputeController (cutDownloadRequired, shiftVideoSyncChanged, videoNormalizationRequired)
+import Controller.ComputeController (cutDownloadRequired, shiftVideoSyncChanged, videoNormalizationRequired, whisperRegenerationRequired)
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Newtype (unwrap)
 import Data.Time.Duration (Milliseconds(..))
@@ -77,3 +77,16 @@ spec = do
         (Just (mkState source1 cut1))
         (State $ (unwrap $ mkState source1 cut1) { shiftVideoSync = Milliseconds 500.0 })
         `shouldEqual` true
+
+  describe "whisperRegenerationRequired" do
+    it "returns true when MP3 is missing and whisper json is missing" $
+      whisperRegenerationRequired false false `shouldEqual` true
+
+    it "returns true when MP3 is missing and whisper json exists" $
+      whisperRegenerationRequired false true `shouldEqual` true
+
+    it "returns true when MP3 exists but whisper json is missing" $
+      whisperRegenerationRequired true false `shouldEqual` true
+
+    it "returns false when both MP3 and whisper json exist" $
+      whisperRegenerationRequired true true `shouldEqual` false

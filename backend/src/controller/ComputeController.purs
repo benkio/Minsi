@@ -83,8 +83,8 @@ runComputePipeline mayOldState state@(State { source, filename, cutVideo: Durati
   runExceptT do
     liftEffect $ log ("[Compute] Start pipeline for filename: " <> filename)
     whisperJsonPath <- liftEffect $ whisperJson filename
-    liftEffect $ log ("[Compute] Delete previous whisper json if present: " <> whisperJsonPath)
-    liftEffect $ catchException (\_ -> pure unit) (rm whisperJsonPath)
+    whisperJsonExists <- liftEffect $ exists whisperJsonPath
+    liftEffect $ log ("[Compute] Whisper json exists at pipeline start: " <> show whisperJsonExists <> " (" <> whisperJsonPath <> ")")
     mp3Path <- liftEffect $ mp3 filename
     mp3Exists <- liftEffect $ exists mp3Path
     liftEffect $ log ("[Compute] MP3 exists at pipeline start: " <> show mp3Exists <> " (" <> mp3Path <> ")")
@@ -105,12 +105,15 @@ runComputePipeline mayOldState state@(State { source, filename, cutVideo: Durati
       $ normalizeVideo filename shiftVideoSync
     liftEffect $ log ("[Compute] Extract MP3 for filename: " <> filename)
     void $ exceptTStep "MP3 extraction" $ extractMp3 filename
-    if mp3Exists then
-      liftEffect $ log "[Compute] Skip Whisper subtitle generation because MP3 already exists at pipeline start"
-    else do
+    if whisperRegenerationRequired mp3Exists whisperJsonExists then do
+      when whisperJsonExists do
+        liftEffect $ log ("[Compute] Delete previous whisper json before regeneration: " <> whisperJsonPath)
+        liftEffect $ catchException (\_ -> pure unit) (rm whisperJsonPath)
       liftEffect $ log ("[Compute] Run Whisper subtitle generation (model=tiny) for filename: " <> filename)
       void $ exceptTStep "Whisper subtitle generation" $ generateJson filename
       liftEffect $ log ("[Compute] Whisper subtitle generation completed for filename: " <> filename)
+    else
+      liftEffect $ log "[Compute] Skip Whisper subtitle generation because both MP3 and whisper json already exist at pipeline start"
     void $ exceptTStep "ID3 tags" $ addId3Tags filename artist title
     void $ exceptTMultiple "Gif Creation" $ makeGif state
     liftEffect $ log ("[Compute] Pipeline completed for filename: " <> filename)
@@ -129,3 +132,7 @@ videoNormalizationRequired mayOldState newState =
 shiftVideoSyncChanged :: Maybe State -> State -> Boolean
 shiftVideoSyncChanged mayOldState (State { shiftVideoSync: newShift }) =
   maybe false (\(State { shiftVideoSync: oldShift }) -> oldShift /= newShift) mayOldState
+
+whisperRegenerationRequired :: Boolean -> Boolean -> Boolean
+whisperRegenerationRequired mp3Exists whisperJsonExists =
+  not mp3Exists || not whisperJsonExists

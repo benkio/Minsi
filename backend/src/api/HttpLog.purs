@@ -33,9 +33,10 @@ logOutgoingPost route status =
 respondJsonPost :: forall a. WriteForeign a => String -> Int -> a -> Handler
 respondJsonPost route status body =
   let
-    bodyStr = truncate 2000 (writeJSON body)
+    bodyStr = writeJSON body
+    bodyStrForLog = truncate 2000 bodyStr
   in
-    liftEffect (log $ "[HTTP] <-- POST " <> route <> " " <> show status <> " body=" <> bodyStr)
+    liftEffect (log $ "[HTTP] <-- POST " <> route <> " " <> show status <> " body=" <> bodyStrForLog)
       *> setStatus status
       *> sendJson (_parseJson bodyStr)
       *> end
