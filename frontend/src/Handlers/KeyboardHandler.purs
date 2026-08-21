@@ -4,7 +4,7 @@ import Prelude
 
 import Components.HtmlComponents (loadComponents)
 import Components.HtmlComponents.Lenses (_keyboardShortcutsButton, _subtitleRowTemplate, _subtitleTable)
-import Components.HtmlIdAndClasses (keyboardShortcutsModalId)
+import Components.HtmlIdAndClasses (keyboardShortcutsModalId, titleId)
 import Components.Modal (showModal)
 import Data.Lens (view)
 import Data.Maybe (Maybe(..), maybe, isJust)
@@ -14,6 +14,7 @@ import Handlers.ErrorHandlers (genericErrorsHandler)
 import Handlers.ResultMedia.MediaSrc (getMediaElement)
 import Handlers.Subtitles.AddSubtitleButtonHandler (addSubtitleButtonEventListener)
 import Handlers.Subtitles.RemoveSubtitleButtonHandler (removeFirstSubtitleRow)
+import Web.DOM.Element as Element
 import Web.DOM.Element (fromEventTarget, toEventTarget)
 import Web.Event.Event (preventDefault, target)
 import Web.Event.EventTarget (addEventListener, eventListener)
@@ -59,6 +60,15 @@ isTargetEditableElement ke =
     (\el -> isJust (HI.fromElement el) || isJust (HTA.fromElement el) || isJust (HS.fromElement el))
     (target (toEvent ke) >>= fromEventTarget)
 
+-- True when the keydown target is the title input.
+isTargetTitleElement :: KeyboardEvent -> Effect Boolean
+isTargetTitleElement ke =
+  case target (toEvent ke) >>= fromEventTarget of
+    Nothing -> pure false
+    Just el -> do
+      elId <- Element.id el
+      pure (elId == titleId)
+
 handleKeyboardEvent :: KeyboardEvent -> Effect Unit
 handleKeyboardEvent keyboardEvent = genericErrorsHandler $ do
   components <- loadComponents
@@ -71,10 +81,12 @@ handleKeyboardEvent keyboardEvent = genericErrorsHandler $ do
     isCtrl = ctrlKey keyboardEvent
     isMeta = metaKey keyboardEvent
     keyValue = key keyboardEvent
+  isTargetTitle <- isTargetTitleElement keyboardEvent
+  let whenNotTitle cond act = when (cond && not isTargetTitle) (act *> stop)
   media <- getMediaElement components
   when (keyValue == "Enter" && (isCtrl || isMeta)) (applyButtonEventListener ev *> stop)
-  when (keyValue == "+") (addSubtitleButtonEventListener subtitleTable subtitleRow (toEvent keyboardEvent) *> stop)
-  when (keyValue == "-") (removeFirstSubtitleRow subtitleTable *> stop)
+  whenNotTitle (keyValue == "+") (addSubtitleButtonEventListener subtitleTable subtitleRow (toEvent keyboardEvent))
+  whenNotTitle (keyValue == "-") (removeFirstSubtitleRow subtitleTable)
   whenNotEditable (keyValue == " ") (toggleResultMediaPlayback media)
   whenNotEditable (keyValue == "ArrowLeft") (skipResultMediaBackward media)
   whenNotEditable (keyValue == "ArrowRight") (skipResultMediaForward media)
