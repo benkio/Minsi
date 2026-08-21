@@ -24,6 +24,7 @@ generateJsonArgs :: FilePath -> FilePath -> Array String
 generateJsonArgs filepathMp3 outputDir =
   [ filepathMp3
   , "--model", "tiny"
+  , "--language", "it"
   , "--task", "transcribe"
   , "--output_format", "json"
   , "--output_dir", outputDir

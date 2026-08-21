@@ -14,6 +14,7 @@ spec = do
       generateJsonArgs "/tmp/input.mp3" "/tmp/out" `shouldEqual`
         [ "/tmp/input.mp3"
         , "--model", "tiny"
+        , "--language", "it"
         , "--task", "transcribe"
         , "--output_format", "json"
         , "--output_dir", "/tmp/out"
