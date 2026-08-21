@@ -109,7 +109,7 @@ runComputePipeline mayOldState state@(State { source, filename, cutVideo: Durati
       when whisperJsonExists do
         liftEffect $ log ("[Compute] Delete previous whisper json before regeneration: " <> whisperJsonPath)
         liftEffect $ catchException (\_ -> pure unit) (rm whisperJsonPath)
-      liftEffect $ log ("[Compute] Run Whisper subtitle generation (model=tiny) for filename: " <> filename)
+      liftEffect $ log ("[Compute] Run Whisper subtitle generation (model=small) for filename: " <> filename)
       void $ exceptTStep "Whisper subtitle generation" $ generateJson filename
       liftEffect $ log ("[Compute] Whisper subtitle generation completed for filename: " <> filename)
     else

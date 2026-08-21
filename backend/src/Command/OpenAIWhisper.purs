@@ -23,7 +23,7 @@ generateJson filename = do
 generateJsonArgs :: FilePath -> FilePath -> Array String
 generateJsonArgs filepathMp3 outputDir =
   [ filepathMp3
-  , "--model", "tiny"
+  , "--model", "small"
   , "--language", "it"
   , "--task", "transcribe"
   , "--output_format", "json"

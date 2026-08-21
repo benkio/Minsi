@@ -55,7 +55,7 @@ RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib" > /etc/apt/so
     && curl -sSL -o /usr/local/bin/yt-dlp "https://github.com/yt-dlp/yt-dlp/releases/latest/download/${ytdlp_asset}" \
     && chmod +x /usr/local/bin/yt-dlp \
     && pip3 install --no-cache-dir --break-system-packages openai-whisper \
-    && python3 -c "import whisper; whisper.load_model('tiny'); print('Whisper tiny model preloaded')" \
+    && python3 -c "import whisper; whisper.load_model('small'); print('Whisper small model preloaded')" \
     && fc-cache -f \
     && rm -rf /var/lib/apt/lists/*
 

@@ -13,7 +13,7 @@ spec = do
     it "builds json-only whisper command arguments from shared constraints" do
       generateJsonArgs "/tmp/input.mp3" "/tmp/out" `shouldEqual`
         [ "/tmp/input.mp3"
-        , "--model", "tiny"
+        , "--model", "small"
         , "--language", "it"
         , "--task", "transcribe"
         , "--output_format", "json"
