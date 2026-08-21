@@ -13,6 +13,7 @@ data MinsiError
   | FfmpegVideoError String
   | FfmpegGifError String
   | FfmpegMp3Error String
+  | OpenAIWhisperError String
   | Id3v2Error String
   | InvalidInputError String
 
@@ -21,6 +22,7 @@ instance Show MinsiError where
   show (FfmpegVideoError s) = "🚫 Ffmpeg video error: " <> s
   show (FfmpegMp3Error s) = "🚫 Ffmpeg mp3 error: " <> s
   show (FfmpegGifError s) = "🚫 Ffmpeg gif error: " <> s
+  show (OpenAIWhisperError s) = "🚫 OpenAI Whisper error: " <> s
   show (Id3v2Error s) = "🚫 Id3v2 error: " <> s
   show (DependencyError s) = "🚫 Error while checking dependencies: " <> s
   show (UpdateError s) = "🚫 Error while checking updates: " <> s

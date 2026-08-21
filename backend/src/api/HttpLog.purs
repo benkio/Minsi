@@ -9,9 +9,11 @@ import Foreign (Foreign)
 import Node.Express.Handler (Handler, HandlerM(..))
 import Node.Express.Response (end, sendJson, setStatus)
 import Node.Express.Types (Request)
+import Yoga.JSON (class WriteForeign, writeJSON)
 
 foreign import _getReqBody :: Request -> Foreign
 foreign import _stringify :: forall a. a -> String
+foreign import _parseJson :: String -> Foreign
 
 truncate :: Int -> String -> String
 truncate n s =
@@ -28,14 +30,14 @@ logOutgoingPost :: String -> Int -> Handler
 logOutgoingPost route status =
   liftEffect $ log $ "[HTTP] <-- POST " <> route <> " " <> show status
 
-respondJsonPost :: forall a. String -> Int -> a -> Handler
+respondJsonPost :: forall a. WriteForeign a => String -> Int -> a -> Handler
 respondJsonPost route status body =
   let
-    bodyStr = truncate 2000 (_stringify body)
+    bodyStr = truncate 2000 (writeJSON body)
   in
     liftEffect (log $ "[HTTP] <-- POST " <> route <> " " <> show status <> " body=" <> bodyStr)
       *> setStatus status
-      *> sendJson body
+      *> sendJson (_parseJson bodyStr)
       *> end
 
 respondEmptyPost :: String -> Int -> Handler

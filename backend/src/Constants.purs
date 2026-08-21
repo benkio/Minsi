@@ -24,6 +24,9 @@ gif filename = outputPath >>= \ofp -> resolve [ ofp ] (filename <> "Gif.mp4")
 srt :: String -> Effect FilePath
 srt filename = outputPath >>= \ofp -> resolve [ ofp ] (filename <> ".srt")
 
+whisperJson :: String -> Effect FilePath
+whisperJson filename = outputPath >>= \ofp -> resolve [ ofp ] (filename <> ".json")
+
 txt :: String -> Effect FilePath
 txt filename = outputPath >>= \ofp -> resolve [ ofp ] (filename <> ".txt")
 
@@ -49,6 +52,7 @@ files filename =
     , mp3
     , gif
     , srt
+    , whisperJson
     , txt
     , reversed
     , reversedFull

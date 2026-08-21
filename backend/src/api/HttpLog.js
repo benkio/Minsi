@@ -15,3 +15,5 @@ export const _stringify = (a) => {
   }
 };
 
+export const _parseJson = (s) => JSON.parse(s);
+

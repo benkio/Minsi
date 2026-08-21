@@ -22,6 +22,7 @@ Required for video/audio processing (must be on your `PATH`):
 | **ffmpeg** | Video/audio conversion     |
 | **yt-dlp** | Video download from supported hosts |
 | **id3v2**  | MP3 metadata (artist/title)|
+| **whisper** | Subtitle seed generation from MP3 |
 | **fc-list** | Font listing (subtitles)   |
 
 You also need **Impact** and **Arial Black** fonts installed if you use subtitles.
@@ -54,7 +55,7 @@ The output filename must follow the format `prefix_Name`: 1–5 lowercase letter
 
 ## Running with Docker
 
-The project includes a multi-stage **Dockerfile** that builds the frontend and backend and runs the app with only the required runtime dependencies (Node, ffmpeg, yt-dlp, id3v2, fonts).
+The project includes a multi-stage **Dockerfile** that builds the frontend and backend and runs the app with only the required runtime dependencies (Node, ffmpeg, yt-dlp, id3v2, openai-whisper, fonts).
 
 The Docker image is published on Docker Hub: [benkio/minsi](https://hub.docker.com/r/benkio/minsi).
 

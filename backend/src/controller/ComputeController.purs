@@ -8,8 +8,9 @@ import Command.Ffmpeg.Gif (makeGif)
 import Command.Ffmpeg.Mp3 (extractMp3)
 import Command.Ffmpeg.Video (FfmpegInput(..), cutVideo, normalizeVideo)
 import Command.Id3v2 (addId3Tags)
+import Command.OpenAIWhisper (generateJson)
 import Command.Ytdlp (YtdlpDownloadResult(..), YtdlpInput(..), ytdlpDownload)
-import Constants (uploaded)
+import Constants (mp3, uploaded, whisperJson)
 import Control.Monad.Except (runExceptT)
 import Data.Array (fromFoldable)
 import Data.Bifunctor (lmap)
@@ -20,10 +21,12 @@ import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
+import Effect.Exception (catchException)
 import InMemoryDB (Store, insert, lookupProcessStatus)
 import MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.State.State (DurationRange(..), Source(..), State(..), WURL(..), validateState)
 import Node.Express.Handler (Handler)
+import Node.FS.Sync (exists, rm)
 import Node.Express.Request (getBody')
 import Yoga.JSON (read)
 
@@ -78,6 +81,13 @@ compute mayOldState state@(State { filename }) store = do
 runComputePipeline :: Maybe State -> State -> Aff (Either String Unit)
 runComputePipeline mayOldState state@(State { source, filename, cutVideo: DurationRange { start, end }, artist, title, shiftVideoSync }) =
   runExceptT do
+    liftEffect $ log ("[Compute] Start pipeline for filename: " <> filename)
+    whisperJsonPath <- liftEffect $ whisperJson filename
+    liftEffect $ log ("[Compute] Delete previous whisper json if present: " <> whisperJsonPath)
+    liftEffect $ catchException (\_ -> pure unit) (rm whisperJsonPath)
+    mp3Path <- liftEffect $ mp3 filename
+    mp3Exists <- liftEffect $ exists mp3Path
+    liftEffect $ log ("[Compute] MP3 exists at pipeline start: " <> show mp3Exists <> " (" <> mp3Path <> ")")
     when (cutDownloadRequired mayOldState state)
       ( do
           case source of
@@ -93,9 +103,17 @@ runComputePipeline mayOldState state@(State { source, filename, cutVideo: Durati
       $ void
       $ exceptTStep "Video Normalization"
       $ normalizeVideo filename shiftVideoSync
+    liftEffect $ log ("[Compute] Extract MP3 for filename: " <> filename)
     void $ exceptTStep "MP3 extraction" $ extractMp3 filename
+    if mp3Exists then
+      liftEffect $ log "[Compute] Skip Whisper subtitle generation because MP3 already exists at pipeline start"
+    else do
+      liftEffect $ log ("[Compute] Run Whisper subtitle generation (model=tiny) for filename: " <> filename)
+      void $ exceptTStep "Whisper subtitle generation" $ generateJson filename
+      liftEffect $ log ("[Compute] Whisper subtitle generation completed for filename: " <> filename)
     void $ exceptTStep "ID3 tags" $ addId3Tags filename artist title
     void $ exceptTMultiple "Gif Creation" $ makeGif state
+    liftEffect $ log ("[Compute] Pipeline completed for filename: " <> filename)
     pure unit
 
 cutDownloadRequired :: Maybe State -> State -> Boolean

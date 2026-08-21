@@ -8,7 +8,7 @@ PureScript Express server for the Minsi web app. It serves the frontend (from `p
 - **Node.js** — runtime (Express)
 - **npm**: `express` (and any transitive deps)
 
-System tools used at runtime (must be on `PATH`): **ffmpeg**, **yt-dlp**, **id3v2**, **fc-list**.
+System tools used at runtime (must be on `PATH`): **ffmpeg**, **yt-dlp**, **id3v2**, **whisper**, **fc-list**.
 
 ## Setup
 

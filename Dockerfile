@@ -40,6 +40,8 @@ RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib" > /etc/apt/so
     apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     libc6 \
+    python3 \
+    python3-pip \
     ttf-mscorefonts-installer \
     id3v2 \
     curl \
@@ -52,6 +54,8 @@ RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib" > /etc/apt/so
     esac \
     && curl -sSL -o /usr/local/bin/yt-dlp "https://github.com/yt-dlp/yt-dlp/releases/latest/download/${ytdlp_asset}" \
     && chmod +x /usr/local/bin/yt-dlp \
+    && pip3 install --no-cache-dir --break-system-packages openai-whisper \
+    && python3 -c "import whisper; whisper.load_model('tiny'); print('Whisper tiny model preloaded')" \
     && fc-cache -f \
     && rm -rf /var/lib/apt/lists/*
 

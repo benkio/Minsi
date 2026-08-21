@@ -15,6 +15,7 @@ import Data.Traversable (traverse_)
 import Data.URL (URL, fromString, toString)
 import Data.Validation.Semigroup (isValid)
 import Foreign (ForeignError(..), fail)
+import Model.State.SubtitleConstraints (maxSubtitleCharsPerLine)
 import Node.Path (FilePath)
 import Validations.VideoUrlValidation (videoUrlValidation)
 import Web.File.File (File)
@@ -243,7 +244,7 @@ validateRange (DurationRange { start: (Milliseconds start), end: (Milliseconds e
 
 validateSubtitleValue :: String -> Either (Array String) Unit
 validateSubtitleValue v =
-  if length v > 30 then Left [ "State Validation: subtitle too long. > 30 chars" ] else Right unit
+  if length v > maxSubtitleCharsPerLine then Left [ "State Validation: subtitle too long. > " <> show maxSubtitleCharsPerLine <> " chars" ] else Right unit
 
 validateFilename :: String -> Either (Array String) Unit
 validateFilename v -- TODO: should check for the prefix

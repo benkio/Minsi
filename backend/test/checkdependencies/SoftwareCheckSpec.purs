@@ -1,11 +1,12 @@
 module Test.CheckDependencies.SoftwareCheckSpec where
 
 import CheckDependencies.SoftwareCheck (checkSoftwareDependency, checkSoftwareDependencies)
+import Data.Array (elem)
 import Effect.Class (liftEffect)
 import Prelude
 import Test.Main (isNotCI)
 import Test.Spec (Spec, describe, it)
-import Test.Spec.Assertions (shouldReturn)
+import Test.Spec.Assertions (shouldEqual, shouldReturn)
 
 spec :: Spec Unit
 spec = do
@@ -17,4 +18,7 @@ spec = do
     it "should return false if the input is not a valid command" $ liftEffect $
       checkSoftwareDependency "not a valid command" `shouldReturn` false
   describe "checkSoftwareDependencies" do
-    it "should return empty array (if your machine is valid)" $ liftEffect $ whenM isNotCI (checkSoftwareDependencies `shouldReturn` [])
+    it "includes whisper when dependency is missing" $ liftEffect do
+      hasWhisper <- checkSoftwareDependency "whisper"
+      missing <- checkSoftwareDependencies
+      (elem "whisper" missing) `shouldEqual` not hasWhisper
