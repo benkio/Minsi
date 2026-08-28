@@ -19,6 +19,7 @@ import Data.Validation.Semigroup (V, andThen, invalid, toEither, validation)
 import Effect (Effect)
 import HTMLTableCellElement (valueFromInputTableCell, valueFromSelectTableCell, valueFromTextAreaTableCell)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
+import Model.State.SubtitleConstraints (maxSubtitleCharsPerLine)
 import Model.State.State (State(..), DurationRange(..), WURL(..), Source(..), Subtitle(..))
 import Model.ValidationErrors (ValidationErrors, toMap, fromSingleton)
 import Parse.Font (parseFontAndColor, parsePosition)
@@ -69,7 +70,7 @@ fromHtmlInputs
   artistV <- HI.value artistInput <#> nonEmptyValidation artistId <#> (_ `andThen` printableAsciiLatinValidation artistId)
   titleV <- HI.value titleInput <#> nonEmptyValidation titleId <#> (_ `andThen` printableAsciiLatinValidation titleId)
   shiftVideoSyncSetValue <- valueAsNumber shiftVideoSync
-  subtitlesV <- loadSubtitlesFromTable loadSubtitleFromRow subtitleTable <#> \subs -> traverse (\(sub@(Subtitle { value })) -> maxCharsValidation 30 "SubtitleRow" value <#> const sub) subs
+  subtitlesV <- loadSubtitlesFromTable loadSubtitleFromRow subtitleTable <#> \subs -> traverse (\(sub@(Subtitle { value })) -> maxCharsValidation maxSubtitleCharsPerLine "SubtitleRow" value <#> const sub) subs
   pure $ ado
     cutVideo <- cutVideoV
     source <- sourceV

@@ -1,0 +1,12 @@
+.git
+.git/**
+node_modules
+**/node_modules
+.spago
+**/.spago
+dist
+coverage
+
+# Avoid baking runtime-generated media/subtitle artifacts into the image.
+public/output/*
+!public/output/.gitignore

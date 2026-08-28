@@ -21,14 +21,15 @@ pkgs.mkShell {
 
   packages = with pkgs; [
     # Build / toolchain (Dockerfile builder + CI)
-    nodejs_24
-    purs
-    spago-unstable
-    purs-tidy
+    cacert
+    curl
     esbuild
     git
-    curl
-    cacert
+    nodejs_24
+    purs
+    purs-tidy
+    spago-unstable
+    openai-whisper
 
     # Runtime media pipeline (Dockerfile runtime + SoftwareCheck)
     ffmpeg
