@@ -87,8 +87,9 @@ applyButtonLogic (State rec) uploadLocalFileInput components = genericErrorsHand
   subtitleRows <- liftEffect $ getRows (view _subtitleTable components)
   let shouldHydrate = null rec.subtitles || null subtitleRows
   when shouldHydrate do
-    unless (null subtitlesResponse.subtitles) $
-      liftEffect $ applyGeneratedSubtitlesToTable components subtitlesResponse.subtitles
+    unless (null subtitlesResponse.subtitles)
+      $ liftEffect
+      $ applyGeneratedSubtitlesToTable components subtitlesResponse.subtitles
 
 uploadLocalFileLogic :: Source -> String -> HI.HTMLInputElement -> Aff Unit
 uploadLocalFileLogic (LocalFile file) filename uploadLocalFileInput = genericErrorsHandler $ do

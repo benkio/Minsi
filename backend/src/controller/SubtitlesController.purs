@@ -87,8 +87,10 @@ linesFromSegments =
 linesFromSegment :: WhisperSegment -> Array Subtitle
 linesFromSegment seg =
   if null seg.words then
-    let text = trim seg.text
-    in if text == "" then [] else [ mkSubtitle (seg.start * 1000.0) (seg.end * 1000.0) text ]
+    let
+      text = trim seg.text
+    in
+      if text == "" then [] else [ mkSubtitle (seg.start * 1000.0) (seg.end * 1000.0) text ]
   else
     finalize acc.lines acc.currentWords
   where
