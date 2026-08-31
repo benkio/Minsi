@@ -1,0 +1,19 @@
+name: DockerHub Cleanup
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 2 * * MON"
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cleanup Docker Hub tags
+        uses: maxisam/dockerhub-cleanup@v0.1.8
+        with:
+          namespace: ${{ secrets.DOCKERHUB_USERNAME }}
+          token: ${{ secrets.DOCKERHUB_TOKEN }}
+          repos: "minsi"
+          preserve_last: "5"
+          dry_run: "false"
