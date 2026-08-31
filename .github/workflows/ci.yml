@@ -154,7 +154,6 @@ jobs:
     uses: ./.github/workflows/cleanup-dockerhub-tags.yml
     with:
       image: benkio/minsi
-      keep: 5
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
