@@ -11,7 +11,7 @@ import Command.Id3v2 (addId3Tags)
 import Command.OpenAIWhisper (generateJson)
 import Command.Ytdlp (YtdlpDownloadResult(..), YtdlpInput(..), ytdlpDownload)
 import Constants (mp3, uploaded, whisperJson)
-import Control.Monad.Except (runExceptT)
+import Control.Monad.Except (lift, runExceptT)
 import Data.Array (fromFoldable)
 import Data.Bifunctor (lmap)
 import Data.Either (Either, either)
@@ -110,8 +110,17 @@ runComputePipeline mayOldState state@(State { source, filename, cutVideo: Durati
         liftEffect $ log ("[Compute] Delete previous whisper json before regeneration: " <> whisperJsonPath)
         liftEffect $ catchException (\_ -> pure unit) (rm whisperJsonPath)
       liftEffect $ log ("[Compute] Run Whisper subtitle generation (model=small) for filename: " <> filename)
-      void $ exceptTStep "Whisper subtitle generation" $ generateJson filename
-      liftEffect $ log ("[Compute] Whisper subtitle generation completed for filename: " <> filename)
+      whisperResult <- lift $ runExceptT (exceptTStep "Whisper subtitle generation" $ generateJson filename)
+      liftEffect $
+        either
+          ( \whisperErr ->
+              log
+                ( "[Compute] Whisper subtitle generation failed but compute will continue: "
+                    <> whisperErr
+                )
+          )
+          (\_ -> log ("[Compute] Whisper subtitle generation completed for filename: " <> filename))
+          whisperResult
     else
       liftEffect $ log "[Compute] Skip Whisper subtitle generation because both MP3 and whisper json already exist at pipeline start"
     void $ exceptTStep "ID3 tags" $ addId3Tags filename artist title

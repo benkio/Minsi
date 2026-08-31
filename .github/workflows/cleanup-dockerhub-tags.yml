@@ -1,4 +1,4 @@
-name: Cleanup Docker Hub Tags (reusable)
+name: Cleanup Docker Hub Images (reusable)
 
 on:
   workflow_call:
@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       keep:
-        description: "How many latest tags to keep"
+        description: "How many latest uploaded images to keep"
         required: false
         default: 5
         type: number
@@ -20,10 +20,10 @@ on:
 
 jobs:
   cleanup:
-    name: Keep latest tags
+    name: Keep latest uploaded images
     runs-on: ubuntu-latest
     steps:
-      - name: Prune old Docker Hub tags
+      - name: Prune old Docker Hub images by upload time
         env:
           IMAGE: ${{ inputs.image }}
           KEEP: ${{ inputs.keep }}
@@ -31,6 +31,14 @@ jobs:
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
           set -euo pipefail
+
+          namespace="${IMAGE%%/*}"
+          repository="${IMAGE#*/}"
+
+          if [ -z "${namespace}" ] || [ -z "${repository}" ] || [ "${namespace}" = "${repository}" ]; then
+            echo "IMAGE must be in the form namespace/repository, got: ${IMAGE}"
+            exit 1
+          fi
 
           TOKEN="$(
             curl -fsSL -X POST "https://hub.docker.com/v2/users/login/" \
@@ -44,31 +52,93 @@ jobs:
             exit 1
           fi
 
-          next_url="https://hub.docker.com/v2/repositories/${IMAGE}/tags?page_size=100"
-          tags_file="$(mktemp)"
+          tags_url="https://hub.docker.com/v2/namespaces/${namespace}/repositories/${repository}/tags?page_size=100"
+          rows_file="$(mktemp)"
 
-          while [ -n "${next_url}" ] && [ "${next_url}" != "null" ]; do
-            page="$(curl -fsSL -H "Authorization: JWT ${TOKEN}" "${next_url}")"
-            echo "${page}" | jq -r '.results[] | select(.name != null and .last_updated != null) | [.name, .last_updated] | @tsv' >> "${tags_file}"
-            next_url="$(echo "${page}" | jq -r '.next')"
+          while [ -n "${tags_url}" ] && [ "${tags_url}" != "null" ]; do
+            page="$(curl -fsSL -H "Authorization: JWT ${TOKEN}" "${tags_url}")"
+            echo "${page}" | jq -r '
+              .results[]
+              | .name as $tag
+              | .images[]
+              | select(.digest != null and .last_pushed != null)
+              | [$tag, .digest, .last_pushed]
+              | @tsv
+            ' >> "${rows_file}"
+            tags_url="$(echo "${page}" | jq -r '.next')"
           done
 
-          if [ ! -s "${tags_file}" ]; then
-            echo "No tags found for ${IMAGE}; nothing to prune"
+          if [ ! -s "${rows_file}" ]; then
+            echo "No tagged images found for ${IMAGE}; nothing to prune"
             exit 0
           fi
 
-          delete_file="$(mktemp)"
-          sort -t $'\t' -k2,2r "${tags_file}" | awk -F '\t' -v keep="${KEEP}" 'NR > keep { print $1 }' > "${delete_file}"
+          digest_file="$(mktemp)"
+          awk -F '\t' '
+            {
+              tag = $1
+              digest = $2
+              pushed = $3
+              if (!(digest in max_pushed) || pushed > max_pushed[digest]) {
+                max_pushed[digest] = pushed
+              }
+              if (tags[digest] == "") {
+                tags[digest] = tag
+              } else {
+                tags[digest] = tags[digest] "," tag
+              }
+            }
+            END {
+              for (d in max_pushed) {
+                print d "\t" max_pushed[d] "\t" tags[d]
+              }
+            }
+          ' "${rows_file}" > "${digest_file}"
 
-          if [ ! -s "${delete_file}" ]; then
-            echo "Tag count is already <= ${KEEP}; nothing to prune"
+          delete_digest_file="$(mktemp)"
+          sort -t $'\t' -k2,2r "${digest_file}" | awk -F '\t' -v keep="${KEEP}" 'NR > keep { print $1 }' > "${delete_digest_file}"
+
+          if [ ! -s "${delete_digest_file}" ]; then
+            echo "Image digest count is already <= ${KEEP}; nothing to prune"
             exit 0
           fi
 
-          while IFS= read -r tag; do
-            echo "Deleting ${IMAGE}:${tag}"
-            curl -fsSL -X DELETE \
+          while IFS= read -r digest; do
+            [ -z "${digest}" ] && continue
+
+            tags_for_digest="$(
+              awk -F '\t' -v d="${digest}" '$1 == d { print $3 }' "${digest_file}" | head -n 1
+            )"
+
+            echo "Deleting old digest ${digest} (${IMAGE})"
+            payload="$(jq -nc \
+              --arg repo "${repository}" \
+              --arg dig "${digest}" \
+              '{dry_run:false, manifests:[{repository:$repo,digest:$dig}], ignore_warnings:[{repository:$repo,digest:$dig,warning:"current_tag"}]}'
+            )"
+
+            if curl -fsSL -X POST \
               -H "Authorization: JWT ${TOKEN}" \
-              "https://hub.docker.com/v2/repositories/${IMAGE}/tags/${tag}/" >/dev/null
-          done < "${delete_file}"
+              -H "Content-Type: application/json" \
+              -d "${payload}" \
+              "https://hub.docker.com/v2/namespaces/${namespace}/delete-images" >/dev/null; then
+              echo "Deleted digest via delete-images API: ${digest}"
+              continue
+            fi
+
+            echo "delete-images API failed; falling back to tag deletion for digest ${digest}"
+            IFS=',' read -ra tag_array <<< "${tags_for_digest}"
+            for tag in "${tag_array[@]}"; do
+              [ -z "${tag}" ] && continue
+              echo "Deleting tag ${IMAGE}:${tag}"
+              if curl -fsSL -X DELETE \
+                -H "Authorization: JWT ${TOKEN}" \
+                "https://hub.docker.com/v2/namespaces/${namespace}/repositories/${repository}/tags/${tag}" >/dev/null; then
+                continue
+              fi
+
+              curl -fsSL -X DELETE \
+                -H "Authorization: JWT ${TOKEN}" \
+                "https://hub.docker.com/v2/repositories/${namespace}/${repository}/tags/${tag}/" >/dev/null
+            done
+          done < "${delete_digest_file}"
