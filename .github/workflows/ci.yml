@@ -132,41 +132,17 @@ jobs:
           fi
 
           echo "✓ CheckDependencies endpoint responding correctly"
-      - name: Save Docker image (for optional publish)
+      - name: Log in to Docker Hub
         if: github.ref == 'refs/heads/main'
-        run: docker save minsi:ci -o /tmp/minsi-image.tar && ls -lh /tmp/minsi-image.tar
-      - name: Upload Docker image artifact
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v4
+        uses: docker/login-action@v3
         with:
-          name: minsi-docker-image
-          path: /tmp/minsi-image.tar
-          if-no-files-found: warn
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Tag and push Docker image
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker tag minsi:ci benkio/minsi:latest
+          docker push benkio/minsi:latest
       - name: Stop Docker container
         if: always()
         run: docker rm -f minsi || true
-  publish_approval:
-    name: Publish Docker image?
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    needs:
-      - shared
-      - backend
-      - frontend
-      - docker
-    environment: dockerhub-publish
-    steps:
-      - name: Await approval
-        run: echo "Publishing approved. Proceeding to publish job."
-  publish_docker_image:
-    name: Publish Docker image
-    if: github.ref == 'refs/heads/main'
-    needs:
-      - publish_approval
-    uses: benkio/minsi/.github/workflows/publish-docker-image.yml@main
-    with:
-      source: artifact
-      artifact_name: minsi-docker-image
-      tag: latest
-      image: benkio/minsi
-    secrets: inherit
