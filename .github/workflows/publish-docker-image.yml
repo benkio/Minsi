@@ -68,12 +68,3 @@ jobs:
           push: true
           tags: ${{ inputs.image }}:${{ inputs.tag }}
 
-  cleanup_dockerhub_tags:
-    name: Cleanup Docker Hub tags
-    needs: publish
-    uses: ./.github/workflows/cleanup-dockerhub-tags.yml
-    with:
-      image: ${{ inputs.image }}
-    secrets:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
