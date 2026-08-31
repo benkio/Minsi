@@ -1,0 +1,23 @@
+name: Container Registry Cleanup
+
+permissions:
+  contents: read
+  packages: write
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 2 * * MON"
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: "tweedegolf/cleanup-images-action@main"
+        with:
+          package: minsi
+          filter: ".*"
+          keep_n: 5
+      - uses: "tweedegolf/cleanup-untagged-images-action@main"
+        with:
+          package: minsi
