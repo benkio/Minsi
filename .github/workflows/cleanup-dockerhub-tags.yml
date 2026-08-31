@@ -1,0 +1,74 @@
+name: Cleanup Docker Hub Tags (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      image:
+        description: "Docker image name (e.g. benkio/minsi)"
+        required: true
+        type: string
+      keep:
+        description: "How many latest tags to keep"
+        required: false
+        default: 5
+        type: number
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
+
+jobs:
+  cleanup:
+    name: Keep latest tags
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prune old Docker Hub tags
+        env:
+          IMAGE: ${{ inputs.image }}
+          KEEP: ${{ inputs.keep }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          TOKEN="$(
+            curl -fsSL -X POST "https://hub.docker.com/v2/users/login/" \
+              -H "Content-Type: application/json" \
+              -d "{\"username\":\"${DOCKERHUB_USERNAME}\",\"password\":\"${DOCKERHUB_TOKEN}\"}" \
+            | jq -r '.token'
+          )"
+
+          if [ -z "${TOKEN}" ] || [ "${TOKEN}" = "null" ]; then
+            echo "Unable to authenticate to Docker Hub API"
+            exit 1
+          fi
+
+          next_url="https://hub.docker.com/v2/repositories/${IMAGE}/tags?page_size=100"
+          tags_file="$(mktemp)"
+
+          while [ -n "${next_url}" ] && [ "${next_url}" != "null" ]; do
+            page="$(curl -fsSL -H "Authorization: JWT ${TOKEN}" "${next_url}")"
+            echo "${page}" | jq -r '.results[] | select(.name != null and .last_updated != null) | [.name, .last_updated] | @tsv' >> "${tags_file}"
+            next_url="$(echo "${page}" | jq -r '.next')"
+          done
+
+          if [ ! -s "${tags_file}" ]; then
+            echo "No tags found for ${IMAGE}; nothing to prune"
+            exit 0
+          fi
+
+          delete_file="$(mktemp)"
+          sort -t $'\t' -k2,2r "${tags_file}" | awk -F '\t' -v keep="${KEEP}" 'NR > keep { print $1 }' > "${delete_file}"
+
+          if [ ! -s "${delete_file}" ]; then
+            echo "Tag count is already <= ${KEEP}; nothing to prune"
+            exit 0
+          fi
+
+          while IFS= read -r tag; do
+            echo "Deleting ${IMAGE}:${tag}"
+            curl -fsSL -X DELETE \
+              -H "Authorization: JWT ${TOKEN}" \
+              "https://hub.docker.com/v2/repositories/${IMAGE}/tags/${tag}/" >/dev/null
+          done < "${delete_file}"

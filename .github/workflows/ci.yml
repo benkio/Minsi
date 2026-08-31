@@ -146,3 +146,15 @@ jobs:
       - name: Stop Docker container
         if: always()
         run: docker rm -f minsi || true
+
+  cleanup_dockerhub_tags:
+    name: Cleanup Docker Hub tags
+    needs: docker
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/cleanup-dockerhub-tags.yml
+    with:
+      image: benkio/minsi
+      keep: 5
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
