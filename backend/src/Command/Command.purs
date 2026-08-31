@@ -16,6 +16,9 @@ import Node.Library.Execa (ExecaProcess, execa, ExecaOptions, ExecaSyncOptions)
 import Node.Library.Execa.Which (isWindows)
 import Prelude
 
+timeout :: Milliseconds
+timeout = Milliseconds 30000.0
+
 runCommand :: Array String -> (String -> MinsiError) -> String -> Aff ExecaProcess
 runCommand args errorConstructor commandExecutable =
   catchError
@@ -33,9 +36,9 @@ shell = isWindows <#> \win -> if win then "cmd.exe" else "/bin/sh"
 commandOptions :: Effect (ExecaOptions -> ExecaOptions)
 commandOptions = do
   sh <- shell
-  pure (\options -> options { shell = Just sh, timeout = Just { killSignal: stringSignal "SIGTERM", milliseconds: Milliseconds 300000.0 } })
+  pure (\options -> options { shell = Just sh, timeout = Just { killSignal: stringSignal "SIGTERM", milliseconds: timeout } })
 
 commandSyncOptions :: Effect (ExecaSyncOptions -> ExecaSyncOptions)
 commandSyncOptions = do
   sh <- shell
-  pure (\options -> options { shell = Just sh, timeout = Just { killSignal: stringSignal "SIGTERM", milliseconds: Milliseconds 300000.0 } })
+  pure (\options -> options { shell = Just sh, timeout = Just { killSignal: stringSignal "SIGTERM", milliseconds: timeout } })
