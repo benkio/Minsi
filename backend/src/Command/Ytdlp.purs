@@ -53,6 +53,9 @@ ytdlpSupportedBrowserCookies =
   , "whale"
   ]
 
+ytdlpTimeout :: Maybe Milliseconds
+ytdlpTimeout = Nothing
+
 exportCookiesScriptUrl :: String
 exportCookiesScriptUrl = "https://github.com/benkio/minsi/blob/main/start-minsi.sh"
 
@@ -62,7 +65,7 @@ startScriptRawUrl = "https://raw.githubusercontent.com/benkio/minsi/main/start-m
 getYtdlpOutputUrl :: YtdlpCookieSource -> YtdlpInput -> Aff ExecaProcess
 getYtdlpOutputUrl cookieSource (YtdlpInput { url: url, filename: filename, maybeStart: maybeStart, maybeEnd: maybeEnd, streaming: streaming }) = do
   args <- liftEffect $ mp4 filename <#> buildArgs
-  runCommand args YtdlpError "yt-dlp"
+  runCommand ytdlpTimeout args YtdlpError "yt-dlp"
   where
   urlString = toString (fromMaybe url (toCanonicalYoutubeWatchUrl url))
   maybeRangeArg = do
@@ -111,7 +114,7 @@ ytdlpDownload input@(YtdlpInput { filename, streaming }) = do
   prepareCookieSource outputFilename (CookieFile cookiePath) = do
     let runtimeCookiePath = "/tmp/minsi-cookies-" <> outputFilename <> ".txt"
     apathize (rm runtimeCookiePath)
-    cpResult <- runCommand [ show cookiePath, show runtimeCookiePath ] YtdlpError "cp" >>= _.getResult
+    cpResult <- runCommand ytdlpTimeout [ show cookiePath, show runtimeCookiePath ] YtdlpError "cp" >>= _.getResult
     case cpResult.exit of
       Normally 0 -> pure (CookieFile runtimeCookiePath)
       _ -> liftEffect $ throwMinsiError (YtdlpError cpResult.message)

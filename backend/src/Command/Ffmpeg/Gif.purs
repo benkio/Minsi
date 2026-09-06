@@ -9,6 +9,7 @@ import Conversion.Time (millisecondsToSecondsString)
 import Data.Array (mapWithIndex, null, singleton)
 import Data.Foldable (intercalate, fold, traverse_)
 import Data.Maybe (Maybe(..))
+import Data.Time.Duration (Milliseconds(..))
 import Effect (Effect)
 import Effect.Aff (Aff, finally, apathize)
 import Effect.Class (liftEffect)
@@ -20,6 +21,9 @@ import Node.Encoding (Encoding(..))
 import Node.FS.Sync (writeFile, rm, rename)
 import Node.Library.Execa (ExecaResult)
 import Node.Path (FilePath)
+
+makeGifTimeout :: Maybe Milliseconds
+makeGifTimeout = Just (Milliseconds 10000.0)
 
 makeGif :: State -> Aff (Array ExecaResult)
 makeGif (State { filename, subtitles, reverseLoop })
@@ -33,7 +37,7 @@ makePlainGif filename = do
   { filepathMp4, filepathGif } <- liftEffect $ resolvePlainGifPaths filename
   apathize (liftEffect $ rm filepathGif)
   let args = addFfmpegPlainGifArgs filepathMp4 filepathGif
-  process <- runCommand args FfmpegGifError "ffmpeg"
+  process <- runCommand makeGifTimeout args FfmpegGifError "ffmpeg"
   process.getResult
   where
   resolvePlainGifPaths fn = do
@@ -52,7 +56,7 @@ makeSubtitleGif filename subtitles = do
   apathize (liftEffect $ rm filepathGif)
   liftEffect $ writeSrtFile filename (makeSrtsString subtitles)
   let args = addFfmpegSubtitleGifArgs filepathMp4 filepathGif filepathSrt
-  process <- runCommand args FfmpegGifError "ffmpeg"
+  process <- runCommand makeGifTimeout args FfmpegGifError "ffmpeg"
   process.getResult
   where
   resolveSubtitleGifPaths fn = do
@@ -82,7 +86,7 @@ makeReverseGif filename = do
 makeReverseSingleGif :: FilePath -> Aff ExecaResult
 makeReverseSingleGif filename = do
   args <- liftEffect $ addFfmpegReverseGifArgs <$> gif filename <*> reversed filename
-  process <- runCommand args FfmpegGifError "ffmpeg"
+  process <- runCommand makeGifTimeout args FfmpegGifError "ffmpeg"
   process.getResult
 
 addFfmpegReverseGifArgs :: FilePath -> FilePath -> Array String
@@ -92,7 +96,7 @@ addFfmpegReverseGifArgs filepathGif filepathReversed =
 mergeVideos :: FilePath -> FilePath -> FilePath -> Aff ExecaResult
 mergeVideos filename filepathGif filepathReversed = do
   args <- liftEffect $ prepareMerge filename filepathGif filepathReversed
-  process <- runCommand args FfmpegGifError "ffmpeg"
+  process <- runCommand makeGifTimeout args FfmpegGifError "ffmpeg"
   process.getResult
   where
   prepareMerge fn gifPath reversedPath = do

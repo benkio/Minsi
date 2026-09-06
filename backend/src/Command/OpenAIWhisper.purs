@@ -4,12 +4,17 @@ import Prelude
 
 import Command.Command (runCommand)
 import Constants (mp3, outputPath)
+import Data.Maybe (Maybe(..))
+import Data.Time.Duration (Milliseconds(..))
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
-import Model.State.SubtitleConstraints (maxSubtitleCharsPerLine)
 import MinsiErrors (MinsiError(..))
+import Model.State.SubtitleConstraints (maxSubtitleCharsPerLine)
 import Node.Library.Execa (ExecaResult)
 import Node.Path (FilePath)
+
+whisperAITimeout :: Maybe Milliseconds
+whisperAITimeout = Just $ Milliseconds 20000.0
 
 maxSubtitleLinesPerSegment :: Int
 maxSubtitleLinesPerSegment = 1
@@ -17,7 +22,7 @@ maxSubtitleLinesPerSegment = 1
 generateJson :: FilePath -> Aff ExecaResult
 generateJson filename = do
   args <- liftEffect $ generateJsonArgs <$> mp3 filename <*> outputPath
-  process <- runCommand args OpenAIWhisperError "whisper"
+  process <- runCommand whisperAITimeout args OpenAIWhisperError "whisper"
   process.getResult
 
 generateJsonArgs :: FilePath -> FilePath -> Array String

@@ -29,6 +29,9 @@ newtype FfmpegInput = FfmpegInput
 
 derive instance newtypeFfmpegInput :: Newtype FfmpegInput _
 
+ffmpegVideoTimeout :: Maybe Milliseconds
+ffmpegVideoTimeout = Nothing
+
 normalizeVideo :: FilePath -> Milliseconds -> Aff ExecaResult
 normalizeVideo filename shiftVideoSync = do
   finally (normaliseVideoCleanup filename) (makeNormalizeVideo filename shiftVideoSync)
@@ -36,7 +39,7 @@ normalizeVideo filename shiftVideoSync = do
 makeNormalizeVideo :: FilePath -> Milliseconds -> Aff ExecaResult
 makeNormalizeVideo filename shiftVideoSync = do
   args <- liftEffect $ normalizeVideoArgs <$> mp4 filename <*> tempVideo filename <*> pure shiftVideoSync
-  process <- runCommand args FfmpegGifError "ffmpeg"
+  process <- runCommand ffmpegVideoTimeout args FfmpegGifError "ffmpeg"
   process.getResult
 
 normalizeVideoArgs :: FilePath -> FilePath -> Milliseconds -> Array String
@@ -104,7 +107,7 @@ cutAndConvertUploadedVideo ffmpegInput@(FfmpegInput { input, filename }) = do
   apathize $ rm filepathMp4
   liftEffect $ log $ "[Command/Video] Execute Command, Cut & Convert:" <> show input <> " into " <> filepathMp4
   let args = cutAndConvertUpladedVideoArgs filepathMp4 ffmpegInput
-  process <- runCommand args FfmpegVideoError "ffmpeg"
+  process <- runCommand ffmpegVideoTimeout args FfmpegVideoError "ffmpeg"
   process.getResult
 
 cutAndConvertUpladedVideoArgs :: FilePath -> FfmpegInput -> Array String

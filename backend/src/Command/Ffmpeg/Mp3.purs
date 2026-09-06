@@ -5,16 +5,21 @@ import Prelude
 import Command.Command (runCommand)
 import Command.Ffmpeg.Base (baseFlagsInput, baseFlagsOutput)
 import Constants (mp3, mp4)
+import Data.Maybe (Maybe(..))
+import Data.Time.Duration (Milliseconds(..))
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
 import MinsiErrors (MinsiError(..))
 import Node.Library.Execa (ExecaResult)
 import Node.Path (FilePath)
 
+extractMp3Timeout :: Maybe Milliseconds
+extractMp3Timeout = Just $ Milliseconds 5000.0
+
 extractMp3 :: FilePath -> Aff ExecaResult
 extractMp3 filename = do
   args <- liftEffect $ extractMp3CommandArgs <$> mp3 filename <*> mp4 filename
-  process <- runCommand args FfmpegMp3Error "ffmpeg"
+  process <- runCommand extractMp3Timeout args FfmpegMp3Error "ffmpeg"
   process.getResult
 
 extractMp3CommandArgs :: FilePath -> FilePath -> Array String

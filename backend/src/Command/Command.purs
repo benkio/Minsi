@@ -19,12 +19,12 @@ import Prelude
 timeout :: Milliseconds
 timeout = Milliseconds 30000.0
 
-runCommand :: Array String -> (String -> MinsiError) -> String -> Aff ExecaProcess
-runCommand args errorConstructor commandExecutable =
+runCommand :: Maybe Milliseconds -> Array String -> (String -> MinsiError) -> String -> Aff ExecaProcess
+runCommand maybeTimeout args errorConstructor commandExecutable =
   catchError
     ( do
         liftEffect $ log ("Execute Command: " <> commandExecutable <> " " <> show (intercalate " " args))
-        optionsF <- liftEffect commandOptions
+        optionsF <- liftEffect (commandOptions maybeTimeout)
         execa commandExecutable args optionsF
     )
     ( \e -> liftEffect $ throwMinsiError (errorConstructor (message e))
@@ -33,10 +33,11 @@ runCommand args errorConstructor commandExecutable =
 shell :: Effect String
 shell = isWindows <#> \win -> if win then "cmd.exe" else "/bin/sh"
 
-commandOptions :: Effect (ExecaOptions -> ExecaOptions)
-commandOptions = do
+commandOptions :: Maybe Milliseconds -> Effect (ExecaOptions -> ExecaOptions)
+commandOptions maybeTimeout = do
   sh <- shell
-  pure (\options -> options { shell = Just sh, timeout = Just { killSignal: stringSignal "SIGTERM", milliseconds: timeout } })
+  let timeout = maybeTimeout >>= (\t -> Just { killSignal: stringSignal "SIGTERM", milliseconds: t })
+  pure (\options -> options { shell = Just sh, timeout = timeout })
 
 commandSyncOptions :: Effect (ExecaSyncOptions -> ExecaSyncOptions)
 commandSyncOptions = do
