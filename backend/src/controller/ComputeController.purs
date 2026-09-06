@@ -129,9 +129,11 @@ runComputePipeline mayOldState state@(State { source, filename, cutVideo: Durati
     pure unit
 
 cutDownloadRequired :: Maybe State -> State -> Boolean
-cutDownloadRequired mayOldState (State { source: newSource, cutVideo: newCutVideo }) =
+cutDownloadRequired mayOldState (State { source: newSource, cutVideo: newCutVideo, shiftVideoSync: newShiftVideoSync }) =
   maybe true
-    (\(State { source: oldSource, cutVideo: oldCutVideo }) -> oldSource /= newSource || oldCutVideo /= newCutVideo)
+    ( \(State { source: oldSource, cutVideo: oldCutVideo, shiftVideoSync: oldShiftVideoSync }) ->
+        oldSource /= newSource || oldCutVideo /= newCutVideo || oldShiftVideoSync /= newShiftVideoSync
+    )
     mayOldState
 
 videoNormalizationRequired :: Maybe State -> State -> Boolean
