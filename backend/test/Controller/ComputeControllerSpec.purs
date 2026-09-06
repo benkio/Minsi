@@ -58,6 +58,12 @@ spec = do
     it "returns true when both source and cut range change" $
       cutDownloadRequired (Just (mkState source1 cut1)) (mkState source2 cut2) `shouldEqual` true
 
+    it "returns true when only shiftVideoSync changes" $
+      cutDownloadRequired
+        (Just (mkState source1 cut1))
+        (State $ (unwrap $ mkState source1 cut1) { shiftVideoSync = Milliseconds 500.0 })
+        `shouldEqual` true
+
   describe "shiftVideoSyncChanged" do
     it "returns false when there is no old state" $
       shiftVideoSyncChanged Nothing (mkState source1 cut1) `shouldEqual` false
@@ -72,6 +78,18 @@ spec = do
         `shouldEqual` true
 
   describe "videoNormalizationRequired" do
+    it "returns true when there is no old state" $
+      videoNormalizationRequired Nothing (mkState source1 cut1) `shouldEqual` true
+
+    it "returns false when source, cut range and shiftVideoSync are unchanged" $
+      videoNormalizationRequired (Just (mkState source1 cut1)) (mkState source1 cut1) `shouldEqual` false
+
+    it "returns true when source changes" $
+      videoNormalizationRequired (Just (mkState source1 cut1)) (mkState source2 cut1) `shouldEqual` true
+
+    it "returns true when cut range changes" $
+      videoNormalizationRequired (Just (mkState source1 cut1)) (mkState source1 cut2) `shouldEqual` true
+
     it "returns true when shiftVideoSync changes but source and cut range do not" $
       videoNormalizationRequired
         (Just (mkState source1 cut1))
