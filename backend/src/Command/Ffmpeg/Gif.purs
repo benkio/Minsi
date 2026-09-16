@@ -35,7 +35,7 @@ makeGif (State { filename, subtitles, reverseLoop })
 makePlainGif :: FilePath -> Aff ExecaResult
 makePlainGif filename = do
   { filepathMp4, filepathGif } <- liftEffect $ resolvePlainGifPaths filename
-  apathize (liftEffect $ rm filepathGif)
+  apathize (liftEffect $ log ("[Gif] Delete " <> show filepathGif) *> rm filepathGif)
   let args = addFfmpegPlainGifArgs filepathMp4 filepathGif
   process <- runCommand makeGifTimeout args FfmpegGifError "ffmpeg"
   process.getResult
@@ -43,7 +43,6 @@ makePlainGif filename = do
   resolvePlainGifPaths fn = do
     p <- mp4 fn
     g <- gif fn
-    log ("[Gif] Delete " <> show g)
     pure { filepathMp4: p, filepathGif: g }
 
 addFfmpegPlainGifArgs :: FilePath -> FilePath -> Array String
@@ -53,7 +52,7 @@ addFfmpegPlainGifArgs mp4 gif =
 makeSubtitleGif :: FilePath -> Array Subtitle -> Aff ExecaResult
 makeSubtitleGif filename subtitles = do
   { filepathMp4, filepathGif, filepathSrt } <- liftEffect $ resolveSubtitleGifPaths filename
-  apathize (liftEffect $ rm filepathGif)
+  apathize (liftEffect $ log ("[Gif] Delete " <> show filepathGif) *> rm filepathGif)
   liftEffect $ writeSrtFile filename (makeSrtsString subtitles)
   let args = addFfmpegSubtitleGifArgs filepathMp4 filepathGif filepathSrt
   process <- runCommand makeGifTimeout args FfmpegGifError "ffmpeg"
@@ -63,7 +62,6 @@ makeSubtitleGif filename subtitles = do
     p <- mp4 fn
     g <- gif fn
     s <- srt fn
-    log ("[Gif] Delete " <> show g)
     pure { filepathMp4: p, filepathGif: g, filepathSrt: s }
 
 addFfmpegSubtitleGifArgs :: FilePath -> FilePath -> FilePath -> Array String
@@ -116,14 +114,14 @@ reverseGifCleanup filename = liftEffect do
   filepathReversed <- reversed filename
   filepathReversedFull <- reversedFull filename
   let filesToDelete = [ filepathGif, filepathReversed, filepathTxt ]
-  log $ "Execute Command, delete multiple files:" <> show filesToDelete
+  log $ "[Gif] Execute Command, delete multiple files:" <> show filesToDelete
   traverse_ rm filesToDelete
-  log $ "Execute Command, rename:" <> show filepathReversedFull <> " into " <> filepathGif
+  log $ "[Gif] Execute Command, rename:" <> show filepathReversedFull <> " into " <> filepathGif
   rename filepathReversedFull filepathGif
 
 subtitleGifCleanup :: String -> Aff Unit
 subtitleGifCleanup filename = liftEffect $
-  log "Execute Command, delete srt" *> deleteSrtFile filename
+  log ("[Gif] Execute Command: deleteSrt " <> show filename) *> srt filename >>= rm
 
 -- Extra Files -------------------------------------------------
 
@@ -131,17 +129,14 @@ writeSrtFile :: FilePath -> String -> Effect Unit
 writeSrtFile filename srtContent = do
   f <- srt filename
   bufferContent <- fromString srtContent UTF8
-  log $ "Execute Command: writeFile " <> show f <> " with content " <> srtContent
+  log $ "[Gif] Execute Command: writeFile " <> show f <> " with content " <> srtContent
   writeFile f bufferContent
-
-deleteSrtFile :: FilePath -> Effect Unit
-deleteSrtFile fp = log ("Execute Command: deleteSrt " <> show fp) *> srt fp >>= rm
 
 writeMergeTxt :: FilePath -> Array FilePath -> Effect Unit
 writeMergeTxt filename files = do
   f <- txt filename
   bufferContent <- fromString txtContent UTF8
-  log $ "Execute Command: writeFile " <> show f <> " with content " <> txtContent
+  log $ "[Gif] Execute Command: writeFile " <> show f <> " with content " <> txtContent
   writeFile f bufferContent
   where
   txtContent = intercalate "\n" $ files <#> (\f -> "file '" <> f <> "'")
