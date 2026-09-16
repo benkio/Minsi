@@ -1,8 +1,6 @@
 module Test.Contracts.ApiSpec where
 
-import Contracts.Api (CheckDependenciesResponse, StatusResponse, UpdateCheckResponse, WhisperSubtitlesResponse)
-import Data.Time.Duration (Milliseconds(..))
-import Model.State.State (Color(..), DurationRange(..), Font(..), Position(..), Subtitle(..))
+import Contracts.Api (CheckDependenciesResponse, StatusResponse, UpdateCheckResponse)
 import Data.Either (Either(..))
 import Prelude
 import Test.Spec (Spec, describe, it)
@@ -30,32 +28,6 @@ spec = do
               } :: UpdateCheckResponse
             )
       json `shouldEqual` """{"updateAvailable":true,"latestVersion":"1.1.0","currentVersion":"1.0.0"}"""
-
-    it "encodes WhisperSubtitlesResponse" do
-      let
-        subtitle1 =
-          Subtitle
-            { videoPosition: DurationRange { start: Milliseconds 10.0, end: Milliseconds 20.0 }
-            , value: "ciao mondo"
-            , font: Impact
-            , fontSize: 24
-            , color: White
-            , screenPosition: Top
-            }
-        subtitle2 =
-          Subtitle
-            { videoPosition: DurationRange { start: Milliseconds 20.0, end: Milliseconds 30.0 }
-            , value: "arrivederci"
-            , font: Impact
-            , fontSize: 24
-            , color: White
-            , screenPosition: Top
-            }
-        json =
-          writeJSON
-            ( { subtitles: [ subtitle1, subtitle2 ] } :: WhisperSubtitlesResponse
-            )
-      json `shouldEqual` """{"subtitles":[{"videoPosition":{"start":10,"end":20},"value":"ciao mondo","screenPosition":"Top","fontSize":24,"font":"Impact","color":"#ffffff"},{"videoPosition":{"start":20,"end":30},"value":"arrivederci","screenPosition":"Top","fontSize":24,"font":"Impact","color":"#ffffff"}]}"""
 
   describe "API contract JSON decoding" do
     it "decodes CheckDependenciesResponse" do
@@ -97,20 +69,3 @@ spec = do
           status `shouldEqual` "Failed"
           description `shouldEqual` "some description"
 
-    it "decodes WhisperSubtitlesResponse" do
-      let
-        json = """{ "subtitles": [ { "videoPosition": { "start": 1000, "end": 2000 }, "value": "ciao", "font": "Impact", "fontSize": 24, "color": "#ffffff", "screenPosition": "Top" } ] }"""
-        res = (readJSON json :: Either _ WhisperSubtitlesResponse)
-      case res of
-        Left err -> fail $ "Expected WhisperSubtitlesResponse to decode, but got error: " <> show err
-        Right { subtitles } ->
-          subtitles `shouldEqual`
-            [ Subtitle
-                { videoPosition: DurationRange { start: Milliseconds 1000.0, end: Milliseconds 2000.0 }
-                , value: "ciao"
-                , font: Impact
-                , fontSize: 24
-                , color: White
-                , screenPosition: Top
-                }
-            ]

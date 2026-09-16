@@ -18,6 +18,6 @@ waitForStatus filename target maybeHandler = tailRecM pollStatus 0
   pollStatus idx = do
     response <- callStatus filename
     case response.status of
-      "Failed" -> liftEffect $ throwMinsiError (ComputeFailed ("Video download failed: " <> response.description))
+      "Failed" -> liftEffect $ throwMinsiError (ComputeFailed response.description)
       status | status == (show target) -> pure $ Done unit
       _ -> handler idx *> delay (Milliseconds 600.0) $> Loop (idx + 1)
