@@ -67,12 +67,12 @@ RUN case "${TARGETARCH}" in \
 
 # Latest yt-dlp release
 RUN case "${TARGETARCH}" in \
-      amd64) YTDLP_ARCH="x86_64" ;; \
-      arm64) YTDLP_ARCH="aarch64" ;; \
+      amd64) YTDLP_ARCH="" ;; \
+      arm64) YTDLP_ARCH="_aarch64" ;; \
       *) echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
     esac \
     && curl -fsSL \
-      "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux_${YTDLP_ARCH}" \
+      "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux${YTDLP_ARCH}" \
       -o /usr/local/bin/yt-dlp \
     && chmod +x /usr/local/bin/yt-dlp
 
