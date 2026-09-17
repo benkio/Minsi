@@ -34,30 +34,53 @@ FROM node:24-bookworm-slim
 
 WORKDIR /usr/src/minsi
 
-# Runtime system deps; install latest yt-dlp from GitHub (Debian package is often outdated and breaks with YouTube)
+# Runtime system deps; use latest yt-dlp + latest shared FFmpeg build.
+# Shared FFmpeg avoids DNS issues seen with fully static binaries in containers.
 RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib" > /etc/apt/sources.list.d/bookworm.list && \
     echo "deb http://security.debian.org/ bookworm-security main contrib" >> /etc/apt/sources.list.d/bookworm.list && \
     apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg \
     libc6 \
-    python3 \
-    python3-pip \
     ttf-mscorefonts-installer \
+    fontconfig \
     id3v2 \
     curl \
+    xz-utils \
     ca-certificates \
-    && arch="$(dpkg --print-architecture)" \
-    && case "$arch" in \
-      amd64) ytdlp_asset="yt-dlp_linux" ;; \
-      arm64) ytdlp_asset="yt-dlp_linux_aarch64" ;; \
-      *) echo "Unsupported architecture for yt-dlp: $arch" >&2; exit 1 ;; \
-    esac \
-    && curl -sSL -o /usr/local/bin/yt-dlp "https://github.com/yt-dlp/yt-dlp/releases/latest/download/${ytdlp_asset}" \
-    && chmod +x /usr/local/bin/yt-dlp \
-    && pip3 install --no-cache-dir --break-system-packages openai-whisper \
-    && python3 -c "import whisper; whisper.load_model('small'); print('Whisper small model preloaded')" \
-    && fc-cache -f \
     && rm -rf /var/lib/apt/lists/*
+
+ARG TARGETARCH
+
+# Latest shared FFmpeg release (BtbN)
+RUN case "${TARGETARCH}" in \
+      amd64) FFMPEG_ARCH="linux64" ;; \
+      arm64) FFMPEG_ARCH="linuxarm64" ;; \
+      *) echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
+    esac \
+    && curl -fsSL \
+      "https://github.com/BtbN/FFmpeg-Builds/releases/latest/download/ffmpeg-master-latest-${FFMPEG_ARCH}-gpl-shared.tar.xz" \
+      -o /tmp/ffmpeg.tar.xz \
+    && mkdir -p /opt/ffmpeg \
+    && tar -xJf /tmp/ffmpeg.tar.xz -C /opt/ffmpeg --strip-components=1 \
+    && ln -sf /opt/ffmpeg/bin/ffmpeg /usr/local/bin/ffmpeg \
+    && ln -sf /opt/ffmpeg/bin/ffprobe /usr/local/bin/ffprobe \
+    && rm -f /tmp/ffmpeg.tar.xz
+
+# Latest yt-dlp release
+RUN case "${TARGETARCH}" in \
+      amd64) YTDLP_ARCH="" ;; \
+      arm64) YTDLP_ARCH="_aarch64" ;; \
+      *) echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
+    esac \
+    && curl -fsSL \
+      "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux${YTDLP_ARCH}" \
+      -o /usr/local/bin/yt-dlp \
+    && chmod +x /usr/local/bin/yt-dlp
+
+ENV LD_LIBRARY_PATH=/opt/ffmpeg/lib
+
+RUN ffmpeg -version
+RUN ffprobe -version
+RUN yt-dlp --version
 
 # Copy built app from builder (no spago/purescript/esbuild, no frontend src)
 COPY --from=builder /usr/src/minsi/public ./public

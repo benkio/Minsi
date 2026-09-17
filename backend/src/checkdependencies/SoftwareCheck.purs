@@ -23,7 +23,6 @@ softwareDependencies =
   [ "ffmpeg"
   , "yt-dlp"
   , "id3v2"
-  , "whisper"
   , "fc-list"
   ]
 

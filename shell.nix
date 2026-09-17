@@ -29,7 +29,6 @@ pkgs.mkShell {
     purs
     purs-tidy
     spago-unstable
-    openai-whisper
 
     # Runtime media pipeline (Dockerfile runtime + SoftwareCheck)
     ffmpeg

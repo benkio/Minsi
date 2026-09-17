@@ -1,12 +1,10 @@
 module Contracts.Api where
 
-import Model.State.State (Source, Subtitle)
+import Model.State.State (Source)
 
 type DownloadRequest = { source :: Source }
 
 type StatusResponse = { status :: String, description :: String }
-
-type WhisperSubtitlesResponse = { subtitles :: Array Subtitle }
 
 type CheckDependenciesResponse = { missedDependencies :: Array String }
 

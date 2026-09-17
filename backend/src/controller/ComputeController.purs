@@ -8,10 +8,9 @@ import Command.Ffmpeg.Gif (makeGif)
 import Command.Ffmpeg.Mp3 (extractMp3)
 import Command.Ffmpeg.Video (FfmpegInput(..), cutVideo, normalizeVideo)
 import Command.Id3v2 (addId3Tags)
-import Command.OpenAIWhisper (generateJson)
 import Command.Ytdlp (YtdlpDownloadResult(..), YtdlpInput(..), ytdlpDownload)
-import Constants (mp3, uploaded, whisperJson)
-import Control.Monad.Except (lift, runExceptT)
+import Constants (uploaded)
+import Control.Monad.Except (runExceptT)
 import Data.Array (fromFoldable)
 import Data.Bifunctor (lmap)
 import Data.Either (Either, either)
@@ -21,12 +20,10 @@ import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
-import Effect.Exception (catchException)
 import InMemoryDB (Store, insert, lookupProcessStatus)
 import MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.State.State (DurationRange(..), Source(..), State(..), WURL(..), validateState)
 import Node.Express.Handler (Handler)
-import Node.FS.Sync (exists, rm)
 import Node.Express.Request (getBody')
 import Yoga.JSON (read)
 
@@ -82,12 +79,6 @@ runComputePipeline :: Maybe State -> State -> Aff (Either String Unit)
 runComputePipeline mayOldState state@(State { source, filename, cutVideo: DurationRange { start, end }, artist, title, shiftVideoSync }) =
   runExceptT do
     liftEffect $ log ("[Compute] Start pipeline for filename: " <> filename)
-    whisperJsonPath <- liftEffect $ whisperJson filename
-    whisperJsonExists <- liftEffect $ exists whisperJsonPath
-    liftEffect $ log ("[Compute] Whisper json exists at pipeline start: " <> show whisperJsonExists <> " (" <> whisperJsonPath <> ")")
-    mp3Path <- liftEffect $ mp3 filename
-    mp3Exists <- liftEffect $ exists mp3Path
-    liftEffect $ log ("[Compute] MP3 exists at pipeline start: " <> show mp3Exists <> " (" <> mp3Path <> ")")
     when (cutDownloadRequired mayOldState state)
       ( do
           case source of
@@ -105,24 +96,6 @@ runComputePipeline mayOldState state@(State { source, filename, cutVideo: Durati
       $ normalizeVideo filename shiftVideoSync
     liftEffect $ log ("[Compute] Extract MP3 for filename: " <> filename)
     void $ exceptTStep "MP3 extraction" $ extractMp3 filename
-    if whisperRegenerationRequired mp3Exists whisperJsonExists then do
-      when whisperJsonExists do
-        liftEffect $ log ("[Compute] Delete previous whisper json before regeneration: " <> whisperJsonPath)
-        liftEffect $ catchException (\_ -> pure unit) (rm whisperJsonPath)
-      liftEffect $ log ("[Compute] Run Whisper subtitle generation (model=small) for filename: " <> filename)
-      whisperResult <- lift $ runExceptT (exceptTStep "Whisper subtitle generation" $ generateJson filename)
-      liftEffect $
-        either
-          ( \whisperErr ->
-              log
-                ( "[Compute] Whisper subtitle generation failed but compute will continue: "
-                    <> whisperErr
-                )
-          )
-          (\_ -> log ("[Compute] Whisper subtitle generation completed for filename: " <> filename))
-          whisperResult
-    else
-      liftEffect $ log "[Compute] Skip Whisper subtitle generation because both MP3 and whisper json already exist at pipeline start"
     void $ exceptTStep "ID3 tags" $ addId3Tags filename artist title
     void $ exceptTMultiple "Gif Creation" $ makeGif state
     liftEffect $ log ("[Compute] Pipeline completed for filename: " <> filename)
@@ -143,7 +116,3 @@ videoNormalizationRequired mayOldState newState =
 shiftVideoSyncChanged :: Maybe State -> State -> Boolean
 shiftVideoSyncChanged mayOldState (State { shiftVideoSync: newShift }) =
   maybe false (\(State { shiftVideoSync: oldShift }) -> oldShift /= newShift) mayOldState
-
-whisperRegenerationRequired :: Boolean -> Boolean -> Boolean
-whisperRegenerationRequired mp3Exists whisperJsonExists =
-  not mp3Exists || not whisperJsonExists
