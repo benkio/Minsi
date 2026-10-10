@@ -44,7 +44,7 @@ makeNormalizeVideo filename shiftVideoSync = do
 
 normalizeVideoArgs :: FilePath -> FilePath -> Milliseconds -> Array String
 normalizeVideoArgs mp4 tempVideo (Milliseconds shiftVideoSync) =
-  baseFlagsInput <> inputFlags <> codecFlags <> baseFlagsOutput <> [ show tempVideo ]
+  baseFlagsInput <> inputFlags <> codecFlags <> baseFlagsOutput <> [ tempVideo ]
   where
   codecFlags =
     [ "-c:v"
@@ -52,19 +52,19 @@ normalizeVideoArgs mp4 tempVideo (Milliseconds shiftVideoSync) =
     , "-c:a"
     , "aac"
     , "-af"
-    , "\"loudnorm=I=-16:TP=-1.5:LRA=11:dual_mono=true\""
+    , "loudnorm=I=-16:TP=-1.5:LRA=11:dual_mono=true"
     ]
   seekStart =
     millisecondsToSecondsString (Milliseconds (abs shiftVideoSync)) (Just '.')
   inputFlags =
-    if shiftVideoSync == 0.0 then [ "-i", show mp4 ]
+    if shiftVideoSync == 0.0 then [ "-i", mp4 ]
     else
       [ "-itsoffset"
       , millisecondsToOffsetSeconds shiftVideoSync
       , "-i"
-      , show mp4
+      , mp4
       , "-i"
-      , show mp4
+      , mp4
       , "-map"
       , "1:a"
       , "-map"

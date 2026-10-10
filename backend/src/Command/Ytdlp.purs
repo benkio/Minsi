@@ -71,12 +71,12 @@ getYtdlpOutputUrl cookieSource (YtdlpInput { url: url, filename: filename, maybe
   maybeRangeArg = do
     start <- map (\start -> millisecondsToSecondsString start (Just '.')) maybeStart
     end <- map (\end -> millisecondsToSecondsString end (Just '.')) maybeEnd
-    pure [ "--download-sections", show ("*" <> start <> "-" <> end) ]
+    pure [ "--download-sections", "*" <> start <> "-" <> end ]
   rangeArgs = maybe [] identity maybeRangeArg
-  outputArgs filepath = if streaming then [ "-o", "-" ] else [ "-o", show filepath ]
+  outputArgs filepath = if streaming then [ "-o", "-" ] else [ "-o", filepath ]
   formatArgs =
     [ "-f"
-    , "\"bv*[ext=mp4][protocol!=m3u8][protocol!=m3u8_native]+ba[ext=m4a]/b[ext=mp4][protocol!=m3u8][protocol!=m3u8_native]\""
+    , "bv*[ext=mp4][protocol!=m3u8][protocol!=m3u8_native]+ba[ext=m4a]/b[ext=mp4][protocol!=m3u8][protocol!=m3u8_native]"
     , "--merge-output-format"
     , "mp4"
     , "--force-keyframes-at-cuts"
@@ -85,9 +85,9 @@ getYtdlpOutputUrl cookieSource (YtdlpInput { url: url, filename: filename, maybe
     , "node"
     ]
   inputArgs = case cookieSource of
-    NoCookies -> [ show urlString ]
-    BrowserCookies browser -> [ "--cookies-from-browser", browser, show urlString ]
-    CookieFile cookiePath -> [ "--cookies", show cookiePath, show urlString ]
+    NoCookies -> [ urlString ]
+    BrowserCookies browser -> [ "--cookies-from-browser", browser, urlString ]
+    CookieFile cookiePath -> [ "--cookies", cookiePath, urlString ]
   buildArgs filepath = formatArgs <> rangeArgs <> outputArgs filepath <> inputArgs
 
 ytdlpDownload :: YtdlpInput -> Aff YtdlpDownloadResult
@@ -114,7 +114,7 @@ ytdlpDownload input@(YtdlpInput { filename, streaming }) = do
   prepareCookieSource outputFilename (CookieFile cookiePath) = do
     let runtimeCookiePath = "/tmp/minsi-cookies-" <> outputFilename <> ".txt"
     apathize (rm runtimeCookiePath)
-    cpResult <- runCommand ytdlpTimeout [ show cookiePath, show runtimeCookiePath ] YtdlpError "cp" >>= _.getResult
+    cpResult <- runCommand ytdlpTimeout [ cookiePath, runtimeCookiePath ] YtdlpError "cp" >>= _.getResult
     case cpResult.exit of
       Normally 0 -> pure (CookieFile runtimeCookiePath)
       _ -> liftEffect $ throwMinsiError (YtdlpError cpResult.message)

@@ -17,16 +17,16 @@ spec = do
         , "-loglevel"
         , "warning"
         , "-i"
-        , "\"input.mp4\""
+        , "input.mp4"
         , "-c:v"
         , "libx264"
         , "-c:a"
         , "aac"
         , "-af"
-        , "\"loudnorm=I=-16:TP=-1.5:LRA=11:dual_mono=true\""
+        , "loudnorm=I=-16:TP=-1.5:LRA=11:dual_mono=true"
         , "-metadata"
         , "encoding_tool=Minsi-" <> currentVersion
-        , "\"output.mp4\""
+        , "output.mp4"
         ]
 
     it "should delay video when shiftVideoSync is positive" do
@@ -37,9 +37,9 @@ spec = do
         , "-itsoffset"
         , "1.5"
         , "-i"
-        , "\"input.mp4\""
+        , "input.mp4"
         , "-i"
-        , "\"input.mp4\""
+        , "input.mp4"
         , "-map"
         , "1:a"
         , "-map"
@@ -51,10 +51,10 @@ spec = do
         , "-c:a"
         , "aac"
         , "-af"
-        , "\"loudnorm=I=-16:TP=-1.5:LRA=11:dual_mono=true\""
+        , "loudnorm=I=-16:TP=-1.5:LRA=11:dual_mono=true"
         , "-metadata"
         , "encoding_tool=Minsi-" <> currentVersion
-        , "\"output.mp4\""
+        , "output.mp4"
         ]
 
     it "should delay audio when shiftVideoSync is negative" do
@@ -65,9 +65,9 @@ spec = do
         , "-itsoffset"
         , "-0.5"
         , "-i"
-        , "\"input.mp4\""
+        , "input.mp4"
         , "-i"
-        , "\"input.mp4\""
+        , "input.mp4"
         , "-map"
         , "1:a"
         , "-map"
@@ -79,8 +79,8 @@ spec = do
         , "-c:a"
         , "aac"
         , "-af"
-        , "\"loudnorm=I=-16:TP=-1.5:LRA=11:dual_mono=true\""
+        , "loudnorm=I=-16:TP=-1.5:LRA=11:dual_mono=true"
         , "-metadata"
         , "encoding_tool=Minsi-" <> currentVersion
-        , "\"output.mp4\""
+        , "output.mp4"
         ]
