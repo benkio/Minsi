@@ -14,8 +14,9 @@ import Handlers.ErrorHandlers (genericErrorsHandler)
 import Handlers.ResultMedia.MediaSrc (getMediaElement)
 import Handlers.Subtitles.AddSubtitleButtonHandler (addSubtitleButtonEventListener)
 import Handlers.Subtitles.RemoveSubtitleButtonHandler (removeFirstSubtitleRow)
-import Web.DOM.Element as Element
+import Handlers.Subtitles.SubtitleTimeButtonsHandler (setSubtitleStartButtonEventListener, setSubtitleEndButtonEventListener)
 import Web.DOM.Element (fromEventTarget, toEventTarget)
+import Web.DOM.Element as Element
 import Web.Event.Event (preventDefault, target)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
@@ -85,8 +86,13 @@ handleKeyboardEvent keyboardEvent = genericErrorsHandler $ do
   let whenNotTitle cond act = when (cond && not isTargetTitle) (act *> stop)
   media <- getMediaElement components
   when (keyValue == "Enter" && (isCtrl || isMeta)) (applyButtonEventListener ev *> stop)
+
   whenNotTitle (keyValue == "+") (addSubtitleButtonEventListener subtitleTable subtitleRow (toEvent keyboardEvent))
   whenNotTitle (keyValue == "-") (removeFirstSubtitleRow subtitleTable)
+
+  whenNotTitle (keyValue == ",") (setSubtitleStartButtonEventListener subtitleTable (toEvent keyboardEvent))
+  whenNotTitle (keyValue == ".") (setSubtitleEndButtonEventListener subtitleTable (toEvent keyboardEvent))
+
   whenNotEditable (keyValue == " ") (toggleResultMediaPlayback media)
   whenNotEditable (keyValue == "ArrowLeft") (skipResultMediaBackward media)
   whenNotEditable (keyValue == "ArrowRight") (skipResultMediaForward media)
