@@ -23,7 +23,7 @@ import Node.Library.Execa (ExecaResult)
 import Node.Path (FilePath)
 
 makeGifTimeout :: Maybe Milliseconds
-makeGifTimeout = Just (Milliseconds 10000.0)
+makeGifTimeout = Just (Milliseconds 60000.0)
 
 makeGif :: State -> Aff (Array ExecaResult)
 makeGif (State { filename, subtitles, reverseLoop })
@@ -47,7 +47,7 @@ makePlainGif filename = do
 
 addFfmpegPlainGifArgs :: FilePath -> FilePath -> Array String
 addFfmpegPlainGifArgs mp4 gif =
-  baseFlagsInput <> [ "-i", show mp4, "-an" ] <> baseFlagsOutput <> [ show gif ]
+  baseFlagsInput <> [ "-i", mp4, "-an" ] <> baseFlagsOutput <> [ gif ]
 
 makeSubtitleGif :: FilePath -> Array Subtitle -> Aff ExecaResult
 makeSubtitleGif filename subtitles = do
@@ -66,7 +66,7 @@ makeSubtitleGif filename subtitles = do
 
 addFfmpegSubtitleGifArgs :: FilePath -> FilePath -> FilePath -> Array String
 addFfmpegSubtitleGifArgs mp4 gif srt =
-  baseFlagsInput <> [ "-i", show mp4, "-an", "-vf", show subtitleArg ] <> baseFlagsOutput <> [ show gif ]
+  baseFlagsInput <> [ "-i", mp4, "-an", "-vf", subtitleArg ] <> baseFlagsOutput <> [ gif ]
   where
   subtitleArg = "subtitles=" <> srt
 
@@ -89,7 +89,7 @@ makeReverseSingleGif filename = do
 
 addFfmpegReverseGifArgs :: FilePath -> FilePath -> Array String
 addFfmpegReverseGifArgs filepathGif filepathReversed =
-  baseFlagsInput <> [ "-i", show filepathGif, "-vf", "reverse" ] <> baseFlagsOutput <> [ show filepathReversed ]
+  baseFlagsInput <> [ "-i", filepathGif, "-vf", "reverse" ] <> baseFlagsOutput <> [ filepathReversed ]
 
 mergeVideos :: FilePath -> FilePath -> FilePath -> Aff ExecaResult
 mergeVideos filename filepathGif filepathReversed = do
@@ -105,7 +105,7 @@ mergeVideos filename filepathGif filepathReversed = do
 
 addFfmpegMergeVideosArgs :: FilePath -> FilePath -> Array String
 addFfmpegMergeVideosArgs filepathTxt filepathReversedFull =
-  baseFlagsInput <> [ "-f", "concat", "-safe", "0", "-i", show filepathTxt, "-c", "copy" ] <> baseFlagsOutput <> [ show filepathReversedFull ]
+  baseFlagsInput <> [ "-f", "concat", "-safe", "0", "-i", filepathTxt, "-c", "copy" ] <> baseFlagsOutput <> [ filepathReversedFull ]
 
 reverseGifCleanup :: String -> Aff Unit
 reverseGifCleanup filename = liftEffect do
