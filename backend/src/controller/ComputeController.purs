@@ -20,9 +20,10 @@ import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
-import InMemoryDB (Store, insert, lookupProcessStatus)
+import InMemoryDB (Store, insert, insertProcessStatus, lookupProcessStatus)
 import MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.State.State (DurationRange(..), Source(..), State(..), WURL(..), validateState)
+import Node.Library.Execa (ExecaResult)
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody')
 import Yoga.JSON (read)
@@ -61,10 +62,10 @@ computeResponse store =
 
 compute :: Maybe State -> State -> Store -> Effect Unit
 compute mayOldState state@(State { filename }) store = do
-  insert filename (Just state) Pending store
+  insert filename (Just state) (Pending "Starting Computing") store
   log "Starting video download in background..."
   launchAff_ $ do
-    result <- runComputePipeline mayOldState state
+    result <- runComputePipeline mayOldState state store
     liftEffect $ saveComputeResult result
   log "Video download launched, returning HTTP response"
   where
@@ -75,31 +76,44 @@ compute mayOldState state@(State { filename }) store = do
       result
     insert filename (Just state) processResult store
 
-runComputePipeline :: Maybe State -> State -> Aff (Either String Unit)
-runComputePipeline mayOldState state@(State { source, filename, cutVideo: DurationRange { start, end }, artist, title, shiftVideoSync }) =
+runComputePipeline :: Maybe State -> State -> Store -> Aff (Either String Unit)
+runComputePipeline mayOldState state@(State { source, filename, cutVideo: range, artist, title, shiftVideoSync }) store =
   runExceptT do
     liftEffect $ log ("[Compute] Start pipeline for filename: " <> filename)
     when (cutDownloadRequired mayOldState state)
-      ( do
-          case source of
-            (WebURL (WURL url)) -> do
-              void $ exceptTStep "Video download" do
-                result <- ytdlpDownload (YtdlpInput { url, filename, maybeStart: Just start, maybeEnd: Just end, streaming: false })
-                case result of
-                  YtdlpDownloadResult execaResult -> pure execaResult
-                  YtdlpDownloadProcess _ -> liftEffect $ throwMinsiError (YtdlpError "Streaming download is not implemented yet")
-            LocalFile _ -> void $ exceptTStep "Video download" $ (liftEffect $ uploaded filename) >>= \fn -> cutVideo (FfmpegInput { input: fn, filename, maybeStart: Just start, maybeEnd: Just end })
-      )
+      $ void
+      $ exceptTStep "Video Download / Extraction"
+      $ liftEffect (insertProcessStatus filename (Pending "Video Download / Extraction") store)
+          *> videoDownloadExtraction source filename range
+
     when (videoNormalizationRequired mayOldState state)
       $ void
       $ exceptTStep "Video Normalization"
-      $ normalizeVideo filename shiftVideoSync
+      $ liftEffect (insertProcessStatus filename (Pending "Video Normalization") store)
+          *> normalizeVideo filename shiftVideoSync
+
     liftEffect $ log ("[Compute] Extract MP3 for filename: " <> filename)
+    liftEffect $ insertProcessStatus filename (Pending "MP3 extraction") store
     void $ exceptTStep "MP3 extraction" $ extractMp3 filename
+
+    liftEffect $ insertProcessStatus filename (Pending "ID3 tags") store
     void $ exceptTStep "ID3 tags" $ addId3Tags filename artist title
+
+    liftEffect $ insertProcessStatus filename (Pending "Gif Creation") store
     void $ exceptTMultiple "Gif Creation" $ makeGif state
+
     liftEffect $ log ("[Compute] Pipeline completed for filename: " <> filename)
     pure unit
+
+videoDownloadExtraction :: Source -> String -> DurationRange -> Aff ExecaResult
+videoDownloadExtraction (WebURL (WURL url)) filename (DurationRange { start, end }) = do
+  result <- ytdlpDownload (YtdlpInput { url, filename, maybeStart: Just start, maybeEnd: Just end, streaming: false })
+  case result of
+    YtdlpDownloadResult execaResult -> pure execaResult
+    YtdlpDownloadProcess _ -> liftEffect $ throwMinsiError (YtdlpError "Streaming download is not implemented yet")
+videoDownloadExtraction (LocalFile _) filename (DurationRange { start, end }) = do
+  fn <- liftEffect $ uploaded filename
+  cutVideo (FfmpegInput { input: fn, filename, maybeStart: Just start, maybeEnd: Just end })
 
 cutDownloadRequired :: Maybe State -> State -> Boolean
 cutDownloadRequired mayOldState newState@(State { source: newSource, cutVideo: newCutVideo }) =

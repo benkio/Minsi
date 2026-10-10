@@ -9,7 +9,7 @@ import Model.ValidationErrors (ValidationErrors, fromSingleton)
 import Prelude
 
 outputFilenameRegex :: String
-outputFilenameRegex = """^[a-z]{1,5}_[A-Z][a-zA-Z0-9]*$"""
+outputFilenameRegex = """^[a-z]{1,5}_[0-9]*[A-Z][a-zA-Z0-9]*$"""
 
 outputFilenameRegexValidation :: String -> V ValidationErrors Regex
 outputFilenameRegexValidation id = V $ lmap (\x -> fromSingleton id x) (regex outputFilenameRegex noFlags)

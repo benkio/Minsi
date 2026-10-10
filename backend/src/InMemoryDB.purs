@@ -3,7 +3,7 @@ module InMemoryDB where
 import Prelude
 
 import Data.Map as Map
-import Data.Maybe (Maybe)
+import Data.Maybe (Maybe(..))
 import Domain.ProcessStatus (ProcessStatus)
 import Effect (Effect)
 import Effect.Ref as Ref
@@ -20,6 +20,17 @@ initStore = Ref.new Map.empty
 insert :: Filename -> Maybe State -> ProcessStatus -> Store -> Effect Unit
 insert file state processStatus store =
   Ref.modify_ (Map.insert file { state, processStatus }) store
+
+insertProcessStatus :: Filename -> ProcessStatus -> Store -> Effect Unit
+insertProcessStatus file processStatus store =
+  Ref.modify_
+    ( Map.update
+        ( \stateProcessStatus ->
+            Just { state: stateProcessStatus.state, processStatus: processStatus }
+        )
+        file
+    )
+    store
 
 clearStore :: Store -> Effect Unit
 clearStore store = Ref.write Map.empty store

@@ -36,8 +36,8 @@ shell = isWindows <#> \win -> if win then "cmd.exe" else "/bin/sh"
 commandOptions :: Maybe Milliseconds -> Effect (ExecaOptions -> ExecaOptions)
 commandOptions maybeTimeout = do
   sh <- shell
-  let timeout = maybeTimeout >>= (\t -> Just { killSignal: stringSignal "SIGTERM", milliseconds: t })
-  pure (\options -> options { shell = Just sh, timeout = timeout })
+  let commandTimeout = maybeTimeout >>= (\t -> Just { killSignal: stringSignal "SIGTERM", milliseconds: t })
+  pure (\options -> options { shell = Just sh, timeout = commandTimeout })
 
 commandSyncOptions :: Effect (ExecaSyncOptions -> ExecaSyncOptions)
 commandSyncOptions = do

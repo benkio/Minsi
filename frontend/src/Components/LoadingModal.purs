@@ -16,6 +16,7 @@ import Effect.Class (liftEffect)
 import Effect (Effect)
 import Prelude
 import Web.DOM.Document (Document, createElement)
+import Web.DOM.Element as Element
 import Web.DOM.Node as Node
 import Web.HTML (window)
 import Web.HTML.HTMLAnchorElement as HA
@@ -41,8 +42,8 @@ parseLoadingModalExtraContentLabel label =
     [ date, country, event ] -> Just { date, country, event }
     _ -> Nothing
 
-loadingModalExtraContentRotation :: Int -> Aff Unit
-loadingModalExtraContentRotation idx = do
+loadingModalExtraContentRotation :: String -> Int -> Aff Unit
+loadingModalExtraContentRotation pendingStatus idx = do
   components <- liftEffect loadComponents
   w <- liftEffect window
   htmlDoc <- liftEffect $ document w
@@ -52,22 +53,25 @@ loadingModalExtraContentRotation idx = do
     maybeExtraContent = loadingModalExtraContentValues !! (idx `mod` length loadingModalExtraContentValues)
     spanNode = HSP.toNode span
   liftEffect do
-    Node.setTextContent "" spanNode
     case maybeExtraContent of
-      Nothing -> pure unit
-      Just extraContent -> appendExtraContentLink doc spanNode extraContent
+      Nothing -> Node.setTextContent pendingStatus spanNode
+      Just extraContent -> appendExtraContentLink pendingStatus doc spanNode extraContent
 
-appendExtraContentLink :: Document -> Node.Node -> LoadingModalExtraContentValue -> Effect Unit
-appendExtraContentLink doc spanNode extraContent = do
+appendExtraContentLink :: String -> Document -> Node.Node -> LoadingModalExtraContentValue -> Effect Unit
+appendExtraContentLink pendingStatus doc spanNode extraContent = do
   anchorRaw <- createElement "a" doc
+  brRaw <- createElement "br" doc
   case HA.fromElement anchorRaw of
-    Nothing -> Node.setTextContent extraContent.label spanNode
+    Nothing -> Node.setTextContent (pendingStatus <> "\n" <> extraContent.label) spanNode
     Just anchor -> do
       let anchorNode = HA.toNode anchor
+      let brNode = Element.toNode brRaw
       setHref extraContent.url (HA.toHTMLHyperlinkElementUtils anchor)
       HA.setTarget "_blank" anchor
       HA.setRel "noopener noreferrer" anchor
       Node.setTextContent extraContent.label anchorNode
+      Node.setTextContent pendingStatus spanNode
+      void $ Node.appendChild brNode spanNode
       void $ Node.appendChild anchorNode spanNode
 
 loadingModalExtraContentValues :: Array LoadingModalExtraContentValue

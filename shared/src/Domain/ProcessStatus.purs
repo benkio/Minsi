@@ -3,7 +3,7 @@ module Domain.ProcessStatus where
 import Prelude
 
 data ProcessStatus
-  = Pending
+  = Pending String
   | Succeed
   | LocalFileUploaded String
   | Failed String
@@ -11,11 +11,11 @@ data ProcessStatus
 derive instance Eq ProcessStatus
 
 instance Show ProcessStatus where
-  show Pending = "Pending"
+  show (Pending _) = "Pending"
   show Succeed = "Succeed"
   show (LocalFileUploaded _) = "LocalFileUploaded"
   show (Failed _) = "Failed"
 
 isFinished :: ProcessStatus -> Boolean
-isFinished Pending = false
+isFinished (Pending _) = false
 isFinished _ = true
