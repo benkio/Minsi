@@ -22,6 +22,9 @@ spec = do
     it "accepts prefix with numbers in name part" $
       isValid (outputFilenameValidation "id" "xah_File123") `shouldEqual` true
 
+    it "accepts prefix with numbers in name part at the beginning" $
+      isValid (outputFilenameValidation "id" "xah_123File") `shouldEqual` true
+
     it "rejects prefix longer than 5 characters" $
       isValid (outputFilenameValidation "id" "abcdef_Hello") `shouldEqual` false
 
@@ -30,6 +33,9 @@ spec = do
 
     it "rejects numbers in prefix" $
       isValid (outputFilenameValidation "id" "ab1_Hello") `shouldEqual` false
+
+    it "rejects prefix with numbers in name part at the beginning followed by lowercase" $
+      isValid (outputFilenameValidation "id" "xah_123file") `shouldEqual` false
 
     it "rejects missing underscore separator" $
       isValid (outputFilenameValidation "id" "abcHello") `shouldEqual` false
