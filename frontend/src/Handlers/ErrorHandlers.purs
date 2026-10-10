@@ -26,14 +26,19 @@ import Web.DOM.Element (toNode) as E
 import Web.DOM.Node (Node, appendChild, removeChild, setTextContent)
 import Web.HTML (window)
 import Web.HTML.HTMLAnchorElement as HA
+import Web.HTML.HTMLAudioElement as HAE
 import Web.HTML.HTMLDivElement (toElement, toNode)
 import Web.HTML.HTMLDivElement as HD
 import Web.HTML.HTMLDocument (toDocument)
 import Web.HTML.HTMLHyperlinkElementUtils (setHref)
 import Web.HTML.HTMLLIElement as LIH
+import Web.HTML.HTMLMediaElement as HME
 import Web.HTML.HTMLParagraphElement as HP
 import Web.HTML.HTMLUListElement as ULH
 import Web.HTML.Window (document)
+
+minsiComplains :: String
+minsiComplains = "minsiComplains.mp3"
 
 -- | Runs an action and handles errors in both Effect and Aff using MonadError + MonadEffect.
 genericErrorsHandler :: forall m. MonadError Error m => MonadEffect m => m Unit -> m Unit
@@ -74,16 +79,25 @@ writeToMinsiLog errorMessage = do
   minsiLogTitle <- loadDiv minsiLogTitleId doc
   logBoxElements <- loadHtmlElementClass minsiLogBoxClass doc
   errorList <- createErrorList errorMessage
+
+  minsiComplainsEl <- HAE.create' minsiComplains
+  let minsiComplainsMediaEl = HAE.toHTMLMediaElement minsiComplainsEl
+
   let minsiLogNode = toNode minsiLog
   let minsiLogTitleNode = E.toNode (toElement minsiLogTitle)
   let errorListNode = E.toNode (ULH.toElement errorList)
+
   appendChild errorListNode minsiLogNode
   swapClasses "border-success" "border-danger" logBoxElements
   setTextContent "\x1F63E MINSI LOG \x1F63E" minsiLogTitleNode
+
+  HME.play minsiComplainsMediaEl
+
   void $ setTimeout 5000 do
     removeChild errorListNode minsiLogNode
     swapClasses "border-danger" "border-success" logBoxElements
     setTextContent "\x1F63A MINSI LOG \x1F63A" minsiLogTitleNode
+    HME.pause minsiComplainsMediaEl
 
 showMinsiErrorDialog :: String -> Effect Unit
 showMinsiErrorDialog errorMessage = do
