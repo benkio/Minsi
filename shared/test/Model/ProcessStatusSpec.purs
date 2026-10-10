@@ -9,7 +9,7 @@ spec :: Spec Unit
 spec = do
   describe "isFinished" do
     it "returns false for Pending" do
-      isFinished Pending `shouldEqual` false
+      isFinished (Pending "still running") `shouldEqual` false
 
     it "returns true for Succeed" do
       isFinished Succeed `shouldEqual` true
