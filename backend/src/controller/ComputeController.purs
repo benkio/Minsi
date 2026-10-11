@@ -77,7 +77,7 @@ compute mayOldState state@(State { filename }) store = do
     insert filename (Just state) processResult store
 
 runComputePipeline :: Maybe State -> State -> Store -> Aff (Either String Unit)
-runComputePipeline mayOldState state@(State { source, filename, cutVideo: range, artist, title, shiftVideoSync }) store =
+runComputePipeline mayOldState state@(State { source, filename, cutVideo: range, artist, title, shiftVideoSync, reverseLoop }) store =
   runExceptT do
     liftEffect $ log ("[Compute] Start pipeline for filename: " <> filename)
     when (cutDownloadRequired mayOldState state)
@@ -90,7 +90,7 @@ runComputePipeline mayOldState state@(State { source, filename, cutVideo: range,
       $ void
       $ exceptTStep "Video Normalization"
       $ liftEffect (insertProcessStatus filename (Pending "Video Normalization") store)
-          *> normalizeVideo filename shiftVideoSync
+          *> normalizeVideo filename shiftVideoSync reverseLoop
 
     liftEffect $ log ("[Compute] Extract MP3 for filename: " <> filename)
     liftEffect $ insertProcessStatus filename (Pending "MP3 extraction") store
@@ -119,14 +119,21 @@ cutDownloadRequired :: Maybe State -> State -> Boolean
 cutDownloadRequired mayOldState newState@(State { source: newSource, cutVideo: newCutVideo }) =
   maybe true
     ( \(State { source: oldSource, cutVideo: oldCutVideo }) ->
-        oldSource /= newSource || oldCutVideo /= newCutVideo || shiftVideoSyncChanged mayOldState newState
+        oldSource /= newSource
+          || oldCutVideo /= newCutVideo
+          || shiftVideoSyncChanged mayOldState newState
+          || reverseLoopChanged mayOldState newState
     )
     mayOldState
 
 videoNormalizationRequired :: Maybe State -> State -> Boolean
 videoNormalizationRequired mayOldState newState =
-  cutDownloadRequired mayOldState newState || shiftVideoSyncChanged mayOldState newState
+  cutDownloadRequired mayOldState newState || shiftVideoSyncChanged mayOldState newState || reverseLoopChanged mayOldState newState
 
 shiftVideoSyncChanged :: Maybe State -> State -> Boolean
 shiftVideoSyncChanged mayOldState (State { shiftVideoSync: newShift }) =
   maybe false (\(State { shiftVideoSync: oldShift }) -> oldShift /= newShift) mayOldState
+
+reverseLoopChanged :: Maybe State -> State -> Boolean
+reverseLoopChanged mayOldState (State { reverseLoop: newReverseLoop }) =
+  maybe false (\(State { reverseLoop: oldReverseLoop }) -> oldReverseLoop /= newReverseLoop) mayOldState

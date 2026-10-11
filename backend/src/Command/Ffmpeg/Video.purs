@@ -32,30 +32,32 @@ derive instance newtypeFfmpegInput :: Newtype FfmpegInput _
 ffmpegVideoTimeout :: Maybe Milliseconds
 ffmpegVideoTimeout = Nothing
 
-normalizeVideo :: FilePath -> Milliseconds -> Aff ExecaResult
-normalizeVideo filename shiftVideoSync = do
-  finally (normaliseVideoCleanup filename) (makeNormalizeVideo filename shiftVideoSync)
+normalizeVideo :: FilePath -> Milliseconds -> Boolean -> Aff ExecaResult
+normalizeVideo filename shiftVideoSync reverseLoop = do
+  finally (normaliseVideoCleanup filename) (makeNormalizeVideo filename shiftVideoSync reverseLoop)
 
-makeNormalizeVideo :: FilePath -> Milliseconds -> Aff ExecaResult
-makeNormalizeVideo filename shiftVideoSync = do
-  args <- liftEffect $ normalizeVideoArgs <$> mp4 filename <*> tempVideo filename <*> pure shiftVideoSync
+makeNormalizeVideo :: FilePath -> Milliseconds -> Boolean -> Aff ExecaResult
+makeNormalizeVideo filename shiftVideoSync reverseLoop = do
+  args <- liftEffect $ normalizeVideoArgs <$> mp4 filename <*> tempVideo filename <*> pure shiftVideoSync <*> pure reverseLoop
   process <- runCommand ffmpegVideoTimeout args FfmpegGifError "ffmpeg"
   process.getResult
 
-normalizeVideoArgs :: FilePath -> FilePath -> Milliseconds -> Array String
-normalizeVideoArgs mp4 tempVideo (Milliseconds shiftVideoSync) =
-  baseFlagsInput <> inputFlags <> codecFlags <> baseFlagsOutput <> [ tempVideo ]
+normalizeVideoArgs :: FilePath -> FilePath -> Milliseconds -> Boolean -> Array String
+normalizeVideoArgs mp4 tempVideo (Milliseconds shiftVideoSync) reverseLoop =
+  if reverseLoop then baseFlagsInput <> inputFlags <> reverseLoopFilterFlags <> codecFlags <> baseFlagsOutput <> [ tempVideo ]
+  else baseFlagsInput <> inputFlags <> passthroughAudioFlags <> codecFlags <> baseFlagsOutput <> [ tempVideo ]
   where
+  loudNormArg = "loudnorm=I=-16:TP=-1.5:LRA=11:dual_mono=true"
   codecFlags =
     [ "-c:v"
     , "libx264"
     , "-c:a"
     , "aac"
-    , "-af"
-    , "loudnorm=I=-16:TP=-1.5:LRA=11:dual_mono=true"
     ]
   seekStart =
     millisecondsToSecondsString (Milliseconds (abs shiftVideoSync)) (Just '.')
+  audioStreamRef = if shiftVideoSync == 0.0 then "[0:a]" else "[1:a]"
+  videoStreamRef = "[0:v]"
   inputFlags =
     if shiftVideoSync == 0.0 then [ "-i", mp4 ]
     else
@@ -65,13 +67,30 @@ normalizeVideoArgs mp4 tempVideo (Milliseconds shiftVideoSync) =
       , mp4
       , "-i"
       , mp4
-      , "-map"
-      , "1:a"
-      , "-map"
-      , "0:v"
       , "-ss"
       , seekStart
       ]
+  passthroughAudioFlags =
+    if shiftVideoSync == 0.0 then [ "-af", loudNormArg ]
+    else [ "-map", "0:v", "-map", "1:a", "-af", loudNormArg ]
+  reverseLoopFilterFlags =
+    [ "-filter_complex"
+    , videoStreamRef
+        <> "split[vfwd][vtmp];"
+        <> "[vtmp]reverse[vrev];"
+        <> "[vfwd][vrev]concat=n=2:v=1:a=0[v];"
+        <> audioStreamRef
+        <> "asplit[afwd][atmp];"
+        <> "[atmp]areverse[arev];"
+        <> "[afwd][arev]concat=n=2:v=0:a=1[aloop];"
+        <> "[aloop]"
+        <> loudNormArg
+        <> "[a]"
+    , "-map"
+    , "[v]"
+    , "-map"
+    , "[a]"
+    ]
 
 millisecondsToOffsetSeconds :: Number -> String
 millisecondsToOffsetSeconds ms = show (ms / 1000.0)

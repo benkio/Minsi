@@ -9,8 +9,8 @@ artistId = "artist"
 titleId :: String
 titleId = "title"
 
-reverseLoopGifId :: String
-reverseLoopGifId = "reverseLoopGif"
+reverseLoopId :: String
+reverseLoopId = "reverseLoop"
 
 cutStartId :: String
 cutStartId = "cutStart"
