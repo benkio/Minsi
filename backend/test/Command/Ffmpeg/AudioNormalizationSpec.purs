@@ -1,4 +1,4 @@
-module Test.Command.AudioNormalizationSpec where
+module Test.Command.Ffmpeg.AudioNormalizationSpec where
 
 import Prelude
 

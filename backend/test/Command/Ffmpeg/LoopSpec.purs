@@ -1,8 +1,8 @@
-module Test.Command.LoopSpec where
+module Test.Command.Ffmpeg.LoopSpec where
 
 import Prelude
 
-import Command.Ffmpeg.Loop (reverseLoopConcatArgs, reverseLoopReverseArgs)
+import Command.Ffmpeg.Loop (concatListContent, reverseLoopConcatArgs, reverseLoopReverseArgs)
 import Config (currentVersion)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
@@ -48,3 +48,8 @@ spec = do
         , "encoding_tool=Minsi-" <> currentVersion
         , "output.mp4"
         ]
+
+  describe "concatListContent" do
+    it "renders concat file content for ffmpeg demuxer" $
+      concatListContent [ "a.mp4", "b.mp4" ]
+        `shouldEqual` "file 'a.mp4'\nfile 'b.mp4'"

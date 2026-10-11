@@ -89,13 +89,16 @@ reverseLoopConcatArgs filepathTxt output =
 
 writeConcatTxt :: FilePath -> Array FilePath -> Effect Unit
 writeConcatTxt filepathTxt files = do
-  bufferContent <- fromString txtContent UTF8
-  log $ "[Loop] write concat txt: " <> filepathTxt <> " content=" <> txtContent
+  bufferContent <- fromString content UTF8
+  log $ "[Loop] write concat txt: " <> filepathTxt <> " content=" <> content
   FSSync.writeFile filepathTxt bufferContent
+
   where
-  txtContent =
-    intercalate "\n"
-      (files <#> \f -> "file '" <> f <> "'")
+  content = concatListContent files
+
+concatListContent :: Array FilePath -> String
+concatListContent files =
+  intercalate "\n" (files <#> \f -> "file '" <> f <> "'")
 
 loopCleanup :: String -> Aff Unit
 loopCleanup filename = liftEffect do

@@ -1,4 +1,4 @@
-module Test.Command.VideoSpec where
+module Test.Command.Ffmpeg.VideoSpec where
 
 import Prelude
 

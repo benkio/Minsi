@@ -2,7 +2,7 @@ module Test.Controller.ComputeControllerSpec where
 
 import Prelude
 
-import Controller.ComputeController (cutDownloadRequired, loopbackSpeedChanged, reverseLoopChanged, shiftVideoSyncChanged, videoNormalizationRequired)
+import Controller.ComputeController (audioNormalizationRequired, cutDownloadRequired, loopRequired, loopbackSpeedChanged, loopbackSpeedRequired, reverseLoopChanged, shiftVideoSyncChanged, videoNormalizationRequired)
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Newtype (unwrap)
 import Data.Time.Duration (Milliseconds(..))
@@ -145,5 +145,44 @@ spec = do
       videoNormalizationRequired
         (Just (mkState source1 cut1))
         (State $ (unwrap $ mkState source1 cut1) { loopbackSpeed = 2.0 })
+        `shouldEqual` true
+
+  describe "audioNormalizationRequired" do
+    it "tracks videoNormalizationRequired behavior" $
+      audioNormalizationRequired
+        (Just (mkState source1 cut1))
+        (State $ (unwrap $ mkState source1 cut1) { shiftVideoSync = Milliseconds 250.0 })
+        `shouldEqual` true
+
+  describe "loopbackSpeedRequired" do
+    it "returns false when normalization is not required" $
+      loopbackSpeedRequired (Just (mkState source1 cut1)) (mkState source1 cut1) `shouldEqual` false
+
+    it "returns false when speed is 1 even if normalization is required" $
+      loopbackSpeedRequired
+        (Just (mkState source1 cut1))
+        (State $ (unwrap $ mkState source1 cut1) { shiftVideoSync = Milliseconds 250.0, loopbackSpeed = 1.0 })
+        `shouldEqual` false
+
+    it "returns true when normalization is required and speed differs from 1" $
+      loopbackSpeedRequired
+        (Just (mkState source1 cut1))
+        (State $ (unwrap $ mkState source1 cut1) { loopbackSpeed = 2.0 })
+        `shouldEqual` true
+
+  describe "loopRequired" do
+    it "returns false when normalization is not required" $
+      loopRequired (Just (mkState source1 cut1)) (mkState source1 cut1) `shouldEqual` false
+
+    it "returns false when reverseLoop is false even if normalization is required" $
+      loopRequired
+        (Just (mkState source1 cut1))
+        (State $ (unwrap $ mkState source1 cut1) { shiftVideoSync = Milliseconds 250.0, reverseLoop = false })
+        `shouldEqual` false
+
+    it "returns true when normalization is required and reverseLoop is true" $
+      loopRequired
+        (Just (mkState source1 cut1))
+        (State $ (unwrap $ mkState source1 cut1) { reverseLoop = true })
         `shouldEqual` true
 
