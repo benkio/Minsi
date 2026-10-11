@@ -15,6 +15,7 @@ import Handlers.ImportStateModalImportButtonHandler (setImportStateModalImportBu
 import Handlers.InputVideo.InputSourceHandler (setInputSourceHandler)
 import Handlers.InputVideo.InputVideoHandler (setVideoHandlers)
 import Handlers.KeyboardHandler (setKeyboardHandlers)
+import Handlers.LoopbackSpeedHandler (setLoopbackSpeedHandler)
 import Handlers.ResetButtonHandler (setResetButtonHandler)
 import Handlers.ResultMedia.Handler (setResultMediaHandlers)
 import Handlers.ResultMedia.VideoSourceHandler (setVideoSourceHandler)
@@ -30,6 +31,7 @@ setupEventHandlers :: Effect Unit
 setupEventHandlers = do
   setCutRangeHandlers
   setShiftVideoSyncHandler
+  setLoopbackSpeedHandler
   setVideoHandlers
   setResultMediaHandlers
   setApplyButtonHandler

@@ -138,7 +138,6 @@ cutDownloadRequired mayOldState newState@(State { source: newSource, cutVideo: n
           || oldCutVideo /= newCutVideo
           || shiftVideoSyncChanged mayOldState newState
           || reverseLoopChanged mayOldState newState
-          || loopbackSpeedChanged mayOldState newState
     )
     mayOldState
 

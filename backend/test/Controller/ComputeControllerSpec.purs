@@ -71,11 +71,11 @@ spec = do
         (State $ (unwrap $ mkState source1 cut1) { reverseLoop = true })
         `shouldEqual` true
 
-    it "returns true when only loopbackSpeed changes" $
+    it "returns false when only loopbackSpeed changes" $
       cutDownloadRequired
         (Just (mkState source1 cut1))
         (State $ (unwrap $ mkState source1 cut1) { loopbackSpeed = 2.0 })
-        `shouldEqual` true
+        `shouldEqual` false
 
   describe "shiftVideoSyncChanged" do
     it "returns false when there is no old state" $

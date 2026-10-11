@@ -30,14 +30,11 @@ makeLoopbackSpeed filename loopbackSpeed = do
 
 loopbackSpeedArgs :: FilePath -> FilePath -> Number -> Array String
 loopbackSpeedArgs input output rawSpeed =
-  baseFlagsInput <> [ "-i", input, "-filter_complex", filterArg, "-map", "[v]", "-map", "[a]" ] <> codecFlags <> baseFlagsOutput <> [ output ]
+  baseFlagsInput <> [ "-i", input, "-vf", videoFilterArg, "-af", audioFilterArg ] <> codecFlags <> baseFlagsOutput <> [ output ]
   where
   speed = clampSpeed rawSpeed
-  filterArg =
-    "[0:v]setpts=PTS/" <> show speed <> "[v];"
-      <> "[0:a]"
-      <> buildAtempoArg speed
-      <> ",loudnorm=I=-16:TP=-1.5:LRA=11:dual_mono=true[a]"
+  videoFilterArg = "setpts=PTS/" <> show speed
+  audioFilterArg = buildAtempoArg speed <> ",loudnorm=I=-16:TP=-1.5:LRA=11:dual_mono=true"
   codecFlags =
     [ "-c:v"
     , "libx264"

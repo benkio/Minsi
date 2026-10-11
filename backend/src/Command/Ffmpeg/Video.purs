@@ -7,10 +7,10 @@ import Command.Ffmpeg.Base (baseFlagsInput, baseFlagsOutput)
 import Constants (mp4)
 import Conversion.Time (millisecondsToSecondsString)
 import Data.Maybe (Maybe(..), maybe)
-import Data.Newtype (class Newtype, unwrap)
+import Data.Newtype (class Newtype)
 import Data.Time.Duration (Milliseconds(..))
 import Effect (Effect)
-import Effect.Aff (Aff, apathize, finally)
+import Effect.Aff (Aff, apathize)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
 import MinsiErrors (MinsiError(..), throwMinsiError)
@@ -36,7 +36,7 @@ ffmpegVideoTimeout = Nothing
 cutVideo :: FfmpegInput -> Aff ExecaResult
 cutVideo ffmpegInput = do
   _ <- liftEffect $ validateAndResolveLocalFile ffmpegInput
-  finally (rm (unwrap ffmpegInput).input) (cutAndConvertUploadedVideo ffmpegInput)
+  cutAndConvertUploadedVideo ffmpegInput
 
 validateAndResolveLocalFile :: FfmpegInput -> Effect FilePath
 validateAndResolveLocalFile (FfmpegInput { input, filename }) = do
