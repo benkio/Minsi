@@ -37,7 +37,8 @@ makeReverseVideo filename = do
 reverseLoopReverseArgs :: FilePath -> FilePath -> Array String
 reverseLoopReverseArgs input output =
   baseFlagsInput
-    <> [ "-i"
+    <>
+      [ "-i"
       , input
       , "-vf"
       , "reverse"
@@ -73,7 +74,8 @@ prepareConcatArgs filename = do
 reverseLoopConcatArgs :: FilePath -> FilePath -> Array String
 reverseLoopConcatArgs filepathTxt output =
   baseFlagsInput
-    <> [ "-f"
+    <>
+      [ "-f"
       , "concat"
       , "-safe"
       , "0"
