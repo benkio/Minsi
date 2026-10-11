@@ -49,6 +49,7 @@ spec = do
         cutVideo = DurationRange { start: Milliseconds 0.0, end: Milliseconds 100.0 }
         filename = "output.mp4"
         reverseLoop = false
+        loopbackSpeed = 1.0
         uploadLocalFile = false
         artist = "Test Artist"
         title = "Test Title"
@@ -67,6 +68,7 @@ spec = do
             , source: WebURL youtubeUrl
             , filename: filename
             , reverseLoop: reverseLoop
+            , loopbackSpeed: loopbackSpeed
             , uploadLocalFile: uploadLocalFile
             , artist: artist
             , title: title
@@ -105,6 +107,11 @@ spec = do
         Just rl -> liftEffect $ readForeignBoolean rl
         Nothing -> liftEffect $ throwException $ error "reverseLoop field missing"
       reverseLoopValue `shouldEqual` reverseLoop
+
+      loopbackSpeedValue <- case lookup "loopbackSpeed" jsonObj of
+        Just ls -> liftEffect $ readForeignNumber ls
+        Nothing -> liftEffect $ throwException $ error "loopbackSpeed field missing"
+      loopbackSpeedValue `shouldEqual` loopbackSpeed
 
       uploadLocalFileValue <- case lookup "uploadLocalFile" jsonObj of
         Just ul -> liftEffect $ readForeignBoolean ul

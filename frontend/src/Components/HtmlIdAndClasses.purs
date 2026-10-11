@@ -12,6 +12,9 @@ titleId = "title"
 reverseLoopId :: String
 reverseLoopId = "reverseLoop"
 
+loopbackSpeedId :: String
+loopbackSpeedId = "loopbackSpeed"
+
 cutStartId :: String
 cutStartId = "cutStart"
 

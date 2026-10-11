@@ -56,6 +56,7 @@ fromHtmlInputs
       , inputSource: inputSourceSelect
       , filename: filenameInput
       , reverseLoop: reverseLoopInput
+      , loopbackSpeed
       , artist: artistInput
       , title: titleInput
       , shiftVideoSync
@@ -66,6 +67,7 @@ fromHtmlInputs
   sourceV <- sourceFromHTMLInput inputSourceSelect youtubeUrlInput localFileInput
   filenameV <- HI.value filenameInput <#> outputFilenameValidation outputFilenameId
   reverseLoopValue <- checked reverseLoopInput
+  loopbackSpeedValue <- valueAsNumber loopbackSpeed
   uploadLocalFileValue <- checked uploadLocalFileInput
   artistV <- HI.value artistInput <#> nonEmptyValidation artistId <#> (_ `andThen` printableAsciiLatinValidation artistId)
   titleV <- HI.value titleInput <#> nonEmptyValidation titleId <#> (_ `andThen` printableAsciiLatinValidation titleId)
@@ -84,6 +86,7 @@ fromHtmlInputs
         , source: source
         , filename: normalizeOutputFilename filename
         , reverseLoop: reverseLoopValue
+        , loopbackSpeed: loopbackSpeedValue
         , uploadLocalFile: uploadLocalFileValue
         , artist: capitalize artist
         , title: capitalize title

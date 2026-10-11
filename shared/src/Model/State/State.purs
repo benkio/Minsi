@@ -31,6 +31,7 @@ newtype State = State
   , source :: Source
   , filename :: FilePath
   , reverseLoop :: Boolean
+  , loopbackSpeed :: Number
   , uploadLocalFile :: Boolean
   , artist :: String
   , title :: String

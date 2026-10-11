@@ -4,9 +4,12 @@ import Prelude
 
 import Api.HttpLog (respondEmptyPost, respondJsonPost)
 import Command.ExecaHelpers (exceptTMultiple, exceptTStep)
+import Command.Ffmpeg.AudioNormalization (normalizeAudio)
 import Command.Ffmpeg.Gif (makeGif)
+import Command.Ffmpeg.Loop (applyReverseLoop)
+import Command.Ffmpeg.LoopbackSpeed (applyLoopbackSpeed)
 import Command.Ffmpeg.Mp3 (extractMp3)
-import Command.Ffmpeg.Video (FfmpegInput(..), cutVideo, normalizeVideo)
+import Command.Ffmpeg.Video (FfmpegInput(..), cutVideo)
 import Command.Id3v2 (addId3Tags)
 import Command.Ytdlp (YtdlpDownloadResult(..), YtdlpInput(..), ytdlpDownload)
 import Constants (uploaded)
@@ -77,7 +80,7 @@ compute mayOldState state@(State { filename }) store = do
     insert filename (Just state) processResult store
 
 runComputePipeline :: Maybe State -> State -> Store -> Aff (Either String Unit)
-runComputePipeline mayOldState state@(State { source, filename, cutVideo: range, artist, title, shiftVideoSync, reverseLoop }) store =
+runComputePipeline mayOldState state@(State { source, filename, cutVideo: range, artist, title, shiftVideoSync, loopbackSpeed }) store =
   runExceptT do
     liftEffect $ log ("[Compute] Start pipeline for filename: " <> filename)
     when (cutDownloadRequired mayOldState state)
@@ -86,11 +89,23 @@ runComputePipeline mayOldState state@(State { source, filename, cutVideo: range,
       $ liftEffect (insertProcessStatus filename (Pending "Video Download / Extraction") store)
           *> videoDownloadExtraction source filename range
 
-    when (videoNormalizationRequired mayOldState state)
+    when (audioNormalizationRequired mayOldState state)
       $ void
-      $ exceptTStep "Video Normalization"
-      $ liftEffect (insertProcessStatus filename (Pending "Video Normalization") store)
-          *> normalizeVideo filename shiftVideoSync reverseLoop
+      $ exceptTStep "Audio Normalization"
+      $ liftEffect (insertProcessStatus filename (Pending "Audio Normalization") store)
+          *> normalizeAudio filename shiftVideoSync
+
+    when (loopbackSpeedRequired mayOldState state)
+      $ void
+      $ exceptTStep "Loopback Speed"
+      $ liftEffect (insertProcessStatus filename (Pending "Loopback Speed") store)
+          *> applyLoopbackSpeed filename loopbackSpeed
+
+    when (loopRequired mayOldState state)
+      $ void
+      $ exceptTStep "Loop"
+      $ liftEffect (insertProcessStatus filename (Pending "Loop") store)
+          *> applyReverseLoop filename
 
     liftEffect $ log ("[Compute] Extract MP3 for filename: " <> filename)
     liftEffect $ insertProcessStatus filename (Pending "MP3 extraction") store
@@ -123,12 +138,24 @@ cutDownloadRequired mayOldState newState@(State { source: newSource, cutVideo: n
           || oldCutVideo /= newCutVideo
           || shiftVideoSyncChanged mayOldState newState
           || reverseLoopChanged mayOldState newState
+          || loopbackSpeedChanged mayOldState newState
     )
     mayOldState
 
 videoNormalizationRequired :: Maybe State -> State -> Boolean
 videoNormalizationRequired mayOldState newState =
-  cutDownloadRequired mayOldState newState || shiftVideoSyncChanged mayOldState newState || reverseLoopChanged mayOldState newState
+  cutDownloadRequired mayOldState newState || shiftVideoSyncChanged mayOldState newState || reverseLoopChanged mayOldState newState || loopbackSpeedChanged mayOldState newState
+
+audioNormalizationRequired :: Maybe State -> State -> Boolean
+audioNormalizationRequired = videoNormalizationRequired
+
+loopbackSpeedRequired :: Maybe State -> State -> Boolean
+loopbackSpeedRequired mayOldState newState@(State { loopbackSpeed }) =
+  videoNormalizationRequired mayOldState newState && loopbackSpeed /= 1.0
+
+loopRequired :: Maybe State -> State -> Boolean
+loopRequired mayOldState newState@(State { reverseLoop }) =
+  videoNormalizationRequired mayOldState newState && reverseLoop
 
 shiftVideoSyncChanged :: Maybe State -> State -> Boolean
 shiftVideoSyncChanged mayOldState (State { shiftVideoSync: newShift }) =
@@ -137,3 +164,7 @@ shiftVideoSyncChanged mayOldState (State { shiftVideoSync: newShift }) =
 reverseLoopChanged :: Maybe State -> State -> Boolean
 reverseLoopChanged mayOldState (State { reverseLoop: newReverseLoop }) =
   maybe false (\(State { reverseLoop: oldReverseLoop }) -> oldReverseLoop /= newReverseLoop) mayOldState
+
+loopbackSpeedChanged :: Maybe State -> State -> Boolean
+loopbackSpeedChanged mayOldState (State { loopbackSpeed: newLoopbackSpeed }) =
+  maybe false (\(State { loopbackSpeed: oldLoopbackSpeed }) -> oldLoopbackSpeed /= newLoopbackSpeed) mayOldState

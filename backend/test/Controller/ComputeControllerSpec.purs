@@ -2,7 +2,7 @@ module Test.Controller.ComputeControllerSpec where
 
 import Prelude
 
-import Controller.ComputeController (cutDownloadRequired, reverseLoopChanged, shiftVideoSyncChanged, videoNormalizationRequired)
+import Controller.ComputeController (cutDownloadRequired, loopbackSpeedChanged, reverseLoopChanged, shiftVideoSyncChanged, videoNormalizationRequired)
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Newtype (unwrap)
 import Data.Time.Duration (Milliseconds(..))
@@ -21,6 +21,7 @@ mkState source cutVideo = State
   , cutVideo
   , filename: "test.mp4"
   , reverseLoop: false
+  , loopbackSpeed: 1.0
   , uploadLocalFile: false
   , artist: "artist"
   , title: "title"
@@ -70,6 +71,12 @@ spec = do
         (State $ (unwrap $ mkState source1 cut1) { reverseLoop = true })
         `shouldEqual` true
 
+    it "returns true when only loopbackSpeed changes" $
+      cutDownloadRequired
+        (Just (mkState source1 cut1))
+        (State $ (unwrap $ mkState source1 cut1) { loopbackSpeed = 2.0 })
+        `shouldEqual` true
+
   describe "shiftVideoSyncChanged" do
     it "returns false when there is no old state" $
       shiftVideoSyncChanged Nothing (mkState source1 cut1) `shouldEqual` false
@@ -96,6 +103,19 @@ spec = do
         (State $ (unwrap $ mkState source1 cut1) { reverseLoop = true })
         `shouldEqual` true
 
+  describe "loopbackSpeedChanged" do
+    it "returns false when there is no old state" $
+      loopbackSpeedChanged Nothing (mkState source1 cut1) `shouldEqual` false
+
+    it "returns false when loopbackSpeed is unchanged" $
+      loopbackSpeedChanged (Just (mkState source1 cut1)) (mkState source1 cut1) `shouldEqual` false
+
+    it "returns true when loopbackSpeed changes" $
+      loopbackSpeedChanged
+        (Just (mkState source1 cut1))
+        (State $ (unwrap $ mkState source1 cut1) { loopbackSpeed = 2.0 })
+        `shouldEqual` true
+
   describe "videoNormalizationRequired" do
     it "returns true when there is no old state" $
       videoNormalizationRequired Nothing (mkState source1 cut1) `shouldEqual` true
@@ -119,5 +139,11 @@ spec = do
       videoNormalizationRequired
         (Just (mkState source1 cut1))
         (State $ (unwrap $ mkState source1 cut1) { reverseLoop = true })
+        `shouldEqual` true
+
+    it "returns true when loopbackSpeed changes but source, cut range and shiftVideoSync do not" $
+      videoNormalizationRequired
+        (Just (mkState source1 cut1))
+        (State $ (unwrap $ mkState source1 cut1) { loopbackSpeed = 2.0 })
         `shouldEqual` true
 

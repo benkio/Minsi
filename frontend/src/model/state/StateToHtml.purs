@@ -28,6 +28,7 @@ loadCurrentState (State s) = do
   components <- loadComponents
   let inputs = components.htmlInputs
   applyShiftVideoSyncToHtml s.shiftVideoSync inputs
+  applyLoopbackSpeedToHtml s.loopbackSpeed inputs
   applyCutVideoToHtml s.cutVideo inputs
   applySourceToHtml s.source inputs
   applyFilenameToHtml s.filename inputs
@@ -41,6 +42,10 @@ loadCurrentState (State s) = do
 applyShiftVideoSyncToHtml :: Milliseconds -> HtmlInputs -> Effect Unit
 applyShiftVideoSyncToHtml (Milliseconds value) (HtmlInputs { shiftVideoSync }) =
   HI.setValue (show value) shiftVideoSync
+
+applyLoopbackSpeedToHtml :: Number -> HtmlInputs -> Effect Unit
+applyLoopbackSpeedToHtml value (HtmlInputs { loopbackSpeed }) =
+  HI.setValue (show value) loopbackSpeed
 
 applyCutVideoToHtml :: DurationRange -> HtmlInputs -> Effect Unit
 applyCutVideoToHtml (DurationRange { start: startMs, end: endMs }) (HtmlInputs { cutStart, cutEnd }) = do
