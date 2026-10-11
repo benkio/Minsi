@@ -1,4 +1,4 @@
-module Test.Command.GifSpec where
+module Test.Command.Ffmpeg.GifSpec where
 
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)

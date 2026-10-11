@@ -37,7 +37,7 @@ spec = do
     it "accepts a youtube.com live URL source from imported JSON" $ liftEffect $ do
       let
         json =
-          """{"uploadLocalFile":true,"title":"Fak These Fakheads","subtitles":[],"source":"https://www.youtube.com/live/vyB7BnvGOE4?t=2130","shiftVideoSync":0,"reverseLoop":false,"filename":"xah_FakTheseFakheads","cutVideo":{"start":2130948,"end":2134189},"artist":"Xah Lee"}"""
+          """{"uploadLocalFile":true,"title":"Fak These Fakheads","subtitles":[],"source":"https://www.youtube.com/live/vyB7BnvGOE4?t=2130","shiftVideoSync":0,"reverseLoop":false,"loopbackSpeed":1,"filename":"xah_FakTheseFakheads","cutVideo":{"start":2130948,"end":2134189},"artist":"Xah Lee"}"""
       case readJSON json :: Either _ State of
         Left err -> fail ("JSON parse failed: " <> show err)
         Right state -> isRight (validateState state) `shouldEqual` true

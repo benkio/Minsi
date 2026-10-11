@@ -19,6 +19,7 @@ module Components.HtmlComponents.Lenses
   , _uploadLocalFile
   , _filename
   , _reverseLoop
+  , _loopbackSpeed
   , _artist
   , _title
   , _applyButton
@@ -122,6 +123,7 @@ _HtmlInputs
        , uploadLocalFile :: HTMLInputElement
        , filename :: HTMLInputElement
        , reverseLoop :: HTMLInputElement
+       , loopbackSpeed :: HTMLInputElement
        , artist :: HTMLInputElement
        , title :: HTMLInputElement
        , applyButton :: HTMLButtonElement
@@ -222,6 +224,9 @@ _filename = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "filename")
 
 _reverseLoop :: Lens' HtmlComponents HTMLInputElement
 _reverseLoop = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "reverseLoop")
+
+_loopbackSpeed :: Lens' HtmlComponents HTMLInputElement
+_loopbackSpeed = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "loopbackSpeed")
 
 _artist :: Lens' HtmlComponents HTMLInputElement
 _artist = _htmlInputs <<< unto HtmlInputs <<< prop (Proxy :: Proxy "artist")

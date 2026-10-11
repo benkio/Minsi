@@ -331,12 +331,32 @@
                         <input
                           class="form-check-input"
                           type="checkbox"
-                          id="reverseLoopGif"
+                          id="reverseLoop"
                         />
-                        <label class="form-check-label" for="reverseLoopGif">
-                          Reverse/Loop GIF
+                        <label class="form-check-label" for="reverseLoop">
+                          Reverse/Loop
                         </label>
                       </div>
+                    </div>
+                  </div>
+
+                  <div class="row g-2 align-items-center mb-2">
+                    <label
+                      for="loopbackSpeed"
+                      class="col-7 col-form-label col-form-label-sm"
+                    >
+                      Loopback Speed
+                    </label>
+                    <div class="col-5">
+                      <input
+                        type="number"
+                        id="loopbackSpeed"
+                        class="form-control form-control-sm"
+                        value="1"
+                        min="0.25"
+                        max="4"
+                        step="0.25"
+                      />
                     </div>
                   </div>
 
