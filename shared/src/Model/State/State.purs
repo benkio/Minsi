@@ -77,9 +77,9 @@ instance Show Font where
 instance Show Color where
   show White = "#ffffff"
   show Black = "#000000"
-  show LightGreen = "#ABEBC6"
-  show LightOrange = "#FAD7A0"
-  show Yellow = "#FFFF00"
+  show LightGreen = "#2ECC71"
+  show LightOrange = "#F39C12"
+  show Yellow = "#FFD400"
 
 instance Show Position where
   show Top = "Top"
@@ -133,9 +133,9 @@ instance WriteForeign Position where
 instance WriteForeign Color where
   writeImpl White = writeImpl "#ffffff"
   writeImpl Black = writeImpl "#000000"
-  writeImpl LightGreen = writeImpl "#ABEBC6"
-  writeImpl LightOrange = writeImpl "#FAD7A0"
-  writeImpl Yellow = writeImpl "#FFFF00"
+  writeImpl LightGreen = writeImpl "#2ECC71"
+  writeImpl LightOrange = writeImpl "#F39C12"
+  writeImpl Yellow = writeImpl "#FFD400"
 
 instance WriteForeign Font where
   writeImpl Impact = writeImpl "Impact"
@@ -169,9 +169,9 @@ instance ReadForeign Color where
     case s of
       "#ffffff" -> pure White
       "#000000" -> pure Black
-      "#ABEBC6" -> pure LightGreen
-      "#FAD7A0" -> pure LightOrange
-      "#FFFF00" -> pure Yellow
+      "#2ECC71" -> pure LightGreen
+      "#F39C12" -> pure LightOrange
+      "#FFD400" -> pure Yellow
       _ -> fail $ TypeMismatch "Color" $ "Invalid Color: " <> s
 
 instance ReadForeign Font where
