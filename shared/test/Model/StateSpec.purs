@@ -4,12 +4,16 @@ import Prelude
 
 import Data.Either (Either(..), isLeft, isRight)
 import Effect.Class (liftEffect)
-import Model.State.State (Color(..), DurationRange, Font(..), Position(..), State, Subtitle(..), validateFilename, validateRange, validateState, validateSubtitles)
+import Model.State.State (Color(..), DurationRange(..), Font(..), Position(..), State(..), Subtitle(..), WURL(..), Source(..), validateFilename, validateRange, validateState, validateSubtitles)
 import Test.Arbitrary (InvalidDurationRange(..), LongerThanNCharacters(..), NonEmptyInvalidDurationRanges(..), NonEmptyValidDurationRanges(..), ValidDurationRange(..))
 import Test.QuickCheck (quickCheck)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (fail, shouldEqual)
 import Yoga.JSON (readJSON)
+import Partial.Unsafe (unsafePartial)
+import Data.Maybe (fromJust)
+import Data.Time.Duration (Milliseconds(..))
+import Data.URL (fromString)
 
 spec :: Spec Unit
 spec = do
@@ -41,7 +45,28 @@ spec = do
       case readJSON json :: Either _ State of
         Left err -> fail ("JSON parse failed: " <> show err)
         Right state -> isRight (validateState state) `shouldEqual` true
+    it "rejects empty title" $ liftEffect $ do
+      let state = mkValidState { artist: "Xah Lee", title: "" }
+      isLeft (validateState state) `shouldEqual` true
+    it "rejects empty artist" $ liftEffect $ do
+      let state = mkValidState { artist: "", title: "Valid title" }
+      isLeft (validateState state) `shouldEqual` true
 
 buildSubtitle :: Array DurationRange -> Array Subtitle
 buildSubtitle ranges =
   map (\videoPosition -> Subtitle { videoPosition, value: "", font: Impact, fontSize: 24, color: White, screenPosition: Bottom }) ranges
+
+mkValidState :: { artist :: String, title :: String } -> State
+mkValidState { artist, title } =
+  State
+    { cutVideo: DurationRange { start: Milliseconds 0.0, end: Milliseconds 1000.0 }
+    , source: WebURL (WURL (unsafePartial fromJust (fromString "https://www.youtube.com/watch?v=dQw4w9WgXcQ")))
+    , filename: "sgar_TestClip"
+    , reverseLoop: false
+    , loopbackSpeed: 1.0
+    , uploadLocalFile: true
+    , artist
+    , title
+    , subtitles: []
+    , shiftVideoSync: Milliseconds 0.0
+    }
