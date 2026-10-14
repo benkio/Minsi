@@ -8,6 +8,8 @@ import Data.Array.NonEmpty (NonEmptyArray, toArray)
 import Data.Either (Either(..))
 import Data.Maybe (maybe)
 import Data.Newtype (class Newtype)
+import Data.String.Regex (regex, test)
+import Data.String.Regex.Flags (noFlags)
 import Data.String (joinWith, length)
 import Data.String.Common (toLower, trim)
 import Data.Time.Duration (Milliseconds(..))
@@ -226,11 +228,13 @@ subtitlesToString subtitles = joinWith "\n" subtitleGroupsValues
   subtitleGroupsValues = groupToString <$> subtitleGroups
 
 validateState :: State -> Either (Array String) State
-validateState state@(State ({ source, filename, cutVideo: durationRange, subtitles, reverseLoop })) = do
+validateState state@(State ({ source, filename, cutVideo: durationRange, subtitles, reverseLoop, artist, title })) = do
   _ <- validateRange durationRange
   _ <- validateSubtitles subtitles reverseLoop
   _ <- validateFilename filename
   _ <- validateSource source
+  _ <- validateArtist artist
+  _ <- validateTitle title
   pure state
 
 validateSubtitles :: Array Subtitle -> Boolean -> Either (Array String) Unit
@@ -256,3 +260,21 @@ validateSource :: Source -> Either (Array String) Unit
 validateSource (LocalFile _) = Right unit
 validateSource (WebURL (WURL url)) =
   if isValid (videoUrlValidation "source" (toString url)) then Right unit else Left [ "State Validation: source must be a valid supported video URL" ]
+
+validateArtist :: String -> Either (Array String) Unit
+validateArtist = validateNonEmptyPrintableField "artist"
+
+validateTitle :: String -> Either (Array String) Unit
+validateTitle = validateNonEmptyPrintableField "title"
+
+validateNonEmptyPrintableField :: String -> String -> Either (Array String) Unit
+validateNonEmptyPrintableField fieldName value =
+  if trim value == "" then Left [ "State Validation: " <> fieldName <> " cannot be empty" ]
+  else if hasOnlyPrintableAsciiLatin value then Right unit
+  else Left [ "State Validation: " <> fieldName <> " must contain only printable ASCII and latin characters" ]
+
+hasOnlyPrintableAsciiLatin :: String -> Boolean
+hasOnlyPrintableAsciiLatin value =
+  case regex """^[\x20-\x7E\u00C0-\u00FF ]+$""" noFlags of
+    Left _ -> false
+    Right r -> test r value
