@@ -87,11 +87,11 @@ handleKeyboardEvent keyboardEvent = genericErrorsHandler $ do
   media <- getMediaElement components
   when (keyValue == "Enter" && (isCtrl || isMeta)) (applyButtonEventListener ev *> stop)
 
-  whenNotTitle (keyValue == "+") (addSubtitleButtonEventListener subtitleTable subtitleRow (toEvent keyboardEvent))
+  whenNotTitle (keyValue == "=") (addSubtitleButtonEventListener subtitleTable subtitleRow (toEvent keyboardEvent))
   whenNotTitle (keyValue == "-") (removeFirstSubtitleRow subtitleTable)
 
-  whenNotTitle (keyValue == "[") (setSubtitleStartButtonEventListener subtitleTable (toEvent keyboardEvent))
-  whenNotTitle (keyValue == "]") (setSubtitleEndButtonEventListener subtitleTable (toEvent keyboardEvent))
+  whenNotTitle (keyValue == "/") (setSubtitleStartButtonEventListener subtitleTable (toEvent keyboardEvent))
+  whenNotTitle (keyValue == "\\") (setSubtitleEndButtonEventListener subtitleTable (toEvent keyboardEvent))
 
   whenNotEditable (keyValue == " ") (toggleResultMediaPlayback media)
   whenNotEditable (keyValue == "ArrowLeft") (skipResultMediaBackward media)
