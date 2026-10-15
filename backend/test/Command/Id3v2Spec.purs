@@ -13,10 +13,10 @@ spec = do
     it "should include TSSE so ffprobe exposes Minsi as encoder metadata" do
       addId3TagsArgs "output.mp3" "Pino Scotto" "Sforzi Fabbrica Oasis" `shouldEqual`
         [ "-a"
-        , "Pino Scotto"
+        , "\"Pino Scotto\""
         , "-t"
-        , "Sforzi Fabbrica Oasis"
+        , "\"Sforzi Fabbrica Oasis\""
         , "--TSSE"
-        , "Minsi-" <> currentVersion
+        , "\"Minsi-" <> currentVersion <> "\""
         , "output.mp3"
         ]

@@ -26,10 +26,10 @@ addId3Tags filename artist title = do
 addId3TagsArgs :: FilePath -> String -> String -> Array String
 addId3TagsArgs filepathMp3 artist title =
   [ "-a"
-  , artist
+  , show artist
   , "-t"
-  , title
+  , show title
   , "--TSSE"
-  , "Minsi-" <> currentVersion
+  , show ("Minsi-" <> currentVersion)
   , filepathMp3
   ]
