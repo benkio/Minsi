@@ -55,10 +55,12 @@ copyTranscriptFromBackendAff :: String -> Aff Unit
 copyTranscriptFromBackendAff requestedFilename = do
   { markdown } <- callTranscript requestedFilename
   currentStateTuple <- liftEffect getCurrentState
-  let currentFilename = case fst currentStateTuple of
-        State { filename } -> filename
-  when (isStaleTranscriptRequest requestedFilename currentFilename) $
-    liftEffect $ throwMinsiError (InvalidInput "copyTranscriptButton" "Selected transcript changed while copying. Please retry.")
+  let
+    currentFilename = case fst currentStateTuple of
+      State { filename } -> filename
+  when (isStaleTranscriptRequest requestedFilename currentFilename)
+    $ liftEffect
+    $ throwMinsiError (InvalidInput "copyTranscriptButton" "Selected transcript changed while copying. Please retry.")
   cb <- liftEffect getClipboardOrThrow
   copyModalContentToClipboardAff cb markdown
   liftEffect do
