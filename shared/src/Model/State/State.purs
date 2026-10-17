@@ -221,14 +221,18 @@ subtitlesToString :: Array Subtitle -> Maybe (Array Subtitle -> String) -> Strin
 subtitlesToString subtitles mayTransformer = joinWith "\n" subtitleGroupsValues
   where
   subtitleGroups = (sort >>> group) subtitles
-  subtitleToLower (Subtitle subtitle) = (toLower <<< trim) subtitle.value
+  normalizeSubtitle (Subtitle subtitle) = Subtitle (subtitle { value = (toLower <<< trim) subtitle.value })
 
   groupToString :: NonEmptyArray Subtitle -> String
   groupToString group =
-    capitalizeFirst $ maybe defaultGroup (\transformer -> transformer subtitleGroup) mayTransformer
+    capitalizeFirst $
+      maybe
+        (subtitleGroupValueConcat normalizedSubtitleGroup)
+        (\transformer -> transformer normalizedSubtitleGroup)
+        mayTransformer
     where
-    subtitleGroup = toArray group
-    defaultGroup = joinWith " " (map subtitleToLower subtitleGroup)
+    normalizedSubtitleGroup = (map normalizeSubtitle <<< toArray) group
+    subtitleGroupValueConcat = joinWith " " <<< map (\(Subtitle { value }) -> value)
   subtitleGroupsValues = groupToString <$> subtitleGroups
 
 validateState :: State -> Either (Array String) State

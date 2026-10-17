@@ -2,9 +2,12 @@ module Test.Command.Ffmpeg.TranscriptionSpec where
 
 import Prelude
 
-import Command.Ffmpeg.Transcription (subtitleToEnphasisChar, subtitleToMarkdown, subtitlesToMarkdown)
+import Command.Ffmpeg.Transcription (subtitleToEnphasisChar, subtitleToMarkdown, subtitlesToMarkdown, transcriptionErrorDetails, toTranscriptionError)
+import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Milliseconds(..))
-import Model.State.State (Color(..), DurationRange(..), Font(..), Position(..), Subtitle(..))
+import Effect.Exception (error, message)
+import MinsiErrors (MinsiError(..))
+import Model.State.State (Color(..), DurationRange(..), Font(..), Position(..), Subtitle(..), subtitlesToString)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 
@@ -50,3 +53,24 @@ spec = do
           , mkSubtitle "third" ArialBlack LightGreen
           ]
       subtitlesToMarkdown subtitles `shouldEqual` "first *second* `third`"
+
+    it "does not keep all-caps input when producing markdown transcript lines" do
+      let
+        subtitles =
+          [ mkSubtitle "  HELLO  " Impact White
+          , mkSubtitle "  WORLD  " Impact White
+          ]
+      subtitlesToString subtitles (Just subtitlesToMarkdown) `shouldEqual` "Hello world"
+
+  describe "transcription error wrapping" do
+    it "preserves both exception type rendering and message" do
+      let
+        e = error "boom"
+      transcriptionErrorDetails e `shouldEqual` ("type=" <> show e <> "; message=" <> message e)
+
+    it "wraps exceptions as TranscriptionError" do
+      let
+        e = error "boom"
+      case toTranscriptionError e of
+        TranscriptionError details -> details `shouldEqual` ("type=" <> show e <> "; message=" <> message e)
+        _ -> "unexpected constructor" `shouldEqual` "TranscriptionError"

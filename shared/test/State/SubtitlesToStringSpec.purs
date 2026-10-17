@@ -82,7 +82,7 @@ spec = do
           , mkSubtitle 30.0 "Three" Impact Black Top
           ]
         transformer group = joinWith "|" (map (\(Subtitle { value }) -> value) group)
-      subtitlesToString subtitles (Just transformer) `shouldEqual` "One|Two\nThree"
+      subtitlesToString subtitles (Just transformer) `shouldEqual` "One|two\nThree"
 
     it "applies capitalization after transformer output" $ do
       let
@@ -92,3 +92,12 @@ spec = do
           ]
         transformer _ = "custom output"
       subtitlesToString subtitles (Just transformer) `shouldEqual` "Custom output"
+
+    it "normalizes subtitle values before custom transformer usage" $ do
+      let
+        subtitles =
+          [ mkSubtitle 10.0 "  HELLO  " Impact White Top
+          , mkSubtitle 20.0 "  WORLD  " Impact White Top
+          ]
+        transformer group = joinWith " " (map (\(Subtitle { value }) -> value) group)
+      subtitlesToString subtitles (Just transformer) `shouldEqual` "Hello world"
