@@ -1,6 +1,7 @@
 module Test.State.SubtitlesToStringSpec where
 
 import Data.Maybe (Maybe(..))
+import Data.String (joinWith)
 import Data.Time.Duration (Milliseconds(..))
 import Model.State.State
   ( DurationRange(..)
@@ -72,3 +73,22 @@ spec = do
           , mkSubtitle 20.0 "  WORLD  " Impact White Top
           ]
       subtitlesToString subtitles Nothing `shouldEqual` "Hello world"
+
+    it "uses a custom transformer on each style-group" $ do
+      let
+        subtitles =
+          [ mkSubtitle 10.0 "One" Impact White Top
+          , mkSubtitle 20.0 "Two" Impact White Top
+          , mkSubtitle 30.0 "Three" Impact Black Top
+          ]
+        transformer group = joinWith "|" (map (\(Subtitle { value }) -> value) group)
+      subtitlesToString subtitles (Just transformer) `shouldEqual` "One|Two\nThree"
+
+    it "applies capitalization after transformer output" $ do
+      let
+        subtitles =
+          [ mkSubtitle 10.0 "hello" Impact White Top
+          , mkSubtitle 20.0 "world" Impact White Top
+          ]
+        transformer _ = "custom output"
+      subtitlesToString subtitles (Just transformer) `shouldEqual` "Custom output"
