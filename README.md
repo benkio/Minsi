@@ -37,6 +37,16 @@ You also need **Impact** and **Arial Black** fonts installed if you use subtitle
    ```
    Server runs at **http://localhost:8080**.
 
+   Optional local punctuation restoration for transcript generation:
+   ```bash
+   cd punctuation-service
+   python -m venv .venv
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   uvicorn app:app --host 127.0.0.1 --port 8090
+   ```
+   (See `punctuation-service/README.md` for offline/cache mode and troubleshooting.)
+
 2. **Frontend** (in another terminal):
    ```bash
    cd frontend
@@ -109,6 +119,8 @@ docker run -d --name minsi-app -p 8080:8080 benkio/minsi:latest
 
 Then open **http://localhost:8080** in your browser.
 
+The Docker image now includes the local punctuation restoration service used for transcript post-processing, so no extra sidecar container is required.
+
 The image is built for **linux/amd64**. On **ARM** (e.g. Apple Silicon) it runs via emulation. To avoid the platform warning, run with:
 `docker run --platform linux/amd64 -d --name minsi-app -p 8080:8080 benkio/minsi:latest`.
 
@@ -118,6 +130,12 @@ Useful commands:
 - **Stop:** `docker stop minsi-app`
 - **Remove:** `docker rm minsi-app`
 - **Run on a different port:** `docker run -d --name minsi-app -p 3000:8080 benkio/minsi:latest` → open `http://localhost:3000`
+
+Optional env overrides (container):
+- `MINSI_PUNCTUATION_SERVICE_URL` (default `http://127.0.0.1:8090/restore`)
+- `MINSI_PUNCTUATION_HOST` (default `127.0.0.1`)
+- `MINSI_PUNCTUATION_PORT` (default `8090`)
+- `MINSI_PUNCTUATION_LOCAL_FILES_ONLY=true` to force offline-cache-only model loading
 
 ### Updating the image
 

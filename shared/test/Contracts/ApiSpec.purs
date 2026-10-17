@@ -1,6 +1,6 @@
 module Test.Contracts.ApiSpec where
 
-import Contracts.Api (CheckDependenciesResponse, StatusResponse, UpdateCheckResponse)
+import Contracts.Api (CheckDependenciesResponse, StatusResponse, TranscriptResponse, UpdateCheckResponse)
 import Data.Either (Either(..))
 import Prelude
 import Test.Spec (Spec, describe, it)
@@ -17,6 +17,10 @@ spec = do
     it "encodes CheckDependenciesResponse" do
       let json = writeJSON ({ missedDependencies: [ "ffmpeg", "yt-dlp" ] } :: CheckDependenciesResponse)
       json `shouldEqual` """{"missedDependencies":["ffmpeg","yt-dlp"]}"""
+
+    it "encodes TranscriptResponse" do
+      let json = writeJSON ({ markdown: "hello" } :: TranscriptResponse)
+      json `shouldEqual` """{"markdown":"hello"}"""
 
     it "encodes UpdateCheckResponse" do
       let
@@ -38,6 +42,15 @@ spec = do
         Left err -> fail $ "Expected CheckDependenciesResponse to decode, but got error: " <> show err
         Right { missedDependencies } ->
           missedDependencies `shouldEqual` [ "ffmpeg", "yt-dlp" ]
+
+    it "decodes TranscriptResponse" do
+      let
+        json = """{ "markdown": "# Hello" }"""
+        res = (readJSON json :: Either _ TranscriptResponse)
+      case res of
+        Left err -> fail $ "Expected TranscriptResponse to decode, but got error: " <> show err
+        Right { markdown } ->
+          markdown `shouldEqual` "# Hello"
 
     it "decodes StatusResponse with Pending status" do
       let

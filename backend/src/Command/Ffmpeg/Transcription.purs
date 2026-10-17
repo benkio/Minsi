@@ -2,6 +2,7 @@ module Command.Ffmpeg.Transcription where
 
 import Prelude
 
+import Command.Ffmpeg.TranscriptRestoration (restoreTranscriptWithFallback)
 import Constants (md)
 import Control.Monad.Error.Class (catchError)
 import Data.Maybe (Maybe(..))
@@ -20,12 +21,13 @@ import Node.Library.Execa (ExecaResult)
 makeTranscription :: State -> Aff (Array ExecaResult)
 makeTranscription (State { filename, subtitles }) =
   catchError
-    ( liftEffect do
-        filepath <- md filename
-        let transcriptionMarkdown = subtitlesToString subtitles (Just subtitlesToMarkdown)
-        transcriptionMarkdownEscaped <- escapeMarkdown transcriptionMarkdown
-        log $ "[Transcription] Execute Command: write file " <> show filepath <> " with content " <> transcriptionMarkdownEscaped
-        writeTextFile UTF8 filepath transcriptionMarkdownEscaped
+    ( do
+        filepath <- liftEffect $ md filename
+        let transcriptionRaw = subtitlesToString subtitles (Just subtitlesToMarkdown)
+        transcriptionRestored <- restoreTranscriptWithFallback transcriptionRaw
+        transcriptionMarkdownEscaped <- liftEffect $ escapeMarkdown transcriptionRestored
+        liftEffect $ log $ "[Transcription] Execute Command: write file " <> show filepath
+        liftEffect $ writeTextFile UTF8 filepath transcriptionMarkdownEscaped
         pure []
     )
     (\e -> liftEffect $ throwMinsiError (toTranscriptionError e))
@@ -39,6 +41,9 @@ transcriptionErrorDetails e = "type=" <> show e <> "; message=" <> message e
 subtitlesToMarkdown :: Array Subtitle -> String
 subtitlesToMarkdown subtitles =
   joinWith " " (map subtitleToMarkdown subtitles)
+
+applyRestorationThenEscaping :: (String -> String) -> (String -> String) -> String -> String
+applyRestorationThenEscaping restore escape = escape <<< restore
 
 foreign import escapeMarkdown :: String -> Effect String
 
