@@ -4,6 +4,12 @@ node_modules
 **/node_modules
 .spago
 **/.spago
+.venv
+**/.venv
+__pycache__
+**/__pycache__
+*.pyc
+**/*.pyc
 dist
 coverage
 

@@ -2,7 +2,7 @@ module Test.Command.Ffmpeg.TranscriptionSpec where
 
 import Prelude
 
-import Command.Ffmpeg.Transcription (subtitleToEnphasisChar, subtitleToMarkdown, subtitlesToMarkdown, transcriptionErrorDetails, toTranscriptionError)
+import Command.Ffmpeg.Transcription (applyRestorationThenEscaping, subtitleToEnphasisChar, subtitleToMarkdown, subtitlesToMarkdown, transcriptionErrorDetails, toTranscriptionError)
 import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Milliseconds(..))
 import Effect.Exception (error, message)
@@ -74,3 +74,18 @@ spec = do
       case toTranscriptionError e of
         TranscriptionError details -> details `shouldEqual` ("type=" <> show e <> "; message=" <> message e)
         _ -> "unexpected constructor" `shouldEqual` "TranscriptionError"
+
+  describe "restoration + escaping order" do
+    it "applies restoration before escaping" do
+      let
+        restore = (_ <> " [restored]")
+        escape = (_ <> " [escaped]")
+      applyRestorationThenEscaping restore escape "hello"
+        `shouldEqual` "hello [restored] [escaped]"
+
+    it "applies escaping exactly once in the pipeline function" do
+      let
+        restore = identity
+        escape = (_ <> " [escaped]")
+      applyRestorationThenEscaping restore escape "hello"
+        `shouldEqual` "hello [escaped]"

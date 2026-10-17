@@ -10,6 +10,10 @@ PureScript Express server for the Minsi web app. It serves the frontend (from `p
 
 System tools used at runtime (must be on `PATH`): **ffmpeg**, **yt-dlp**, **id3v2**, **fc-list**.
 
+Optional local service for punctuation/capitalization restoration (mainly for local non-Docker runs):
+- see `../punctuation-service/README.md`
+- backend reads `MINSI_PUNCTUATION_SERVICE_URL` (default: `http://127.0.0.1:8090/restore`)
+
 ## Setup
 
 1. Install PureScript and Spago (if needed):
@@ -21,6 +25,15 @@ System tools used at runtime (must be on `PATH`): **ffmpeg**, **yt-dlp**, **id3v
    ```bash
    npm install
    spago install
+   ```
+
+3. (Optional, recommended for transcript punctuation) start the local punctuation service:
+   ```bash
+   cd ../punctuation-service
+   python -m venv .venv
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   uvicorn app:app --host 127.0.0.1 --port 8090
    ```
 
 ## Usage

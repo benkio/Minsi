@@ -8,6 +8,8 @@ type StatusResponse = { status :: String, description :: String }
 
 type CheckDependenciesResponse = { missedDependencies :: Array String }
 
+type TranscriptResponse = { markdown :: String }
+
 type UpdateCheckResponse =
   { updateAvailable :: Boolean
   , currentVersion :: String

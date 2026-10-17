@@ -40,6 +40,9 @@ RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib" > /etc/apt/so
     echo "deb http://security.debian.org/ bookworm-security main contrib" >> /etc/apt/sources.list.d/bookworm.list && \
     apt-get update && apt-get install -y --no-install-recommends \
     libc6 \
+    python3 \
+    python3-pip \
+    python3-venv \
     ttf-mscorefonts-installer \
     fontconfig \
     id3v2 \
@@ -89,8 +92,19 @@ COPY --from=builder /usr/src/minsi/backend/run.js ./backend/
 COPY --from=builder /usr/src/minsi/backend/package.json ./backend/
 COPY --from=builder /usr/src/minsi/backend/package-lock.json* ./backend/
 COPY --from=builder /usr/src/minsi/backend/node_modules ./backend/node_modules
+COPY --from=builder /usr/src/minsi/backend/start-services.sh ./backend/
+COPY --from=builder /usr/src/minsi/punctuation-service ./punctuation-service
+
+RUN python3 -m venv /usr/src/minsi/punctuation-service/.venv \
+    && /usr/src/minsi/punctuation-service/.venv/bin/pip install --no-cache-dir -r /usr/src/minsi/punctuation-service/requirements.txt
+RUN chmod +x /usr/src/minsi/backend/start-services.sh
 
 WORKDIR /usr/src/minsi/backend
 
+ENV MINSI_PUNCTUATION_SERVICE_URL=http://127.0.0.1:8090/restore
+ENV MINSI_PUNCTUATION_HOST=127.0.0.1
+ENV MINSI_PUNCTUATION_PORT=8090
+ENV MINSI_PUNCTUATION_PYTHON=/usr/src/minsi/punctuation-service/.venv/bin/python
+
 EXPOSE 8080
-CMD ["node", "run.js"]
+CMD ["./start-services.sh"]
