@@ -2,7 +2,7 @@ module Test.Command.Ffmpeg.TranscriptionSpec where
 
 import Prelude
 
-import Command.Ffmpeg.Transcription (applyRestorationThenEscaping, subtitleToEnphasisChar, subtitleToMarkdown, subtitlesToMarkdown, transcriptionErrorDetails, toTranscriptionError)
+import Command.Ffmpeg.Transcription (applyRestorationThenEscaping, restoreTranscriptGroupedByLineWith, subtitleToEnphasisChar, subtitleToMarkdown, subtitlesToMarkdown, transcriptionErrorDetails, toTranscriptionError)
 import Data.Maybe (Maybe(..))
 import Data.Time.Duration (Milliseconds(..))
 import Effect.Exception (error, message)
@@ -52,7 +52,16 @@ spec = do
           , mkSubtitle "second" ArialBlack LightOrange
           , mkSubtitle "third" ArialBlack LightGreen
           ]
-      subtitlesToMarkdown subtitles `shouldEqual` "first *second* `third`"
+      subtitlesToMarkdown subtitles `shouldEqual` "first second third"
+
+    it "applies emphasis only once around the full grouped line" do
+      let
+        subtitles =
+          [ mkSubtitle "ah rock" ArialBlack Yellow
+          , mkSubtitle "e lento" ArialBlack Yellow
+          , mkSubtitle "e quello e quell'altro" ArialBlack Yellow
+          ]
+      subtitlesToMarkdown subtitles `shouldEqual` "_ah rock e lento e quello e quell'altro_"
 
     it "does not keep all-caps input when producing markdown transcript lines" do
       let
@@ -61,6 +70,20 @@ spec = do
           , mkSubtitle "  WORLD  " Impact White
           ]
       subtitlesToString subtitles (Just subtitlesToMarkdown) `shouldEqual` "Hello world"
+
+    it "keeps style groups on separate lines in markdown transformation" do
+      let
+        subtitles =
+          [ mkSubtitle "C'è capito la gente" Impact White
+          , mkSubtitle "che dice" Impact White
+          , mkSubtitle "ah rock" ArialBlack Yellow
+          , mkSubtitle "e lento" ArialBlack Yellow
+          , mkSubtitle "e quello e quell'altro" ArialBlack Yellow
+          , mkSubtitle "fate ridere" Impact White
+          ]
+      subtitlesToString subtitles (Just subtitlesToMarkdown)
+        `shouldEqual`
+          "C'è capito la gente che dice\n_ah rock e lento e quello e quell'altro_\nFate ridere"
 
   describe "transcription error wrapping" do
     it "preserves both exception type rendering and message" do
@@ -89,3 +112,10 @@ spec = do
         escape = (_ <> " [escaped]")
       applyRestorationThenEscaping restore escape "hello"
         `shouldEqual` "hello [escaped]"
+
+  describe "line-group preservation during restoration" do
+    it "restores each non-empty line independently and keeps line breaks" do
+      let
+        fakeRestore line = pure ("[" <> line <> "]")
+      result <- restoreTranscriptGroupedByLineWith fakeRestore "first line\n\n_third line_"
+      result `shouldEqual` "[first line]\n\n[_third line_]"

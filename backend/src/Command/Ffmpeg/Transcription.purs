@@ -5,8 +5,12 @@ import Prelude
 import Command.Ffmpeg.TranscriptRestoration (restoreTranscriptWithFallback)
 import Constants (md)
 import Control.Monad.Error.Class (catchError)
-import Data.Maybe (Maybe(..))
-import Data.String (joinWith)
+import Data.Array (head)
+import Data.Maybe (Maybe(..), maybe)
+import Data.String (joinWith, split)
+import Data.String.Common (trim)
+import Data.String.Pattern (Pattern(..))
+import Data.Traversable (traverse)
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
@@ -24,7 +28,7 @@ makeTranscription (State { filename, subtitles }) =
     ( do
         filepath <- liftEffect $ md filename
         let transcriptionRaw = subtitlesToString subtitles (Just subtitlesToMarkdown)
-        transcriptionRestored <- restoreTranscriptWithFallback transcriptionRaw
+        transcriptionRestored <- restoreTranscriptGroupedByLine transcriptionRaw
         transcriptionMarkdownEscaped <- liftEffect $ escapeMarkdown transcriptionRestored
         liftEffect $ log $ "[Transcription] Execute Command: write file " <> show filepath
         liftEffect $ writeTextFile UTF8 filepath transcriptionMarkdownEscaped
@@ -40,7 +44,22 @@ transcriptionErrorDetails e = "type=" <> show e <> "; message=" <> message e
 
 subtitlesToMarkdown :: Array Subtitle -> String
 subtitlesToMarkdown subtitles =
-  joinWith " " (map subtitleToMarkdown subtitles)
+  emphasis <> subtitlesLine <> emphasis
+  where
+  subtitlesLine = joinWith " " (map (\(Subtitle { value }) -> value) subtitles)
+  emphasis = maybe "" subtitleToEnphasisChar (head subtitles)
+
+restoreTranscriptGroupedByLine :: String -> Aff String
+restoreTranscriptGroupedByLine = restoreTranscriptGroupedByLineWith restoreTranscriptWithFallback
+
+restoreTranscriptGroupedByLineWith :: (String -> Aff String) -> String -> Aff String
+restoreTranscriptGroupedByLineWith restoreLineWithFallback text = do
+  restoredLines <- traverse restoreLine (split (Pattern "\n") text)
+  pure $ joinWith "\n" restoredLines
+  where
+  restoreLine line
+    | trim line == "" = pure line
+    | otherwise = restoreLineWithFallback line
 
 applyRestorationThenEscaping :: (String -> String) -> (String -> String) -> String -> String
 applyRestorationThenEscaping restore escape = escape <<< restore
