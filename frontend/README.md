@@ -1,6 +1,6 @@
 # Minsi Frontend
 
-PureScript frontend for the Minsi video clip extractor. It provides the web UI (Bootstrap, YouTube embed) and talks to the backend API.
+PureScript frontend for the Minsi video clip extractor. It provides the web UI (Bootstrap, YouTube embed), previews MP4/GIF/MP3 outputs, and lets users download all generated files including transcript `.md`.
 
 ## Dependencies
 
