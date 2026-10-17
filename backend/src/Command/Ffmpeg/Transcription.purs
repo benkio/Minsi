@@ -1,28 +1,42 @@
 module Command.Ffmpeg.Transcription where
 
--- import Prelude
+import Prelude
 
--- import Command.Command (runCommand)
--- import Command.Ffmpeg.Base (baseFlagsInput, baseFlagsOutput)
--- import Constants (mp4, gif, srt)
--- import Conversion.Time (millisecondsToSecondsString)
--- import Data.Array (mapWithIndex, null, singleton)
--- import Data.Foldable (fold)
--- import Data.Maybe (Maybe(..))
--- import Data.Time.Duration (Milliseconds(..))
--- import Effect (Effect)
+import Constants (md)
+import Data.Maybe (Maybe(..))
+import Data.String (joinWith)
+import Effect (Effect)
 import Effect.Aff (Aff)
--- import Effect.Class (liftEffect)
--- import Effect.Console (log)
--- import MinsiErrors (MinsiError(..))
-import Model.State.State (State)
--- import Node.Buffer (fromString)
--- import Node.Encoding (Encoding(..))
--- import Node.FS.Sync (rm, writeFile)
+import Effect.Class (liftEffect)
+import Effect.Console (log)
+import Model.State.State (Color(..), Font(..), State(..), Subtitle(..), subtitlesToString)
+import Node.Encoding (Encoding(..))
+import Node.FS.Sync (writeTextFile)
 import Node.Library.Execa (ExecaResult)
--- import Node.Path (FilePath)
-
-import Partial.Unsafe (unsafeCrashWith)
 
 makeTranscription :: State -> Aff (Array ExecaResult)
-makeTranscription state = unsafeCrashWith "TODO: implement makeTranscription"
+makeTranscription (State { filename, subtitles }) = liftEffect do
+  filepath <- md filename
+  let transcriptionMarkdown = subtitlesToString subtitles (Just subtitlesToMarkdown)
+  transcriptionMarkdownEscaped <- escapeMarkdown transcriptionMarkdown
+  log $ "[Transcription] Execute Command: write file " <> show filepath <> " with content " <> transcriptionMarkdownEscaped
+  writeTextFile UTF8 filepath transcriptionMarkdownEscaped
+  pure []
+
+subtitlesToMarkdown :: Array Subtitle -> String
+subtitlesToMarkdown subtitles =
+  joinWith " " (map subtitleToMarkdown subtitles)
+
+foreign import escapeMarkdown :: String -> Effect String
+
+subtitleToMarkdown :: Subtitle -> String
+subtitleToMarkdown subtitle@(Subtitle { value }) =
+  enphasis <> value <> enphasis
+  where
+  enphasis = subtitleToEnphasisChar subtitle
+
+subtitleToEnphasisChar :: Subtitle -> String
+subtitleToEnphasisChar (Subtitle { font: ArialBlack, color: Yellow }) = "_"
+subtitleToEnphasisChar (Subtitle { font: ArialBlack, color: LightOrange }) = "*"
+subtitleToEnphasisChar (Subtitle { font: ArialBlack, color: LightGreen }) = "`"
+subtitleToEnphasisChar _ = ""

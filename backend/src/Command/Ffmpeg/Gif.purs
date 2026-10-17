@@ -18,7 +18,7 @@ import MinsiErrors (MinsiError(..))
 import Model.State.State (DurationRange(..), Subtitle(..), Position(..), State(..))
 import Node.Buffer (fromString)
 import Node.Encoding (Encoding(..))
-import Node.FS.Sync (rm, writeFile)
+import Node.FS.Sync (rm, writeTextFile)
 import Node.Library.Execa (ExecaResult)
 import Node.Path (FilePath)
 
@@ -80,9 +80,8 @@ subtitleGifCleanup filename = liftEffect $
 writeSrtFile :: FilePath -> String -> Effect Unit
 writeSrtFile filename srtContent = do
   f <- srt filename
-  bufferContent <- fromString srtContent UTF8
-  log $ "[Gif] Execute Command: writeFile " <> show f <> " with content " <> srtContent
-  writeFile f bufferContent
+  log $ "[Gif] Execute Command: write file " <> show f <> " with content " <> srtContent
+  writeTextFile UTF8 f srtContent
 
 -- SRT String Creation -------------------------------------
 

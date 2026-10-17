@@ -217,18 +217,19 @@ shiftDurationRange :: Milliseconds -> DurationRange -> DurationRange
 shiftDurationRange (Milliseconds millis) (DurationRange { start: (Milliseconds s), end: (Milliseconds e) }) =
   DurationRange { start: (Milliseconds (s + millis)), end: (Milliseconds (e + millis)) }
 
-subtitlesToString :: Array Subtitle -> Maybe (Array String -> String) -> String
-subtitlesToString subtitles mayTransformer = subtitleGroupsValuesTransformed
+subtitlesToString :: Array Subtitle -> Maybe (Array Subtitle -> String) -> String
+subtitlesToString subtitles mayTransformer = joinWith "\n" subtitleGroupsValues
   where
   subtitleGroups = (sort >>> group) subtitles
-  subtitleToLower (Subtitle { value }) = (toLower <<< trim) value
+  subtitleToLower (Subtitle subtitle) = (toLower <<< trim) subtitle.value
 
   groupToString :: NonEmptyArray Subtitle -> String
-  groupToString group = (capitalizeFirst <<< joinWith " " <<< map subtitleToLower <<< toArray) group
+  groupToString group =
+    capitalizeFirst $ maybe defaultGroup (\transformer -> transformer subtitleGroup) mayTransformer
+    where
+    subtitleGroup = toArray group
+    defaultGroup = joinWith " " (map subtitleToLower subtitleGroup)
   subtitleGroupsValues = groupToString <$> subtitleGroups
-
-  subtitleGroupsValuesTransformed :: String
-  subtitleGroupsValuesTransformed = maybe (joinWith "\n" subtitleGroupsValues) (\transformer -> transformer subtitleGroupsValues) mayTransformer
 
 validateState :: State -> Either (Array String) State
 validateState state@(State ({ source, filename, cutVideo: durationRange, subtitles, reverseLoop, artist, title })) = do
