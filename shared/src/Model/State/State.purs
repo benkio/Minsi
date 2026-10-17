@@ -6,12 +6,12 @@ import Conversion.String (capitalizeFirst)
 import Data.Array (group, null, sort)
 import Data.Array.NonEmpty (NonEmptyArray, toArray)
 import Data.Either (Either(..))
-import Data.Maybe (maybe)
+import Data.Maybe (maybe, Maybe)
 import Data.Newtype (class Newtype)
-import Data.String.Regex (regex, test)
-import Data.String.Regex.Flags (noFlags)
 import Data.String (joinWith, length)
 import Data.String.Common (toLower, trim)
+import Data.String.Regex (regex, test)
+import Data.String.Regex.Flags (noFlags)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Traversable (traverse_)
 import Data.URL (URL, fromString, toString)
@@ -217,8 +217,8 @@ shiftDurationRange :: Milliseconds -> DurationRange -> DurationRange
 shiftDurationRange (Milliseconds millis) (DurationRange { start: (Milliseconds s), end: (Milliseconds e) }) =
   DurationRange { start: (Milliseconds (s + millis)), end: (Milliseconds (e + millis)) }
 
-subtitlesToString :: Array Subtitle -> String
-subtitlesToString subtitles = joinWith "\n" subtitleGroupsValues
+subtitlesToString :: Array Subtitle -> Maybe (Array String -> String) -> String
+subtitlesToString subtitles mayTransformer = subtitleGroupsValuesTransformed
   where
   subtitleGroups = (sort >>> group) subtitles
   subtitleToLower (Subtitle { value }) = (toLower <<< trim) value
@@ -226,6 +226,9 @@ subtitlesToString subtitles = joinWith "\n" subtitleGroupsValues
   groupToString :: NonEmptyArray Subtitle -> String
   groupToString group = (capitalizeFirst <<< joinWith " " <<< map subtitleToLower <<< toArray) group
   subtitleGroupsValues = groupToString <$> subtitleGroups
+
+  subtitleGroupsValuesTransformed :: String
+  subtitleGroupsValuesTransformed = maybe (joinWith "\n" subtitleGroupsValues) (\transformer -> transformer subtitleGroupsValues) mayTransformer
 
 validateState :: State -> Either (Array String) State
 validateState state@(State ({ source, filename, cutVideo: durationRange, subtitles, reverseLoop, artist, title })) = do

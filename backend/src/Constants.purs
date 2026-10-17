@@ -21,6 +21,9 @@ mp3 filename = outputPath >>= \ofp -> resolve [ ofp ] (filename <> ".mp3")
 gif :: String -> Effect FilePath
 gif filename = outputPath >>= \ofp -> resolve [ ofp ] (filename <> "Gif.mp4")
 
+md :: String -> Effect FilePath
+md filename = outputPath >>= \ofp -> resolve [ ofp ] (filename <> ".md")
+
 srt :: String -> Effect FilePath
 srt filename = outputPath >>= \ofp -> resolve [ ofp ] (filename <> ".srt")
 
@@ -48,6 +51,7 @@ files filename =
     [ mp4
     , mp3
     , gif
+    , md
     , srt
     , txt
     , reversed

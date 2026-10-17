@@ -35,7 +35,7 @@ copyTranscriptButtonEventListener _ = genericErrorsHandler $ do
   state <- getCurrentState
   let
     subtitles = view _subtitles (fst state)
-    transcript = subtitlesToString subtitles
+    transcript = subtitlesToString subtitles Nothing
     clipboardContentEl = view _clipboardOutputModalContent components
   setTextContent transcript (HP.toNode clipboardContentEl)
   showModal clipboardOutputModalId (Just 5000)

@@ -6,7 +6,7 @@ import Components.HTMLElement (showElementHideOther)
 import Components.HTMLMediaElement (setMediaSrcAndLoad)
 import Components.HtmlComponents (HtmlComponents)
 import Components.HtmlComponents.Lenses (_resultAudio, _resultVideo, _videoSource)
-import Constants (mp4, gif, mp3)
+import Constants (mp4, gif, mp3, md)
 import Data.DateTime.Instant (unInstant)
 import Data.Lens (view)
 import Data.Time.Duration (Milliseconds(..))
@@ -27,6 +27,7 @@ pathForVideoSource selectedVideoSourceValue filename =
     "mp4" -> pure (mp4 filename)
     "gif" -> pure (gif filename)
     "mp3" -> pure (mp3 filename)
+    "md" -> pure (md filename)
     x -> throwMinsiError (InvalidInput "videoSource" ("Value " <> x <> " not recognized as valid input"))
 
 isVideoSource :: String -> Boolean
