@@ -66,13 +66,14 @@
       <div class="row">
         <div class="col-12 col-lg-8 mx-auto">
           <div class="card shadow-sm mb-4">
-            <div class="card-header bg-light fw-bold">How to get Video, MP3 & GIF</div>
+            <div class="card-header bg-light fw-bold">How to get Video, MP3, GIF & Transcript</div>
             <div class="card-body">
               <p class="lead mb-4">
                 Use the main app (<a href="./index.html">index.html</a>) to pick a
                 video clip, set the time range and metadata, then run the
                 pipeline. You get a <strong>video</strong> (MP4), an
-                <strong>MP3</strong>, and optionally a <strong>GIF</strong>.
+                <strong>MP3</strong>, optionally a <strong>GIF</strong>, and a
+                <strong>transcript</strong> (<code>.md</code>).
               </p>
 
               <div class="mb-4">
@@ -147,6 +148,7 @@
               </p>
               <ul class="small mb-3">
                 <li><strong>Video / Gif / Mp3</strong> — A dropdown to preview the MP4 clip, the generated GIF, or the MP3 audio extract.</li>
+                <li><strong>Download All</strong> — Downloads all generated outputs, including the transcript <code>.md</code> file.</li>
                 <li><strong>Subtitles table</strong> — Visible only when <strong>Reverse / Loop GIF</strong> is <em>un</em>checked. Use it to define captions that will be burned into the GIF on the next Apply (see below).</li>
               </ul>
 
@@ -182,6 +184,7 @@
                 <li><code>&lt;filename&gt;.mp4</code> — video clip</li>
                 <li><code>&lt;filename&gt;.mp3</code> — audio with ID3 tags</li>
                 <li><code>&lt;filename&gt;Gif.mp4</code> — GIF (or looped clip)</li>
+                <li><code>&lt;filename&gt;.md</code> — transcript generated from subtitles</li>
               </ul>
 
               <h5 class="mt-4 mb-2">8. Keyboard shortcuts</h5>

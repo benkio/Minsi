@@ -1,8 +1,7 @@
 module Test.State.SubtitlesToStringSpec where
 
-import Prelude
-import Test.Spec (Spec, describe, it)
-import Test.Spec.Assertions (shouldEqual)
+import Data.Maybe (Maybe(..))
+import Data.String (joinWith)
 import Data.Time.Duration (Milliseconds(..))
 import Model.State.State
   ( DurationRange(..)
@@ -12,6 +11,9 @@ import Model.State.State
   , Position(..)
   , subtitlesToString
   )
+import Prelude
+import Test.Spec (Spec, describe, it)
+import Test.Spec.Assertions (shouldEqual)
 
 mkSubtitle :: Number -> String -> Font -> Color -> Position -> Subtitle
 mkSubtitle start value font color screenPosition =
@@ -33,7 +35,7 @@ spec = do
           [ mkSubtitle 10.0 "Hello" Impact White Top
           , mkSubtitle 20.0 "world" Impact White Top
           ]
-      subtitlesToString subtitles `shouldEqual` "Hello world"
+      subtitlesToString subtitles Nothing `shouldEqual` "Hello world"
 
     it "starts a new line when font, color, or screen position changes" $ do
       let
@@ -44,7 +46,7 @@ spec = do
           , mkSubtitle 40.0 "Bottom" Impact Black Bottom
           , mkSubtitle 50.0 "Bold" ArialBlack Black Bottom
           ]
-      subtitlesToString subtitles `shouldEqual` "First line\nOther\nBottom\nBold"
+      subtitlesToString subtitles Nothing `shouldEqual` "First line\nOther\nBottom\nBold"
 
     it "sorts by video position before grouping" $ do
       let
@@ -53,7 +55,7 @@ spec = do
           , mkSubtitle 10.0 "First" Impact White Top
           , mkSubtitle 20.0 "Second" Impact White Top
           ]
-      subtitlesToString subtitles `shouldEqual` "First second third"
+      subtitlesToString subtitles Nothing `shouldEqual` "First second third"
 
     it "does not merge matching styles separated by a different group" $ do
       let
@@ -62,7 +64,7 @@ spec = do
           , mkSubtitle 20.0 "Two" Impact Black Top
           , mkSubtitle 30.0 "Three" Impact White Top
           ]
-      subtitlesToString subtitles `shouldEqual` "One\nTwo\nThree"
+      subtitlesToString subtitles Nothing `shouldEqual` "One\nTwo\nThree"
 
     it "lowercases and trims subtitle values" $ do
       let
@@ -70,4 +72,32 @@ spec = do
           [ mkSubtitle 10.0 "  HELLO  " Impact White Top
           , mkSubtitle 20.0 "  WORLD  " Impact White Top
           ]
-      subtitlesToString subtitles `shouldEqual` "Hello world"
+      subtitlesToString subtitles Nothing `shouldEqual` "Hello world"
+
+    it "uses a custom transformer on each style-group" $ do
+      let
+        subtitles =
+          [ mkSubtitle 10.0 "One" Impact White Top
+          , mkSubtitle 20.0 "Two" Impact White Top
+          , mkSubtitle 30.0 "Three" Impact Black Top
+          ]
+        transformer group = joinWith "|" (map (\(Subtitle { value }) -> value) group)
+      subtitlesToString subtitles (Just transformer) `shouldEqual` "One|two\nThree"
+
+    it "applies capitalization after transformer output" $ do
+      let
+        subtitles =
+          [ mkSubtitle 10.0 "hello" Impact White Top
+          , mkSubtitle 20.0 "world" Impact White Top
+          ]
+        transformer _ = "custom output"
+      subtitlesToString subtitles (Just transformer) `shouldEqual` "Custom output"
+
+    it "normalizes subtitle values before custom transformer usage" $ do
+      let
+        subtitles =
+          [ mkSubtitle 10.0 "  HELLO  " Impact White Top
+          , mkSubtitle 20.0 "  WORLD  " Impact White Top
+          ]
+        transformer group = joinWith " " (map (\(Subtitle { value }) -> value) group)
+      subtitlesToString subtitles (Just transformer) `shouldEqual` "Hello world"

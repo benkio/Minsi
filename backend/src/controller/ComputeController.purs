@@ -9,6 +9,7 @@ import Command.Ffmpeg.Gif (makeGif)
 import Command.Ffmpeg.Loop (applyReverseLoop)
 import Command.Ffmpeg.LoopbackSpeed (applyLoopbackSpeed)
 import Command.Ffmpeg.Mp3 (extractMp3)
+import Command.Ffmpeg.Transcription (makeTranscription)
 import Command.Ffmpeg.Video (FfmpegInput(..), cutVideo)
 import Command.Id3v2 (addId3Tags)
 import Command.Ytdlp (YtdlpDownloadResult(..), YtdlpInput(..), ytdlpDownload)
@@ -26,9 +27,9 @@ import Effect.Console (log)
 import InMemoryDB (Store, insert, insertProcessStatus, lookupProcessStatus)
 import MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.State.State (DurationRange(..), Source(..), State(..), WURL(..), validateState)
-import Node.Library.Execa (ExecaResult)
 import Node.Express.Handler (Handler)
 import Node.Express.Request (getBody')
+import Node.Library.Execa (ExecaResult)
 import Yoga.JSON (read)
 
 data ComputeResponse
@@ -116,6 +117,9 @@ runComputePipeline mayOldState state@(State { source, filename, cutVideo: range,
 
     liftEffect $ insertProcessStatus filename (Pending "Gif Creation") store
     void $ exceptTMultiple "Gif Creation" $ makeGif state
+
+    liftEffect $ insertProcessStatus filename (Pending "Transcription Creation") store
+    void $ exceptTMultiple "Transcription Creation" $ makeTranscription state
 
     liftEffect $ log ("[Compute] Pipeline completed for filename: " <> filename)
     pure unit

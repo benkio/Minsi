@@ -1,6 +1,6 @@
 # Minsi Backend
 
-PureScript Express server for the Minsi web app. It serves the frontend (from `public/`), runs the API used by the UI, and executes video/audio pipelines (yt-dlp, ffmpeg, id3v2).
+PureScript Express server for the Minsi web app. It serves the frontend (from `public/`), runs the API used by the UI, and executes video/audio/transcript pipelines (yt-dlp, ffmpeg, id3v2).
 
 ## Dependencies
 
@@ -48,7 +48,7 @@ System tools used at runtime (must be on `PATH`): **ffmpeg**, **yt-dlp**, **id3v
 - Serves static files from **`../public/`** (relative to the backend directory).
 - Root (`/`) serves **`index.html`**; other assets (e.g. `index.js`, `instructions.html`) are served by path.
 - Exposes API routes used by the frontend (e.g. dependency check, compute, status).
-- Writes output files (MP4, MP3, GIF) under **`public/output/`**.
+- Writes output files (MP4, MP3, GIF, MD transcript) under **`public/output/`**.
 
 ### Configuration
 

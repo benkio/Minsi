@@ -6,12 +6,12 @@ import Conversion.String (capitalizeFirst)
 import Data.Array (group, null, sort)
 import Data.Array.NonEmpty (NonEmptyArray, toArray)
 import Data.Either (Either(..))
-import Data.Maybe (maybe)
+import Data.Maybe (maybe, Maybe)
 import Data.Newtype (class Newtype)
-import Data.String.Regex (regex, test)
-import Data.String.Regex.Flags (noFlags)
 import Data.String (joinWith, length)
 import Data.String.Common (toLower, trim)
+import Data.String.Regex (regex, test)
+import Data.String.Regex.Flags (noFlags)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Traversable (traverse_)
 import Data.URL (URL, fromString, toString)
@@ -217,14 +217,22 @@ shiftDurationRange :: Milliseconds -> DurationRange -> DurationRange
 shiftDurationRange (Milliseconds millis) (DurationRange { start: (Milliseconds s), end: (Milliseconds e) }) =
   DurationRange { start: (Milliseconds (s + millis)), end: (Milliseconds (e + millis)) }
 
-subtitlesToString :: Array Subtitle -> String
-subtitlesToString subtitles = joinWith "\n" subtitleGroupsValues
+subtitlesToString :: Array Subtitle -> Maybe (Array Subtitle -> String) -> String
+subtitlesToString subtitles mayTransformer = joinWith "\n" subtitleGroupsValues
   where
   subtitleGroups = (sort >>> group) subtitles
-  subtitleToLower (Subtitle { value }) = (toLower <<< trim) value
+  normalizeSubtitle (Subtitle subtitle) = Subtitle (subtitle { value = (toLower <<< trim) subtitle.value })
 
   groupToString :: NonEmptyArray Subtitle -> String
-  groupToString group = (capitalizeFirst <<< joinWith " " <<< map subtitleToLower <<< toArray) group
+  groupToString group =
+    capitalizeFirst $
+      maybe
+        (subtitleGroupValueConcat normalizedSubtitleGroup)
+        (\transformer -> transformer normalizedSubtitleGroup)
+        mayTransformer
+    where
+    normalizedSubtitleGroup = (map normalizeSubtitle <<< toArray) group
+    subtitleGroupValueConcat = joinWith " " <<< map (\(Subtitle { value }) -> value)
   subtitleGroupsValues = groupToString <$> subtitleGroups
 
 validateState :: State -> Either (Array String) State

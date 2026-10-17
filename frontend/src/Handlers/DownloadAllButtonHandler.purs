@@ -36,3 +36,4 @@ downloadAll filename = liftEffect do
   triggerDownloadLink filename "mp4"
   triggerDownloadLink filename "gif"
   triggerDownloadLink filename "mp3"
+  triggerDownloadLink filename "md"

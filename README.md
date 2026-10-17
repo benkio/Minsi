@@ -1,8 +1,8 @@
 # Minsi
 
-**Opinionated Video Clip, GIF & Audio Extractor**
+**Opinionated Video Clip, GIF, Audio & Transcript Extractor**
 
-A web application to download supported video URLs (YouTube and selected mirror hosts) and produce customized clips: **video** (MP4), **MP3** audio, and **GIF** (with optional subtitles), with best-possible quality.
+A web application to download supported video URLs (YouTube and selected mirror hosts) and produce customized clips: **video** (MP4), **MP3** audio, **GIF** (with optional subtitles), and a **transcript** (`.md`), with best-possible quality.
 
 **PROJECT IN MAINTENANCE MODE**
 I don't plan to develop new features on this for now. Just fix bugs and keep it working
@@ -47,9 +47,9 @@ You also need **Impact** and **Arial Black** fonts installed if you use subtitle
 
 3. **Use the app**
    - Open **http://localhost:8080** in your browser.
-  - See **[Instructions](http://localhost:8080/instructions.html)** for how to get video, MP3, and GIF from a supported video URL.
+  - See **[Instructions](http://localhost:8080/instructions.html)** for how to get video, MP3, GIF, and transcript outputs from a supported video URL.
 
-Output files are written to **`public/output/`** (e.g. `rphjb_Hello.mp4`, `rphjb_Hello.mp3`, `rphjb_HelloGif.mp4`).
+Output files are written to **`public/output/`** (e.g. `rphjb_Hello.mp4`, `rphjb_Hello.mp3`, `rphjb_HelloGif.mp4`, `rphjb_Hello.md`).
 The output filename must follow the format `prefix_Name`: 1–5 lowercase letters, an underscore, then a capitalized name with letters and numbers.
 
 ## Running with Docker
@@ -194,5 +194,6 @@ I needed a single tool to turn a video clip into:
 - A **GIF** (with optional subtitles)
 - An **MP3** audio extract
 - A **video** clip
+- A **transcript** (`.md`)
 
 [This script](https://gist.github.com/benkio/103960b7b5a5781c222df1c4e31544a2) did the job; Minsi adds a **web UI** so it’s easier to use.
