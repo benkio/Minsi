@@ -44,33 +44,25 @@ minsiComplains = "minsiComplains.mp3"
 genericErrorsHandler :: forall m. MonadError Error m => MonadEffect m => m Unit -> m Unit
 genericErrorsHandler p =
   catchError p
-    ( \e ->
-        let
-          errorMessage = message e
-          handleError =
-            case getErrorSeverity e of
-              Fatal -> liftEffect (showMinsiBlockingErrorDialog errorMessage)
-              Critical -> liftEffect (showMinsiErrorDialog errorMessage)
-              Standard -> liftEffect (writeToMinsiLog errorMessage)
-        in
-          liftEffect (log errorMessage) *> catchError handleError (const (liftEffect (raiseErrorAlert errorMessage)))
-    )
+    genericErrorHandlerLogic
 
--- | Handles Either result (e.g. from runAff_ callback). Stays in Effect.
-genericErrorsHandlerEither :: forall a. Either Error a -> Effect Unit
+-- | Handles Either results in any MonadError + MonadEffect context.
+genericErrorsHandlerEither :: forall m a. MonadError Error m => MonadEffect m => Either Error a -> m Unit
 genericErrorsHandlerEither = either
-  ( \e ->
-      let
-        errorMessage = message e
-        handleError =
-          case getErrorSeverity e of
-            Fatal -> liftEffect (showMinsiBlockingErrorDialog errorMessage)
-            Critical -> liftEffect (showMinsiErrorDialog errorMessage)
-            Standard -> liftEffect (writeToMinsiLog errorMessage)
-      in
-        log errorMessage *> catchError handleError (const (raiseErrorAlert errorMessage))
-  )
+  genericErrorHandlerLogic
   (const (pure unit))
+
+genericErrorHandlerLogic :: forall m. MonadError Error m => MonadEffect m => Error -> m Unit
+genericErrorHandlerLogic e =
+  let
+    errorMessage = message e
+    handleError =
+      case getErrorSeverity e of
+        Fatal -> liftEffect (showMinsiBlockingErrorDialog errorMessage)
+        Critical -> liftEffect (showMinsiErrorDialog errorMessage)
+        Standard -> liftEffect (writeToMinsiLog errorMessage)
+  in
+    liftEffect (log errorMessage) *> catchError handleError (const (liftEffect (raiseErrorAlert errorMessage)))
 
 writeToMinsiLog :: String -> Effect Unit
 writeToMinsiLog errorMessage = do

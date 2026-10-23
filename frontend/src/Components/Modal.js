@@ -1,14 +1,22 @@
 const backgroundSound = new Audio("loadingSound.mp3");
 
 function startAudio(audio) {
-  console.log("Starting audio: " + audio.src);
-  audio.play();
+  console.log("[Modal.js] Starting audio: " + audio.src);
+  try {
+    audio.play();
+  } catch (err) {
+    console.log("[Modal.js] Error playing the audio: " + JSON.stringify(err));
+  }
 }
 
 function stopBackground(audio) {
-  console.log("Stopping audio: " + audio.src);
-  audio.pause();
-  audio.currentTime = 0;
+  console.log("[Modal.js] Stopping audio: " + audio.src);
+  try {
+    audio.pause();
+    audio.currentTime = 0;
+  } catch (err) {
+    console.log("[Modal.js] Error stopping the audio: " + JSON.stringify(err));
+  }
 }
 
 export function showModal(id) {
@@ -19,10 +27,12 @@ export function showModal(id) {
       modal.show();
       startAudio(backgroundSound);
       el.addEventListener("hidden.bs.modal", () => {
-        console.log("Modal closed");
+        console.log("[Modal.js] Modal closed " + id);
         stopBackground(backgroundSound);
       });
-      console.log(`Setting Timeout: ${JSON.stringify(maybeTimeout)}`);
+      console.log(
+        `[Modal.js] Setting Timeout: ${JSON.stringify(maybeTimeout)}`,
+      );
       if (maybeTimeout.tag === "Just") {
         setTimeout(() => {
           console.log(`Hiding the modal ${id}`);
@@ -36,9 +46,8 @@ export function showModal(id) {
 
 export function hideModal(id) {
   return function () {
-    const el = document.getElementById(id);
-    const modal = bootstrap.Modal.getOrCreateInstance(el);
     stopBackground(backgroundSound);
-    modal.hide();
+    console.log("[Modal.js] Hide modal id: " + id);
+    bootstrap.Modal.getOrCreateInstance(document.getElementById(id)).hide();
   };
 }
