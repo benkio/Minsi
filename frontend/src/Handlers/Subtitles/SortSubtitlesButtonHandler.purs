@@ -12,12 +12,12 @@ import Components.HtmlComponents (loadComponents)
 import Components.HtmlComponents.Lenses (_sortSubtitlesButton, _subtitleTable)
 import Data.Lens (view)
 import Handlers.ErrorHandlers (genericErrorsHandler)
+import Validations.Number (valueAsNumber)
 import Web.DOM.Element (toEventTarget)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
 import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLButtonElement as HB
-import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLTableElement as HT
 
 setSortSubtitlesButtonHandler :: Effect Unit
@@ -38,7 +38,7 @@ sortSubtitlesButtonEventListener table _ = genericErrorsHandler do
     traverse
       ( \row -> do
           startInput <- getStartInput row
-          start <- HI.valueAsNumber startInput
+          start <- valueAsNumber "SubtitleTableStartCell" startInput
           pure { row, start }
       )
       rows

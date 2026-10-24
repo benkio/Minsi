@@ -5,9 +5,9 @@ import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Prelude (bind, identity, pure, show, ($), (<#>), (<>), (>>=), (>>>))
+import Validations.Number (valueAsNumber)
 import Web.DOM.Element (Element, toParentNode)
 import Web.DOM.ParentNode (QuerySelector(..), querySelector)
-import Web.HTML.HTMLInputElement (valueAsNumber)
 import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLSelectElement as HS
 import Web.HTML.HTMLTableCellElement as HTC
@@ -44,7 +44,7 @@ getInputValueFromCell cell = do
   let parentNode = toParentNode element
   elementMaybe <- querySelector (QuerySelector "input") parentNode
   let inputMaybe = elementMaybe >>= HI.fromElement
-  maybe (pure Nothing) (\input -> valueAsNumber input <#> floor >>> Just) inputMaybe
+  maybe (pure Nothing) (\input -> valueAsNumber "SubtitleTableInputCell" input <#> floor >>> Just) inputMaybe
 
 getTextAreaValueFromCell :: HTC.HTMLTableCellElement -> Effect String
 getTextAreaValueFromCell cell = do

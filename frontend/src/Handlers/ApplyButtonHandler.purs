@@ -57,10 +57,12 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   let uploadLocalFileInput = view _uploadLocalFile components
   showModal loadingModalId (Just 15240)
   runAff_
-    (
-      either (\e -> finallyHandlersError
-                    *> genericErrorHandlerLogic e
-             ) (\_ -> genericErrorsHandler (finallyHandlersSuccess components state)))
+    ( either
+        ( \e -> finallyHandlersError
+            *> genericErrorHandlerLogic e
+        )
+        (\_ -> genericErrorsHandler (finallyHandlersSuccess components state))
+    )
     (applyButtonLogic state uploadLocalFileInput)
 
 applyButtonLogic :: State -> HI.HTMLInputElement -> Aff Unit
@@ -70,8 +72,8 @@ applyButtonLogic state@(State rec) uploadLocalFileInput = do
     filename = rec.filename
     source = rec.source
   when (uploadLocalFile && isLocalFile source)
-    ( liftEffect (log "[ApplyButtonHandler] Uploading Local File") *>
-      uploadLocalFileLogic source filename uploadLocalFileInput
+    ( liftEffect (log "[ApplyButtonHandler] Uploading Local File")
+        *> uploadLocalFileLogic source filename uploadLocalFileInput
         *> waitForStatus filename (LocalFileUploaded "") Nothing
     )
   liftEffect $ log "[ApplyButtonHandler] Calling Compute"

@@ -15,12 +15,12 @@ import Handlers.ResultMedia.MediaSrc (getMediaElement)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.ValidationErrors (toMap)
 import Validations.DurationRangeValidation (durationRangeValidation)
+import Validations.Number (valueAsNumber)
 import Web.DOM.Element (toEventTarget)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
 import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLButtonElement as HB
-import Web.HTML.HTMLInputElement (valueAsNumber)
 import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLMediaElement (HTMLMediaElement, currentTime, duration)
 
@@ -42,8 +42,8 @@ setResultCutButtonsHandlers = genericErrorsHandler $ do
 setResultCutStartButtonEvL :: HTMLMediaElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
 setResultCutStartButtonEvL media cutStart cutEnd uploadLocalFile _ = genericErrorsHandler do
   log "[ResultMedia] set result cut start button clicked"
-  start <- valueAsNumber cutStart
-  end <- valueAsNumber cutEnd
+  start <- valueAsNumber cutStartId cutStart
+  end <- valueAsNumber cutEndId cutEnd
   currentTime <- currentTime media
   let newStart = start + (currentTime * 1000.0)
   validation
@@ -54,8 +54,8 @@ setResultCutStartButtonEvL media cutStart cutEnd uploadLocalFile _ = genericErro
 setResultCutEndButtonEvL :: HTMLMediaElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
 setResultCutEndButtonEvL media cutStart cutEnd uploadLocalFile _ = genericErrorsHandler do
   log "[ResultMedia] set result cut end button clicked"
-  start <- valueAsNumber cutStart
-  end <- valueAsNumber cutEnd
+  start <- valueAsNumber cutStartId cutStart
+  end <- valueAsNumber cutEndId cutEnd
   currentTime <- currentTime media
   duration <- duration media
   let
