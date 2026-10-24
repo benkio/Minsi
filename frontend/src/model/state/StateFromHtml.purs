@@ -4,7 +4,7 @@ import Prelude
 
 import Components.HTMLTableElement (loadSubtitlesFromTable)
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), loadComponents)
-import Components.HtmlIdAndClasses (youtubeUrlId, outputFilenameId, artistId, titleId, cutStartId, localFileId, inputSourceId)
+import Components.HtmlIdAndClasses (youtubeUrlId, outputFilenameId, artistId, titleId, cutStartId, cutEndId, localFileId, inputSourceId, loopbackSpeedId, shiftVideoSyncId)
 import Conversion.OutputFilename (normalizeOutputFilename)
 import Conversion.String (capitalize)
 import Data.Array (length, (!!))
@@ -27,12 +27,13 @@ import Partial.Unsafe (unsafePartial)
 import Validations.DurationRangeValidation (durationRangeValidation)
 import Validations.MaxCharatersValidation (maxCharsValidation)
 import Validations.NonEmptyValidation (nonEmptyValidation)
+import Validations.Number (valueAsNumber)
 import Validations.OutputFilenameValidation (outputFilenameValidation)
 import Validations.PrintableAsciiLatinValidation (printableAsciiLatinValidation)
 import Validations.VideoUrlValidation (videoUrlValidation)
 import Web.DOM.HTMLCollection as HC
 import Web.File.FileList (item)
-import Web.HTML.HTMLInputElement (HTMLInputElement, valueAsNumber, checked)
+import Web.HTML.HTMLInputElement (HTMLInputElement, checked)
 import Web.HTML.HTMLInputElement as HI
 import Web.HTML.HTMLSelectElement (HTMLSelectElement)
 import Web.HTML.HTMLSelectElement as HS
@@ -67,11 +68,11 @@ fromHtmlInputs
   sourceV <- sourceFromHTMLInput inputSourceSelect youtubeUrlInput localFileInput
   filenameV <- HI.value filenameInput <#> outputFilenameValidation outputFilenameId
   reverseLoopValue <- checked reverseLoopInput
-  loopbackSpeedValue <- valueAsNumber loopbackSpeed
+  loopbackSpeedValue <- valueAsNumber loopbackSpeedId loopbackSpeed
   uploadLocalFileValue <- checked uploadLocalFileInput
   artistV <- HI.value artistInput <#> nonEmptyValidation artistId <#> (_ `andThen` printableAsciiLatinValidation artistId)
   titleV <- HI.value titleInput <#> nonEmptyValidation titleId <#> (_ `andThen` printableAsciiLatinValidation titleId)
-  shiftVideoSyncSetValue <- valueAsNumber shiftVideoSync
+  shiftVideoSyncSetValue <- valueAsNumber shiftVideoSyncId shiftVideoSync
   subtitlesV <- loadSubtitlesFromTable loadSubtitleFromRow subtitleTable <#> \subs -> traverse (\(sub@(Subtitle { value })) -> maxCharsValidation maxSubtitleCharsPerLine "SubtitleRow" value <#> const sub) subs
   pure $ ado
     cutVideo <- cutVideoV
@@ -96,8 +97,8 @@ fromHtmlInputs
 
 cutVideoFromHtmlRange :: HTMLInputElement -> HTMLInputElement -> Effect (V ValidationErrors DurationRange)
 cutVideoFromHtmlRange cutStart cutEnd = do
-  start <- valueAsNumber cutStart
-  end <- valueAsNumber cutEnd
+  start <- valueAsNumber cutStartId cutStart
+  end <- valueAsNumber cutEndId cutEnd
   pure $ durationRangeValidation cutStartId start end
 
 sourceFromHTMLInput :: HTMLSelectElement -> HTMLInputElement -> HTMLInputElement -> Effect (V ValidationErrors Source)

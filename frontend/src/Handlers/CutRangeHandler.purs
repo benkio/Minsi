@@ -12,11 +12,11 @@ import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Model.ValidationErrors (toMap)
 import Prelude
 import Validations.DurationRangeValidation (durationRangeValidation)
+import Validations.Number (valueAsNumber)
 import Web.DOM.Element (toEventTarget)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (Event)
 import Web.HTML.Event.EventTypes as E
-import Web.HTML.HTMLInputElement (valueAsNumber)
 import Web.HTML.HTMLInputElement as HI
 
 setCutRangeHandlers :: Effect Unit
@@ -37,8 +37,8 @@ setCutRangeHandlers = genericErrorsHandler $ do
 -- When start range changes, update start number input if durationRangeValidation is satisfied
 rangeToNumberListenerStart :: HI.HTMLInputElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
 rangeToNumberListenerStart cutStart cutEnd uploadLocalFile _ = genericErrorsHandler $ do
-  start <- valueAsNumber cutStart
-  end <- valueAsNumber cutEnd
+  start <- valueAsNumber cutStartId cutStart
+  end <- valueAsNumber cutEndId cutEnd
   validation
     (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
     (\_ -> log "[CutRangeHandler] set the uploadLocalFile to true" *> HI.setChecked true uploadLocalFile)
@@ -47,8 +47,8 @@ rangeToNumberListenerStart cutStart cutEnd uploadLocalFile _ = genericErrorsHand
 -- When end range changes, update end number input if durationRangeValidation is satisfied
 rangeToNumberListenerEnd :: HI.HTMLInputElement -> HI.HTMLInputElement -> HI.HTMLInputElement -> Event -> Effect Unit
 rangeToNumberListenerEnd cutStart cutEnd uploadLocalFile _ = genericErrorsHandler $ do
-  start <- valueAsNumber cutStart
-  end <- valueAsNumber cutEnd
+  start <- valueAsNumber cutStartId cutStart
+  end <- valueAsNumber cutEndId cutEnd
   validation
     (\errs -> throwMinsiError (InvalidInputs (toMap errs)))
     (\_ -> log "[CutRangeHandler] set the uploadLocalFile to true" *> HI.setChecked true uploadLocalFile)

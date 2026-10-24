@@ -1,7 +1,5 @@
 module Endpoints.ResponseParser where
 
-import Effect (Effect)
-
 import Data.Either (either)
 import Data.String (joinWith)
 import Effect.Aff (Aff)
@@ -11,19 +9,27 @@ import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Prelude
 import Yoga.JSON (class ReadForeign, readJSON)
 
-validateResponse :: Response -> Effect Response
+validateResponse :: Response -> Aff Response
 validateResponse response =
-  if response.ok then pure response else throwMinsiError (ErrorResponse (response.status))
+  if response.ok then pure response
+  else response.text
+    >>= (\responseText -> liftEffect $ throwMinsiError (ErrorResponse response.status responseText))
 
 decodeJsonResponse :: forall a. ReadForeign a => String -> Response -> Aff a
-decodeJsonResponse context response = do
+decodeJsonResponse context rawResponse = do
+  response <- validateResponse rawResponse
   bodyText <- response.text
-  decodeBody bodyText
+  decodeBody response bodyText
   where
-  decodeBody :: String -> Aff a
-  decodeBody "" =
-    liftEffect $ throwMinsiError (JSONParsingError (joinWith " " [ context, ": empty response body", "(http", show response.status, response.statusText, ")" ]))
-  decodeBody b =
+  decodeBody :: Response -> String -> Aff a
+  decodeBody response "" =
+    liftEffect $
+      throwMinsiError
+        ( JSONParsingError
+            ( joinWith " " [ context, ": empty response body", "(http", show response.status, response.statusText, ")" ]
+            )
+        )
+  decodeBody response b =
     either
       (\err -> liftEffect $ throwMinsiError (JSONParsingError (joinWith " " [ context, ":", show err, " (http ", show response.status, response.statusText, ")", " body=", b ])))
       pure

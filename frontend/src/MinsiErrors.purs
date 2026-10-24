@@ -19,7 +19,7 @@ data MinsiError
   | InvalidInput String String
   | InvalidInputs (Map String String)
   | JSONParsingError String
-  | ErrorResponse Int
+  | ErrorResponse Int String
   | ComputeFailed String
   | ClipboardUnavailable String
 
@@ -44,7 +44,7 @@ instance Show MinsiError where
       in
         joinWith "<br>" errorMessages
     JSONParsingError err -> "Error while parsing: " <> err
-    ErrorResponse status -> "Got a Response with status ≠ 200: " <> show status
+    ErrorResponse status responseText -> "Got a Response with status ≠ 200: " <> show status <> " with text: " <> responseText
     ComputeFailed msg -> "Compute failed: " <> msg
     ClipboardUnavailable msg -> "Clipboard: " <> msg
 
@@ -58,7 +58,7 @@ minsiErrorName (MissingDependenciesError _) = "MissingDependenciesError"
 minsiErrorName (InvalidInput _ _) = "InvalidInput"
 minsiErrorName (InvalidInputs _) = "InvalidInputs"
 minsiErrorName (JSONParsingError _) = "JSONParsingError"
-minsiErrorName (ErrorResponse _) = "ErrorResponse"
+minsiErrorName (ErrorResponse _ _) = "ErrorResponse"
 minsiErrorName (ComputeFailed _) = "ComputeFailed"
 minsiErrorName (ClipboardUnavailable _) = "ClipboardUnavailable"
 minsiErrorName (OutOfDateError _ _) = "OutOfDateError"

@@ -31,13 +31,12 @@ uploadEndpoint = backendUrl <> "upload"
 callUpload :: File -> String -> Aff Int
 callUpload file filename = do
   formData <- liftEffect $ prepareUpload file filename
-  response <- fetch uploadEndpoint
+  rawResponse <- fetch uploadEndpoint
     { method: POST
     , body: formData
     }
-  liftEffect do
-    log "[Upload] Validate the response"
-    void $ validateResponse response
+  liftEffect $ log "[Upload] Validate the response"
+  response <- validateResponse rawResponse
   pure response.status
   where
   prepareUpload f fn = do
