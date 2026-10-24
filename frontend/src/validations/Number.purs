@@ -1,6 +1,6 @@
 module Validations.Number where
 
-import Data.Number (nan)
+import Data.Number (isNaN)
 import Effect (Effect)
 import Main.MinsiErrors (MinsiError(..), throwMinsiError)
 import Prelude
@@ -10,6 +10,6 @@ valueAsNumber :: String -> HIE.HTMLInputElement -> Effect Number
 valueAsNumber label el =
   HIE.valueAsNumber el >>=
     ( \numOrNan ->
-        if numOrNan == nan then throwMinsiError (InvalidInput label "[Number] Conversion to Number failed with NaN")
+        if isNaN numOrNan then throwMinsiError (InvalidInput label "[Number] Conversion to Number failed with NaN")
         else pure numOrNan
     )
