@@ -20,6 +20,9 @@ import Web.HTML.HTMLInputElement as HI
 loopbackMaxValue :: Number
 loopbackMaxValue = 4.0
 
+loopbackMinValue :: Number
+loopbackMinValue = 0.25
+
 setLoopbackSpeedHandler :: Effect Unit
 setLoopbackSpeedHandler = genericErrorsHandler $ do
   components <- loadComponents
@@ -39,7 +42,7 @@ loopbackSpeedListener loopbackSpeed uploadLocalFile _ = genericErrorsHandler do
     ( throwMinsiError
         ( InvalidInput
             loopbackSpeedId
-            ("[LoopbackSpeedHandler] LoopbackSpeed value out of range (0 - " <> show loopbackMaxValue <> "): " <> show loopbackValue)
+            ("[LoopbackSpeedHandler] LoopbackSpeed value out of range (" <> show loopbackMinValue <> " - " <> show loopbackMaxValue <> "): " <> show loopbackValue)
         )
     )
   log "[LoopbackSpeedHandler] set the uploadLocalFile to true"
