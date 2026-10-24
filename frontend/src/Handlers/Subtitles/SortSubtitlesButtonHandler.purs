@@ -10,6 +10,7 @@ import Effect (Effect)
 import Effect.Console (log)
 import Components.HtmlComponents (loadComponents)
 import Components.HtmlComponents.Lenses (_sortSubtitlesButton, _subtitleTable)
+import Components.HtmlIdAndClasses (subtitleTableId)
 import Data.Lens (view)
 import Handlers.ErrorHandlers (genericErrorsHandler)
 import Validations.Number (valueAsNumber)
@@ -38,7 +39,7 @@ sortSubtitlesButtonEventListener table _ = genericErrorsHandler do
     traverse
       ( \row -> do
           startInput <- getStartInput row
-          start <- valueAsNumber "SubtitleTableStartCell" startInput
+          start <- valueAsNumber subtitleTableId startInput
           pure { row, start }
       )
       rows

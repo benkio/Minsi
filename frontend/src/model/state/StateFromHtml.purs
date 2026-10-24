@@ -4,7 +4,7 @@ import Prelude
 
 import Components.HTMLTableElement (loadSubtitlesFromTable)
 import Components.HtmlComponents (HtmlComponents, HtmlInputs(..), loadComponents)
-import Components.HtmlIdAndClasses (youtubeUrlId, outputFilenameId, artistId, titleId, cutStartId, cutEndId, localFileId, inputSourceId)
+import Components.HtmlIdAndClasses (youtubeUrlId, outputFilenameId, artistId, titleId, cutStartId, cutEndId, localFileId, inputSourceId, loopbackSpeedId, shiftVideoSyncId)
 import Conversion.OutputFilename (normalizeOutputFilename)
 import Conversion.String (capitalize)
 import Data.Array (length, (!!))
@@ -68,11 +68,11 @@ fromHtmlInputs
   sourceV <- sourceFromHTMLInput inputSourceSelect youtubeUrlInput localFileInput
   filenameV <- HI.value filenameInput <#> outputFilenameValidation outputFilenameId
   reverseLoopValue <- checked reverseLoopInput
-  loopbackSpeedValue <- valueAsNumber "LoopbackSpeed" loopbackSpeed
+  loopbackSpeedValue <- valueAsNumber loopbackSpeedId loopbackSpeed
   uploadLocalFileValue <- checked uploadLocalFileInput
   artistV <- HI.value artistInput <#> nonEmptyValidation artistId <#> (_ `andThen` printableAsciiLatinValidation artistId)
   titleV <- HI.value titleInput <#> nonEmptyValidation titleId <#> (_ `andThen` printableAsciiLatinValidation titleId)
-  shiftVideoSyncSetValue <- valueAsNumber "ShiftVideoSync" shiftVideoSync
+  shiftVideoSyncSetValue <- valueAsNumber shiftVideoSyncId shiftVideoSync
   subtitlesV <- loadSubtitlesFromTable loadSubtitleFromRow subtitleTable <#> \subs -> traverse (\(sub@(Subtitle { value })) -> maxCharsValidation maxSubtitleCharsPerLine "SubtitleRow" value <#> const sub) subs
   pure $ ado
     cutVideo <- cutVideoV
