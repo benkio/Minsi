@@ -22,6 +22,7 @@ import Handlers.ResultMedia.VideoSourceHandler (setVideoSourceHandler)
 import Handlers.ShiftVideoSyncHandler (setShiftVideoSyncHandler)
 import Handlers.Subtitles.AddSubtitleButtonHandler (setAddSubtitleButtonHandler)
 import Handlers.Subtitles.RemoveSubtitleButtonHandler (setRemoveSubtitleButtonHandler)
+import Handlers.Subtitles.SubtitleRangeValidationHandler (setSubtitleRangeValidationHandler)
 import Handlers.Subtitles.SortSubtitlesButtonHandler (setSortSubtitlesButtonHandler)
 import Handlers.Subtitles.SubtitleTimeButtonsHandler (setSubtitleTimeButtonsHandlers)
 import Handlers.TextInputValidationHandler (setTextInputValidationHandlers)
@@ -37,6 +38,7 @@ setupEventHandlers = do
   setApplyButtonHandler
   setKeyboardHandlers
   setAddSubtitleButtonHandler
+  setSubtitleRangeValidationHandler
   setSortSubtitlesButtonHandler
   setRemoveSubtitleButtonHandler
   setSubtitleTimeButtonsHandlers
