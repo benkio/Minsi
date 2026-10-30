@@ -11,7 +11,6 @@ import Data.String (joinWith, split)
 import Data.String.Common (trim)
 import Data.String.Pattern (Pattern(..))
 import Data.Traversable (traverse)
-import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
@@ -29,9 +28,8 @@ makeTranscription (State { filename, subtitles }) =
         filepath <- liftEffect $ md filename
         let transcriptionRaw = subtitlesToString subtitles (Just subtitlesToMarkdown)
         transcriptionRestored <- restoreTranscriptGroupedByLine transcriptionRaw
-        transcriptionMarkdownEscaped <- liftEffect $ escapeMarkdown transcriptionRestored
         liftEffect $ log $ "[Transcription] Execute Command: write file " <> show filepath
-        liftEffect $ writeTextFile UTF8 filepath transcriptionMarkdownEscaped
+        liftEffect $ writeTextFile UTF8 filepath transcriptionRestored
         pure []
     )
     (\e -> liftEffect $ throwMinsiError (toTranscriptionError e))
@@ -60,11 +58,6 @@ restoreTranscriptGroupedByLineWith restoreLineWithFallback text = do
   restoreLine line
     | trim line == "" = pure line
     | otherwise = restoreLineWithFallback line
-
-applyRestorationThenEscaping :: (String -> String) -> (String -> String) -> String -> String
-applyRestorationThenEscaping restore escape = escape <<< restore
-
-foreign import escapeMarkdown :: String -> Effect String
 
 subtitleToMarkdown :: Subtitle -> String
 subtitleToMarkdown subtitle@(Subtitle { value }) =
