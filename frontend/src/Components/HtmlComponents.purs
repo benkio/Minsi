@@ -4,7 +4,7 @@ import Prelude
 
 import Components.HTMLComponentsLoader (loadHtmlElementClass, loadHtmlElementId)
 import Components.HTMLElement (addClassToElement, removeClassFromElement)
-import Components.HtmlIdAndClasses (addSubtitleId, advancedOptionsToggleId, advancedOptionsToggleLabelId, applyId, artistId, clipboardOutputModalContentId, clipboardOutputModalCopyClipboardButtonId, clipboardOutputModalId, clipboardOutputModalTitleId, collapseAdvancedOptionsId, copyTranscriptButtonId, cutEndId, cutStartId, downloadAllButtonId, downloadFullButtonId, exportStateButtonId, importStateButtonId, importStateModalId, importStateModalImportButtonId, importStateModalTextareaId, importStateModalTitleId, inputSourceId, keyboardShortcutsButtonId, loadingModalExtraConentId, loadingModalId, localFileId, loopbackSpeedId, minsiErrorModalId, minsiLogBoxClass, minsiLogId, minsiLogTitleId, outputFilenameId, playbackPositionResultMediaId, playbackPositionResultRowId, playbackPositionYoutubeId, resetButtonId, resultAudioId, resultPreviewId, resultVideoId, reverseLoopId, setCutEndButton, setCutStartButton, setResultCutEndButton, setResultCutStartButton, setSubtitleEndButtonId, setSubtitleStartButtonId, shiftVideoSyncId, sortSubtitlesId, subtitleRow, subtitleTableId, subtitlesRowId, titleId, uploadLocalFileId, videoRowId, videoSourceId, videoSourceRowId, youtubeUrlId)
+import Components.HtmlIdAndClasses (addSubtitleId, advancedOptionsToggleId, advancedOptionsToggleLabelId, applyId, artistId, clipboardOutputModalContentId, clipboardOutputModalCopyClipboardButtonId, clipboardOutputModalId, clipboardOutputModalTitleId, collapseAdvancedOptionsId, copyTranscriptButtonId, cutEndId, cutStartId, downloadAllButtonId, downloadFullButtonId, exportStateButtonId, importStateButtonId, importStateModalId, importStateModalImportButtonId, importStateModalTextareaId, importStateModalTitleId, inputSourceId, keyboardShortcutsButtonId, loadingModalExtraConentId, loadingModalId, localFileId, loopbackSpeedId, minsiErrorModalId, minsiLogBoxClass, minsiLogId, minsiLogTitleId, outputFilenameId, pageTitleId, playbackPositionResultMediaId, playbackPositionResultRowId, playbackPositionYoutubeId, resetButtonId, resultAudioId, resultPreviewId, resultVideoId, reverseLoopId, setCutEndButton, setCutStartButton, setResultCutEndButton, setResultCutStartButton, setSubtitleEndButtonId, setSubtitleStartButtonId, shiftVideoSyncId, sortSubtitlesId, subtitleRow, subtitleTableId, subtitlesRowId, titleId, uploadLocalFileId, videoRowId, videoSourceId, videoSourceRowId, youtubeUrlId)
 import Components.Window (getDocument)
 import Control.Monad.Error.Class (catchError)
 import Data.Maybe (Maybe(..))
@@ -37,6 +37,8 @@ import Web.HTML.HTMLTableElement (HTMLTableElement)
 import Web.HTML.HTMLTableElement as HT
 import Web.HTML.HTMLTemplateElement (HTMLTemplateElement)
 import Web.HTML.HTMLTemplateElement as HTP
+import Web.HTML.HTMLTitleElement (HTMLTitleElement)
+import Web.HTML.HTMLTitleElement as HTT
 import Web.HTML.HTMLTextAreaElement (HTMLTextAreaElement)
 import Web.HTML.HTMLTextAreaElement as HTA
 import Web.HTML.HTMLVideoElement (HTMLVideoElement)
@@ -126,6 +128,7 @@ newtype HtmlOutputs = HtmlOutputs
   , importStateModal :: ImportStateModal
   , resultVideo :: HTMLVideoElement
   , resultAudio :: HTMLAudioElement
+  , pageTitle :: HTMLTitleElement
   }
 
 derive instance Newtype HtmlOutputs _
@@ -244,6 +247,7 @@ loadHtmlOutputs doc = do
   importStateModal <- loadImportStateModal doc
   resultVideo <- loadVideo resultVideoId doc
   resultAudio <- loadAudio resultAudioId doc
+  pageTitle <- loadTitle pageTitleId doc
   pure
     ( HtmlOutputs
         { resultPreview: resultPreview
@@ -258,6 +262,7 @@ loadHtmlOutputs doc = do
         , importStateModal: importStateModal
         , resultVideo: resultVideo
         , resultAudio: resultAudio
+        , pageTitle: pageTitle
         }
     )
 
@@ -342,6 +347,9 @@ loadVideo id = loadHtmlElementId id HV.fromElement
 
 loadAudio :: String -> NonElementParentNode -> Effect HTMLAudioElement
 loadAudio id = loadHtmlElementId id HA.fromElement
+
+loadTitle :: String -> NonElementParentNode -> Effect HTMLTitleElement
+loadTitle id = loadHtmlElementId id HTT.fromElement
 
 loadTemplate :: String -> NonElementParentNode -> Effect HTMLTemplateElement
 loadTemplate id = loadHtmlElementId id HTP.fromElement

@@ -6,6 +6,9 @@ outputFilenameId = "outputFilename"
 artistId :: String
 artistId = "artist"
 
+pageTitleId :: String
+pageTitleId = "pageTitle"
+
 titleId :: String
 titleId = "title"
 

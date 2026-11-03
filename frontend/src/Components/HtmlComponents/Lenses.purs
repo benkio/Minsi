@@ -59,6 +59,7 @@ module Components.HtmlComponents.Lenses
   , _importStateModalTextarea
   , _resultVideo
   , _resultAudio
+  , _pageTitle
   -- HtmlComponents → HtmlVisualElements fields
   , _videoSourceRow
   , _videoRow
@@ -95,6 +96,7 @@ import Web.HTML.HTMLPreElement (HTMLPreElement)
 import Web.HTML.HTMLSelectElement (HTMLSelectElement)
 import Web.HTML.HTMLSpanElement (HTMLSpanElement)
 import Web.HTML.HTMLTableElement (HTMLTableElement)
+import Web.HTML.HTMLTitleElement (HTMLTitleElement)
 import Web.HTML.HTMLTemplateElement (HTMLTemplateElement)
 import Web.HTML.HTMLTextAreaElement (HTMLTextAreaElement)
 import Web.HTML.HTMLVideoElement (HTMLVideoElement)
@@ -163,6 +165,7 @@ _HtmlOutputs
        , importStateModal :: ImportStateModal
        , resultVideo :: HTMLVideoElement
        , resultAudio :: HTMLAudioElement
+       , pageTitle :: HTMLTitleElement
        }
 _HtmlOutputs = unto HtmlOutputs
 
@@ -348,6 +351,9 @@ _importStateModalTextarea =
 
 _resultVideo :: Lens' HtmlComponents HTMLVideoElement
 _resultVideo = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "resultVideo")
+
+_pageTitle :: Lens' HtmlComponents HTMLTitleElement
+_pageTitle = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "pageTitle")
 
 _resultAudio :: Lens' HtmlComponents HTMLAudioElement
 _resultAudio = _htmlOutputs <<< unto HtmlOutputs <<< prop (Proxy :: Proxy "resultAudio")
