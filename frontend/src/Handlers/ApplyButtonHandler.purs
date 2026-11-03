@@ -7,8 +7,9 @@ module Handlers.ApplyButtonHandler
 
 import Prelude
 
+import Components.HTMLTitle (setNormalTitle, setWIPTitle)
 import Components.HtmlComponents (HtmlComponents, loadComponents)
-import Components.HtmlComponents.Lenses (_applyButton, _resultAudio, _resultVideo, _subtitleRowTemplate, _subtitleTable, _uploadLocalFile, _videoSource)
+import Components.HtmlComponents.Lenses (_applyButton, _pageTitle, _resultAudio, _resultVideo, _subtitleRowTemplate, _subtitleTable, _uploadLocalFile, _videoSource)
 import Components.HtmlIdAndClasses (loadingModalId, videoSourceId)
 import Components.HtmlVisualElements (showHiddenElements)
 import Components.LoadingModal (loadingModalExtraContentRotation)
@@ -41,6 +42,7 @@ import Web.File.File (name)
 import Web.HTML.Event.EventTypes as E
 import Web.HTML.HTMLButtonElement as HB
 import Web.HTML.HTMLInputElement as HI
+import Web.HTML.HTMLTitleElement (HTMLTitleElement)
 
 setApplyButtonHandler :: Effect Unit
 setApplyButtonHandler = genericErrorsHandler $ do
@@ -55,18 +57,21 @@ applyButtonEventListener _ = genericErrorsHandler $ do
   let state = fst stateComponents
   let components = snd stateComponents
   let uploadLocalFileInput = view _uploadLocalFile components
+  let pageTitle = view _pageTitle components
   showModal loadingModalId (Just 15240)
+  setWIPTitle pageTitle
   runAff_
     ( either
-        ( \e -> finallyHandlersError
+        ( \e -> setNormalTitle pageTitle
+            *> finallyHandlersError
             *> genericErrorHandlerLogic e
         )
-        (\_ -> genericErrorsHandler (finallyHandlersSuccess components state))
+        (\_ -> setNormalTitle pageTitle *> genericErrorsHandler (finallyHandlersSuccess components state))
     )
-    (applyButtonLogic state uploadLocalFileInput)
+    (applyButtonLogic state uploadLocalFileInput pageTitle)
 
-applyButtonLogic :: State -> HI.HTMLInputElement -> Aff Unit
-applyButtonLogic state@(State rec) uploadLocalFileInput = do
+applyButtonLogic :: State -> HI.HTMLInputElement -> HTMLTitleElement -> Aff Unit
+applyButtonLogic state@(State rec) uploadLocalFileInput pageTitle = do
   let
     uploadLocalFile = rec.uploadLocalFile
     filename = rec.filename
@@ -74,12 +79,17 @@ applyButtonLogic state@(State rec) uploadLocalFileInput = do
   when (uploadLocalFile && isLocalFile source)
     ( liftEffect (log "[ApplyButtonHandler] Uploading Local File")
         *> uploadLocalFileLogic source filename uploadLocalFileInput
-        *> waitForStatus filename (LocalFileUploaded "") Nothing
+        *> waitForStatus filename (LocalFileUploaded "") (Just (\_ _ -> liftEffect (setWIPTitle pageTitle)))
     )
   liftEffect $ log "[ApplyButtonHandler] Calling Compute"
   void (callCompute state)
   liftEffect $ log "[ApplyButtonHandler] Start Polling"
-  waitForStatus filename Succeed (Just loadingModalExtraContentRotation)
+  waitForStatus filename Succeed (Just (computePollingHandler pageTitle))
+
+computePollingHandler :: HTMLTitleElement -> String -> Int -> Aff Unit
+computePollingHandler pageTitle description idx =
+  loadingModalExtraContentRotation description idx
+    *> liftEffect (setWIPTitle pageTitle)
 
 uploadLocalFileLogic :: Source -> String -> HI.HTMLInputElement -> Aff Unit
 uploadLocalFileLogic (LocalFile file) filename uploadLocalFileInput = do

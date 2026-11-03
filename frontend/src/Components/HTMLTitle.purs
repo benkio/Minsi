@@ -13,20 +13,19 @@ normalTitle :: String
 normalTitle = "Minsi"
 
 wipTitlePrefix :: Array String
-wipTitlePrefix = [
-  "🐱",
-  "🐈",
-  "🙀",
-  "😿",
-  "😾",
-  "😽",
-  "😼",
-  "😻",
-  "😺",
-  "😹",
-  "😸"
+wipTitlePrefix =
+  [ "🐱"
+  , "🐈"
+  , "🙀"
+  , "😿"
+  , "😾"
+  , "😽"
+  , "😼"
+  , "😻"
+  , "😺"
+  , "😹"
+  , "😸"
   ]
-
 
 setNormalTitle :: HTMLTitleElement -> Effect Unit
 setNormalTitle = setText normalTitle
