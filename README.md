@@ -161,7 +161,7 @@ docker run -d --name minsi-app -p 8080:8080 benkio/minsi:latest
 From the project root:
 
 ```bash
-docker build -t benkio/minsi:latest .
+docker build --platform linux/amd64,linux/arm64  -t benkio/minsi:latest .
 ```
 
 ## Publish Docker Image
@@ -173,7 +173,7 @@ It requires `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` repository secrets.
 To publish manually instead:
 
 ```bash
-docker build -t benkio/minsi:latest .
+docker build --platform linux/amd64,linux/arm64  -t benkio/minsi:latest .
 docker push benkio/minsi:latest
 ```
 

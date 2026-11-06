@@ -94,7 +94,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Build Docker image
-        run: docker build -t minsi:ci .
+        run: docker build --platform linux/amd64,linux/arm64 -t minsi:ci .
       - name: Run Docker container
         run: docker run -d --name minsi -p 8080:8080 --network host minsi:ci
       - name: Wait for server to be ready
@@ -146,4 +146,3 @@ jobs:
       - name: Stop Docker container
         if: always()
         run: docker rm -f minsi || true
-

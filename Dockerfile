@@ -1,4 +1,3 @@
-# Use linux/amd64 so npm install -g purescript gets a prebuilt binary (linux-aarch64 often 403)
 # Stage 1: build frontend and backend
 FROM node:24-bookworm-slim AS builder
 
