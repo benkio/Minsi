@@ -80,9 +80,8 @@ RUN case "${TARGETARCH}" in \
 
 ENV LD_LIBRARY_PATH=/opt/ffmpeg/lib
 
-RUN ffmpeg -version
-RUN ffprobe -version
-RUN yt-dlp --version
+# Sanity check the installed tools in a single layer
+RUN ffmpeg -version && ffprobe -version && yt-dlp --version
 
 # Copy built app from builder (no spago/purescript/esbuild, no frontend src)
 COPY --from=builder /usr/src/minsi/public ./public
@@ -94,9 +93,12 @@ COPY --from=builder /usr/src/minsi/backend/node_modules ./backend/node_modules
 COPY --from=builder /usr/src/minsi/backend/start-services.sh ./backend/
 COPY --from=builder /usr/src/minsi/punctuation-service ./punctuation-service
 
+# punctuators depends on torch, but only the onnxruntime model is used and there is no GPU:
+# install the CPU-only torch wheel first so pip doesn't pull the CUDA stack (~5GB).
 RUN python3 -m venv /usr/src/minsi/punctuation-service/.venv \
-    && /usr/src/minsi/punctuation-service/.venv/bin/pip install --no-cache-dir -r /usr/src/minsi/punctuation-service/requirements.txt
-RUN chmod +x /usr/src/minsi/backend/start-services.sh
+    && /usr/src/minsi/punctuation-service/.venv/bin/pip install --no-cache-dir torch --extra-index-url https://download.pytorch.org/whl/cpu \
+    && /usr/src/minsi/punctuation-service/.venv/bin/pip install --no-cache-dir -r /usr/src/minsi/punctuation-service/requirements.txt \
+    && chmod +x /usr/src/minsi/backend/start-services.sh
 
 WORKDIR /usr/src/minsi/backend
 
